@@ -19,5 +19,5 @@ The registry will enable the following:
 
 ## System diagram
 
-![C4 system diagram](/registry/doc/figures/system.drawio.svg)
+![C4 system diagram](/doc/figures/system.drawio.svg)
 
