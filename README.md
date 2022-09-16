@@ -18,7 +18,7 @@ The registry will enable the following:
 - [ ] The registry handles ownership based on public-private key-pairs.
 - [ ] Users can transfer ownership of a sub-part of a certificate to another private-key.
 
-## System Context diagram
+## Architecture
 
 Below is a [system context diagram](https://c4model.com/#SystemContextDiagram) showing what systems the registry integrates with.
 
