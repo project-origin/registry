@@ -9,14 +9,19 @@ The goal of [this project](https://github.com/orgs/project-origin/projects/1) is
 
 The registry will enable the following:
 
-- [ ] Federation setup enabling multiple registries to create a common truth.
+- [ ] Data in the registry is publicly verifiable.
 - [ ] Enable the issuance of Granular Certificates.
+- [ ] Privacy of the individual amounts is hidden behind a Petersen-commitments.
 - [ ] Enable the claim of Granular Certificates to some consumption.
+- [ ] Users can verify that they have a provable amount of a Granular Certificate, that mathematically proves it is only used once.
+- [ ] Federated setup enabling multiple registries to create a shared truth.
 - [ ] The registry handles ownership based on public-private key-pairs.
-- [ ] Users can verify that they have a proffable amount of a Granular Certificate, that mathematically proves it is only used once.
 - [ ] Users can transfer ownership of a sub-part of a certificate to another private-key.
-- [ ] Privacy of the individual measurement is hidden behind a Petersen-commitments.
 
-## System diagram
+## System Context diagram
+
+Below is a [system context diagram](https://c4model.com/#SystemContextDiagram) showing what systems the registry integrates with.
 
 ![C4 system diagram](/doc/figures/system.drawio.svg)
+
+More in depth information can be found in the [architecture description](doc/architecture.md).

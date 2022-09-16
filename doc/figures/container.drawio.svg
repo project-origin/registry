@@ -1,0 +1,574 @@
+<svg host="65bd71144e" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="1080px" height="861px" viewBox="-0.5 -0.5 1080 861" content="&lt;mxfile&gt;&lt;diagram id=&quot;ir1_qhydO5nLh8rpua9W&quot; name=&quot;Page-1&quot;&gt;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&lt;/diagram&gt;&lt;/mxfile&gt;">
+    <defs/>
+    <g>
+        <path d="M 440 710 L 440 800 L 799.76 800" fill="none" stroke="#808080" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="6 6" pointer-events="stroke"/>
+        <path d="M 807.76 800 L 799.76 804 L 799.76 796 Z" fill="#808080" stroke="#808080" stroke-width="2" stroke-miterlimit="10" pointer-events="all"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 781px; margin-left: 681px;">
+                        <div data-drawio-colors="color: #808080; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(128, 128, 128); line-height: 1.2; pointer-events: all; white-space: nowrap;">
+                                Publishes merkel roots for each
+                                <br/>
+                                batch of events to the blockchain.
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="681" y="784" fill="#808080" font-family="Helvetica" font-size="12px" text-anchor="middle">
+                    Publishes merkel roots for each...
+                </text>
+            </switch>
+        </g>
+        <path d="M 570.24 500 L 680 500 L 680 550 L 809.76 550" fill="none" stroke="#808080" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="6 6" pointer-events="stroke"/>
+        <path d="M 562.24 500 L 570.24 496 L 570.24 504 Z" fill="#808080" stroke="#808080" stroke-width="2" stroke-miterlimit="10" pointer-events="all"/>
+        <path d="M 817.76 550 L 809.76 554 L 809.76 546 Z" fill="#808080" stroke="#808080" stroke-width="2" stroke-miterlimit="10" pointer-events="all"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 571px; margin-left: 697px;">
+                        <div data-drawio-colors="color: #808080; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(128, 128, 128); line-height: 1.2; pointer-events: all; white-space: nowrap;">
+                                Two phase transactions when
+                                <br/>
+                                multiple registries are involved.
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="697" y="574" fill="#808080" font-family="Helvetica" font-size="12px" text-anchor="middle">
+                    Two phase transactions when...
+                </text>
+            </switch>
+        </g>
+        <rect x="810" y="740" width="240" height="120" fill="#8c8496" stroke="#736782" pointer-events="all"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 238px; height: 1px; padding-top: 800px; margin-left: 811px;">
+                        <div data-drawio-colors="color: #ffffff; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(255, 255, 255); line-height: 1.2; pointer-events: all; white-space: normal; overflow-wrap: normal;">
+                                <font style="font-size: 16px">
+                                    <b>
+                                        Layer 1 - Blockchain
+                                    </b>
+                                </font>
+                                <div>
+                                    [External system]
+                                </div>
+                                <br/>
+                                <div>
+                                    <font style="font-size: 11px">
+                                        <font color="#cccccc">
+                                            Conventional blockchain that will store a series of hashes for each merkel tree, ensuring that data within the tree cannot be changed without it being visible.
+                                        </font>
+                                    </font>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="930" y="804" fill="#ffffff" font-family="Helvetica" font-size="12px" text-anchor="middle">
+                    Layer 1 - Blockchain...
+                </text>
+            </switch>
+        </g>
+        <rect x="810" y="490" width="240" height="120" fill="#8c8496" stroke="#736782" pointer-events="all"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 238px; height: 1px; padding-top: 550px; margin-left: 811px;">
+                        <div data-drawio-colors="color: #ffffff; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(255, 255, 255); line-height: 1.2; pointer-events: all; white-space: normal; overflow-wrap: normal;">
+                                <font style="font-size: 16px">
+                                    <b>
+                                        Other registries
+                                    </b>
+                                </font>
+                                <div>
+                                    [External system]
+                                </div>
+                                <br/>
+                                <div>
+                                    <font style="font-size: 11px">
+                                        <font color="#cccccc">
+                                            Other registries that supports the same protocol, enabled cross registry claims.
+                                        </font>
+                                    </font>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="930" y="554" fill="#ffffff" font-family="Helvetica" font-size="12px" text-anchor="middle">
+                    Other registries...
+                </text>
+            </switch>
+        </g>
+        <path d="M 440 150 L 440 219.76" fill="none" stroke="#808080" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="6 6" pointer-events="stroke"/>
+        <path d="M 440 227.76 L 436 219.76 L 444 219.76 Z" fill="#808080" stroke="#808080" stroke-width="2" stroke-miterlimit="10" pointer-events="all"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 185px; margin-left: 439px;">
+                        <div data-drawio-colors="color: #808080; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(128, 128, 128); line-height: 1.2; pointer-events: all; white-space: nowrap;">
+                                Executes signed requests to a registry.
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="439" y="188" fill="#808080" font-family="Helvetica" font-size="12px" text-anchor="middle">
+                    Executes signed requests to a registry.
+                </text>
+            </switch>
+        </g>
+        <rect x="320" y="30" width="240" height="120" fill="#8c8496" stroke="#736782" pointer-events="all"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 238px; height: 1px; padding-top: 90px; margin-left: 321px;">
+                        <div data-drawio-colors="color: #ffffff; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(255, 255, 255); line-height: 1.2; pointer-events: all; white-space: normal; overflow-wrap: normal;">
+                                <font style="font-size: 16px">
+                                    <b>
+                                        Account abstraction
+                                    </b>
+                                </font>
+                                <div>
+                                    [Out of scope system]
+                                </div>
+                                <br/>
+                                <div>
+                                    <font style="font-size: 11px">
+                                        <font color="#cccccc">
+                                            Concept of accounts, users and holdings, manages public-private key pairs.
+                                        </font>
+                                    </font>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="440" y="94" fill="#ffffff" font-family="Helvetica" font-size="12px" text-anchor="middle">
+                    Account abstraction...
+                </text>
+            </switch>
+        </g>
+        <path d="M 910 180 L 910 210 L 1070 210 L 1070 650 L 600 650 L 570.24 650" fill="none" stroke="#808080" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="6 6" pointer-events="stroke"/>
+        <path d="M 562.24 650 L 570.24 646 L 570.24 654 Z" fill="#808080" stroke="#808080" stroke-width="2" stroke-miterlimit="10" pointer-events="all"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 237px; margin-left: 991px;">
+                        <div data-drawio-colors="color: #808080; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(128, 128, 128); line-height: 1.2; pointer-events: all; white-space: nowrap;">
+                                Can read public data
+                                <br/>
+                                to verify the authenticity
+                                <br/>
+                                of claims.
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="991" y="240" fill="#808080" font-family="Helvetica" font-size="12px" text-anchor="middle">
+                    Can read public data...
+                </text>
+            </switch>
+        </g>
+        <ellipse cx="910" cy="40.5" rx="40.5" ry="40.5" fill="#6c6477" stroke="#4d4d4d" pointer-events="all"/>
+        <path d="M 810 105.3 C 810 82.93 828.13 64.8 850.5 64.8 L 969.5 64.8 C 991.87 64.8 1010 82.93 1010 105.3 L 1010 139.5 C 1010 161.87 991.87 180 969.5 180 L 850.5 180 C 828.13 180 810 161.87 810 139.5 Z" fill="#6c6477" stroke="#4d4d4d" stroke-miterlimit="10" pointer-events="all"/>
+        <ellipse cx="910" cy="40.5" rx="40.5" ry="40.5" fill="#6c6477" stroke="#4d4d4d" pointer-events="all"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 123px; margin-left: 910px;">
+                        <div data-drawio-colors="color: #ffffff; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 11px; font-family: Helvetica; color: rgb(255, 255, 255); line-height: 1.2; pointer-events: all; white-space: nowrap;">
+                                <font style="font-size: 16px">
+                                    <b>
+                                        User
+                                    </b>
+                                </font>
+                                <div>
+                                    [Person]
+                                </div>
+                                <br/>
+                                <div>
+                                    <font style="font-size: 11px">
+                                        <font color="#cccccc">
+                                            A user that wants to validate
+                                            <br/>
+                                            claims aganst the registry
+                                        </font>
+                                    </font>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="910" y="126" fill="#ffffff" font-family="Helvetica" font-size="11px" text-anchor="middle">
+                    User...
+                </text>
+            </switch>
+        </g>
+        <rect x="0" y="210" width="580" height="650" fill="none" stroke="#666666" stroke-dasharray="8 4" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe flex-end; justify-content: unsafe flex-start; width: 562px; height: 1px; padding-top: 849px; margin-left: 10px;">
+                        <div data-drawio-colors="color: #333333; " style="box-sizing: border-box; font-size: 0px; text-align: left;">
+                            <div style="display: inline-block; font-size: 11px; font-family: Helvetica; color: rgb(51, 51, 51); line-height: 1.2; pointer-events: none; white-space: normal; overflow-wrap: normal;">
+                                <font style="font-size: 16px">
+                                    <b>
+                                        <div style="text-align: left">
+                                            Registry
+                                        </div>
+                                    </b>
+                                </font>
+                                <div style="text-align: left">
+                                    [Software System]
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="10" y="849" fill="#333333" font-family="Helvetica" font-size="11px">
+                    Registry...
+                </text>
+            </switch>
+        </g>
+        <rect x="320" y="590" width="240" height="120" fill="#23a2d9" stroke="#0e7dad" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 238px; height: 1px; padding-top: 650px; margin-left: 321px;">
+                        <div data-drawio-colors="color: #ffffff; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 11px; font-family: Helvetica; color: rgb(255, 255, 255); line-height: 1.2; pointer-events: none; white-space: normal; overflow-wrap: normal;">
+                                <font style="font-size: 16px">
+                                    <b>
+                                        Layer 2 - Verifiable event store
+                                    </b>
+                                </font>
+                                <div>
+                                    [Container: to be determined]
+                                </div>
+                                <br/>
+                                <div>
+                                    <font style="font-size: 11px">
+                                        <font color="#E6E6E6">
+                                            Stores events as public data, and arranges them in a series of merkel trees, each root publishes to the blockchain after a set time or number of events.
+                                        </font>
+                                    </font>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="440" y="653" fill="#ffffff" font-family="Helvetica" font-size="11px" text-anchor="middle">
+                    Layer 2 - Verifiable event store...
+                </text>
+            </switch>
+        </g>
+        <rect x="320" y="410" width="240" height="120" fill="#23a2d9" stroke="#0e7dad" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 238px; height: 1px; padding-top: 470px; margin-left: 321px;">
+                        <div data-drawio-colors="color: #ffffff; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 11px; font-family: Helvetica; color: rgb(255, 255, 255); line-height: 1.2; pointer-events: none; white-space: normal; overflow-wrap: normal;">
+                                <font style="font-size: 16px">
+                                    <b>
+                                        Layer 3 - Logic
+                                    </b>
+                                </font>
+                                <div>
+                                    [Container: to be determined]
+                                </div>
+                                <br/>
+                                <div>
+                                    <font style="font-size: 11px">
+                                        <font color="#E6E6E6">
+                                            Validates events that they are valid Ensures that events are valid and allowed based on the logic and rules.
+                                        </font>
+                                    </font>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="440" y="473" fill="#ffffff" font-family="Helvetica" font-size="11px" text-anchor="middle">
+                    Layer 3 - Logic...
+                </text>
+            </switch>
+        </g>
+        <rect x="320" y="230" width="240" height="120" fill="#23a2d9" stroke="#0e7dad" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 238px; height: 1px; padding-top: 290px; margin-left: 321px;">
+                        <div data-drawio-colors="color: #ffffff; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 11px; font-family: Helvetica; color: rgb(255, 255, 255); line-height: 1.2; pointer-events: none; white-space: normal; overflow-wrap: normal;">
+                                <font style="font-size: 16px">
+                                    <b>
+                                        Layer 4 - Privacy
+                                    </b>
+                                </font>
+                                <div>
+                                    [Container: to be determined]
+                                </div>
+                                <br/>
+                                <div>
+                                    <font style="font-size: 11px">
+                                        <font color="#E6E6E6">
+                                            Ensures the
+                                            <b>
+                                                privacy
+                                            </b>
+                                            and
+                                            <b>
+                                                commitments
+                                            </b>
+                                            , by enabling requests signed with correct keys to create events and unlock data in commitments.
+                                        </font>
+                                    </font>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="440" y="293" fill="#ffffff" font-family="Helvetica" font-size="11px" text-anchor="middle">
+                    Layer 4 - Privacy...
+                </text>
+            </switch>
+        </g>
+        <path d="M 440 530 L 440 579.76" fill="none" stroke="#808080" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="6 6" pointer-events="none"/>
+        <path d="M 440 587.76 L 436 579.76 L 444 579.76 Z" fill="#808080" stroke="#808080" stroke-width="2" stroke-miterlimit="10" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 561px; margin-left: 441px;">
+                        <div data-drawio-colors="color: #808080; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(128, 128, 128); line-height: 1.2; pointer-events: none; white-space: nowrap;">
+                                Persist valid events to the
+                                <br/>
+                                registries event store.
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="441" y="564" fill="#808080" font-family="Helvetica" font-size="12px" text-anchor="middle">
+                    Persist valid events to the...
+                </text>
+            </switch>
+        </g>
+        <path d="M 440 350 L 440 399.76" fill="none" stroke="#808080" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="6 6" pointer-events="none"/>
+        <path d="M 440 407.76 L 436 399.76 L 444 399.76 Z" fill="#808080" stroke="#808080" stroke-width="2" stroke-miterlimit="10" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 381px; margin-left: 441px;">
+                        <div data-drawio-colors="color: #808080; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(128, 128, 128); line-height: 1.2; pointer-events: none; white-space: nowrap;">
+                                Requests transactions to create
+                                <br/>
+                                eventson the registry.
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="441" y="384" fill="#808080" font-family="Helvetica" font-size="12px" text-anchor="middle">
+                    Requests transactions to create...
+                </text>
+            </switch>
+        </g>
+        <path d="M 20 335 C 20 326.72 73.73 320 140 320 C 171.83 320 202.35 321.58 224.85 324.39 C 247.36 327.21 260 331.02 260 335 L 260 425 C 260 433.28 206.27 440 140 440 C 73.73 440 20 433.28 20 425 Z" fill="#23a2d9" stroke="#0e7dad" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 260 335 C 260 343.28 206.27 350 140 350 C 73.73 350 20 343.28 20 335" fill="none" stroke="#0e7dad" stroke-miterlimit="10" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 238px; height: 1px; padding-top: 393px; margin-left: 21px;">
+                        <div data-drawio-colors="color: #ffffff; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(255, 255, 255); line-height: 1.2; pointer-events: none; white-space: normal; overflow-wrap: normal;">
+                                <font style="font-size: 16px">
+                                    <b>
+                                        Secret data store
+                                    </b>
+                                </font>
+                                <div>
+                                    [Container : to be determined]
+                                </div>
+                                <br/>
+                                <div>
+                                    <font style="font-size: 11px">
+                                        <font color="#E6E6E6">
+                                            Stores secret data like commitments and other data that might be categorised as private.
+                                        </font>
+                                    </font>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="140" y="396" fill="#ffffff" font-family="Helvetica" font-size="12px" text-anchor="middle">
+                    Secret data store...
+                </text>
+            </switch>
+        </g>
+        <path d="M 320 290 L 140 290 L 140 309.76" fill="none" stroke="#808080" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="6 6" pointer-events="none"/>
+        <path d="M 140 317.76 L 136 309.76 L 144 309.76 Z" fill="#808080" stroke="#808080" stroke-width="2" stroke-miterlimit="10" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 271px; margin-left: 151px;">
+                        <div data-drawio-colors="color: #808080; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(128, 128, 128); line-height: 1.2; pointer-events: none; white-space: nowrap;">
+                                Stores and reads data protected by
+                                <br/>
+                                commitments and other private data.
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="151" y="274" fill="#808080" font-family="Helvetica" font-size="12px" text-anchor="middle">
+                    Stores and reads data protected by...
+                </text>
+            </switch>
+        </g>
+        <path d="M 20 705 C 20 696.72 73.73 690 140 690 C 171.83 690 202.35 691.58 224.85 694.39 C 247.36 697.21 260 701.02 260 705 L 260 795 C 260 803.28 206.27 810 140 810 C 73.73 810 20 803.28 20 795 Z" fill="#23a2d9" stroke="#0e7dad" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 260 705 C 260 713.28 206.27 720 140 720 C 73.73 720 20 713.28 20 705" fill="none" stroke="#0e7dad" stroke-miterlimit="10" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 238px; height: 1px; padding-top: 763px; margin-left: 21px;">
+                        <div data-drawio-colors="color: #ffffff; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(255, 255, 255); line-height: 1.2; pointer-events: none; white-space: normal; overflow-wrap: normal;">
+                                <font style="font-size: 16px">
+                                    <b>
+                                        Event store
+                                    </b>
+                                </font>
+                                <div>
+                                    [Container : to be determined]
+                                </div>
+                                <br/>
+                                <div>
+                                    <font style="font-size: 11px">
+                                        <font color="#E6E6E6">
+                                            Stores all events for the registry in batches.
+                                        </font>
+                                    </font>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="140" y="766" fill="#ffffff" font-family="Helvetica" font-size="12px" text-anchor="middle">
+                    Event store...
+                </text>
+            </switch>
+        </g>
+        <path d="M 320 650 L 140 650 L 140 679.76" fill="none" stroke="#808080" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="6 6" pointer-events="none"/>
+        <path d="M 140 687.76 L 136 679.76 L 144 679.76 Z" fill="#808080" stroke="#808080" stroke-width="2" stroke-miterlimit="10" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 631px; margin-left: 141px;">
+                        <div data-drawio-colors="color: #808080; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(128, 128, 128); line-height: 1.2; pointer-events: none; white-space: nowrap;">
+                                Stores and reads events from
+                                <br/>
+                                the event store.
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="141" y="634" fill="#808080" font-family="Helvetica" font-size="12px" text-anchor="middle">
+                    Stores and reads events from...
+                </text>
+            </switch>
+        </g>
+        <rect x="810" y="300" width="240" height="120" fill="#8c8496" stroke="#736782" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 238px; height: 1px; padding-top: 360px; margin-left: 811px;">
+                        <div data-drawio-colors="color: #ffffff; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(255, 255, 255); line-height: 1.2; pointer-events: none; white-space: normal; overflow-wrap: normal;">
+                                <font style="font-size: 16px">
+                                    <b>
+                                        Governance
+                                    </b>
+                                </font>
+                                <div>
+                                    [Future addition]
+                                </div>
+                                <br/>
+                                <div>
+                                    <font style="font-size: 11px">
+                                        <font color="#cccccc">
+                                            Will replace hard-coded rules to a ruleset defined by a shared ownership of the participating registries.
+                                        </font>
+                                    </font>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="930" y="364" fill="#ffffff" font-family="Helvetica" font-size="12px" text-anchor="middle">
+                    Governance...
+                </text>
+            </switch>
+        </g>
+        <path d="M 560 440 L 680 440 L 680 360 L 799.76 360" fill="none" stroke="#808080" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="6 6" pointer-events="none"/>
+        <path d="M 807.76 360 L 799.76 364 L 799.76 356 Z" fill="#808080" stroke="#808080" stroke-width="2" stroke-miterlimit="10" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 341px; margin-left: 681px;">
+                        <div data-drawio-colors="color: #808080; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(128, 128, 128); line-height: 1.2; pointer-events: none; white-space: nowrap;">
+                                Uses rules defined
+                                <br/>
+                                by shared group.
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="681" y="344" fill="#808080" font-family="Helvetica" font-size="12px" text-anchor="middle">
+                    Uses rules defined...
+                </text>
+            </switch>
+        </g>
+        <path d="M 930 490 L 930 430.24" fill="none" stroke="#808080" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="6 6" pointer-events="none"/>
+        <path d="M 930 422.24 L 934 430.24 L 926 430.24 Z" fill="#808080" stroke="#808080" stroke-width="2" stroke-miterlimit="10" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 462px; margin-left: 931px;">
+                        <div data-drawio-colors="color: #808080; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(128, 128, 128); line-height: 1.2; pointer-events: none; white-space: nowrap;">
+                                Uses rules defined
+                                <br/>
+                                by shared group.
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="931" y="465" fill="#808080" font-family="Helvetica" font-size="12px" text-anchor="middle">
+                    Uses rules defined...
+                </text>
+            </switch>
+        </g>
+    </g>
+    <switch>
+        <g requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"/>
+        <a transform="translate(0,-5)" xlink:href="https://www.diagrams.net/doc/faq/svg-export-text-problems" target="_blank">
+            <text text-anchor="middle" font-size="10px" x="50%" y="100%">
+                Viewer does not support full SVG 1.1
+            </text>
+        </a>
+    </switch>
+</svg>
