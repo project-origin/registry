@@ -2,7 +2,6 @@
 
 ![C4 component diagram of layer 2](/doc/layer2_verifiable_event_store/component_diagra.drawio.svg)
 
-
 ## Component
 
 ### Batcher
@@ -64,7 +63,6 @@ message PublishRootResult {
 }
 ```
 
-
 ### 4. Get block from transaction
 
 ```protobuf
@@ -83,4 +81,3 @@ message GetBlockResult {
 ### 5. Publish hash to Blockchain
 
 Look here: https://timestamp.northstake.dk
-
