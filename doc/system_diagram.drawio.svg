@@ -9,7 +9,7 @@
                     <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 444px; margin-left: 520px;">
                         <div data-drawio-colors="color: #808080; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
                             <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(128, 128, 128); line-height: 1.2; pointer-events: all; white-space: nowrap;">
-                                Publishes merkel roots for each
+                                Publishes merkle roots for each
                                 <br/>
                                 batch of events to the blockchain.
                             </div>
@@ -17,7 +17,7 @@
                     </div>
                 </foreignObject>
                 <text x="520" y="447" fill="#808080" font-family="Helvetica" font-size="12px" text-anchor="middle">
-                    Publishes merkel roots for each...
+                    Publishes merkle roots for each...
                 </text>
             </switch>
         </g>
@@ -93,7 +93,7 @@
                                 <div>
                                     <font style="font-size: 11px">
                                         <font color="#cccccc">
-                                            Conventional blockchain that will store a series of hashes for each merkel tree, ensuring that data within the tree cannot be changed without it being visible.
+                                            Conventional blockchain that will store a series of hashes for each merkle tree, ensuring that data within the tree cannot be changed without it being visible.
                                         </font>
                                     </font>
                                 </div>
