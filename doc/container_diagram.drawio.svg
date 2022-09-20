@@ -9,7 +9,7 @@
                     <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 751px; margin-left: 698px;">
                         <div data-drawio-colors="color: #808080; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
                             <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(128, 128, 128); line-height: 1.2; pointer-events: all; white-space: nowrap;">
-                                Publishes merkel roots for each
+                                Publishes merkle roots for each
                                 <br/>
                                 batch of events to the blockchain.
                             </div>
@@ -17,7 +17,7 @@
                     </div>
                 </foreignObject>
                 <text x="698" y="754" fill="#808080" font-family="Helvetica" font-size="12px" text-anchor="middle">
-                    Publishes merkel roots for each...
+                    Publishes merkle roots for each...
                 </text>
             </switch>
         </g>
@@ -61,7 +61,7 @@
                                 <div>
                                     <font style="font-size: 11px">
                                         <font color="#cccccc">
-                                            Conventional blockchain that will store a series of hashes for each merkel tree, ensuring that data within the tree cannot be changed without it being visible.
+                                            Conventional blockchain that will store a series of hashes for each merkle tree, ensuring that data within the tree cannot be changed without it being visible.
                                         </font>
                                     </font>
                                 </div>
@@ -166,7 +166,7 @@
                             <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(128, 128, 128); line-height: 1.2; pointer-events: all; white-space: nowrap;">
                                 Can read public data
                                 <br/>
-                                and request merkel-proofs
+                                and request merkle-proofs
                             </div>
                         </div>
                     </div>
@@ -257,7 +257,7 @@
                                 <div>
                                     <font style="font-size: 11px">
                                         <font color="#E6E6E6">
-                                            Stores events as public data, and arranges them in a series of merkel trees, each root publishes to the blockchain after a set time or number of events.
+                                            Stores events as public data, and arranges them in a series of merkle trees, each root publishes to the blockchain after a set time or number of events.
                                         </font>
                                     </font>
                                 </div>
@@ -588,9 +588,9 @@
                     <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 181px; margin-left: 1041px;">
                         <div data-drawio-colors="color: #808080; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
                             <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(128, 128, 128); line-height: 1.2; pointer-events: none; white-space: nowrap;">
-                                Read merkel roots to
+                                Read merkle roots to
                                 <br/>
-                                validate merkel proofs
+                                validate merkle proofs
                                 <br/>
                                 from layer.
                             </div>
@@ -598,7 +598,7 @@
                     </div>
                 </foreignObject>
                 <text x="1041" y="184" fill="#808080" font-family="Helvetica" font-size="12px" text-anchor="middle">
-                    Read merkel roots to...
+                    Read merkle roots to...
                 </text>
             </switch>
         </g>
