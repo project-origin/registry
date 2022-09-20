@@ -11,7 +11,7 @@ The registry will enable the following:
 
 - [ ] Data in the registry is publicly verifiable.
 - [ ] Enable the issuance of Granular Certificates.
-- [ ] Privacy of the individual amounts is hidden behind a Petersen-commitments.
+- [ ] Privacy of the individual amounts is hidden behind a Pedersen-commitments.
 - [ ] Enable the claim of Granular Certificates to some consumption.
 - [ ] Users can verify that they have a provable amount of a Granular Certificate, that mathematically proves it is only used once.
 - [ ] Federated setup enabling multiple registries to create a shared truth.
