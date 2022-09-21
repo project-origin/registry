@@ -1,6 +1,6 @@
 namespace EnergyOrigin.VerifiableEventStore.Api.Services.Batcher;
 
-public class BatcherOptions
+public record BatcherOptions
 {
-    public long BatchSize { get; set; }
+    public long BatchSize { get; init; }
 }

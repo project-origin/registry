@@ -1,3 +1,3 @@
 namespace EnergyOrigin.VerifiableEventStore.Api.Services.EventStore;
 
-public record Batch(List<Event> Events);
+public record Batch(string blockId, string transactionId, List<Event> Events);
