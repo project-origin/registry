@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+using EnergyOrigin.VerifiableEventStore.Api.Extensions;
 using EnergyOrigin.VerifiableEventStore.Api.Services.BlockchainConnector;
 using EnergyOrigin.VerifiableEventStore.Api.Services.EventStore;
 using Microsoft.Extensions.Options;
@@ -39,7 +39,7 @@ public class MemoryBatcher : IBatcher
 
     private async Task<Batch> PublishBatch(List<Event> batchEvents)
     {
-        var root = CalculateMerkleRoot(events);
+        var root = batchEvents.CalculateMerkleRoot(x => x.Content);
 
         var transaction = await blockchainConnector.PublishBytes(root);
 
@@ -52,40 +52,5 @@ public class MemoryBatcher : IBatcher
 
         var batch = new Batch(block.BlockId, transaction.TransactionId, batchEvents);
         return batch;
-    }
-
-    private byte[] CalculateMerkleRoot(List<Event> events)
-    {
-        byte[] RecursiveShaNodes(IEnumerable<byte[]> nodes)
-        {
-            if (nodes.Count() == 1)
-            {
-                return nodes.Single();
-            }
-
-            List<byte[]> combined = new List<byte[]>();
-
-            for (int i = 0; i < nodes.Count(); i = i + 2)
-            {
-                var left = SHA256.HashData(nodes.Skip(i).First());
-                var right = SHA256.HashData(nodes.Skip(i + 1).First());
-
-                combined.Add(SHA256.HashData(left.Concat(right).ToArray()));
-            }
-
-            return RecursiveShaNodes(combined);
-        }
-
-        if (!IsPowerOfTwo(events.Count))
-        {
-            throw new NotSupportedException("CalculateMerkleRoot currently only supported on exponents of 2");
-        }
-
-        return RecursiveShaNodes(events.Select(e => e.Content));
-    }
-
-    private bool IsPowerOfTwo(int x)
-    {
-        return (x & (x - 1)) == 0;
     }
 }
