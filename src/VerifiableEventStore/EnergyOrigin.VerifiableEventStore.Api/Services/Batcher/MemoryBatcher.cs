@@ -20,7 +20,7 @@ public class MemoryBatcher : IBatcher
         this.eventStore = eventStore;
         this.options = options;
 
-        this.batchSize = (long)Math.Pow(2, options.Value.BatchSize);
+        this.batchSize = (long)Math.Pow(2, options.Value.BatchSizeExponent);
     }
 
     public async Task PublishEvent(PublishEventRequest request)
