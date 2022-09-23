@@ -1,17 +1,15 @@
 using System.Security.Cryptography;
-using AutoFixture;
 using EnergyOrigin.VerifiableEventStore.Api.Services.Batcher;
 using EnergyOrigin.VerifiableEventStore.Api.Services.BlockchainConnector;
 using EnergyOrigin.VerifiableEventStore.Api.Services.EventStore;
 using Microsoft.Extensions.Options;
-using Moq;
 
 namespace EnergyOrigin.VerifiableEventStore.Tests;
 
 public class MemoryBatcherTests
 {
     [Fact]
-    public async Task Test1()
+    public async Task MemoryBatcher_WhenBatchIsFull_BatchIsStoredAndPublished()
     {
         string blockId = new Fixture().Create<string>();
         string transactionId = new Fixture().Create<string>();

@@ -14,6 +14,39 @@ public static class IEnumerableMerkleExtension
         return RecursiveShaNodes(events.Select(selector));
     }
 
+    public static IEnumerable<byte[]> GetRequiredHashes<T>(this IEnumerable<T> events, Func<T, byte[]> selector, int leafIndex)
+    {
+        return RecursiveGetRequiredHashes(events.Select(selector), leafIndex);
+    }
+
+    private static IEnumerable<byte[]> RecursiveGetRequiredHashes(IEnumerable<byte[]> events, int leafIndex)
+    {
+        if (events.Count() == 2)
+        {
+            yield return SHA256.HashData(events.Skip(1 - leafIndex).First());
+        }
+        else
+        {
+            var i = events.Count() / 2;
+            if (leafIndex >= i)
+            {
+                yield return RecursiveShaNodes(events.Take(i));
+                foreach (var x in RecursiveGetRequiredHashes(events.Skip(i), leafIndex - i))
+                {
+                    yield return x;
+                }
+            }
+            else
+            {
+                foreach (var x in RecursiveGetRequiredHashes(events.Take(i), leafIndex))
+                {
+                    yield return x;
+                }
+                yield return RecursiveShaNodes(events.Skip(i));
+            }
+        }
+    }
+
     private static byte[] RecursiveShaNodes(IEnumerable<byte[]> nodes)
     {
         if (nodes.Count() == 1)
@@ -28,12 +61,7 @@ public static class IEnumerableMerkleExtension
             var left = SHA256.HashData(nodes.Skip(i).First());
             var right = SHA256.HashData(nodes.Skip(i + 1).First());
 
-            var combined = new byte[left.Length + right.Length];
-
-            left.CopyTo(combined, 0);
-            right.CopyTo(combined, left.Length);
-
-            newList.Add(combined);
+            newList.Add(left.Concat(right).ToArray());
         }
 
         return RecursiveShaNodes(newList);
