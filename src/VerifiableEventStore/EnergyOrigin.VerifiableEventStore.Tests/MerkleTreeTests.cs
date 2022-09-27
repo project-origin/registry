@@ -1,6 +1,8 @@
 using System.Security.Cryptography;
+using System.Text;
 using EnergyOrigin.VerifiableEventStore.Api.Extensions;
 using EnergyOrigin.VerifiableEventStore.Api.Services.EventStore;
+using NSec.Cryptography;
 
 namespace EnergyOrigin.VerifiableEventStore.Tests;
 

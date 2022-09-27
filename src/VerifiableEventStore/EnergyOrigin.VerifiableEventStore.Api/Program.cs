@@ -9,7 +9,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.Configure<BatcherOptions>(builder.Configuration);
+builder.Services.Configure<ConcordiumOptions>(builder.Configuration);
 
 var app = builder.Build();
 
