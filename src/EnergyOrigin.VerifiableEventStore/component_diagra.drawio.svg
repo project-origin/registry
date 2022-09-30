@@ -1,0 +1,464 @@
+<svg host="65bd71144e" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="731px" height="901px" viewBox="-0.5 -0.5 731 901" content="&lt;mxfile&gt;&lt;diagram id=&quot;FBxYk-bCOjcYe218ZED0&quot; name=&quot;Page-1&quot;&gt;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&lt;/diagram&gt;&lt;/mxfile&gt;">
+    <defs/>
+    <g>
+        <rect x="0" y="240" width="730" height="460" rx="10" ry="10" fill="none" stroke="#808080" stroke-dasharray="8 4" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe flex-end; justify-content: unsafe flex-start; width: 712px; height: 1px; padding-top: 689px; margin-left: 10px;">
+                        <div data-drawio-colors="color: #808080; " style="box-sizing: border-box; font-size: 0px; text-align: left;">
+                            <div style="display: inline-block; font-size: 11px; font-family: Helvetica; color: rgb(128, 128, 128); line-height: 1.2; pointer-events: none; white-space: normal; overflow-wrap: normal;">
+                                <font style="font-size: 16px">
+                                    <b>
+                                        <div style="text-align: left">
+                                            Layer 2
+                                            <br/>
+                                            Verifiable event store
+                                        </div>
+                                    </b>
+                                </font>
+                                <div style="text-align: left">
+                                    [Container]
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="10" y="689" fill="#808080" font-family="Helvetica" font-size="11px">
+                    Layer 2...
+                </text>
+            </switch>
+        </g>
+        <rect x="130" y="780" width="240" height="120" fill="#8c8496" stroke="#736782" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 238px; height: 1px; padding-top: 840px; margin-left: 131px;">
+                        <div data-drawio-colors="color: #ffffff; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(255, 255, 255); line-height: 1.2; pointer-events: none; white-space: normal; overflow-wrap: normal;">
+                                <font style="font-size: 16px">
+                                    <b>
+                                        Layer 1 - Blockchain
+                                    </b>
+                                </font>
+                                <div>
+                                    [External system]
+                                </div>
+                                <br/>
+                                <div>
+                                    <font style="font-size: 11px">
+                                        <font color="#cccccc">
+                                            Conventional blockchain that will store a series of hashes for each merkle tree, ensuring that data within the tree cannot be changed without it being visible.
+                                        </font>
+                                    </font>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="250" y="844" fill="#ffffff" font-family="Helvetica" font-size="12px" text-anchor="middle">
+                    Layer 1 - Blockchain...
+                </text>
+            </switch>
+        </g>
+        <rect x="130" y="40" width="240" height="120" fill="#23a2d9" stroke="#0e7dad" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 238px; height: 1px; padding-top: 100px; margin-left: 131px;">
+                        <div data-drawio-colors="color: #ffffff; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 11px; font-family: Helvetica; color: rgb(255, 255, 255); line-height: 1.2; pointer-events: none; white-space: normal; overflow-wrap: normal;">
+                                <font style="font-size: 16px">
+                                    <b>
+                                        Layer 3 - Logic
+                                    </b>
+                                </font>
+                                <div>
+                                    [Container: to be determined]
+                                </div>
+                                <br/>
+                                <div>
+                                    <font style="font-size: 11px">
+                                        <font color="#E6E6E6">
+                                            Validates events that they are valid Ensures that events are valid and allowed based on the logic and rules.
+                                        </font>
+                                    </font>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="250" y="103" fill="#ffffff" font-family="Helvetica" font-size="11px" text-anchor="middle">
+                    Layer 3 - Logic...
+                </text>
+            </switch>
+        </g>
+        <path d="M 450 775 C 450 766.72 503.73 760 570 760 C 601.83 760 632.35 761.58 654.85 764.39 C 677.36 767.21 690 771.02 690 775 L 690 865 C 690 873.28 636.27 880 570 880 C 503.73 880 450 873.28 450 865 Z" fill="#23a2d9" stroke="#0e7dad" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 690 775 C 690 783.28 636.27 790 570 790 C 503.73 790 450 783.28 450 775" fill="none" stroke="#0e7dad" stroke-miterlimit="10" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 238px; height: 1px; padding-top: 833px; margin-left: 451px;">
+                        <div data-drawio-colors="color: #ffffff; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(255, 255, 255); line-height: 1.2; pointer-events: none; white-space: normal; overflow-wrap: normal;">
+                                <font style="font-size: 16px">
+                                    <b>
+                                        Datastore
+                                    </b>
+                                </font>
+                                <div>
+                                    [Container : local-files]
+                                </div>
+                                <br/>
+                                <div>
+                                    <font style="font-size: 11px">
+                                        <font color="#E6E6E6">
+                                            Stores all events for the registry in batches.
+                                        </font>
+                                    </font>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="570" y="836" fill="#ffffff" font-family="Helvetica" font-size="12px" text-anchor="middle">
+                    Datastore...
+                </text>
+            </switch>
+        </g>
+        <ellipse cx="570" cy="40.5" rx="40.5" ry="40.5" fill="#6c6477" stroke="#4d4d4d" pointer-events="none"/>
+        <path d="M 470 105.3 C 470 82.93 488.13 64.8 510.5 64.8 L 629.5 64.8 C 651.87 64.8 670 82.93 670 105.3 L 670 139.5 C 670 161.87 651.87 180 629.5 180 L 510.5 180 C 488.13 180 470 161.87 470 139.5 Z" fill="#6c6477" stroke="#4d4d4d" stroke-miterlimit="10" pointer-events="none"/>
+        <ellipse cx="570" cy="40.5" rx="40.5" ry="40.5" fill="#6c6477" stroke="#4d4d4d" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 123px; margin-left: 570px;">
+                        <div data-drawio-colors="color: #ffffff; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 11px; font-family: Helvetica; color: rgb(255, 255, 255); line-height: 1.2; pointer-events: none; white-space: nowrap;">
+                                <font style="font-size: 16px">
+                                    <b>
+                                        User
+                                    </b>
+                                </font>
+                                <div>
+                                    [Person]
+                                </div>
+                                <br/>
+                                <div>
+                                    <font style="font-size: 11px">
+                                        <font color="#cccccc">
+                                            A user that wants to validate
+                                            <br/>
+                                            claims aganst the registry
+                                        </font>
+                                    </font>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="570" y="126" fill="#ffffff" font-family="Helvetica" font-size="11px" text-anchor="middle">
+                    User...
+                </text>
+            </switch>
+        </g>
+        <rect x="130" y="280" width="240" height="120" fill="#63bef2" stroke="#2086c9" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 238px; height: 1px; padding-top: 340px; margin-left: 131px;">
+                        <div data-drawio-colors="color: #ffffff; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(255, 255, 255); line-height: 1.2; pointer-events: none; white-space: normal; overflow-wrap: normal;">
+                                <font style="font-size: 16px">
+                                    <b>
+                                        Batcher
+                                    </b>
+                                </font>
+                                <div>
+                                    [Component: ]
+                                </div>
+                                <br/>
+                                <div>
+                                    <font style="font-size: 11px">
+                                        Holds events until batch is publishes, defines order of events, and creates merkle-root.
+                                    </font>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="250" y="344" fill="#ffffff" font-family="Helvetica" font-size="12px" text-anchor="middle">
+                    Batcher...
+                </text>
+            </switch>
+        </g>
+        <rect x="450" y="280" width="240" height="120" fill="#63bef2" stroke="#2086c9" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 238px; height: 1px; padding-top: 340px; margin-left: 451px;">
+                        <div data-drawio-colors="color: #ffffff; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(255, 255, 255); line-height: 1.2; pointer-events: none; white-space: normal; overflow-wrap: normal;">
+                                <font style="font-size: 16px">
+                                    <b>
+                                        EventProver
+                                    </b>
+                                </font>
+                                <div>
+                                    [Component: ]
+                                </div>
+                                <br/>
+                                <div>
+                                    <font style="font-size: 11px">
+                                        Gets an event and batch from the DataStore and creates the merkle-proof for the event.
+                                    </font>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="570" y="344" fill="#ffffff" font-family="Helvetica" font-size="12px" text-anchor="middle">
+                    EventProver...
+                </text>
+            </switch>
+        </g>
+        <rect x="130" y="530" width="240" height="120" fill="#63bef2" stroke="#2086c9" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 238px; height: 1px; padding-top: 590px; margin-left: 131px;">
+                        <div data-drawio-colors="color: #ffffff; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(255, 255, 255); line-height: 1.2; pointer-events: none; white-space: normal; overflow-wrap: normal;">
+                                <font style="font-size: 16px">
+                                    <b>
+                                        Blockchain Connector
+                                    </b>
+                                </font>
+                                <div>
+                                    [Component: ]
+                                </div>
+                                <br/>
+                                <div>
+                                    <font style="font-size: 11px">
+                                        Writes transaction containing the merkle-root to a blockchain, and handles authentication.
+                                    </font>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="250" y="594" fill="#ffffff" font-family="Helvetica" font-size="12px" text-anchor="middle">
+                    Blockchain Connector...
+                </text>
+            </switch>
+        </g>
+        <path d="M 190 400 L 190 511.76" fill="none" stroke="#808080" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="6 6" pointer-events="none"/>
+        <path d="M 190 527.76 L 184.67 511.76 L 195.33 511.76 Z" fill="#808080" stroke="#808080" stroke-width="2" stroke-miterlimit="10" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 433px; margin-left: 190px;">
+                        <div data-drawio-colors="color: #808080; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 11px; font-family: Helvetica; color: rgb(128, 128, 128); line-height: 1.2; pointer-events: none; white-space: nowrap;">
+                                <div style="text-align: left ; font-size: 11px">
+                                    <div style="text-align: center ; font-size: 11px">
+                                        <b style="font-size: 11px">
+                                            3. Publish merkle Root returns
+                                            <br/>
+                                            blockchain-transaction-ref
+                                        </b>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="190" y="436" fill="#808080" font-family="Helvetica" font-size="11px" text-anchor="middle">
+                    3. Publish merkle Root returns...
+                </text>
+            </switch>
+        </g>
+        <path d="M 310 400 L 310 511.76" fill="none" stroke="#808080" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="6 6" pointer-events="none"/>
+        <path d="M 310 527.76 L 304.67 511.76 L 315.33 511.76 Z" fill="#808080" stroke="#808080" stroke-width="2" stroke-miterlimit="10" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 465px; margin-left: 310px;">
+                        <div data-drawio-colors="color: #808080; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 11px; font-family: Helvetica; color: rgb(128, 128, 128); line-height: 1.2; pointer-events: none; white-space: nowrap;">
+                                <div style="text-align: left ; font-size: 11px">
+                                    <div style="text-align: center ; font-size: 11px">
+                                        <b style="font-size: 11px">
+                                            4. Get Block from
+                                            <br/>
+                                            blockchain-transaction-ref
+                                        </b>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="310" y="468" fill="#808080" font-family="Helvetica" font-size="11px" text-anchor="middle">
+                    4. Get Block from...
+                </text>
+            </switch>
+        </g>
+        <path d="M 250 650 L 250 761.76" fill="none" stroke="#808080" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="6 6" pointer-events="none"/>
+        <path d="M 250 777.76 L 244.67 761.76 L 255.33 761.76 Z" fill="#808080" stroke="#808080" stroke-width="2" stroke-miterlimit="10" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 734px; margin-left: 250px;">
+                        <div data-drawio-colors="color: #808080; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 11px; font-family: Helvetica; color: rgb(128, 128, 128); line-height: 1.2; pointer-events: none; white-space: nowrap;">
+                                <div style="text-align: left ; font-size: 11px">
+                                    <div style="text-align: center ; font-size: 11px">
+                                        <b style="font-size: 11px">
+                                            5. Publishes merkle roots for each
+                                            <br/>
+                                            batch of events to the blockchain.
+                                        </b>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="250" y="737" fill="#808080" font-family="Helvetica" font-size="11px" text-anchor="middle">
+                    5. Publishes merkle roots for each...
+                </text>
+            </switch>
+        </g>
+        <path d="M 130 310 L 70 310 L 70 370 L 111.76 370" fill="none" stroke="#808080" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="6 6" pointer-events="none"/>
+        <path d="M 127.76 370 L 111.76 375.33 L 111.76 364.67 Z" fill="#808080" stroke="#808080" stroke-width="2" stroke-miterlimit="10" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 341px; margin-left: 73px;">
+                        <div data-drawio-colors="color: #808080; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 11px; font-family: Helvetica; color: rgb(128, 128, 128); line-height: 1.2; pointer-events: none; white-space: nowrap;">
+                                <div style="text-align: left ; font-size: 11px">
+                                    <div style="text-align: center ; font-size: 11px">
+                                        <b style="font-size: 11px">
+                                            Publish Batch
+                                            <br/>
+                                            when 2^x
+                                        </b>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="73" y="344" fill="#808080" font-family="Helvetica" font-size="11px" text-anchor="middle">
+                    Publish Batch...
+                </text>
+            </switch>
+        </g>
+        <path d="M 250 160 L 250 261.76" fill="none" stroke="#808080" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="6 6" pointer-events="none"/>
+        <path d="M 250 277.76 L 244.67 261.76 L 255.33 261.76 Z" fill="#808080" stroke="#808080" stroke-width="2" stroke-miterlimit="10" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 220px; margin-left: 250px;">
+                        <div data-drawio-colors="color: #808080; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 11px; font-family: Helvetica; color: rgb(128, 128, 128); line-height: 1.2; pointer-events: none; white-space: nowrap;">
+                                <div style="text-align: left ; font-size: 11px">
+                                    <div style="text-align: center ; font-size: 11px">
+                                        <b style="font-size: 11px">
+                                            1. Publish event
+                                        </b>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="250" y="223" fill="#808080" font-family="Helvetica" font-size="11px" text-anchor="middle">
+                    1. Publish event
+                </text>
+            </switch>
+        </g>
+        <path d="M 570 180 L 570 261.76" fill="none" stroke="#808080" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="6 6" pointer-events="none"/>
+        <path d="M 570 277.76 L 564.67 261.76 L 575.33 261.76 Z" fill="#808080" stroke="#808080" stroke-width="2" stroke-miterlimit="10" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 230px; margin-left: 570px;">
+                        <div data-drawio-colors="color: #808080; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 11px; font-family: Helvetica; color: rgb(128, 128, 128); line-height: 1.2; pointer-events: none; white-space: nowrap;">
+                                <div style="text-align: left ; font-size: 11px">
+                                    <div style="text-align: center ; font-size: 11px">
+                                        <b style="font-size: 11px">
+                                            2. Get Merkle Proof from eventRef
+                                        </b>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="570" y="233" fill="#808080" font-family="Helvetica" font-size="11px" text-anchor="middle">
+                    2. Get Merkle Proof from eventRef
+                </text>
+            </switch>
+        </g>
+        <path d="M 570 400 L 570 741.76" fill="none" stroke="#808080" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="6 6" pointer-events="none"/>
+        <path d="M 570 757.76 L 564.67 741.76 L 575.33 741.76 Z" fill="#808080" stroke="#808080" stroke-width="2" stroke-miterlimit="10" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 580px; margin-left: 570px;">
+                        <div data-drawio-colors="color: #808080; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 11px; font-family: Helvetica; color: rgb(128, 128, 128); line-height: 1.2; pointer-events: none; white-space: nowrap;">
+                                <div style="text-align: left ; font-size: 11px">
+                                    <div style="text-align: center ; font-size: 11px">
+                                        <b style="font-size: 11px">
+                                            Reads event and batch
+                                        </b>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="570" y="583" fill="#808080" font-family="Helvetica" font-size="11px" text-anchor="middle">
+                    Reads event and batch
+                </text>
+            </switch>
+        </g>
+        <path d="M 370 340 L 410 340 L 410 480 L 534 743.5" fill="none" stroke="#808080" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="6 6" pointer-events="none"/>
+        <path d="M 540.81 757.98 L 529.17 745.77 L 538.83 741.23 Z" fill="#808080" stroke="#808080" stroke-width="2" stroke-miterlimit="10" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 539px; margin-left: 438px;">
+                        <div data-drawio-colors="color: #808080; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 11px; font-family: Helvetica; color: rgb(128, 128, 128); line-height: 1.2; pointer-events: none; white-space: nowrap;">
+                                <div style="text-align: left ; font-size: 11px">
+                                    <div style="text-align: center ; font-size: 11px">
+                                        <b style="font-size: 11px">
+                                            Write event and batch
+                                        </b>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="438" y="542" fill="#808080" font-family="Helvetica" font-size="11px" text-anchor="middle">
+                    Write event and batch
+                </text>
+            </switch>
+        </g>
+    </g>
+    <switch>
+        <g requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"/>
+        <a transform="translate(0,-5)" xlink:href="https://www.diagrams.net/doc/faq/svg-export-text-problems" target="_blank">
+            <text text-anchor="middle" font-size="10px" x="50%" y="100%">
+                Viewer does not support full SVG 1.1
+            </text>
+        </a>
+    </switch>
+</svg>
