@@ -9,8 +9,6 @@ public static class BigIntegerExtensions
         return !number.IsProbablyPrime(witnesses);
     }
 
-
-
     /// <summary>
     /// Checks that a BigInteger is probably a prime based
     /// https://stackoverflow.com/a/33918233

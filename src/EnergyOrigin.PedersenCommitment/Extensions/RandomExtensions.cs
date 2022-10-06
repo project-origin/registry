@@ -8,17 +8,17 @@ public static class RandomExtensions
     /// Generates a random BigInteger between 0 and 2^bits - 1.
     /// </summary>
     /// <param name="bits">The number of random bits to generate.</param>
-    public static BigInteger NextBigInteger(this Random self, int bits)
+    public static BigInteger NextBigInteger(this Random self, long bits)
     {
         if (bits < 1) return BigInteger.Zero;
 
-        int neededBytes = bits / bitsInByte + 1;
-        int maskShift = bitsInByte - bits % bitsInByte;
+        var max = new BigInteger(2) ^ bits;
 
-        byte[] bytes = new byte[neededBytes];
+        byte[] bytes = new byte[max.GetByteCount()];
         self.NextBytes(bytes);
 
-        bytes[bytes.Length - 1] &= (byte)(0xFF >> maskShift);
+        var lastIndex = bytes.Length - 1;
+        bytes[lastIndex] &= max.ToByteArray()[lastIndex];
 
         return new BigInteger(bytes);
     }
@@ -35,16 +35,8 @@ public static class RandomExtensions
         if (start == end) return start;
 
         BigInteger range = end - start;
+        var bits = range.GetBitLength();
 
-        byte[] bytes = range.ToByteArray();
-
-        int bits = 0;
-        while ((2 ^ bits) < (int)bytes[bytes.Length - 1])
-        {
-            bits++;
-        }
-        bits += bitsInByte * bytes.Length - 1;
-
-        return ((self.NextBigInteger(bits) * range) / BigInteger.Pow(2, bits)) + start;
+        return ((self.NextBigInteger(bits) * range) / (new BigInteger(2) ^ bits)) + start;
     }
 }
