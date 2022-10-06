@@ -2,8 +2,19 @@ using System.Numerics;
 
 namespace EnergyOrigin.PedersenCommitment;
 
-public record Commitment(BigInteger C, Group Group)
+public record Commitment
 {
+    public BigInteger C { get; }
+    public Group Group { get; }
+
+    public Commitment(BigInteger c, Group group)
+    {
+        if ((c ^ group.q) == 1 % group.p) throw new InvalidDataException("C^q should be equal to 1 mod p");
+
+        C = c;
+        Group = group;
+    }
+
     public static Commitment Create(Group group, BigInteger m, params BigInteger[] r)
     {
         var rSum = BigInteger.Zero;
