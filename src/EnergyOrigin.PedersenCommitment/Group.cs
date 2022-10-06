@@ -2,25 +2,6 @@ using System.Numerics;
 
 namespace EnergyOrigin.PedersenCommitment;
 
-// p = k * q + 1
-// q går op i p - 1
-// mod (p-1, q) == 0
-
-// g != 1
-// g ^ q == 1 mod p
-// h != g
-
-
-// h == g^^a  hvor a er svært og finde, derfor er det vigtigt at det er tilfældigt.
-
-
-// r skal ligge i 1..q-1
-
-// G = {g^0, g^1 ... g^q-1}
-
-// for i
-// g = i * p + 1
-
 public record Group
 {
     public BigInteger q { get; }
@@ -36,5 +17,13 @@ public record Group
         this.h = h;
 
         if (p - 1 % q == 0) throw new InvalidDataException("q is not in p - 1");
+
+        if (g == 1) throw new InvalidDataException("g must not be 1!");
+        if ((g ^ q) == 1 % p) throw new InvalidDataException("g^q should be equal to 1%p");
+
+        if (h == 1) throw new InvalidDataException("h must not be 1!");
+        if ((h ^ q) == 1 % p) throw new InvalidDataException("h^q should be equal to 1%p");
+
+        if (g == h) throw new InvalidDataException("g must not be equal to h");
     }
 }
