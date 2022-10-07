@@ -9,7 +9,7 @@ public record Commitment
 
     public Commitment(BigInteger c, Group group)
     {
-        //if (BigInteger.ModPow(c, group.q, group.p) != 1) throw new InvalidDataException("C^q should be equal to 1 mod p");
+        if (BigInteger.ModPow(c, group.q, group.p) != 1 % group.p) throw new InvalidDataException("C^q should be equal to 1 mod p");
 
         C = c;
         Group = group;

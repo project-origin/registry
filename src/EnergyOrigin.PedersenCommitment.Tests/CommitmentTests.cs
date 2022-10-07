@@ -11,7 +11,7 @@ public class CommitmentTests
         var p = BigInteger.Parse("519410415765480562065563560862184550988245350627770327636130577");
         var g = BigInteger.Parse("101455240839796123327081946568988620614409829310312504112082811");
         var h = BigInteger.Parse("162315825204305527697219690878071619973299472069112727941372177");
-        var group = new Group(p, q, g, h, new Random());
+        var group = new Group(p, q, g, h);
 
         var m = new BigInteger(51);
         var r = BigInteger.Parse("35425707649260674451675575047706194335233578342436579356033362");
@@ -21,24 +21,24 @@ public class CommitmentTests
     }
 
     [Fact]
-    public void s()
+    public void Commitment_CreateOnOtherGroup_ThrowsException()
     {
-        var group1 = Group.Create(200, new Random());
-        var group2 = Group.Create(200, new Random());
+        var group1 = Group.Create();
+        var group2 = Group.Create();
 
         var m = new BigInteger(51);
 
         var r = group1.RandomR();
         var c = Commitment.Create(group1, m, r);
 
-        //Assert.Throws<InvalidDataException>(() => new Commitment(c.C, group2));
+        Assert.Throws<InvalidDataException>(() => new Commitment(c.C, group2));
     }
 
 
     [Fact]
     public void Commitment_Addition_Success()
     {
-        var group = Group.Create(200, new Random());
+        var group = Group.Create();
 
         var m1 = new BigInteger(51);
         var m2 = new BigInteger(63);
@@ -56,7 +56,7 @@ public class CommitmentTests
 
     public void Commitment_ToZero_Success()
     {
-        var group = Group.Create(200, new Random());
+        var group = Group.Create();
 
         var m2 = new BigInteger(51);
         var m3 = new BigInteger(63);

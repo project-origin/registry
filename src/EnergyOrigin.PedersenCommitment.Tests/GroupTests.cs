@@ -11,7 +11,7 @@ public class GroupTests
         var p = BigInteger.Parse("519410415765480562065563560862184550988245350627770327636130577");
         var g = BigInteger.Parse("101455240839796123327081946568988620614409829310312504112082811");
         var h = BigInteger.Parse("162315825204305527697219690878071619973299472069112727941372177");
-        var group = new Group(p, q, g, h, new Random());
+        var group = new Group(p, q, g, h);
 
         Assert.NotNull(group);
     }
@@ -20,7 +20,7 @@ public class GroupTests
     [Fact]
     public void CreateGroup_Generate_Success()
     {
-        var group = Group.Create(200, new Random());
+        var group = Group.Create();
 
         Assert.NotNull(group);
     }
