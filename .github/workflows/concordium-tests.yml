@@ -8,13 +8,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Build the stack
-        run: docker-compose up -d -f src/EnergyOrigin.VerifiableEventStore.Tests/docker-compose.yaml
+      - name: Start Concordium node
+        run: docker-compose -f src/EnergyOrigin.VerifiableEventStore.Tests/docker-compose.yaml up -d
 
       - name: Setup .NET Core SDK 6
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: "6.0"
 
-      - name: Test
+      - name: Run integration tests
         run: dotnet test --filter Category=Concordium
