@@ -1,3 +1,3 @@
 namespace EnergyOrigin.VerifiableEventStore.Services.BlockchainConnector;
 
-public record TransactionReference(string TransactionId);
+public record TransactionReference(string TransactionHash);

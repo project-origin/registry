@@ -1,0 +1,20 @@
+name: Concordium Integration tests
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build the stack
+        run: docker-compose up -d -f src/EnergyOrigin.VerifiableEventStore.Tests/docker-compose.yaml
+
+      - name: Setup .NET Core SDK 6
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "6.0"
+
+      - name: Test
+        run: dotnet test --filter Category=Concordium

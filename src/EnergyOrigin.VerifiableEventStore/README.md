@@ -90,3 +90,17 @@ message GetBlockResult {
 ### 5. Publish hash to Blockchain
 
 Look here: https://timestamp.northstake.dk
+
+# Tests
+
+## Integration test with Concordium
+
+To be able to run the integration test with Concordium, 
+an Identity and Account is required.
+
+To create these, follow the [Concordium documentation](https://developer.concordium.software/en/mainnet/net/guides/company-identities.html)
+for the testnet.
+
+https://github.com/Concordium/concordium-base/blob/main/rust-bins/docs/user-cli.md#generate-a-version-0-request-for-the-version-0-identity-object
+
+Wait for 

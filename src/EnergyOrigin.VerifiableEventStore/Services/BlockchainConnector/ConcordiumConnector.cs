@@ -9,22 +9,23 @@ namespace EnergyOrigin.VerifiableEventStore.Services.BlockchainConnector;
 
 public class ConcordiumConnector : IBlockchainConnector, IDisposable
 {
-    private ConcordiumNodeClient concordiumNodeClient;
     private IOptions<ConcordiumOptions> options;
-    private TransactionSigner transactionSigner;
+    private Lazy<ConcordiumNodeClient> concordiumNodeClient;
+    private Lazy<TransactionSigner> transactionSigner;
 
     public ConcordiumConnector(IOptions<ConcordiumOptions> options)
     {
         this.options = options;
 
-        Connection connection = new Connection
-        {
-            Address = options.Value.Address,
-            AuthenticationToken = options.Value.AuthenticationToken
-        };
-        concordiumNodeClient = new ConcordiumNodeClient(connection);
-        var signer = CreateSigner(options.Value.SignerFilepath);
-        this.transactionSigner = signer;
+        this.concordiumNodeClient = new Lazy<ConcordiumNodeClient>(
+            () => new ConcordiumNodeClient(new Connection
+            {
+                Address = options.Value.Address,
+                AuthenticationToken = options.Value.AuthenticationToken
+            })
+            , true);
+
+        this.transactionSigner = new Lazy<TransactionSigner>(() => CreateSigner(options.Value.SignerFilepath), true);
     }
 
     private static TransactionSigner CreateSigner(string signerFilepath)
@@ -39,18 +40,19 @@ public class ConcordiumConnector : IBlockchainConnector, IDisposable
         return signer;
     }
 
-    public void Dispose() => concordiumNodeClient.Dispose();
+    public void Dispose() => concordiumNodeClient.Value.Dispose();
 
     public async Task<Block?> GetBlock(TransactionReference transactionReference)
     {
-        var transactionHash = TransactionHash.From(transactionReference.TransactionId);
+        var transactionHash = TransactionHash.From(transactionReference.TransactionHash);
 
-        var status = await concordiumNodeClient.GetTransactionStatusAsync(transactionHash);
+        var transactionStatus = await concordiumNodeClient.Value.GetTransactionStatusAsync(transactionHash);
 
-        if (status != null)
+        if (transactionStatus != null
+            && transactionStatus.Outcomes != null
+            && transactionStatus.Status == TransactionStatusType.Finalized)
         {
-            throw new NotImplementedException("I could not find where to get block id.");
-            return new Block("", status.Status == TransactionStatusType.Finalized);
+            return new Block(transactionStatus.Outcomes.Single().Key, transactionStatus.Status == TransactionStatusType.Finalized);
         }
 
         return null;
@@ -58,11 +60,11 @@ public class ConcordiumConnector : IBlockchainConnector, IDisposable
 
     public async Task<TransactionReference> PublishBytes(byte[] bytes)
     {
-        AccountTransactionService accountTransactionService = new AccountTransactionService(concordiumNodeClient);
+        AccountTransactionService accountTransactionService = new AccountTransactionService(concordiumNodeClient.Value);
 
         var address = AccountAddress.From(options.Value.AccountAddress);
         var payload = RegisterDataPayload.Create(bytes);
-        var transactionHash = await accountTransactionService.SendAccountTransactionAsync(address, payload, transactionSigner);
+        var transactionHash = await accountTransactionService.SendAccountTransactionAsync(address, payload, transactionSigner.Value);
 
         return new TransactionReference(transactionHash.AsString);
     }

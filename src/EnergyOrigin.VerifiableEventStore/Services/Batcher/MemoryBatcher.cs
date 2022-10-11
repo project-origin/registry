@@ -51,7 +51,7 @@ public class MemoryBatcher : IBatcher
             block = await blockchainConnector.GetBlock(transaction);
         }
 
-        var batch = new Batch(block.BlockId, transaction.TransactionId, batchEvents);
+        var batch = new Batch(block.BlockId, transaction.TransactionHash, batchEvents);
         return batch;
     }
 }
