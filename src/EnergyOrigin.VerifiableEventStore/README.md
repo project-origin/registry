@@ -95,12 +95,32 @@ Look here: https://timestamp.northstake.dk
 
 ## Integration test with Concordium
 
-To be able to run the integration test with Concordium, 
-an Identity and Account is required.
+To be able to run the integration test with Concordium,
+a Concordium node and github self-hosted runner is required.
 
-To create these, follow the [Concordium documentation](https://developer.concordium.software/en/mainnet/net/guides/company-identities.html)
-for the testnet.
+This can be achieved using the included [docker-compose](../EnergyOrigin.VerifiableEventStore.Tests/docker-compose.yaml).
+One forking the repo, one must get a token from GitHub to be able to join runners.
 
-https://github.com/Concordium/concordium-base/blob/main/rust-bins/docs/user-cli.md#generate-a-version-0-request-for-the-version-0-identity-object
+1. Make a .env file containing the following environment variables:
 
-Wait for 
+```sh
+GITHUB_RUNNER_TOKEN=#YOUR_GITHUB_RUNNER_TOKEN
+CONCORDIUM_HOST_DIRECTORY=/var/concordium/data
+```
+
+2. Next get the docker-compose file and run it. ***Note: it takes quite a while before the node has processed all blocks and are ready. (hours)***
+
+    The long time for the node to be ready is why this is done in this matter instead of in a GitHub workflow, since it wouldn't be feasible.
+
+```sh
+#wget https://raw.githubusercontent.com/project-origin/registry/main/src/EnergyOrigin.VerifiableEventStore.Tests/docker-compose.yaml
+wget -qO- https://raw.githubusercontent.com/project-origin/registry/eventstore/integration-tests/src/EnergyOrigin.VerifiableEventStore.Tests/docker-compose.yaml | docker-compose -f - up -d
+```
+
+3. Create an Identity and Account with Concordium.
+
+    To create these, follow the [Concordium documentation](https://developer.concordium.software/en/mainnet/net/guides/company-identities.html)
+for the testnet. More info can be found [here](https://github.com/Concordium/concordium-base/blob/main/rust-bins/docs/user-cli.md#generate-a-version-0-request-for-the-version-0-identity-object
+). Wait for Concordium to respond with the **id-object.json**.
+
+4. Wait for

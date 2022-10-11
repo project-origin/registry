@@ -72,7 +72,7 @@ services:
     # The node's database should be stored in a persistent volume so that it
     # survives container restart. In this case we map the **host** directory
     # /var/lib/concordium-testnet to be used as the node's database directory.
-    - /tmp/concordium-testnet:/mnt/data
+    - ${CONCORDIUM_HOST_DIRECTORY}:/mnt/data
   # The collector reports the state of the node to the network dashboard. A node
   # can run without reporting to the network dashboard. Remove this section if
   # that is desired.
