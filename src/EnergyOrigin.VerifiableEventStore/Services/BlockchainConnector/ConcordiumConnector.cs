@@ -48,9 +48,6 @@ public class ConcordiumConnector : IBlockchainConnector, IDisposable
 
         var transactionStatus = await concordiumNodeClient.Value.GetTransactionStatusAsync(transactionHash);
 
-        Console.WriteLine("1:" + transactionStatus.ToString());
-        Console.WriteLine("2:" + transactionStatus.Status.ToString());
-
         if (transactionStatus != null
             && transactionStatus.Outcomes != null
             && transactionStatus.Status == TransactionStatusType.Finalized)
