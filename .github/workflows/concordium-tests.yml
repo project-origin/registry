@@ -2,6 +2,9 @@ name: Concordium Integration tests
 
 on: [push]
 
+env:
+  compose_folder: src/EnergyOrigin.VerifiableEventStore.Tests
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -9,7 +12,8 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Start Concordium node
-        run: docker-compose -f src/EnergyOrigin.VerifiableEventStore.Tests/docker-compose.yaml up -d
+        working-directory: ${{ env.compose_folder }}
+        run: docker-compose up -d
 
       - name: Setup .NET Core SDK 6
         uses: actions/setup-dotnet@v3
@@ -19,3 +23,8 @@ jobs:
       - name: Run integration tests
         working-directory: src
         run: dotnet test --filter Category=Concordium
+
+      - name: On error output concordium node logs
+        if: ${{ failure() }}
+        working-directory: ${{ env.compose_folder }}
+        run: docker-compose logs
