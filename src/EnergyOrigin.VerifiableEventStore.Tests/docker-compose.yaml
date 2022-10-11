@@ -1,6 +1,14 @@
 # This is an example configuration for running the testnet node
 version: '3'
 services:
+  github-runner:
+    container_name: github-runner
+    image: ghcr.io/energinet-datahub/eo-selfhosted-runner:v0.9.0
+    restart: always
+    environment:
+      REPOSITORY: https://github.com/project-origin/registry
+      TOKEN: ${REDACTED}
+      NAME: concordium-workflow-runner
   testnet-node:
     container_name: testnet-node
     image: concordium/testnet-node:4.2.3-0

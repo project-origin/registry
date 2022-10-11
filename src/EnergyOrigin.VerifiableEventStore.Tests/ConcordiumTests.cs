@@ -13,7 +13,7 @@ public class ConcordiumTests
         var knownBlockId = "06a531f87594658eee1aeb369b3e755e5b5bb6a34501aa5d24e2adfa025e7343";
 
         var optionsMock = new Mock<IOptions<ConcordiumOptions>>();
-        optionsMock.Setup(obj => obj.Value).Returns(new ConcordiumOptions("http://localhost:10001", "rpcadmin", "", ""));
+        optionsMock.Setup(obj => obj.Value).Returns(new ConcordiumOptions("http://testnet-node:10001", "rpcadmin", "", ""));
         var connector = new ConcordiumConnector(optionsMock.Object);
 
         var block = await connector.GetBlock(new TransactionReference(knownTransactionHash));

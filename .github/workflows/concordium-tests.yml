@@ -7,13 +7,9 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
-
-      - name: Start Concordium node
-        working-directory: ${{ env.compose_folder }}
-        run: docker-compose up -d
 
       - name: Setup .NET Core SDK 6
         uses: actions/setup-dotnet@v3
@@ -23,8 +19,3 @@ jobs:
       - name: Run integration tests
         working-directory: src
         run: dotnet test --filter Category=Concordium
-
-      - name: On error output concordium node logs
-        if: ${{ failure() }}
-        working-directory: ${{ env.compose_folder }}
-        run: docker-compose logs
