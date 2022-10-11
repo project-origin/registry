@@ -17,4 +17,5 @@ jobs:
           dotnet-version: "6.0"
 
       - name: Run integration tests
+        working-directory: src
         run: dotnet test --filter Category=Concordium
