@@ -14,7 +14,7 @@ public static class RandomExtensions
 
         var max = BigInteger.Pow(2, bits);
 
-        byte[] bytes = new byte[max.GetByteCount()];
+        var bytes = new byte[max.GetByteCount()];
         self.NextBytes(bytes);
 
         var lastIndex = bytes.Length - 1;
@@ -34,8 +34,8 @@ public static class RandomExtensions
         if (start > end) throw new InvalidDataException("Start must be smaller or equal to end.");
         if (start == end) return start;
 
-        BigInteger range = end - start;
-        int bits = (int)range.GetBitLength();
+        var range = end - start;
+        var bits = (int)range.GetBitLength();
 
         return ((self.NextBigInteger(bits) * range) / BigInteger.Pow(2, bits)) + start;
     }

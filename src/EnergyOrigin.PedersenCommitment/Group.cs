@@ -4,7 +4,7 @@ namespace EnergyOrigin.PedersenCommitment;
 
 public record Group
 {
-    private const int DefaultBitLength = 200;
+    private const int defaultBitLength = 200;
 
     public BigInteger p { get; }
     public BigInteger q { get; }
@@ -41,7 +41,7 @@ public record Group
         return random.NextBigInteger(1, q);
     }
 
-    public static Group Create(int numberOfBits = DefaultBitLength, Random? random = null)
+    public static Group Create(int numberOfBits = defaultBitLength, Random? random = null)
     {
         random = random ?? Random.Shared;
 
@@ -70,7 +70,7 @@ public record Group
     private static (BigInteger, int) GenerateP(BigInteger q)
     {
         BigInteger p;
-        int k = 0;
+        var k = 0;
 
         do
         {

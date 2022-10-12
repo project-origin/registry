@@ -29,12 +29,14 @@ public record Commitment
     public static Commitment operator *(Commitment left, Commitment right)
     {
         if (left.Group != right.Group) throw new InvalidOperationException("Operator * between two commitments in different groups are not allowed");
-        return new Commitment(left.C * right.C % left.Group.p, left.Group);
+        return new Commitment((left.C * right.C) % left.Group.p, left.Group);
     }
 
     public static Commitment operator /(Commitment left, Commitment right)
     {
         if (left.Group != right.Group) throw new InvalidOperationException("Operator / between two commitments in different groups are not allowed");
-        return new Commitment(left.C / right.C % left.Group.p, left.Group);
+
+        var theInverse = BigInteger.ModPow(right.C, left.Group.q - 1, left.Group.p);
+        return new Commitment(left.C * theInverse % left.Group.p, left.Group);
     }
 }

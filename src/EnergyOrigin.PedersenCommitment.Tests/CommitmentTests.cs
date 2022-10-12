@@ -26,7 +26,7 @@ public class CommitmentTests
         var group1 = Group.Create();
         var group2 = Group.Create();
 
-        var m = new BigInteger(51);
+        var m = new Fixture().Create<BigInteger>();
 
         var r = group1.RandomR();
         var c = Commitment.Create(group1, m, r);
@@ -40,8 +40,8 @@ public class CommitmentTests
     {
         var group = Group.Create();
 
-        var m1 = new BigInteger(51);
-        var m2 = new BigInteger(63);
+        var m1 = new Fixture().Create<BigInteger>();
+        var m2 = new Fixture().Create<BigInteger>();
         var r1 = group.RandomR();
         var r2 = group.RandomR();
 
@@ -54,12 +54,13 @@ public class CommitmentTests
         Assert.Equal(c3.C, cSum.C);
     }
 
+    [Fact]
     public void Commitment_ToZero_Success()
     {
         var group = Group.Create();
 
-        var m2 = new BigInteger(51);
-        var m3 = new BigInteger(63);
+        var m2 = new Fixture().Create<BigInteger>();
+        var m3 = new Fixture().Create<BigInteger>();
         var m1 = m2 + m3;
 
         var r1 = group.RandomR();
@@ -70,8 +71,7 @@ public class CommitmentTests
         var c2 = Commitment.Create(group, m2, r2);
         var c3 = Commitment.Create(group, m3, r3);
 
-        var rTo0 = r1 - (r2 + r3) % group.p;
-
+        var rTo0 = (r1 - (r2 + r3)).MathMod(group.q);
         var cTo0 = Commitment.Create(group, 0, rTo0);
 
         Assert.Equal(cTo0.C, (c1 / (c2 * c3)).C);
