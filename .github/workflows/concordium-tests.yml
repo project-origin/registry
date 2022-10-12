@@ -11,6 +11,7 @@ env:
 jobs:
   test:
     runs-on: [self-hosted, concordium-testnet]
+    environment: testnet
     steps:
       - uses: actions/checkout@v3
 
@@ -21,4 +22,7 @@ jobs:
 
       - name: Run integration tests
         working-directory: src
+        env:
+          AccountAddress: ${{ secrets.AccountAddress }}
+          AccountKey: ${{ secrets.AccountKey }}
         run: dotnet test EnergyOrigin.VerifiableEventStore.ConcordiumIntegrationTests

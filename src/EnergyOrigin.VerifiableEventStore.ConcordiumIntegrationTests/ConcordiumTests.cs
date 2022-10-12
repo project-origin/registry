@@ -1,10 +1,10 @@
-using EnergyOrigin.VerifiableEventStore.Services.BlockchainConnector;
-using Microsoft.Extensions.Options;
 using NSec.Cryptography;
 using Xunit;
 using Moq;
+using EnergyOrigin.VerifiableEventStore.Services.BlockchainConnector;
+using Microsoft.Extensions.Options;
 
-namespace EnergyOrigin.VerifiableEventStore.Tests;
+namespace EnergyOrigin.VerifiableEventStore.ConcordiumIntegrationTests;
 
 public class ConcordiumTests
 {
@@ -14,7 +14,7 @@ public class ConcordiumTests
     const string FakePrivateKey = "2e5e7eb639bf87423bac5796ceb1f70e805e938803e36154e361892214974926";
 
     [Fact]
-    public async Task GetRequiredHashes_ValidateNumberOfHashesReturned()
+    public async Task GetRandomKnownTransaction_Success()
     {
         var randomKnownTransactionHash = "f8931b7da1f1464453d78e8ab606dee44b3bca00c91170e2fcbcba552da485f4";
         var knownBlockId = "06a531f87594658eee1aeb369b3e755e5b5bb6a34501aa5d24e2adfa025e7343";
@@ -28,5 +28,20 @@ public class ConcordiumTests
         Assert.NotNull(block);
         Assert.True(block?.Final);
         Assert.Equal(knownBlockId, block?.BlockId);
+    }
+
+    [Fact]
+    public async Task PublishHelloWorld_Success()
+    {
+        var accountAddress = Environment.GetEnvironmentVariable("AccountAddress");
+        var accountKey = Environment.GetEnvironmentVariable("AccountKey");
+
+        var optionsMock = new Mock<IOptions<ConcordiumOptions>>();
+        optionsMock.Setup(obj => obj.Value).Returns(new ConcordiumOptions(NodeAddress, NodeToken, accountAddress, accountKey));
+        var connector = new ConcordiumConnector(optionsMock.Object);
+
+        var transactionRef = await connector.PublishBytes(System.Text.Encoding.UTF8.GetBytes("Hello world"));
+
+        Assert.NotNull(transactionRef);
     }
 }
