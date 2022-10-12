@@ -6,7 +6,7 @@ ARG VERSION="2.298.2"
 ARG TOKEN
 ARG REPOSITORY="https://github.com/project-origin/registry"
 ARG NAME="concordium-workflow-runner"
-ARG LABELS="concordium-test"
+ARG LABELS="concordium-testnet"
 
 # Set env variables
 ENV DEBIAN_FRONTEND=noninteractive
