@@ -29,7 +29,8 @@ RUN curl -o runner.tar.gz -L https://github.com/actions/runner/releases/download
     tar xzf runner.tar.gz &&\
     rm runner.tar.gz &&\
     ./bin/installdependencies.sh &&\
-    chown -R runner /home/runner
+    chown -R runner /home/runner &&\
+    chown -R runner /usr/share
 
 # Set user as "runner"
 USER runner
