@@ -21,8 +21,7 @@ jobs:
           dotnet-version: "6.0"
 
       - name: Run integration tests
-        working-directory: src
         env:
           AccountAddress: ${{ secrets.AccountAddress }}
           AccountKey: ${{ secrets.AccountKey }}
-        run: dotnet test EnergyOrigin.VerifiableEventStore.ConcordiumIntegrationTests
+        run: make concordium-tests

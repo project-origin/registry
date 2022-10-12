@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnergyOrigin.VerifiableEven
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnergyOrigin.VerifiableEventStore.Tests", "EnergyOrigin.VerifiableEventStore.Tests\EnergyOrigin.VerifiableEventStore.Tests.csproj", "{5364EBE0-1AD3-4C1C-9D1A-F90583D48DB5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnergyOrigin.VerifiableEventStore.ConcordiumIntegrationTests", "EnergyOrigin.VerifiableEventStore.ConcordiumIntegrationTests\EnergyOrigin.VerifiableEventStore.ConcordiumIntegrationTests.csproj", "{B5DAEBAB-6196-469E-9A45-A989907D3A3D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{5364EBE0-1AD3-4C1C-9D1A-F90583D48DB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5364EBE0-1AD3-4C1C-9D1A-F90583D48DB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5364EBE0-1AD3-4C1C-9D1A-F90583D48DB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5DAEBAB-6196-469E-9A45-A989907D3A3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5DAEBAB-6196-469E-9A45-A989907D3A3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5DAEBAB-6196-469E-9A45-A989907D3A3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5DAEBAB-6196-469E-9A45-A989907D3A3D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
