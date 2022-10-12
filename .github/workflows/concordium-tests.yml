@@ -10,7 +10,7 @@ env:
 
 jobs:
   test:
-    runs-on: [self-hosted, concordium-testnode]
+    runs-on: [self-hosted, concordium-testnet]
     steps:
       - uses: actions/checkout@v3
 
