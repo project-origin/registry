@@ -2,13 +2,16 @@
 version: '3'
 services:
   github-runner:
-    container_name: github-runner
-    image: ghcr.io/energinet-datahub/eo-selfhosted-runner:v0.10.0
+    build:
+      context: .
+      dockerfile: github-runner.dockerfile
+      args:
+        TOKEN: ${GITHUB_RUNNER_TOKEN}
+        REPOSITORY: https://github.com/project-origin/registry
+        NAME: concordium-workflow-runner
+        LABELS: concordium-test
     restart: always
-    environment:
-      REPOSITORY: https://github.com/project-origin/registry
-      TOKEN: ${GITHUB_RUNNER_TOKEN}
-      NAME: concordium-workflow-runner
+    container_name: github-runner
   testnet-node:
     container_name: testnet-node
     image: concordium/testnet-node:4.2.3-0
