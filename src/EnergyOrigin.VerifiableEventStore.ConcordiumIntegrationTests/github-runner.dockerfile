@@ -14,7 +14,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Update and install packages
 RUN apt-get update -y &&\
     apt-get upgrade -y &&\
-    apt-get install -y --no-install-recommends curl ca-certificates unzip sudo git
+    apt-get install -y --no-install-recommends curl ca-certificates unzip sudo git make
 
 # Configure user and ownership
 RUN useradd -m runner &&\
