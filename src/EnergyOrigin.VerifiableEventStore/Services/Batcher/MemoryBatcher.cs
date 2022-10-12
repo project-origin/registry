@@ -21,7 +21,7 @@ public class MemoryBatcher : IBatcher
         this.eventStore = eventStore;
         this.options = options;
 
-        this.batchSize = (long)Math.Pow(2, options.Value.BatchSizeExponent);
+        batchSize = (long)Math.Pow(2, options.Value.BatchSizeExponent);
     }
 
     public async Task PublishEvent(Event e)
@@ -44,7 +44,7 @@ public class MemoryBatcher : IBatcher
 
         var transaction = await blockchainConnector.PublishBytes(root);
 
-        Block? block = await blockchainConnector.GetBlock(transaction);
+        var block = await blockchainConnector.GetBlock(transaction);
         while (block == null || !block.Final)
         {
             await Task.Delay(blockRetryWaitMilliseconds);

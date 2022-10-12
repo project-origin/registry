@@ -12,12 +12,12 @@ public class MemoryBatcherTests
     [Fact]
     public async Task MemoryBatcher_WhenBatchIsFull_BatchIsStoredAndPublished()
     {
-        string blockId = new Fixture().Create<string>();
-        string transactionId = new Fixture().Create<string>();
+        var blockId = new Fixture().Create<string>();
+        var transactionId = new Fixture().Create<string>();
         var event1 = new Fixture().Create<Event>();
         var event2 = new Fixture().Create<Event>();
 
-        byte[] rootHash = CalculateRoot(event1.Content, event2.Content);
+        var rootHash = CalculateRoot(event1.Content, event2.Content);
 
         var optionsMock = new Mock<IOptions<BatcherOptions>>();
         optionsMock.Setup(obj => obj.Value).Returns(new BatcherOptions { BatchSizeExponent = 1 });

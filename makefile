@@ -1,4 +1,4 @@
-default: restore build unit-tests
+default: restore format build unit-tests
 
 clean:
 	dotnet clean src
@@ -8,6 +8,9 @@ restore:
 
 build:
 	dotnet build src
+
+format:
+	dotnet format src
 
 unit-tests:
 	dotnet test src --filter 'FullyQualifiedName!~IntegrationTests'

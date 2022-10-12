@@ -54,9 +54,9 @@ public static class IEnumerableMerkleExtension
             return SHA256.HashData(nodes.Single());
         }
 
-        List<byte[]> newList = new List<byte[]>();
+        var newList = new List<byte[]>();
 
-        for (int i = 0; i < nodes.Count(); i = i + 2)
+        for (var i = 0; i < nodes.Count(); i = i + 2)
         {
             var left = SHA256.HashData(nodes.Skip(i).First());
             var right = SHA256.HashData(nodes.Skip(i + 1).First());

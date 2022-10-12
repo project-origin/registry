@@ -15,7 +15,7 @@ public class ConcordiumConnector : IBlockchainConnector, IDisposable
     public ConcordiumConnector(IOptions<ConcordiumOptions> options)
     {
         this.options = options;
-        this.concordiumNodeClient = new ConcordiumNodeClient(
+        concordiumNodeClient = new ConcordiumNodeClient(
             new Connection
             {
                 Address = options.Value.Address,
@@ -23,8 +23,8 @@ public class ConcordiumConnector : IBlockchainConnector, IDisposable
             });
 
         var ed25519TransactionSigner = Ed25519SignKey.From(options.Value.AccountKey);
-        this.transactionSigner = new TransactionSigner();
-        this.transactionSigner.AddSignerEntry(ConcordiumNetSdk.Types.Index.Create(0), ConcordiumNetSdk.Types.Index.Create(0), ed25519TransactionSigner);
+        transactionSigner = new TransactionSigner();
+        transactionSigner.AddSignerEntry(ConcordiumNetSdk.Types.Index.Create(0), ConcordiumNetSdk.Types.Index.Create(0), ed25519TransactionSigner);
 
     }
 
@@ -49,7 +49,7 @@ public class ConcordiumConnector : IBlockchainConnector, IDisposable
 
     public async Task<TransactionReference> PublishBytes(byte[] bytes)
     {
-        AccountTransactionService accountTransactionService = new AccountTransactionService(concordiumNodeClient);
+        var accountTransactionService = new AccountTransactionService(concordiumNodeClient);
 
         var address = AccountAddress.From(options.Value.AccountAddress);
         var payload = RegisterDataPayload.Create(bytes);
