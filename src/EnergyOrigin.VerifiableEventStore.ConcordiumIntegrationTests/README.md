@@ -63,4 +63,13 @@ user_cli create-credential --id-use-data id-use-data.json \
 concordium-client transaction deploy-credential credential.json
 ```
 
-##
+## Configure GitHub environment
+
+1. Create a Environment on GitHub named testnet
+
+2. Add 2 secrets:
+
+    1. AccountAddress - should contain the address to pay for the tests.
+    2. AccountKey - should contain the hex key for the account.
+
+3. Run tests

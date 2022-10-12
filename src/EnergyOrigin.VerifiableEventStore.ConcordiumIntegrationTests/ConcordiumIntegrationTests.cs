@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace EnergyOrigin.VerifiableEventStore.ConcordiumIntegrationTests;
 
-public class ConcordiumTests
+public class ConcordiumIntegrationTests
 {
     const string NodeAddress = "http://testnet-node:10001";
     const string NodeToken = "rpcadmin";
