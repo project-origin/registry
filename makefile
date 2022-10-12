@@ -1,19 +1,24 @@
+src_path = src
+
 default: restore format build unit-tests
 
+verify: build
+	dotnet format $(src_path) --verify-no-changes
+
 clean:
-	dotnet clean src
+	dotnet clean $(src_path)
 
 restore:
-	dotnet restore src
+	dotnet restore $(src_path)
 
 build:
-	dotnet build src
+	dotnet build $(src_path)
 
 format:
-	dotnet format src
+	dotnet format $(src_path)
 
 unit-tests:
-	dotnet test src --filter 'FullyQualifiedName!~IntegrationTests'
+	dotnet test $(src_path) --filter 'FullyQualifiedName!~IntegrationTests'
 
 concordium-tests:
-	dotnet test src/EnergyOrigin.VerifiableEventStore.ConcordiumIntegrationTests
+	dotnet test $(src_path)/EnergyOrigin.VerifiableEventStore.ConcordiumIntegrationTests

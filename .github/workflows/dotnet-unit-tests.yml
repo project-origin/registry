@@ -1,4 +1,4 @@
-name: Unit Tests
+name: Dotnet Unit Tests
 
 on:
   pull_request:
