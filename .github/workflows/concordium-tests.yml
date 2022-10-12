@@ -21,4 +21,4 @@ jobs:
 
       - name: Run integration tests
         working-directory: src
-        run: dotnet test --filter Category=Concordium
+        run: dotnet test EnergyOrigin.VerifiableEventStore.ConcordiumIntegrationTests
