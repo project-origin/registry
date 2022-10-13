@@ -90,14 +90,8 @@ In order to be able to produce and validate the commitments, we need to define a
 
 `G` is a cyclic group of prime order `q` with generator `g`. 
 
-$$ Z~\text{mod}~q $$
-
-$$ g = h^{(p-1)/q}  $$
-
-
-    Choose a random h in `G` and define `h^x = g^r` for some random `r` in `Z_q`.
-    Choose a random number `r` in the range `[1,q-1]`.
-
+### Commitment definition
+Messages we can make commitments to 
 
 ## Future work
 Making the Pedersen commitment scheme more efficient by using a more efficient group definition and secure by using eliptic curve cryptography
