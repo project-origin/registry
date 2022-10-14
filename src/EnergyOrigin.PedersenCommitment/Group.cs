@@ -18,14 +18,14 @@ public record Group
         if (q.IsProbablyNotPrime()) throw new InvalidDataException("q is probably not a prime");
         if (p.IsProbablyNotPrime()) throw new InvalidDataException("p is probably not a prime");
 
-        if (p - 1 % q == 0) throw new InvalidDataException("q is not in p - 1");
+        if ((p - 1) % q != 0) throw new InvalidDataException("q is not divisor in p - 1");
 
         if (g == 1) throw new InvalidDataException("g must not be 1!");
 
-        if (BigInteger.ModPow(g, q, p) != 1 % p) throw new InvalidDataException("g^q==1 mod p not satisfied.");
+        if (BigInteger.ModPow(g, q, p) != 1) throw new InvalidDataException("g^q==1 mod p not satisfied.");
 
         if (h == 1) throw new InvalidDataException("h must not be 1!");
-        if (BigInteger.ModPow(h, q, p) != 1 % p) throw new InvalidDataException("h^q==1 mod p not satisfied.");
+        if (BigInteger.ModPow(h, q, p) != 1) throw new InvalidDataException("h^q==1 mod p not satisfied.");
 
         if (g == h) throw new InvalidDataException("g must not be equal to h");
 
