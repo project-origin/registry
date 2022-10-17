@@ -20,7 +20,7 @@ graph TD
 There are commutation and homomorphism properties that are useful for the Pedersen commitment scheme. These properties are defined as follows:
 
 
-## What these properties can do in practice for Energy Track and Trace
+## What these properties can do in practice for Project Origin
 The Pedersen commitment scheme is used to obfuscate the amount of energy that is being transferred. The amount of energy is encrypted using Pedersen commitments. An additional property is that we can add and subtract hidden amounts of energy without revealing the individual amounts to anyone - but you can prove that the result is correct.
 
 ## How to prove that a certain value is committed to without revealing the value itself
