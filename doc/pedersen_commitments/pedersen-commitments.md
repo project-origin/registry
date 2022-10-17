@@ -66,10 +66,9 @@ flowchart LR
 ```
 
 ### Pedersen commitments are used in the following way to obfuscate the amount of energy that is being transferred:
-We want to show that the sum of the commitments in a certificate (e.g. transactions + remainder) is equal to the committed value in the original production certificate, 
-corresponding to 
+We want to show that the sum of the commitments in a certificate (e.g. transactions + remainder) is equal to the committed value in the original production certificate, corresponding to a Commitment to 0 `C_total / ( C_t1 + C_t2 + ... + C_tN + C_remainder ) = C´`. `C´` is the commitment to 0.
 
-$$Ctotal / (Ctransactions * Cremainder)$$ 
+$$C´= Ctotal / (Ctransactions * Cremainder)$$ 
 
 being a commitment to 0. In the more general, in some cases, the value in a production certificate may be divided up 
 among several owners (several commitments) and there may be several claims. In this case, we want to show that the product of commitments in the first certificate 
