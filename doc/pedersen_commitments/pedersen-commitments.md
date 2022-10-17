@@ -1,6 +1,6 @@
 # Pedersen Commitments
 
-In order to obfuscate the amount of energy that is being transferred, the amount of energy is encrypted using Pedersen commitments. The Pedersen commitment is a commitment scheme that allows the holder of the commitment to commit to a value without revealing the value itself. The commitment can be opened to reveal the value. The holder cannot open it to reveal another value. The commitment scheme is homomorphic in the sense that the product of two commitments will be a commitment to the sum of the two values.
+In order to obfuscate sensitive data in the certificates to only be accesible and readable to the owner and verifiable to the reciver of the data ie GSRN numbers, amount of energy that is being transferred, etc, the data is encrypted using Pedersen commitments. The Pedersen commitment is a commitment scheme that allows the holder of the commitment to commit to a value without revealing the value itself. The commitment can be opened to reveal the value. The holder cannot open it to reveal another value. The commitment scheme is homomorphic in the sense that the product of two commitments will be a commitment to the sum of the two values.
 
 ## Pedersen commitments are defined as follows:
 $$c=C(m,r)$$
