@@ -70,9 +70,7 @@ We want to show that the sum of the commitments in a certificate (e.g. transacti
 
 $$C´= Ctotal / (Ctransactions * Cremainder)$$ 
 
-being a commitment to 0. In the more general, in some cases, the value in a production certificate may be divided up 
-among several owners (several commitments) and there may be several claims. In this case, we want to show that the product of commitments in the first certificate 
-divided by the product of commitments in the second is a commitment to 0 (so the sum of energy quantities is the same in the two certificates).
+The value in a production certificate may be divided up among several owners (several commitments) and there may be several claims. In this case, we want to show that the product of commitments in the first certificate divided by the product of commitments in the second is a `C´` - commitment to 0 (so the sum of energy quantities is the same in the two certificates).
 
 The possible transactions in the certificate are:
 |Type|description|
