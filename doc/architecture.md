@@ -1,6 +1,6 @@
 # Architecture
 
-This file contains the run though of the suggested architecture for the registry.
+This file contains the run though of the latest suggested architecture for the registry.
 
 ## Container diagram
 
