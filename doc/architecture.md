@@ -1,6 +1,6 @@
 # Architecture
 
-This file contains the run though of the latest suggested architecture for the registry.
+This file contains the run though of the latest target architecture for the registry.
 
 ## Container diagram
 
@@ -11,7 +11,7 @@ high level of what containers the system exists of.
 
 For in depth description of the containers look in the following documents:
 
-- [Layer 2 - Verifiable event store](/doc/layer2_verifiable_event_store/README.md)
+- [Layer 2 - Verifiable event store](/doc/verifiable_event_store/README.md)
 - [Layer 3 - Logic](/doc/layer3_logic/README.md)
 - [Layer 4 - Privacy](/doc/layer4_privacy/README.md)
 

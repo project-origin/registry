@@ -2,7 +2,7 @@
 
 ![C4 component diagram of layer 2](/doc/layer2_verifiable_event_store/component_diagra.drawio.svg)
 
-## Component
+## Components
 
 ### Batcher
 
@@ -14,7 +14,6 @@ When a batch is being publishes, a new batch to begin collecting events are crea
 An event will be added to the new batch with a reference to the previous batch, referencing the previous root hash, to ensure ordering.
 
 Hashing is done with SHA256.
-
 
 ## Endpoints
 
