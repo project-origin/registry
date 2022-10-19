@@ -33,4 +33,3 @@ public record CommitmentParameters
         return cActual == cExpected;
     }
 }
-
