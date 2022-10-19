@@ -1,10 +1,13 @@
 using System.Numerics;
+using System.Runtime.Serialization;
 
 namespace ProjectOrigin.PedersenCommitment;
 
 public record Commitment
 {
     public BigInteger C { get; }
+
+    [IgnoreDataMember]
     public Group Group { get; }
 
     public Commitment(BigInteger c, Group group)

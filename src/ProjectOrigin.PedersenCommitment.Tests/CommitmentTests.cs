@@ -34,7 +34,6 @@ public class CommitmentTests
         Assert.Throws<InvalidDataException>(() => new Commitment(c.C, group2));
     }
 
-
     [Fact]
     public void Commitment_Addition_Success()
     {
@@ -75,5 +74,27 @@ public class CommitmentTests
         var cTo0 = Commitment.Create(group, 0, rTo0);
 
         Assert.Equal(cTo0.C, (c1 / (c2 * c3)).C);
+    }
+
+    [Fact]
+    public void Group_Commit_Success()
+    {
+        var group = Group.Create();
+
+        var m = new Fixture().Create<BigInteger>();
+
+        Assert.NotNull(group.Commit(m));
+    }
+
+    [Fact]
+    public void CommmitmentParameters_Verify_Success()
+    {
+        var group = Group.Create();
+
+        var m = new Fixture().Create<BigInteger>();
+
+        var commmitmentParameters = group.Commit(m);
+
+        Assert.True(commmitmentParameters.Verify(Commitment.Create(group, m, commmitmentParameters.r).C));
     }
 }

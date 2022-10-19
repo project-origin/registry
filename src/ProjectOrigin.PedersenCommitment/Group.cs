@@ -41,6 +41,11 @@ public record Group
         return random.NextBigInteger(1, q);
     }
 
+    public CommitmentParameters Commit(BigInteger m)
+    {
+        return new CommitmentParameters(m, RandomR(), this);
+    }
+
     public static Group Create(int numberOfBits = defaultBitLength, Random? random = null)
     {
         random = random ?? Random.Shared;

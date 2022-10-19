@@ -16,7 +16,6 @@ public class GroupTests
         Assert.NotNull(group);
     }
 
-
     [Fact]
     public void CreateGroup_Generate_Success()
     {
