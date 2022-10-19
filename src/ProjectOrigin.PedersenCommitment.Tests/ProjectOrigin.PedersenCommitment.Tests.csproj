@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EnergyOrigin.PedersenCommitment\EnergyOrigin.PedersenCommitment.csproj" />
+    <ProjectReference Include="..\ProjectOrigin.PedersenCommitment\ProjectOrigin.PedersenCommitment.csproj" />
   </ItemGroup>
 
 </Project>

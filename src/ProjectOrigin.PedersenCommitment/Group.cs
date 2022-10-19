@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace EnergyOrigin.PedersenCommitment;
+namespace ProjectOrigin.PedersenCommitment;
 
 public record Group
 {

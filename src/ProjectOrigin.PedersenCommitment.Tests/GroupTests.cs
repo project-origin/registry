@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace EnergyOrigin.PedersenCommitment.Tests;
+namespace ProjectOrigin.PedersenCommitment.Tests;
 
 public class GroupTests
 {
