@@ -21,4 +21,4 @@ unit-tests:
 	dotnet test $(src_path) --filter 'FullyQualifiedName!~IntegrationTests'
 
 concordium-tests:
-	dotnet test $(src_path)/EnergyOrigin.VerifiableEventStore.ConcordiumIntegrationTests
+	dotnet test $(src_path)/ProjectOrigin.VerifiableEventStore.ConcordiumIntegrationTests

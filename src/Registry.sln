@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnergyOrigin.VerifiableEventStore", "EnergyOrigin.VerifiableEventStore\EnergyOrigin.VerifiableEventStore.csproj", "{08F84068-CF3C-47B2-ADC5-A1BCDF497EE7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.VerifiableEventStore", "ProjectOrigin.VerifiableEventStore\ProjectOrigin.VerifiableEventStore.csproj", "{08F84068-CF3C-47B2-ADC5-A1BCDF497EE7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnergyOrigin.VerifiableEventStore.Tests", "EnergyOrigin.VerifiableEventStore.Tests\EnergyOrigin.VerifiableEventStore.Tests.csproj", "{5364EBE0-1AD3-4C1C-9D1A-F90583D48DB5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.VerifiableEventStore.Tests", "ProjectOrigin.VerifiableEventStore.Tests\ProjectOrigin.VerifiableEventStore.Tests.csproj", "{5364EBE0-1AD3-4C1C-9D1A-F90583D48DB5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnergyOrigin.VerifiableEventStore.ConcordiumIntegrationTests", "EnergyOrigin.VerifiableEventStore.ConcordiumIntegrationTests\EnergyOrigin.VerifiableEventStore.ConcordiumIntegrationTests.csproj", "{B5DAEBAB-6196-469E-9A45-A989907D3A3D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.VerifiableEventStore.ConcordiumIntegrationTests", "ProjectOrigin.VerifiableEventStore.ConcordiumIntegrationTests\ProjectOrigin.VerifiableEventStore.ConcordiumIntegrationTests.csproj", "{B5DAEBAB-6196-469E-9A45-A989907D3A3D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

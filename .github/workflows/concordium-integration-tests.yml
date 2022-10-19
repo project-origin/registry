@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  compose_folder: src/EnergyOrigin.VerifiableEventStore.Tests
+  compose_folder: src/ProjectOrigin.VerifiableEventStore.Tests
 
 jobs:
   test:
