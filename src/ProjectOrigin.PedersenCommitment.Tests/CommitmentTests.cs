@@ -60,20 +60,15 @@ public class CommitmentTests
 
         var m2 = new Fixture().Create<BigInteger>();
         var m3 = new Fixture().Create<BigInteger>();
-        var m1 = m2 + m3;
 
-        var r1 = group.RandomR();
-        var r2 = group.RandomR();
-        var r3 = group.RandomR();
+        var cp1 = group.Commit(m2 + m3);
+        var cp2 = group.Commit(m2);
+        var cp3 = group.Commit(m3);
 
-        var c1 = Commitment.Create(group, m1, r1);
-        var c2 = Commitment.Create(group, m2, r2);
-        var c3 = Commitment.Create(group, m3, r3);
-
-        var rTo0 = (r1 - (r2 + r3)).MathMod(group.q);
+        var rTo0 = (cp1.r - (cp2.r + cp3.r)).MathMod(group.q);
         var cTo0 = Commitment.Create(group, 0, rTo0);
 
-        Assert.Equal(cTo0.C, (c1 / (c2 * c3)).C);
+        Assert.Equal(cTo0.C, (cp1.Commitment / (cp2.Commitment * cp3.Commitment)).C);
     }
 
     [Fact]
