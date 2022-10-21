@@ -28,6 +28,11 @@ public record CommitmentParameters
     public bool Verify(BigInteger c)
     {
         var cActual = new Commitment(c, Group);
+        return Verify(cActual);
+    }
+
+    public bool Verify(Commitment cActual)
+    {
         var cExpected = Commitment.Create(Group, m, r);
 
         return cActual == cExpected;
