@@ -1,5 +1,4 @@
 using ProjectOrigin.Electricity.Production.Requests;
-using ProjectOrigin.Electricity.Shared;
 using ProjectOrigin.Electricity.Shared.Internal;
 
 namespace ProjectOrigin.Electricity.Production;
