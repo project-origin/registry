@@ -2,7 +2,7 @@ src_path = src
 
 default: restore format build unit-tests
 
-verify: build
+verify: unit-tests # Verify code is ready for commit to branch
 	dotnet format $(src_path) --verify-no-changes
 
 clean:

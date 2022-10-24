@@ -12,6 +12,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.PedersenCommi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.PedersenCommitment.Tests", "ProjectOrigin.PedersenCommitment.Tests\ProjectOrigin.PedersenCommitment.Tests.csproj", "{FDA069D8-E8FE-465E-A11E-77BC15E4EB2A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.RequestProcessor", "ProjectOrigin.RequestProcessor\ProjectOrigin.RequestProcessor.csproj", "{EC541F55-C0A9-4694-A902-B41026E9AC73}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.RequestProcessor.Tests", "ProjectOrigin.RequestProcessor.Tests\ProjectOrigin.RequestProcessor.Tests.csproj", "{0C7EF78A-5D77-4B04-BDC4-EBE2C5F179AA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,5 +45,13 @@ Global
 		{FDA069D8-E8FE-465E-A11E-77BC15E4EB2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FDA069D8-E8FE-465E-A11E-77BC15E4EB2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FDA069D8-E8FE-465E-A11E-77BC15E4EB2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC541F55-C0A9-4694-A902-B41026E9AC73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC541F55-C0A9-4694-A902-B41026E9AC73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC541F55-C0A9-4694-A902-B41026E9AC73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC541F55-C0A9-4694-A902-B41026E9AC73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C7EF78A-5D77-4B04-BDC4-EBE2C5F179AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C7EF78A-5D77-4B04-BDC4-EBE2C5F179AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C7EF78A-5D77-4B04-BDC4-EBE2C5F179AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C7EF78A-5D77-4B04-BDC4-EBE2C5F179AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
