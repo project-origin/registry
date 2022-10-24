@@ -1,8 +1,13 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.VerifiableEventStore", "ProjectOrigin.VerifiableEventStore\ProjectOrigin.VerifiableEventStore.csproj", "{08F84068-CF3C-47B2-ADC5-A1BCDF497EE7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.VerifiableEventStore.Tests", "ProjectOrigin.VerifiableEventStore.Tests\ProjectOrigin.VerifiableEventStore.Tests.csproj", "{5364EBE0-1AD3-4C1C-9D1A-F90583D48DB5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.VerifiableEventStore.ConcordiumIntegrationTests", "ProjectOrigin.VerifiableEventStore.ConcordiumIntegrationTests\ProjectOrigin.VerifiableEventStore.ConcordiumIntegrationTests.csproj", "{B5DAEBAB-6196-469E-9A45-A989907D3A3D}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.PedersenCommitment", "ProjectOrigin.PedersenCommitment\ProjectOrigin.PedersenCommitment.csproj", "{0A0F1082-9AF8-4A64-8494-4C9C87291421}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.PedersenCommitment.Tests", "ProjectOrigin.PedersenCommitment.Tests\ProjectOrigin.PedersenCommitment.Tests.csproj", "{FDA069D8-E8FE-465E-A11E-77BC15E4EB2A}"
@@ -16,6 +21,18 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{08F84068-CF3C-47B2-ADC5-A1BCDF497EE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08F84068-CF3C-47B2-ADC5-A1BCDF497EE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08F84068-CF3C-47B2-ADC5-A1BCDF497EE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08F84068-CF3C-47B2-ADC5-A1BCDF497EE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5364EBE0-1AD3-4C1C-9D1A-F90583D48DB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5364EBE0-1AD3-4C1C-9D1A-F90583D48DB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5364EBE0-1AD3-4C1C-9D1A-F90583D48DB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5364EBE0-1AD3-4C1C-9D1A-F90583D48DB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5DAEBAB-6196-469E-9A45-A989907D3A3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5DAEBAB-6196-469E-9A45-A989907D3A3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5DAEBAB-6196-469E-9A45-A989907D3A3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5DAEBAB-6196-469E-9A45-A989907D3A3D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0A0F1082-9AF8-4A64-8494-4C9C87291421}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0A0F1082-9AF8-4A64-8494-4C9C87291421}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A0F1082-9AF8-4A64-8494-4C9C87291421}.Release|Any CPU.ActiveCfg = Release|Any CPU

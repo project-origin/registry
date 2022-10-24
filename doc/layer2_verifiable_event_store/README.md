@@ -15,6 +15,7 @@ An event will be added to the new batch with a reference to the previous batch, 
 
 Hashing is done with SHA256.
 
+
 ## Endpoints
 
 ### 1. PublishEvent
