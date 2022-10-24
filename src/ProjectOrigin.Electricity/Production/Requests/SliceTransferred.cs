@@ -16,7 +16,6 @@ internal record ProductionSliceTransferredRequest(
     byte[] Signature
     ) : PublishRequest<ProductionSliceTransferredEvent>(Event.CertificateId, Signature, Event);
 
-
 internal class ProductionSliceTransferredVerifier : SliceVerifier, IRequestVerifier<ProductionSliceTransferredRequest, ProductionCertificate>
 {
     public ProductionSliceTransferredVerifier(IEventSerializer serializer) : base(serializer)
@@ -31,6 +30,6 @@ internal class ProductionSliceTransferredVerifier : SliceVerifier, IRequestVerif
         if (!PublicKey.TryImport(SignatureAlgorithm.Ed25519, request.Event.NewOwner, KeyBlobFormat.RawPublicKey, out _))
             return VerificationResult.Invalid("Invalid NewOwner key, not a valid Ed25519 publicKey");
 
-        return VerifySlice(request, request.SliceParameters, request.Event.Slice, model.Slices);
+        return VerifySlice(request, request.SliceParameters, request.Event.Slice, model.AvailableSlices);
     }
 }

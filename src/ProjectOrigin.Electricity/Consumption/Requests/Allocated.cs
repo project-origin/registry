@@ -1,4 +1,4 @@
-using ProjectOrigin.Electricity.Shared;
+using ProjectOrigin.Electricity.Production;
 using ProjectOrigin.Electricity.Shared.Internal;
 using ProjectOrigin.RequestProcessor.Interfaces;
 using ProjectOrigin.RequestProcessor.Models;
@@ -19,18 +19,30 @@ internal record ConsumptionAllocatedRequest(
 
 internal class ConsumptionAllocatedVerifier : SliceVerifier, IRequestVerifier<ConsumptionAllocatedRequest, ConsumptionCertificate>
 {
-    public ConsumptionAllocatedVerifier(IEventSerializer serializer) : base(serializer)
+    private IModelLoader loader;
+
+    public ConsumptionAllocatedVerifier(IEventSerializer serializer, IModelLoader loader) : base(serializer)
     {
+        this.loader = loader;
     }
 
-    public Task<VerificationResult> Verify(ConsumptionAllocatedRequest request, ConsumptionCertificate? model)
+    public async Task<VerificationResult> Verify(ConsumptionAllocatedRequest request, ConsumptionCertificate? model)
     {
         if (model is null)
             return VerificationResult.Invalid("Certificate does not exist");
 
-        throw new NotImplementedException("Verify production allocated!");
+        var v = VerifySlice(request, request.SliceParameters, request.Event.Slice, model.AvailableSlices);
+        if (!v.IsValid)
+            return v;
 
-        return VerifySlice(request, request.SliceParameters, request.Event.Slice, model.Slices);
+        var (productionCertificate, _) = await loader.Get<ProductionCertificate>(request.Event.ProductionCertificateId);
+        if (productionCertificate == null || !productionCertificate.HasAllocation(request.Event.AllocationId))
+            return VerificationResult.Invalid("Production not allocated");
+
+        if (productionCertificate.GetAllocation(request.Event.AllocationId)!.Commitment != request.Event.Slice.Quantity)
+            return VerificationResult.Invalid("Commmitment are not the same.");
+
+        return VerificationResult.Valid;
     }
 }
 

@@ -19,14 +19,12 @@ internal record ProductionIssuedEvent(
     byte[] OwnerPublicKey,
     CommitmentParameters? QuantityParameters = null);
 
-
 internal record ProductionIssuedRequest(
     CommitmentParameters GsrnCommitmentParameters,
     CommitmentParameters QuantityCommitmentParameters,
     ProductionIssuedEvent Event,
     byte[] Signature
     ) : PublishRequest<ProductionIssuedEvent>(Event.Id, Signature, Event);
-
 
 internal class ProductionIssuedVerifier : IRequestVerifier<ProductionIssuedRequest, ProductionCertificate>
 {
@@ -50,7 +48,8 @@ internal class ProductionIssuedVerifier : IRequestVerifier<ProductionIssuedReque
         if (!request.QuantityCommitmentParameters.Verify(request.Event.QuantityCommitment))
             return VerificationResult.Invalid("Calculated Quantity commitment does not equal the parameters");
 
-        if (request.Event.QuantityParameters is not null && request.QuantityCommitmentParameters != request.Event.QuantityParameters)
+        if (request.Event.QuantityParameters is not null
+            && request.QuantityCommitmentParameters != request.Event.QuantityParameters)
             return VerificationResult.Invalid($"{nameof(request.Event.QuantityParameters)} and {nameof(request.QuantityCommitmentParameters)} are not the same");
 
         if (!PublicKey.TryImport(SignatureAlgorithm.Ed25519, request.Event.OwnerPublicKey, KeyBlobFormat.RawPublicKey, out _))

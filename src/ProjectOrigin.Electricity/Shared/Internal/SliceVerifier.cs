@@ -15,7 +15,7 @@ internal abstract class SliceVerifier
         this.serializer = serializer;
     }
 
-    public VerificationResult VerifySlice(PublishRequest request, SliceParameters parameters, Slice slice, IEnumerable<CertificateSlices> modelSlices)
+    public VerificationResult VerifySlice(PublishRequest request, SliceParameters parameters, Slice slice, IEnumerable<CertificateSlice> modelSlices)
     {
 
         if (parameters.Quantity.m > parameters.Source.m)
@@ -37,9 +37,8 @@ internal abstract class SliceVerifier
         if (sliceFound is null)
             return VerificationResult.Invalid("Slice not found");
 
-        var publicKey = PublicKey.Import(SignatureAlgorithm.Ed25519, sliceFound.Owner, KeyBlobFormat.RawPublicKey);
         var data = serializer.Serialize(request.Event);
-        if (!Ed25519.Ed25519.Verify(publicKey, data, request.Signature))
+        if (!Ed25519.Ed25519.Verify(sliceFound.Owner, data, request.Signature))
             return VerificationResult.Invalid($"Invalid signature");
 
         var group = parameters.Source.Group;

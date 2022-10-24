@@ -1,3 +1,4 @@
+using ProjectOrigin.Electricity.Consumption;
 using ProjectOrigin.Electricity.Shared.Internal;
 using ProjectOrigin.RequestProcessor.Interfaces;
 using ProjectOrigin.RequestProcessor.Models;
@@ -18,15 +19,22 @@ internal record ProductionAllocatedRequest(
 
 internal class ProductionAllocatedVerifier : SliceVerifier, IRequestVerifier<ProductionAllocatedRequest, ProductionCertificate>
 {
-    public ProductionAllocatedVerifier(IEventSerializer serializer) : base(serializer)
+    private IModelLoader loader;
+
+    public ProductionAllocatedVerifier(IEventSerializer serializer, IModelLoader loader) : base(serializer)
     {
+        this.loader = loader;
     }
 
-    public Task<VerificationResult> Verify(ProductionAllocatedRequest request, ProductionCertificate? model)
+    public async Task<VerificationResult> Verify(ProductionAllocatedRequest request, ProductionCertificate? model)
     {
         if (model is null)
             return VerificationResult.Invalid("Certificate does not exist");
 
-        return VerifySlice(request, request.SliceParameters, request.Event.Slice, model.Slices);
+        var (consumptionCertificate, _) = await loader.Get<ConsumptionCertificate>(request.Event.ConsumptionCertificateId);
+        if (consumptionCertificate == null)
+            return VerificationResult.Invalid("ConsumptionCertificate does not exist");
+
+        return VerifySlice(request, request.SliceParameters, request.Event.Slice, model.AvailableSlices);
     }
 }
