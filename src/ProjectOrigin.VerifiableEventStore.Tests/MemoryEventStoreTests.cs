@@ -11,12 +11,12 @@ public class MemoryEventStoreTests
         var batch1 = new Fixture().Create<Batch>();
         var batch2 = new Fixture().Create<Batch>();
 
-        var meroryEventStore = new MemoryEventStore();
+        var memoryEventStore = new MemoryEventStore();
 
-        await meroryEventStore.StoreBatch(batch1);
-        await meroryEventStore.StoreBatch(batch2);
+        await memoryEventStore.StoreBatch(batch1);
+        await memoryEventStore.StoreBatch(batch2);
 
-        var batchResult = await meroryEventStore.GetBatch(batch1.Events.First().Id);
+        var batchResult = await memoryEventStore.GetBatch(batch1.Events.First().Id);
 
         Assert.Equal(batch1, batchResult);
     }
@@ -24,9 +24,9 @@ public class MemoryEventStoreTests
     [Fact]
     public async Task MemoryEventStore_GetBatchNotFound_ReturnNull()
     {
-        var meroryEventStore = new MemoryEventStore();
+        var memoryEventStore = new MemoryEventStore();
         var eventId = new Fixture().Create<EventId>();
-        var batchResult = await meroryEventStore.GetBatch(eventId);
+        var batchResult = await memoryEventStore.GetBatch(eventId);
 
         Assert.Null(batchResult);
     }
