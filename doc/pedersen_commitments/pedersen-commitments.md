@@ -1,6 +1,6 @@
 # Pedersen Commitments
 
-In order to obfuscate sensitive data in the certificates to only be accesible and readable to the owner and verifiable to the reciver of the data ie GSRN numbers, amount of energy that is being transferred, etc, the data is encrypted using Pedersen commitments. The Pedersen commitment is a commitment scheme that allows the holder of the commitment to commit to a value without revealing the value itself. The commitment can be opened to reveal the value. The holder cannot open it to reveal another value. The commitment scheme is homomorphic in the sense that the product of two commitments will be a commitment to the sum of the two values.
+In order to obfuscate sensitive data in the certificates to only be accesible and readable to the owner and verifiable to the reciver of the data ie GSRN numbers, quantity of energy that is being transferred, etc, the data is encrypted using Pedersen commitments. The Pedersen commitment is a commitment scheme that allows the holder of the commitment to commit to a value without revealing the value itself. The commitment can be opened to reveal the value. The holder cannot open it to reveal another value. The commitment scheme is homomorphic in the sense that the product of two commitments will be a commitment to the sum of the two values.
 
 ## Pedersen commitments are defined as follows:
 $$c=C(m,r)$$
@@ -21,7 +21,7 @@ There are commutation and homomorphism properties that are useful for the Peders
 
 
 ## What these properties can do in practice for Project Origin
-The Pedersen commitment scheme is used to obfuscate the amount of energy that is being transferred. The amount of energy is encrypted using Pedersen commitments. An additional property is that we can add and subtract hidden amounts of energy without revealing the individual amounts to anyone - but you can prove that the result is correct.
+The Pedersen commitment scheme is used to obfuscate the quantity of energy that is being transferred. The quantity of energy is encrypted using Pedersen commitments. An additional property is that we can add and subtract hidden quantitys of energy without revealing the individual quantitys to anyone - but you can prove that the result is correct.
 
 ## How to prove that a certain value is committed to without revealing the value itself
 ```mermaid
@@ -29,19 +29,19 @@ flowchart LR
 
     subgraph S1[Value]
         direction TB
-        A[Wh] 
+        A[Wh]
         subgraph S2[Pedersen Commitments]
             direction TB
             B[C_total]
-            
+
             subgraph S3[Commited Transactions]
                 C[C_t1]
                 D[C_t2]
                 E[C_tN]
                 F[C_remainder]
             end
-            
-            
+
+
             subgraph S4[Validation]
                 direction LR
                 J[C_total / Commited Transacations]
@@ -65,17 +65,17 @@ flowchart LR
     S5 --> C
 ```
 
-### Pedersen commitments are used in the following way to obfuscate the amount of energy that is being transferred:
+### Pedersen commitments are used in the following way to obfuscate the quantity of energy that is being transferred:
 We want to show that the sum of the commitments in a certificate (e.g. transactions + remainder) is equal to the committed value in the original production certificate, corresponding to a Commitment to 0 `C_total / ( C_t1 + C_t2 + ... + C_tN + C_remainder ) = C´`. `C´` is the commitment to 0.
 
-$$C´= Ctotal / (Ctransactions * Cremainder)$$ 
+$$C´= Ctotal / (Ctransactions * Cremainder)$$
 
 The value in a production certificate may be divided up among several owners (several commitments) and there may be several claims. In this case, we want to show that the product of commitments in the first certificate divided by the product of commitments in the second is a `C´` - commitment to 0 (so the sum of energy quantities is the same in the two certificates).
 
 The possible transactions in the certificate are:
 |Type|description|
 |---|---|
-|Transfer|transfer of ownership X amount of units ie. Wh from user A to B|
+|Transfer|transfer of ownership X quantity of units ie. Wh from user A to B|
 |Claim|claim of ownership of production certificate X to consumption certificate Y|
 |Expire|expiration of remainder of production certificate|
 |Withdraw|withdrawal of remainder of production certificate|
