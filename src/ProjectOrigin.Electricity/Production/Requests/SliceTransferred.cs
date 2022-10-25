@@ -30,6 +30,11 @@ internal class ProductionSliceTransferredVerifier : SliceVerifier, IRequestVerif
         if (!PublicKey.TryImport(SignatureAlgorithm.Ed25519, request.Event.NewOwner, KeyBlobFormat.RawPublicKey, out _))
             return VerificationResult.Invalid("Invalid NewOwner key, not a valid Ed25519 publicKey");
 
-        return VerifySlice(request, request.SliceParameters, request.Event.Slice, model.AvailableSlices);
+        var sliceFound = model.GetSlice(request.Event.Slice.Source);
+        var verificationResult = VerifySlice(request, request.SliceParameters, request.Event.Slice, sliceFound);
+        if (!verificationResult.IsValid)
+            return verificationResult;
+
+        return VerificationResult.Valid;
     }
 }

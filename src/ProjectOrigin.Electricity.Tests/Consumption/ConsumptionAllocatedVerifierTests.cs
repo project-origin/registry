@@ -1,8 +1,6 @@
-using Microsoft.Extensions.Options;
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Consumption.Requests;
 using ProjectOrigin.Electricity.Production;
-using ProjectOrigin.PedersenCommitment;
 using ProjectOrigin.RequestProcessor.Interfaces;
 using ProjectOrigin.RequestProcessor.Services;
 
@@ -22,15 +20,15 @@ public class ConsumptionAllocatedVerifierTests
     {
         var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
 
-        var consIssued = Helper.ConsumptionIssued(ownerKey, 300);
-        var prodIssued = Helper.ProductionIssued(ownerKey, 250);
-        var quantity = Helper.Group.Commit(150);
-        var prodAllocated = Helper.ProductionAllocated(ownerKey, quantity, prodIssued, consIssued.certificate.Id);
-        var verifier = Verifier(prodAllocated.certificate);
+        var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey, 250);
+        var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey, 300);
+        var quantity = FakeRegister.Group.Commit(150);
+        var (allocationId, _) = prodCert.Allocated(prodParams, consCert.Id, quantity);
+        var verifier = Verifier(prodCert);
 
-        var request = Helper.CreateAllocation(prodAllocated.allocationId, consIssued.certificate.Id, prodIssued.certificate.Id, consIssued.parameters, quantity, ownerKey);
+        var request = FakeRegister.CreateConsumptionAllocationRequest(allocationId, consCert.Id, prodCert.Id, consParams, quantity, ownerKey);
 
-        var result = await verifier.Verify(request, consIssued.certificate);
+        var result = await verifier.Verify(request, consCert);
 
         Assert.True(result.IsValid, result.ErrorMessage);
     }
@@ -40,13 +38,13 @@ public class ConsumptionAllocatedVerifierTests
     {
         var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
 
-        var consIssued = Helper.ConsumptionIssued(ownerKey, 300);
-        var prodIssued = Helper.ProductionIssued(ownerKey, 250);
-        var quantity = Helper.Group.Commit(150);
-        var prodAllocated = Helper.ProductionAllocated(ownerKey, quantity, prodIssued, consIssued.certificate.Id);
-        var verifier = Verifier(prodAllocated.certificate);
+        var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey, 250);
+        var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey, 300);
+        var quantity = FakeRegister.Group.Commit(150);
+        var (allocationId, _) = prodCert.Allocated(prodParams, consCert.Id, quantity);
+        var verifier = Verifier(prodCert);
 
-        var request = Helper.CreateAllocation(prodAllocated.allocationId, consIssued.certificate.Id, prodIssued.certificate.Id, consIssued.parameters, quantity, ownerKey);
+        var request = FakeRegister.CreateConsumptionAllocationRequest(allocationId, consCert.Id, prodCert.Id, consParams, quantity, ownerKey);
 
         var result = await verifier.Verify(request, null);
 
@@ -59,17 +57,37 @@ public class ConsumptionAllocatedVerifierTests
     {
         var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
 
-        var consIssued = Helper.ConsumptionIssued(ownerKey, 300);
-        var prodIssued = Helper.ProductionIssued(ownerKey, 250);
-        var quantity = Helper.Group.Commit(150);
-        var prodAllocated = Helper.ProductionAllocated(ownerKey, quantity, prodIssued, consIssued.certificate.Id);
-        var verifier = Verifier(prodAllocated.certificate);
+        var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey, 250);
+        var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey, 300);
+        var quantity = FakeRegister.Group.Commit(150);
+        var (allocationId, _) = prodCert.Allocated(prodParams, consCert.Id, quantity);
+        var verifier = Verifier(prodCert);
 
-        var request = Helper.CreateAllocation(Guid.NewGuid(), consIssued.certificate.Id, prodIssued.certificate.Id, consIssued.parameters, quantity, ownerKey);
+        var request = FakeRegister.CreateConsumptionAllocationRequest(Guid.NewGuid(), consCert.Id, prodCert.Id, consParams, quantity, ownerKey);
 
-        var result = await verifier.Verify(request, consIssued.certificate);
+        var result = await verifier.Verify(request, consCert);
 
         Assert.False(result.IsValid);
         Assert.Equal("Production not allocated", result.ErrorMessage);
+    }
+
+    [Fact]
+    public async Task Verifier_AllocateCertificate_DifferentCommitmentsSameQuantity()
+    {
+        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
+
+        var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey, 250);
+        var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey, 300);
+        var quantity1 = FakeRegister.Group.Commit(150);
+        var quantity2 = FakeRegister.Group.Commit(150);
+        var (allocationId, _) = prodCert.Allocated(prodParams, consCert.Id, quantity1);
+        var verifier = Verifier(prodCert);
+
+        var request = FakeRegister.CreateConsumptionAllocationRequest(allocationId, consCert.Id, prodCert.Id, consParams, quantity2, ownerKey);
+
+        var result = await verifier.Verify(request, consCert);
+
+        Assert.False(result.IsValid);
+        Assert.Equal("Commmitment are not the same", result.ErrorMessage);
     }
 }

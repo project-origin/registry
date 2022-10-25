@@ -31,10 +31,21 @@ internal class ProductionAllocatedVerifier : SliceVerifier, IRequestVerifier<Pro
         if (model is null)
             return VerificationResult.Invalid("Certificate does not exist");
 
+        var sliceFound = model.GetSlice(request.Event.Slice.Source);
+        var verificationResult = VerifySlice(request, request.SliceParameters, request.Event.Slice, sliceFound);
+        if (!verificationResult.IsValid)
+            return verificationResult;
+
         var (consumptionCertificate, _) = await loader.Get<ConsumptionCertificate>(request.Event.ConsumptionCertificateId);
         if (consumptionCertificate == null)
             return VerificationResult.Invalid("ConsumptionCertificate does not exist");
 
-        return VerifySlice(request, request.SliceParameters, request.Event.Slice, model.AvailableSlices);
+        if (consumptionCertificate.Period != model.Period)
+            return VerificationResult.Invalid("Certificates are not in the same period");
+
+        if (consumptionCertificate.GridArea != model.GridArea)
+            return VerificationResult.Invalid("Certificates are not in the same area");
+
+        return VerificationResult.Valid;
     }
 }

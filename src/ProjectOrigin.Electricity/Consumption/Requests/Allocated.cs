@@ -31,52 +31,18 @@ internal class ConsumptionAllocatedVerifier : SliceVerifier, IRequestVerifier<Co
         if (model is null)
             return VerificationResult.Invalid("Certificate does not exist");
 
-        var v = VerifySlice(request, request.SliceParameters, request.Event.Slice, model.AvailableSlices);
-        if (!v.IsValid)
-            return v;
+        var sliceFound = model.GetSlice(request.Event.Slice.Source);
+        var verificationResult = VerifySlice(request, request.SliceParameters, request.Event.Slice, sliceFound);
+        if (!verificationResult.IsValid)
+            return verificationResult;
 
         var (productionCertificate, _) = await loader.Get<ProductionCertificate>(request.Event.ProductionCertificateId);
         if (productionCertificate == null || !productionCertificate.HasAllocation(request.Event.AllocationId))
             return VerificationResult.Invalid("Production not allocated");
 
         if (productionCertificate.GetAllocation(request.Event.AllocationId)!.Commitment != request.Event.Slice.Quantity)
-            return VerificationResult.Invalid("Commmitment are not the same.");
+            return VerificationResult.Invalid("Commmitment are not the same");
 
         return VerificationResult.Valid;
     }
 }
-
-// public static class AllocatedConsumptionHttpClassExtensions
-// {
-//     static IEventSerializer serializer = new JsonEventSerializer();
-
-//     public static void AllocatedConsumption(this HttpClient client,
-//         Guid allocationId,
-//         CertifcateId productionCertificateId,
-//         CertifcateId consumptionCertificateId,
-//         CommitmentParameters source,
-//         CommitmentParameters quantity,
-//         CommitmentParameters remainder,
-//         Key ownerKey)
-//     {
-//         var e = new ConsumptionAllocated(
-//                 allocationId,
-//                 productionCertificateId,
-//                 consumptionCertificateId,
-//                 new Slice(source.Commitment, quantity.Commitment, remainder.Commitment, 0)
-//             );
-
-//         var serializedEvent = serializer.Serialize(e);
-//         var signature = NSec.Cryptography.Ed25519.Ed25519.Sign(ownerKey, serializedEvent);
-
-//         var rerquest = new ConsumptionAllocatedRequest(
-//             new(
-//                 source, quantity, remainder
-//             ),
-//             e,
-//             signature
-//         );
-
-//         throw new NotImplementedException();
-//     }
-// }

@@ -1,16 +1,22 @@
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Production.Requests;
+using ProjectOrigin.Electricity.Shared;
 using ProjectOrigin.Electricity.Shared.Internal;
+using ProjectOrigin.PedersenCommitment;
 using ProjectOrigin.RequestProcessor.Interfaces;
 
 namespace ProjectOrigin.Electricity.Production;
 
 internal class ProductionCertificate : IModel
 {
-    public FederatedStreamId Id { get => issued!.Id; }
+    public FederatedStreamId Id { get => issued.Id; }
+    public TimePeriod Period { get => issued.Period; }
+    public string GridArea { get => issued.GridArea; }
 
-    public IEnumerable<CertificateSlice> AvailableSlices { get => availableSlices; }
-    public IEnumerable<AllocationSlice> AllocationSlices { get => allocationSlices; }
+    internal CertificateSlice? GetSlice(Commitment source) => availableSlices.SingleOrDefault(x => x.Commitment == source);
+    public bool HasClaim(Guid allocationId) => claimedSlices.SingleOrDefault(x => x.AllocationId == allocationId) is not null;
+    public bool HasAllocation(Guid allocationId) => allocationSlices.SingleOrDefault(x => x.AllocationId == allocationId) is not null;
+    public AllocationSlice? GetAllocation(Guid allocationId) => allocationSlices.SingleOrDefault(x => x.AllocationId == allocationId);
 
     private ProductionIssuedEvent issued;
     private List<CertificateSlice> availableSlices = new List<CertificateSlice>();
@@ -32,12 +38,6 @@ internal class ProductionCertificate : IModel
         availableSlices.Add(new(e.Slice.Quantity, publicKey));
         availableSlices.Add(new(e.Slice.Remainder, oldSlice.Owner));
     }
-
-    internal bool HasClaim(Guid allocationId) => claimedSlices.SingleOrDefault(x => x.AllocationId == allocationId) is not null;
-
-    public bool HasAllocation(Guid allocationId) => allocationSlices.SingleOrDefault(x => x.AllocationId == allocationId) is not null;
-
-    public AllocationSlice? GetAllocation(Guid allocationId) => allocationSlices.SingleOrDefault(x => x.AllocationId == allocationId);
 
     public void Apply(ProductionAllocatedEvent e)
     {

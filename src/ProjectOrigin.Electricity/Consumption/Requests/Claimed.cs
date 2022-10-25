@@ -30,7 +30,7 @@ internal class ConsumptionClaimedVerifier : IRequestVerifier<ConsumptionClaimedR
         if (model is null)
             return VerificationResult.Invalid("Certificate does not exist");
 
-        var slice = model.AllocationSlices.Single(x => x.AllocationId == request.Event.AllocationId);
+        var slice = model.GetAllocation(request.Event.AllocationId);
         if (slice is null)
             return VerificationResult.Invalid("Allocation does not exist");
 
@@ -39,8 +39,8 @@ internal class ConsumptionClaimedVerifier : IRequestVerifier<ConsumptionClaimedR
             return VerificationResult.Invalid($"Invalid signature");
 
         var (productionCertificate, _) = await loader.Get<ProductionCertificate>(slice.ProductionCertificateId);
-        if (productionCertificate == null || productionCertificate.HasClaim(request.Event.AllocationId))
-            throw new NotImplementedException("Verify production not claimed");
+        if (productionCertificate == null || !productionCertificate.HasClaim(request.Event.AllocationId))
+            return VerificationResult.Invalid("Production not claimed");
 
         return VerificationResult.Valid;
     }

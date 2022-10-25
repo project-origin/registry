@@ -39,8 +39,8 @@ internal class ProductionClaimedVerifier : IRequestVerifier<ProductionClaimedReq
             return VerificationResult.Invalid($"Invalid signature");
 
         var (consumptionCertificate, _) = await loader.Get<ConsumptionCertificate>(slice.ConsumptionCertificateId);
-        if (consumptionCertificate == null || consumptionCertificate.HasAllocation(request.Event.AllocationId))
-            throw new NotImplementedException("Verify consumption not allocated");
+        if (consumptionCertificate == null || !consumptionCertificate.HasAllocation(request.Event.AllocationId))
+            return VerificationResult.Invalid("Consumption not allocated");
 
         return VerificationResult.Valid;
     }

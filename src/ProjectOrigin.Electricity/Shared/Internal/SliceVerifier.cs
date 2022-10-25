@@ -15,9 +15,8 @@ internal abstract class SliceVerifier
         this.serializer = serializer;
     }
 
-    public VerificationResult VerifySlice(PublishRequest request, SliceParameters parameters, Slice slice, IEnumerable<CertificateSlice> modelSlices)
+    public VerificationResult VerifySlice(PublishRequest request, SliceParameters parameters, Slice slice, CertificateSlice? certificateSlice)
     {
-
         if (parameters.Quantity.m > parameters.Source.m)
             return VerificationResult.Invalid("Transfer larger than source");
 
@@ -33,12 +32,11 @@ internal abstract class SliceVerifier
         if (!parameters.Remainder.Verify(slice.Remainder))
             return VerificationResult.Invalid("Calculated Remainder commitment does not equal the parameters");
 
-        var sliceFound = modelSlices.SingleOrDefault(s => s.Commitment == slice.Source);
-        if (sliceFound is null)
+        if (certificateSlice is null)
             return VerificationResult.Invalid("Slice not found");
 
         var data = serializer.Serialize(request.Event);
-        if (!Ed25519.Ed25519.Verify(sliceFound.Owner, data, request.Signature))
+        if (!Ed25519.Ed25519.Verify(certificateSlice.Owner, data, request.Signature))
             return VerificationResult.Invalid($"Invalid signature");
 
         var group = parameters.Source.Group;
