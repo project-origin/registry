@@ -13,8 +13,8 @@ public class MerkleTreeTests
     [InlineData(16, 5, 4)]
     public void GetRequiredHashes_ValidateNumberOfHashesReturned(int numberOfEvents, int leafIndex, int numberOfHashes)
     {
-        var events = new Fixture().CreateMany<Event>(numberOfEvents);
-        var hashes = events.GetRequiredHashes(x => x.Content, leafIndex);
+        var events = new Fixture().CreateMany<VerifiableEvent>(numberOfEvents);
+        var hashes = events.GetRequiredHashes(x => Serializer.SerializeProto(x), leafIndex);
 
         Assert.Equal(numberOfHashes, hashes.Count());
     }
@@ -31,12 +31,12 @@ public class MerkleTreeTests
     [InlineData(32, 15)]
     public void GetRequiredHashes_ValidateHashesCorrect(int numberOfEvents, int leafIndex)
     {
-        var events = new Fixture().CreateMany<Event>(numberOfEvents);
-        var hashes = events.GetRequiredHashes(x => x.Content, leafIndex);
+        var events = new Fixture().CreateMany<VerifiableEvent>(numberOfEvents);
+        var hashes = events.GetRequiredHashes(x => Serializer.SerializeProto(x), leafIndex);
 
-        var calculatedRoot = HashRootFromMerkleProof(hashes, leafIndex, events.Skip(leafIndex).First().Content);
+        var calculatedRoot = HashRootFromMerkleProof(hashes, leafIndex, Serializer.SerializeProto(events.Skip(leafIndex).First()));
 
-        var rootHash = events.CalculateMerkleRoot(e => e.Content);
+        var rootHash = events.CalculateMerkleRoot(e => Serializer.SerializeProto(e));
 
         Assert.Equal(rootHash, calculatedRoot);
     }

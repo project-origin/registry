@@ -18,9 +18,9 @@ public class MemoryEventStore : IEventStore
         return Task.FromResult(batch);
     }
 
-    public Task<IEnumerable<Event>> GetEventsForEventStream(Guid streamId)
+    public Task<IEnumerable<VerifiableEvent>> GetEventsForEventStream(Guid streamId)
     {
-        var events = batches.SelectMany(b => b.Events.Where(e => e.Id.EventStreamId == streamId));
+        var events = batches.SelectMany(b => b.Events.Where(e => Guid.Parse(e.Id.EventStreamId.Value) == streamId));
         return Task.FromResult(events);
     }
 }

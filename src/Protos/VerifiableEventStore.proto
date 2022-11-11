@@ -2,14 +2,13 @@ syntax = "proto3";
 
 import "Primitives.proto";
 
-option csharp_namespace = "ProjectOrigin.VerifiableEventStore";
+option csharp_namespace = "ProjectOrigin.VerifiableEventStore.Models";
 
 package ProjectOrigin.VerifiableEventStore.v1;
 
-
 message VerifiableEvent {
     EventId Id = 1;
-    SignedSerializedEvent Payload = 2;
+    SignedSerializedEvent Content = 2;
 }
 
 message SignedSerializedEvent {
@@ -20,6 +19,18 @@ message SignedSerializedEvent {
 }
 
 message EventId {
-    Uuid EventStreamId = 1;
+    ProjectOrigin.Registry.v1.Uuid EventStreamId = 1;
     uint32 Index = 2;
+}
+
+message MerkleProof {
+    VerifiableEvent Event = 1;
+    RootReference BlockchainReference = 2;
+    sint32 LeafIndex = 3;
+    repeated bytes Hashes = 4;
+}
+
+message RootReference {
+    reserved 1; // Reserved for blockchain type reference, e.g. Concordium
+    string TransactionHash = 2;
 }

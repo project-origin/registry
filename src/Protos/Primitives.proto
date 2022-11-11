@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option csharp_namespace = "ProjectOrigin.Registry";
+option csharp_namespace = "ProjectOrigin.Primitives";
 
 package ProjectOrigin.Registry.v1;
 
