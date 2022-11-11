@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+import "Primitives.proto";
+
+option csharp_namespace = "ProjectOrigin.Electricity";
+
+package ProjectOrigin.Electricity.v1;
+
+message Slice {
+    Commitment Source = 1;
+    Commitment Quantity = 2;
+    Commitment Remainder = 3;
+    bytes ZeroR = 4;
+}
+
+message Commitment {
+    bytes C = 1;
+}
+
+message TimePeriod {
+    uint32 DateTimeFrom = 1;
+    uint32 DateTimeTo = 2;
+}
+
+message SliceProof {
+    CommitmentProof Source = 1;
+    CommitmentProof Quantity = 2;
+    CommitmentProof Remainder = 3;
+}
+
+message CommitmentProof {
+    uint64 m = 1;
+    bytes r = 2;
+}
+
+message Signature {
+    bytes Content = 1;
+}
+
+message PublicKey {
+    bytes Content = 1;
+}

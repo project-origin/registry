@@ -12,4 +12,10 @@
     <PackageReference Include="NSec.Cryptography" Version="22.4.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.21.8" />
+    <PackageReference Include="Grpc.Tools" Version="2.50.0" />
+    <Protobuf Include="..\Protos\Primitives.proto" />
+    <Protobuf Include="..\Protos\VerifiableEventStore.proto" />
+  </ItemGroup>
 </Project>

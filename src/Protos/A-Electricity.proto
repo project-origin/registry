@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+import "Primitives.proto";
+import "Electricity-primitives.proto";
+
+option csharp_namespace = "ProjectOrigin.Electricity";
+
+package ProjectOrigin.Electricity.v1;
+
+message ConsumptionIssuedEvent {
+    FederatedStreamId CertificateId = 1;
+    TimePeriod Period = 2;
+    string GridArea = 3;
+    Commitment GsrnCommitment = 4;
+    Commitment QuantityCommitment = 5;
+    PublicKey OwnerPublicKey = 6;
+}
+
+message ConsumptionIssuedProof {
+    CommitmentParameters GsrnParameters = 1;
+    CommitmentParameters QuantityParameters = 2;
+}

@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+import "Primitives.proto";
+
+option csharp_namespace = "ProjectOrigin.VerifiableEventStore.Models";
+
+package ProjectOrigin.VerifiableEventStore.v1;
+
+message VerifiableEvent {
+    EventId Id = 1;
+    SignedSerializedEvent Content = 2;
+}
+
+message SignedSerializedEvent {
+    string Type = 1;
+    uint32 Version = 2;
+    bytes SerializedEvent = 3;
+    bytes Signature = 4;
+}
+
+message EventId {
+    ProjectOrigin.Registry.v1.Uuid EventStreamId = 1;
+    uint32 Index = 2;
+}
+
+message MerkleProof {
+    VerifiableEvent Event = 1;
+    RootReference BlockchainReference = 2;
+    sint32 LeafIndex = 3;
+    repeated bytes Hashes = 4;
+}
+
+message RootReference {
+    reserved 1; // Reserved for blockchain type reference, e.g. Concordium
+    string TransactionHash = 2;
+}

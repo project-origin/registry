@@ -23,8 +23,25 @@ public class EventProverService : IEventProver
 
         var eventObj = batch.Events.Single(e => e.Id == eventId);
         var eventIndex = batch.Events.IndexOf(eventObj);
-        var hashes = batch.Events.GetRequiredHashes(e => e.Content, eventIndex);
+        var hashes = batch.Events.GetRequiredHashes(e => Serializer.SerializeProto(e), eventIndex);
 
-        return new MerkleProof(eventId, eventObj.Content, batch.BlockId, batch.TransactionId, batch.Events.IndexOf(eventObj), hashes);
+        return CreateMerkleProof(eventObj, batch.TransactionId, eventIndex, hashes);
+    }
+
+    private static MerkleProof CreateMerkleProof(VerifiableEvent eventObj, string TransactionId, int leafIndex, IEnumerable<byte[]> hashes)
+    {
+        var proof = new MerkleProof()
+        {
+            Event = eventObj,
+            BlockchainReference = new()
+            {
+                TransactionHash = TransactionId
+            },
+            LeafIndex = leafIndex
+        };
+
+        proof.Hashes.AddRange(hashes.Select(x => Google.Protobuf.ByteString.CopyFrom(x)));
+
+        return proof;
     }
 }
