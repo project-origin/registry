@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+import "Primitives.proto";
+
+option csharp_namespace = "ProjectOrigin.VerifiableEventStore";
+
+package ProjectOrigin.VerifiableEventStore.v1;
+
+
+message VerifiableEvent {
+    EventId Id = 1;
+    SignedSerializedEvent Payload = 2;
+}
+
+message SignedSerializedEvent {
+    string Type = 1;
+    uint32 Version = 2;
+    bytes SerializedEvent = 3;
+    bytes Signature = 4;
+}
+
+message EventId {
+    Uuid EventStreamId = 1;
+    uint32 Index = 2;
+}
