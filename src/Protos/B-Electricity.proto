@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+import "Primitives.proto";
+import "Electricity-primitives.proto";
+
+option csharp_namespace = "ProjectOrigin.Electricity";
+
+package ProjectOrigin.Electricity.v1;
+
+message IssudConsumptionCommand {
+    message ConsumptionIssuedEvent {
+        FederatedStreamId CertificateId = 1;
+        TimePeriod Period = 2;
+        string GridArea = 3;
+        Commitment GsrnCommitment = 4;
+        Commitment QuantityCommitment = 5;
+        PublicKey OwnerPublicKey = 6;
+    }
+
+    message ConsumptionIssuedProof {
+        CommitmentProof GsrnParameters = 1;
+        CommitmentProof QuantityParameters = 2;
+    }
+
+    ConsumptionIssuedEvent Event = 1;
+    Signature Signature = 2;
+    ConsumptionIssuedProof Proof = 3;
+
+}
+
+message ClaimCommand {
+    message AllocatedEvent {
+        Uuid AllocationId = 1;
+        FederatedStreamId ProductionCertificateId = 2;
+        FederatedStreamId ConsumptionCertificateId = 3;
+        Slice Slice = 4;
+    }
+
+    message ClaimedEvent {
+        Uuid AllocationId = 1;
+        FederatedStreamId CertificateId = 2;
+    }
+
+    AllocatedEvent AllocatedEvent = 1;
+    Signature ConsumptionAllocatedSignature = 2;
+
+    AllocatedEvent AllocatedEvent = 3;
+    Signature ProductionAllocatedSignature = 4;
+
+    ClaimedEvent ConsumptionClaimedEvent = 5;
+    Signature ConsumptionClaimedSignature = 6;
+
+    ClaimedEvent ProductionClaimedEvent = 7;
+    Signature ProductionClaimedSignature = 8;
+
+    SliceProof ConsumptionAllocatedProof = 9;
+    SliceProof ProductionAllocatedProof = 10;
+}

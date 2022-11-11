@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+import "Primitives.proto";
+
+option csharp_namespace = "ProjectOrigin.Registry";
+
+package ProjectOrigin.Registry.v1;
+
+service Registry {
+  rpc SubmitCommand (Command) returns (CommandStatus);
+}
+
+enum CommandState {
+  Failed = 0;
+  Succeeded = 1;
+}
+
+enum CommandLineState {
+   Failed = 0;
+  Rollback = 1;
+  Succeeded = 2;
+}
+
+message CommandStatus {
+  bytes Id = 1;
+  CommandState State = 2;
+  string Error = 3;
+  repeated CommandLineStatus Lines = 4;
+}
+
+message CommandLineStatus {
+  CommandLineState State = 1;
+  string Error = 2;
+}
+
+message Command {
+  message Envelope {
+    FederatedStreamId RoutingKey = 1;
+    SignedSerializedEvent Payload = 2;
+    bytes SerializedProof = 3; // To be removed later....
+  }
+
+  bytes Id = 1;
+  repeated Envelope Lines = 2; // Implicit ordered
+}
+
+message VerifiableEvent {
+  EventId Id = 1;
+  SignedSerializedEvent Payload = 2;
+}
+
+message SignedSerializedEvent {
+  string Type = 1;
+  uint32 Version = 2;
+  bytes SerializedEvent = 3;
+  bytes Signature = 4;
+}
+
+message EventId {
+  Uuid EventStreamId = 1;
+  uint32 Index = 2;
+}
