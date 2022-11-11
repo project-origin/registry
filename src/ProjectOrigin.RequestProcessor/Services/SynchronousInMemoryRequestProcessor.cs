@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Microsoft.Extensions.Options;
 using ProjectOrigin.RequestProcessor.Interfaces;
 using ProjectOrigin.RequestProcessor.Models;
 using ProjectOrigin.VerifiableEventStore.Models;
@@ -9,12 +10,14 @@ namespace ProjectOrigin.RequestProcessor.Services;
 public class SynchronousInMemoryRequestProcessor : IRequestProcessor
 {
     private ConcurrentDictionary<RequestId, RequestResult> requestDictionary = new();
+    private RequestProcessorOptions options;
     private IDispatcher dispatcher;
     private IBatcher batcher;
     private IEventSerializer eventSerializer;
 
-    public SynchronousInMemoryRequestProcessor(IDispatcher dispatcher, IBatcher batcher, IEventSerializer eventSerializer)
+    public SynchronousInMemoryRequestProcessor(IOptions<RequestProcessorOptions> options, IDispatcher dispatcher, IBatcher batcher, IEventSerializer eventSerializer)
     {
+        this.options = options.Value;
         this.dispatcher = dispatcher;
         this.batcher = batcher;
         this.eventSerializer = eventSerializer;
@@ -22,6 +25,9 @@ public class SynchronousInMemoryRequestProcessor : IRequestProcessor
 
     public async Task QueueRequest(IPublishRequest request)
     {
+        if (request.FederatedStreamId.Registry != options.RegistryName)
+            throw new InvalidDataException($"Invalid registry for request");
+
         if (requestDictionary.TryAdd(request.RequestId, new RequestResult(request.RequestId, RequestState.Queued)))
         {
             await ProcessRequest(request);

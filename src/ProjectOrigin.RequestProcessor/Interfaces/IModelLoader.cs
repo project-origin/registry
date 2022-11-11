@@ -2,5 +2,6 @@ namespace ProjectOrigin.RequestProcessor.Interfaces;
 
 public interface IModelLoader
 {
-    Task<(IModel? model, int eventCount)> Get(Guid eventStreamId, Type type);
+    Task<(T? model, int eventCount)> Get<T>(FederatedStreamId eventStreamId) where T : class, IModel;
+    Task<(IModel? model, int eventCount)> Get(FederatedStreamId eventStreamId, Type type);
 }

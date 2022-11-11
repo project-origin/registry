@@ -15,7 +15,7 @@ public class DispatcherTests
         };
 
         var modelLoaderMock = new Mock<IModelLoader>();
-        modelLoaderMock.SetupSequence(obj => obj.Get(It.IsAny<Guid>(), It.IsAny<Type>()))
+        modelLoaderMock.SetupSequence(obj => obj.Get(It.IsAny<FederatedStreamId>(), It.IsAny<Type>()))
             .ReturnsAsync((Chat.Null, 0))
             .ReturnsAsync((new Chat(), 1));
 
@@ -41,7 +41,7 @@ public class DispatcherTests
         };
 
         var modelLoaderMock = new Mock<IModelLoader>();
-        modelLoaderMock.SetupSequence(obj => obj.Get(It.IsAny<Guid>(), It.IsAny<Type>()))
+        modelLoaderMock.SetupSequence(obj => obj.Get(It.IsAny<FederatedStreamId>(), It.IsAny<Type>()))
             .ReturnsAsync((Chat.Null, 0))
             .ReturnsAsync((new Chat(), 1));
 

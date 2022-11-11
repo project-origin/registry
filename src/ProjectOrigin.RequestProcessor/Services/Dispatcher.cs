@@ -40,7 +40,7 @@ public class Dispatcher : IDispatcher
 
         var func = async (IPublishRequest request, IModelLoader ml) =>
         {
-            var (model, eventCount) = await ml.Get(request.FederatedStreamId.StreamId, modelType);
+            var (model, eventCount) = await ml.Get(request.FederatedStreamId, modelType);
 
             var result = await (methodInfo.Invoke(verifier, new object[]{
                 request, model!
