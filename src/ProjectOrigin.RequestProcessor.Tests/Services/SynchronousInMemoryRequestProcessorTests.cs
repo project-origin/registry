@@ -28,7 +28,7 @@ public class SynchronousInMemoryRequestProcessorTests
 
         await processor.QueueRequest(request);
 
-        batcherMock.Verify(obj => obj.PublishEvent(It.Is<Event>(e => e.Id == new EventId(request.FederatedStreamId.StreamId, index))), Times.Once);
+        batcherMock.Verify(obj => obj.PublishEvent(It.Is<Event>(e => e.Id.Equals(new EventId(request.FederatedStreamId.StreamId, index)))), Times.Once);
     }
 
     [Fact]

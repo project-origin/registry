@@ -1,3 +1,3 @@
 namespace ProjectOrigin.VerifiableEventStore.Models;
 
-public record Batch(string BlockId, string TransactionId, List<VerifiableEvent> Events);
+public record Batch(string BlockId, string TransactionId, List<Event> Events);

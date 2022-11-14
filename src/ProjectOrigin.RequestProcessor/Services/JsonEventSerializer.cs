@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using Google.Protobuf;
 using ProjectOrigin.RequestProcessor.Interfaces;
 using ProjectOrigin.RequestProcessor.Services.Serialization;
 using ProjectOrigin.VerifiableEventStore.Models;
@@ -19,7 +20,7 @@ public class JsonEventSerializer : IEventSerializer
     {
         try
         {
-            return Unwrap(e.Content);
+            return Unwrap(e.Content.ToArray());
         }
         catch (Exception ex)
         {
@@ -31,7 +32,11 @@ public class JsonEventSerializer : IEventSerializer
     {
         try
         {
-            return new Event(id, Wrap(e));
+            return new Event()
+            {
+                Id = id,
+                Content = ByteString.CopyFrom(Wrap(e)),
+            };
         }
         catch (Exception ex)
         {

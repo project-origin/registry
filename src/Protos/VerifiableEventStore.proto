@@ -6,16 +6,9 @@ option csharp_namespace = "ProjectOrigin.VerifiableEventStore.Models";
 
 package ProjectOrigin.VerifiableEventStore.v1;
 
-message VerifiableEvent {
+message Event {
     EventId Id = 1;
-    SignedSerializedEvent Content = 2;
-}
-
-message SignedSerializedEvent {
-    string Type = 1;
-    uint32 Version = 2;
-    bytes SerializedEvent = 3;
-    bytes Signature = 4;
+    bytes Content = 2;
 }
 
 message EventId {
@@ -24,7 +17,7 @@ message EventId {
 }
 
 message MerkleProof {
-    VerifiableEvent Event = 1;
+    Event Event = 1;
     RootReference BlockchainReference = 2;
     sint32 LeafIndex = 3;
     repeated bytes Hashes = 4;

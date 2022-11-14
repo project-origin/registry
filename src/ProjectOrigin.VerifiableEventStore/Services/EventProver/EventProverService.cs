@@ -21,14 +21,14 @@ public class EventProverService : IEventProver
             return null;
         }
 
-        var eventObj = batch.Events.Single(e => e.Id == eventId);
+        var eventObj = batch.Events.Single(e => e.Id.Equals(eventId));
         var eventIndex = batch.Events.IndexOf(eventObj);
         var hashes = batch.Events.GetRequiredHashes(e => Serializer.SerializeProto(e), eventIndex);
 
         return CreateMerkleProof(eventObj, batch.TransactionId, eventIndex, hashes);
     }
 
-    private static MerkleProof CreateMerkleProof(VerifiableEvent eventObj, string TransactionId, int leafIndex, IEnumerable<byte[]> hashes)
+    private static MerkleProof CreateMerkleProof(Event eventObj, string TransactionId, int leafIndex, IEnumerable<byte[]> hashes)
     {
         var proof = new MerkleProof()
         {
