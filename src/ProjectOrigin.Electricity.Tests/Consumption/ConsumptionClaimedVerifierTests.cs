@@ -1,8 +1,8 @@
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Consumption.Requests;
 using ProjectOrigin.Electricity.Production;
-using ProjectOrigin.RequestProcessor.Interfaces;
-using ProjectOrigin.RequestProcessor.Services;
+using ProjectOrigin.Register.LineProcessor.Interfaces;
+using ProjectOrigin.Register.LineProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Tests;
 
@@ -12,7 +12,7 @@ public class ConsumptionClaimedVerifierTests
     {
         var mock = new Mock<IModelLoader>();
         mock.Setup(obj => obj.Get<ProductionCertificate>(It.IsAny<FederatedStreamId>())).Returns(Task.FromResult((model: pc, eventCount: 1)));
-        return new ConsumptionClaimedVerifier(new JsonEventSerializer(), mock.Object);
+        return new ConsumptionClaimedVerifier(mock.Object);
     }
 
     [Fact]
@@ -20,8 +20,8 @@ public class ConsumptionClaimedVerifierTests
     {
         var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
         var quantity = FakeRegister.Group.Commit(150);
-        var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey, 250);
-        var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey, 300);
+        var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
+        var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 300);
         var (allocationId, _) = prodCert.Allocated(prodParams, consCert.Id, quantity);
         consCert.Allocated(allocationId, consParams, prodCert.Id, quantity);
         prodCert.Claimed(allocationId);
@@ -30,7 +30,7 @@ public class ConsumptionClaimedVerifierTests
         var request = FakeRegister.CreateConsumptionClaim(consCert.Id, allocationId, ownerKey);
         var result = await verifier.Verify(request, consCert);
 
-        Assert.True(result.IsValid, result.ErrorMessage);
+        Assert.IsType<VerificationResult.Valid>(result);
     }
 
     [Fact]
@@ -39,8 +39,8 @@ public class ConsumptionClaimedVerifierTests
         var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
         var otherKey = Key.Create(SignatureAlgorithm.Ed25519);
         var quantity = FakeRegister.Group.Commit(150);
-        var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey, 250);
-        var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey, 300);
+        var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
+        var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 300);
         var (allocationId, _) = prodCert.Allocated(prodParams, consCert.Id, quantity);
         consCert.Allocated(allocationId, consParams, prodCert.Id, quantity);
         prodCert.Claimed(allocationId);
@@ -49,8 +49,9 @@ public class ConsumptionClaimedVerifierTests
         var request = FakeRegister.CreateConsumptionClaim(consCert.Id, allocationId, otherKey);
         var result = await verifier.Verify(request, consCert);
 
-        Assert.False(result.IsValid, result.ErrorMessage);
-        Assert.Equal("Invalid signature", result.ErrorMessage);
+        var invalid = result as VerificationResult.Invalid;
+        Assert.NotNull(invalid);
+        Assert.Equal("Invalid signature", invalid!.ErrorMessage);
     }
 
     [Fact]
@@ -58,8 +59,8 @@ public class ConsumptionClaimedVerifierTests
     {
         var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
         var quantity = FakeRegister.Group.Commit(150);
-        var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey, 250);
-        var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey, 300);
+        var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
+        var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 300);
         var (allocationId, _) = prodCert.Allocated(prodParams, consCert.Id, quantity);
         prodCert.Claimed(allocationId);
 
@@ -67,8 +68,9 @@ public class ConsumptionClaimedVerifierTests
         var request = FakeRegister.CreateConsumptionClaim(consCert.Id, allocationId, ownerKey);
         var result = await verifier.Verify(request, consCert);
 
-        Assert.False(result.IsValid, result.ErrorMessage);
-        Assert.Equal("Allocation does not exist", result.ErrorMessage);
+        var invalid = result as VerificationResult.Invalid;
+        Assert.NotNull(invalid);
+        Assert.Equal("Allocation does not exist", invalid!.ErrorMessage);
     }
 
     [Fact]
@@ -76,8 +78,8 @@ public class ConsumptionClaimedVerifierTests
     {
         var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
         var quantity = FakeRegister.Group.Commit(150);
-        var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey, 250);
-        var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey, 300);
+        var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
+        var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 300);
         var (allocationId, _) = prodCert.Allocated(prodParams, consCert.Id, quantity);
         consCert.Allocated(allocationId, consParams, prodCert.Id, quantity);
         prodCert.Claimed(allocationId);
@@ -86,8 +88,9 @@ public class ConsumptionClaimedVerifierTests
         var request = FakeRegister.CreateConsumptionClaim(consCert.Id, allocationId, ownerKey);
         var result = await verifier.Verify(request, null);
 
-        Assert.False(result.IsValid, result.ErrorMessage);
-        Assert.Equal("Certificate does not exist", result.ErrorMessage);
+        var invalid = result as VerificationResult.Invalid;
+        Assert.NotNull(invalid);
+        Assert.Equal("Certificate does not exist", invalid!.ErrorMessage);
     }
 
     [Fact]
@@ -95,8 +98,8 @@ public class ConsumptionClaimedVerifierTests
     {
         var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
         var quantity = FakeRegister.Group.Commit(150);
-        var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey, 250);
-        var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey, 300);
+        var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
+        var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 300);
         var (allocationId, _) = prodCert.Allocated(prodParams, consCert.Id, quantity);
         consCert.Allocated(allocationId, consParams, prodCert.Id, quantity);
 
@@ -104,7 +107,8 @@ public class ConsumptionClaimedVerifierTests
         var request = FakeRegister.CreateConsumptionClaim(consCert.Id, allocationId, ownerKey);
         var result = await verifier.Verify(request, consCert);
 
-        Assert.False(result.IsValid, result.ErrorMessage);
-        Assert.Equal("Production not claimed", result.ErrorMessage);
+        var invalid = result as VerificationResult.Invalid;
+        Assert.NotNull(invalid);
+        Assert.Equal("Production not claimed", invalid!.ErrorMessage);
     }
 }

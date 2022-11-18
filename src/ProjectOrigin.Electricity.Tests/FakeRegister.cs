@@ -1,22 +1,19 @@
 using System.Numerics;
+using Google.Protobuf;
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Consumption;
-using ProjectOrigin.Electricity.Consumption.Requests;
 using ProjectOrigin.Electricity.Production;
-using ProjectOrigin.Electricity.Production.Requests;
 using ProjectOrigin.Electricity.Shared;
 using ProjectOrigin.Electricity.Shared.Internal;
 using ProjectOrigin.PedersenCommitment;
-using ProjectOrigin.RequestProcessor.Interfaces;
-using ProjectOrigin.RequestProcessor.Services;
+using ProjectOrigin.Register.LineProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Tests;
 
 internal static class FakeRegister
 {
-    private static IEventSerializer serializer = new JsonEventSerializer();
-    private static Lazy<Group> lazyGroup = new Lazy<Group>(() => Group.Create(), true);
-    internal static Group Group { get => lazyGroup.Value; }
+    internal static Group Group { get => Group.Default; }
+    const string Registry = "OurReg";
 
     private static TimePeriod defaultPeriod = new TimePeriod(
             new DateTimeOffset(2022, 09, 25, 12, 0, 0, TimeSpan.Zero),
@@ -42,7 +39,12 @@ internal static class FakeRegister
 
     internal static void Claimed(this ProductionCertificate certificate, Guid allocationId)
     {
-        var e = new ProductionClaimedEvent(certificate.Id, allocationId);
+        var e = new V1.ClaimCommand.Types.ClaimedEvent()
+        {
+            CertificateId = certificate.Id,
+            AllocationId = allocationId.ToUuid()
+        };
+
         certificate.Apply(e);
     }
 
@@ -55,7 +57,7 @@ internal static class FakeRegister
         return (e.transfer, e.remainder);
     }
 
-    internal static ProductionSliceTransferredRequest CreateTransfer(
+    internal static CommandStep<V1.TransferProductionSliceCommand.Types.ProductionSliceTransferredEvent> CreateTransfer(
        FederatedStreamId id,
        CommitmentParameters sourceParameters,
        long quantity,
@@ -71,51 +73,65 @@ internal static class FakeRegister
 
         var (e, transferParamerters, remainderParameters) = CreateTransferEvent(id, sourceParameters, quantity, newOwner, quantityOffset);
 
-        var request = new ProductionSliceTransferredRequest(
-            new SliceParameters(
-                sourceParametersOverride ?? sourceParameters,
-                transferParametersOverride ?? transferParamerters,
-                remainderParametersOverride ?? remainderParameters
-            ),
-            Event: e,
-            Signature: Sign(signerKey, e));
-
-        return request;
+        return new CommandStep<V1.TransferProductionSliceCommand.Types.ProductionSliceTransferredEvent>(
+            id,
+            SignEvent(signerKey, e),
+            typeof(ProductionCertificate),
+            new V1.SliceProof()
+            {
+                Source = Mapper.ToProto(sourceParametersOverride ?? sourceParameters),
+                Quantity = Mapper.ToProto(transferParametersOverride ?? transferParamerters),
+                Remainder = Mapper.ToProto(remainderParametersOverride ?? remainderParameters),
+            }
+        );
     }
 
-    internal static (ProductionSliceTransferredEvent e, CommitmentParameters transfer, CommitmentParameters remainder) CreateTransferEvent(FederatedStreamId id, CommitmentParameters sourceParameters, long quantity, byte[] newOwner, long quantityOffset = 0)
+    internal static (V1.TransferProductionSliceCommand.Types.ProductionSliceTransferredEvent e, CommitmentParameters transfer, CommitmentParameters remainder) CreateTransferEvent(FederatedStreamId id, CommitmentParameters sourceParameters, long quantity, byte[] newOwner, long quantityOffset = 0)
     {
         var transferParameters = Group.Commit(quantity);
         var remainderParameters = Group.Commit(sourceParameters.m - quantity + quantityOffset);
 
-        var e = new ProductionSliceTransferredEvent(
-                id,
-                CreateSlice(sourceParameters, transferParameters, remainderParameters),
-                newOwner
-                );
+        var e = new V1.TransferProductionSliceCommand.Types.ProductionSliceTransferredEvent()
+        {
+            CertificateId = id,
+            Slice = CreateSlice(sourceParameters, transferParameters, remainderParameters),
+            NewOwner = ByteString.CopyFrom(newOwner)
+        };
 
         return (e, transferParameters, remainderParameters);
     }
 
-    internal static ProductionClaimedRequest CreateProductionClaim(FederatedStreamId certificateId, Guid allocationId, Key signerKey)
+    internal static CommandStep<V1.ClaimCommand.Types.ClaimedEvent> CreateProductionClaim(FederatedStreamId certificateId, Guid allocationId, Key signerKey)
     {
-        var e = new ProductionClaimedEvent(certificateId, allocationId);
+        var e = new V1.ClaimCommand.Types.ClaimedEvent()
+        {
+            CertificateId = certificateId,
+            AllocationId = allocationId.ToUuid()
+        };
 
-        return new ProductionClaimedRequest(
-            e, Sign(signerKey, e)
+        return new CommandStep<V1.ClaimCommand.Types.ClaimedEvent>(
+            certificateId,
+            SignEvent(signerKey, e),
+            typeof(ProductionCertificate)
         );
     }
 
-    internal static ConsumptionClaimedRequest CreateConsumptionClaim(FederatedStreamId certificateId, Guid allocationId, Key signerKey)
+    internal static CommandStep<V1.ClaimCommand.Types.ClaimedEvent> CreateConsumptionClaim(FederatedStreamId certificateId, Guid allocationId, Key signerKey)
     {
-        var e = new ConsumptionClaimedEvent(certificateId, allocationId);
+        var e = new V1.ClaimCommand.Types.ClaimedEvent()
+        {
+            CertificateId = certificateId,
+            AllocationId = allocationId.ToUuid()
+        };
 
-        return new ConsumptionClaimedRequest(
-            e, Sign(signerKey, e)
+        return new CommandStep<V1.ClaimCommand.Types.ClaimedEvent>(
+            certificateId,
+            SignEvent(signerKey, e),
+            typeof(ConsumptionCertificate)
         );
     }
 
-    internal static ConsumptionAllocatedRequest CreateConsumptionAllocationRequest(
+    internal static CommandStep<V1.ClaimCommand.Types.AllocatedEvent> CreateConsumptionAllocationRequest(
         Guid allocationId,
         FederatedStreamId productionId,
         FederatedStreamId consumptionId,
@@ -126,16 +142,20 @@ internal static class FakeRegister
     {
         var (e, transferParamerters, remainderParameters) = CreateConsumptionAllocatedEvent(allocationId, productionId, consumptionId, quantityParameters, sourceParameters);
 
-        var request = new ConsumptionAllocatedRequest(new SliceParameters(
-                sourceParameters,
-                transferParamerters,
-                remainderParameters
-            ), e, Sign(signerKey, e));
-
-        return request;
+        return new CommandStep<V1.ClaimCommand.Types.AllocatedEvent>(
+            consumptionId,
+            SignEvent(signerKey, e),
+            typeof(ConsumptionCertificate),
+            new V1.SliceProof()
+            {
+                Source = Mapper.ToProto(sourceParameters),
+                Quantity = Mapper.ToProto(transferParamerters),
+                Remainder = Mapper.ToProto(remainderParameters),
+            }
+        );
     }
 
-    internal static ProductionAllocatedRequest CreateProductionAllocationRequest(
+    internal static CommandStep<V1.ClaimCommand.Types.AllocatedEvent> CreateProductionAllocationRequest(
     FederatedStreamId productionId,
     FederatedStreamId consumptionId,
     CommitmentParameters sourceParameters,
@@ -146,54 +166,64 @@ internal static class FakeRegister
         var allocationId = Guid.NewGuid();
         var (e, transferParamerters, remainderParameters) = CreateProductionAllocatedEvent(allocationId, productionId, consumptionId, quantityParameters, sourceParameters);
 
-        var request = new ProductionAllocatedRequest(new SliceParameters(
-                sourceParameters,
-                transferParamerters,
-                remainderParameters
-            ), e, Sign(signerKey, e));
-
-        return request;
+        return new CommandStep<V1.ClaimCommand.Types.AllocatedEvent>(
+            productionId,
+            SignEvent(signerKey, e),
+            typeof(ProductionCertificate),
+            new V1.SliceProof()
+            {
+                Source = Mapper.ToProto(sourceParameters),
+                Quantity = Mapper.ToProto(transferParamerters),
+                Remainder = Mapper.ToProto(remainderParameters),
+            }
+        );
     }
 
-    internal static (ProductionAllocatedEvent e, CommitmentParameters transfer, CommitmentParameters remainder) CreateProductionAllocatedEvent(Guid allocationId, FederatedStreamId productionId, FederatedStreamId consumptionId, CommitmentParameters quantityParameters, CommitmentParameters sourceParameters)
+    internal static (V1.ClaimCommand.Types.AllocatedEvent e, CommitmentParameters transfer, CommitmentParameters remainder) CreateProductionAllocatedEvent(Guid allocationId, FederatedStreamId productionId, FederatedStreamId consumptionId, CommitmentParameters quantityParameters, CommitmentParameters sourceParameters)
     {
         var remainderParameters = Group.Commit(sourceParameters.m - quantityParameters.m);
 
-        var e = new ProductionAllocatedEvent(
-                allocationId,
-                productionId,
-                consumptionId,
-                CreateSlice(sourceParameters, quantityParameters, remainderParameters));
+        var e = new V1.ClaimCommand.Types.AllocatedEvent()
+        {
+            AllocationId = allocationId.ToUuid(),
+            ProductionCertificateId = productionId,
+            ConsumptionCertificateId = consumptionId,
+            Slice = CreateSlice(sourceParameters, quantityParameters, remainderParameters)
+        };
 
         return (e, quantityParameters, remainderParameters);
     }
 
-    internal static (ConsumptionAllocatedEvent e, CommitmentParameters transfer, CommitmentParameters remainder) CreateConsumptionAllocatedEvent(Guid allocationId, FederatedStreamId productionId, FederatedStreamId consumptionId, CommitmentParameters quantityParameters, CommitmentParameters sourceParameters)
+    internal static (V1.ClaimCommand.Types.AllocatedEvent e, CommitmentParameters transfer, CommitmentParameters remainder) CreateConsumptionAllocatedEvent(Guid allocationId, FederatedStreamId productionId, FederatedStreamId consumptionId, CommitmentParameters quantityParameters, CommitmentParameters sourceParameters)
     {
         var remainderParameters = Group.Commit(sourceParameters.m - quantityParameters.m);
 
-        var e = new ConsumptionAllocatedEvent(
-                allocationId,
-                productionId,
-                consumptionId,
-                CreateSlice(sourceParameters, quantityParameters, remainderParameters));
+        var e = new V1.ClaimCommand.Types.AllocatedEvent()
+        {
+            AllocationId = allocationId.ToUuid(),
+            ProductionCertificateId = productionId,
+            ConsumptionCertificateId = consumptionId,
+            Slice = CreateSlice(sourceParameters, quantityParameters, remainderParameters)
+        };
 
         return (e, quantityParameters, remainderParameters);
     }
 
-    internal static (ConsumptionCertificate certificate, CommitmentParameters parameters) ConsumptionIssued(Key ownerKey, long quantity, string area = "DK1", TimePeriod? period = null)
+    internal static (ConsumptionCertificate certificate, CommitmentParameters parameters) ConsumptionIssued(PublicKey ownerKey, long quantity, string area = "DK1", TimePeriod? period = null)
     {
+        var id = new FederatedStreamId(Registry, Guid.NewGuid());
         var quantityCommitmentParameters = Group.Commit(quantity);
         var gsrnCommitmentParameters = Group.Commit(new Fixture().Create<long>());
 
-        var e = new ConsumptionIssuedEvent(
-                new("", Guid.NewGuid()),
-                period ?? defaultPeriod,
-                area,
-                gsrnCommitmentParameters.Commitment,
-                quantityCommitmentParameters.Commitment,
-                ownerKey.PublicKey.Export(KeyBlobFormat.RawPublicKey)
-                );
+        var e = new V1.IssueConsumptionCommand.Types.ConsumptionIssuedEvent()
+        {
+            CertificateId = id,
+            Period = period ?? defaultPeriod,
+            GridArea = area,
+            GsrnCommitment = Mapper.ToProto(gsrnCommitmentParameters.Commitment),
+            QuantityCommitment = Mapper.ToProto(quantityCommitmentParameters.Commitment),
+            OwnerPublicKey = Mapper.ToProto(ownerKey),
+        };
 
         var cert = new ConsumptionCertificate();
         cert.Apply(e);
@@ -201,21 +231,23 @@ internal static class FakeRegister
         return (cert, quantityCommitmentParameters);
     }
 
-    internal static (ProductionCertificate certificate, CommitmentParameters parameters) ProductionIssued(Key ownerKey, long quantity, string area = "DK1", TimePeriod? period = null)
+    internal static (ProductionCertificate certificate, CommitmentParameters parameters) ProductionIssued(PublicKey ownerKey, long quantity, string area = "DK1", TimePeriod? period = null)
     {
+        var id = new FederatedStreamId(Registry, Guid.NewGuid());
         var quantityCommitmentParameters = Group.Commit(quantity);
         var gsrnCommitmentParameters = Group.Commit(new Fixture().Create<long>());
 
-        var e = new ProductionIssuedEvent(
-                new("", Guid.NewGuid()),
-                period ?? defaultPeriod,
-                area,
-                gsrnCommitmentParameters.Commitment,
-                quantityCommitmentParameters.Commitment,
-                "F01050100",
-                "T020002",
-                ownerKey.PublicKey.Export(KeyBlobFormat.RawPublicKey)
-                );
+        var e = new V1.IssueProductionCommand.Types.ProductionIssuedEvent()
+        {
+            CertificateId = id,
+            Period = period ?? defaultPeriod,
+            GridArea = area,
+            FuelCode = "F01050100",
+            TechCode = "T020002",
+            GsrnCommitment = Mapper.ToProto(gsrnCommitmentParameters.Commitment),
+            QuantityCommitment = Mapper.ToProto(quantityCommitmentParameters.Commitment),
+            OwnerPublicKey = Mapper.ToProto(ownerKey),
+        };
 
         var cert = new ProductionCertificate();
         cert.Apply(e);
@@ -223,8 +255,7 @@ internal static class FakeRegister
         return (cert, quantityCommitmentParameters);
     }
 
-    internal static ConsumptionIssuedRequest CreateConsumptionIssuedRequest(
-        JsonEventSerializer serializer,
+    internal static CommandStep<V1.IssueConsumptionCommand.Types.ConsumptionIssuedEvent> CreateConsumptionIssuedRequest(
         Key signerKey,
         CommitmentParameters? gsrnCommitmentOverride = null,
         CommitmentParameters? quantityCommitmentOverride = null,
@@ -232,33 +263,40 @@ internal static class FakeRegister
         string? gridAreaOverride = null
         )
     {
+        var id = new FederatedStreamId(Registry, Guid.NewGuid());
         var quantityCommitmentParameters = Group.Commit(150);
         var gsrnCommitmentParameters = Group.Commit(5700000000000001);
 
-        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
+        var ownerKey = new V1.PublicKey()
+        {
+            Content = ByteString.CopyFrom(ownerKeyOverride ?? Key.Create(SignatureAlgorithm.Ed25519).Export(KeyBlobFormat.RawPublicKey))
+        };
 
-        var e = new ConsumptionIssuedEvent(
-                new FederatedStreamId("registry", Guid.NewGuid()),
-                new TimePeriod(
+        var e = new V1.IssueConsumptionCommand.Types.ConsumptionIssuedEvent()
+        {
+            CertificateId = id,
+            Period = new TimePeriod(
                     DateTimeOffset.Now,
                     DateTimeOffset.Now.AddHours(1)),
-                gridAreaOverride ?? "DK1",
-                gsrnCommitmentParameters.Commitment,
-                quantityCommitmentParameters.Commitment,
-                ownerKeyOverride ?? ownerKey.PublicKey.Export(KeyBlobFormat.RawPublicKey)
-                );
+            GridArea = gridAreaOverride ?? "DK1",
+            GsrnCommitment = Mapper.ToProto(gsrnCommitmentParameters.Commitment),
+            QuantityCommitment = Mapper.ToProto(quantityCommitmentParameters.Commitment),
+            OwnerPublicKey = ownerKey,
+        };
 
-        var request = new ConsumptionIssuedRequest(
-            GsrnParameters: gsrnCommitmentOverride ?? gsrnCommitmentParameters,
-            QuantityParameters: quantityCommitmentOverride ?? quantityCommitmentParameters,
-            Event: e,
-            Signature: Sign(signerKey, e));
-
-        return request;
+        return new CommandStep<V1.IssueConsumptionCommand.Types.ConsumptionIssuedEvent>(
+            id,
+            SignEvent(signerKey, e),
+            typeof(ConsumptionCertificate),
+            new V1.IssueConsumptionCommand.Types.ConsumptionIssuedProof()
+            {
+                GsrnProof = Mapper.ToProto(gsrnCommitmentOverride ?? gsrnCommitmentParameters),
+                QuantityProof = Mapper.ToProto(quantityCommitmentOverride ?? quantityCommitmentParameters)
+            }
+        );
     }
 
-    internal static ProductionIssuedRequest CreateProductionIssuedRequest(
-        JsonEventSerializer serializer,
+    internal static CommandStep<V1.IssueProductionCommand.Types.ProductionIssuedEvent> CreateProductionIssuedRequest(
         Key signerKey,
         CommitmentParameters? gsrnCommitmentOverride = null,
         CommitmentParameters? quantityCommitmentOverride = null,
@@ -268,45 +306,62 @@ internal static class FakeRegister
         string? gridAreaOverride = null
         )
     {
+        var id = new FederatedStreamId(Registry, Guid.NewGuid());
         var quantityCommitmentParameters = Group.Commit(150);
         var gsrnCommitmentParameters = Group.Commit(5700000000000001);
 
-        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
+        var ownerKey = new V1.PublicKey()
+        {
+            Content = ByteString.CopyFrom(ownerKeyOverride ?? Key.Create(SignatureAlgorithm.Ed25519).Export(KeyBlobFormat.RawPublicKey))
+        };
 
-        var e = new ProductionIssuedEvent(
-                new FederatedStreamId("", Guid.NewGuid()),
-                new TimePeriod(
+        var e = new V1.IssueProductionCommand.Types.ProductionIssuedEvent()
+        {
+            CertificateId = id,
+            Period = new TimePeriod(
                     DateTimeOffset.Now,
                     DateTimeOffset.Now.AddHours(1)),
-                gridAreaOverride ?? "DK1",
-                gsrnCommitmentParameters.Commitment,
-                quantityCommitmentParameters.Commitment,
-                "F01050100",
-                "T020002",
-                ownerKeyOverride ?? ownerKey.PublicKey.Export(KeyBlobFormat.RawPublicKey),
-                publicQuantity ? publicQuantityCommitmentOverride ?? quantityCommitmentParameters : null
-                );
+            GridArea = gridAreaOverride ?? "DK1",
+            FuelCode = "F01050100",
+            TechCode = "T020002",
+            GsrnCommitment = Mapper.ToProto(gsrnCommitmentParameters.Commitment),
+            QuantityCommitment = Mapper.ToProto(quantityCommitmentParameters.Commitment),
+            OwnerPublicKey = ownerKey,
+            QuantityProof = publicQuantity ? Mapper.ToProto(publicQuantityCommitmentOverride ?? quantityCommitmentParameters) : null
+        };
 
-        var request = new ProductionIssuedRequest(
-            GsrnCommitmentParameters: gsrnCommitmentOverride ?? gsrnCommitmentParameters,
-            QuantityCommitmentParameters: quantityCommitmentOverride ?? quantityCommitmentParameters,
-            Event: e,
-            Signature: Sign(signerKey, e));
-
-        return request;
+        return new CommandStep<V1.IssueProductionCommand.Types.ProductionIssuedEvent>(
+            id,
+            SignEvent(signerKey, e),
+            typeof(ProductionCertificate),
+            new V1.IssueProductionCommand.Types.ProductionIssuedProof()
+            {
+                GsrnProof = Mapper.ToProto(gsrnCommitmentOverride ?? gsrnCommitmentParameters),
+                QuantityProof = Mapper.ToProto(quantityCommitmentOverride ?? quantityCommitmentParameters)
+            }
+        );
     }
 
-    private static byte[] Sign(Key signerKey, object e)
+
+    private static SignedEvent<T> SignEvent<T>(Key signerKey, T e) where T : IMessage
     {
-        var serializedEvent = serializer.Serialize(e);
-        var signature = NSec.Cryptography.Ed25519.Ed25519.Sign(signerKey, serializedEvent);
-        return signature;
+        var signature = NSec.Cryptography.Ed25519.Ed25519.Sign(signerKey, e.ToByteArray());
+        return new SignedEvent<T>(e, signature);
     }
 
-    private static Slice CreateSlice(CommitmentParameters sourceParameters, CommitmentParameters transferParameters, CommitmentParameters remainderParameters) => new Slice(
-                        sourceParameters.Commitment,
-                        transferParameters.Commitment,
-                        remainderParameters.Commitment,
-                        (sourceParameters.r - (transferParameters.r + remainderParameters.r)).MathMod(Group.q)
-                    );
+    private static byte[] Sign(Key signerKey, IMessage e)
+    {
+        return NSec.Cryptography.Ed25519.Ed25519.Sign(signerKey, e.ToByteArray());
+    }
+
+    private static V1.Slice CreateSlice(CommitmentParameters sourceParameters, CommitmentParameters transferParameters, CommitmentParameters remainderParameters)
+    {
+        return new V1.Slice()
+        {
+            Source = Mapper.ToProto(sourceParameters.Commitment),
+            Quantity = Mapper.ToProto(transferParameters.Commitment),
+            Remainder = Mapper.ToProto(remainderParameters.Commitment),
+            ZeroR = ByteString.CopyFrom(((sourceParameters.r - (transferParameters.r + remainderParameters.r)).MathMod(Group.q)).ToByteArray())
+        };
+    }
 }

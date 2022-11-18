@@ -14,8 +14,8 @@ public class MemoryBatcherTests
     {
         var blockId = new Fixture().Create<string>();
         var transactionId = new Fixture().Create<string>();
-        var event1 = new Fixture().Create<Event>();
-        var event2 = new Fixture().Create<Event>();
+        var event1 = new Fixture().Create<VerifiableEvent>();
+        var event2 = new Fixture().Create<VerifiableEvent>();
 
         var rootHash = CalculateRoot(event1.Content, event2.Content);
 

@@ -3,7 +3,7 @@
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     <ProjectReference Include="..\ProjectOrigin.PedersenCommitment\ProjectOrigin.PedersenCommitment.csproj" />
-    <ProjectReference Include="..\ProjectOrigin.RequestProcessor\ProjectOrigin.RequestProcessor.csproj" />
+    <ProjectReference Include="..\ProjectOrigin.Register.LineProcessor\ProjectOrigin.Register.LineProcessor.csproj" />
     <PackageReference Include="NSec.Cryptography" Version="22.4.0" />
   </ItemGroup>
 
@@ -22,5 +22,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.21.9" />
+    <PackageReference Include="Grpc.Tools" Version="2.49.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.49.0" />
+    <Protobuf Include="..\Protos\electricity.proto" />
+    <Protobuf Include="..\Protos\electricity-primitives.proto" />
+  </ItemGroup>
 
 </Project>

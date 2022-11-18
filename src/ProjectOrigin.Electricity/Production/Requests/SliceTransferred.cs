@@ -1,40 +1,34 @@
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Shared.Internal;
-using ProjectOrigin.RequestProcessor.Interfaces;
-using ProjectOrigin.RequestProcessor.Models;
+using ProjectOrigin.Register.LineProcessor.Interfaces;
+using ProjectOrigin.Register.LineProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Production.Requests;
 
-internal record ProductionSliceTransferredEvent(
-    FederatedStreamId CertificateId,
-    Slice Slice,
-    byte[] NewOwner);
-
-internal record ProductionSliceTransferredRequest(
-    SliceParameters SliceParameters,
-    ProductionSliceTransferredEvent Event,
-    byte[] Signature
-    ) : PublishRequest<ProductionSliceTransferredEvent>(Event.CertificateId, Signature, Event);
-
-internal class ProductionSliceTransferredVerifier : SliceVerifier, IRequestVerifier<ProductionSliceTransferredRequest, ProductionCertificate>
+internal class ProductionSliceTransferredVerifier : ICommandStepVerifier<V1.TransferProductionSliceCommand.Types.ProductionSliceTransferredEvent, ProductionCertificate>
 {
-    public ProductionSliceTransferredVerifier(IEventSerializer serializer) : base(serializer)
+    public Task<VerificationResult> Verify(CommandStep<V1.TransferProductionSliceCommand.Types.ProductionSliceTransferredEvent> commandStep, ProductionCertificate? model)
     {
-    }
+        var @event = commandStep.SignedEvent.Event;
 
-    public Task<VerificationResult> Verify(ProductionSliceTransferredRequest request, ProductionCertificate? model)
-    {
         if (model is null)
-            return VerificationResult.Invalid("Certificate does not exist");
+            return new VerificationResult.Invalid("Certificate does not exist");
 
-        if (!PublicKey.TryImport(SignatureAlgorithm.Ed25519, request.Event.NewOwner, KeyBlobFormat.RawPublicKey, out _))
-            return VerificationResult.Invalid("Invalid NewOwner key, not a valid Ed25519 publicKey");
+        var proof = commandStep.Proof as V1.SliceProof;
+        if (proof is null)
+            return new VerificationResult.Invalid("Invalid or missing proof");
 
-        var sliceFound = model.GetSlice(request.Event.Slice.Source);
-        var verificationResult = VerifySlice(request, request.SliceParameters, request.Event.Slice, sliceFound);
-        if (!verificationResult.IsValid)
+        if (!PublicKey.TryImport(SignatureAlgorithm.Ed25519, @event.NewOwner.ToByteArray(), KeyBlobFormat.RawPublicKey, out _))
+            return new VerificationResult.Invalid("Invalid NewOwner key, not a valid Ed25519 publicKey");
+
+        var certificateSlice = model.GetCertificateSlice(Slice.From(@event.Slice));
+        if (certificateSlice is null)
+            return new VerificationResult.Invalid("Slice not found");
+
+        var verificationResult = certificateSlice.Verify(commandStep.SignedEvent, proof, Slice.From(@event.Slice));
+        if (verificationResult is VerificationResult.Invalid)
             return verificationResult;
 
-        return VerificationResult.Valid;
+        return new VerificationResult.Valid();
     }
 }

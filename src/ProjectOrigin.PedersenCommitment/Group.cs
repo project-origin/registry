@@ -6,6 +6,21 @@ public record Group
 {
     private const int defaultBitLength = 200;
 
+    private static Lazy<Group> lazyDefault = new Lazy<Group>(() => new Group(
+        p: BigInteger.Parse("519410415765480562065563560862184550988245350627770327636130577"),
+        q: BigInteger.Parse("1202338925383056856633248983477279053213530904230949832491043"),
+        g: BigInteger.Parse("101455240839796123327081946568988620614409829310312504112082811"),
+        h: BigInteger.Parse("162315825204305527697219690878071619973299472069112727941372177")
+    ), true);
+
+    public static Group Default
+    {
+        get
+        {
+            return lazyDefault.Value;
+        }
+    }
+
     public BigInteger p { get; }
     public BigInteger q { get; }
     public BigInteger g { get; }

@@ -1,68 +1,52 @@
+using Google.Protobuf;
 using Microsoft.Extensions.Options;
 using NSec.Cryptography;
-using ProjectOrigin.Electricity.Shared;
 using ProjectOrigin.Electricity.Shared.Internal;
-using ProjectOrigin.PedersenCommitment;
-using ProjectOrigin.RequestProcessor.Interfaces;
-using ProjectOrigin.RequestProcessor.Models;
+using ProjectOrigin.Register.LineProcessor.Interfaces;
+using ProjectOrigin.Register.LineProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Production.Requests;
 
-internal record ProductionIssuedEvent(
-    FederatedStreamId Id,
-    TimePeriod Period,
-    string GridArea,
-    Commitment GsrnCommitment,
-    Commitment QuantityCommitment,
-    string FuelCode,
-    string TechCode,
-    byte[] OwnerPublicKey,
-    CommitmentParameters? QuantityParameters = null);
-
-internal record ProductionIssuedRequest(
-    CommitmentParameters GsrnCommitmentParameters,
-    CommitmentParameters QuantityCommitmentParameters,
-    ProductionIssuedEvent Event,
-    byte[] Signature
-    ) : PublishRequest<ProductionIssuedEvent>(Event.Id, Signature, Event);
-
-internal class ProductionIssuedVerifier : IRequestVerifier<ProductionIssuedRequest, ProductionCertificate>
+internal class ProductionIssuedVerifier : ICommandStepVerifier<V1.IssueProductionCommand.Types.ProductionIssuedEvent, ProductionCertificate>
 {
     private IssuerOptions issuerOptions;
-    private IEventSerializer serializer;
 
-    public ProductionIssuedVerifier(IOptions<IssuerOptions> issuerOptions, IEventSerializer serializer)
+    public ProductionIssuedVerifier(IOptions<IssuerOptions> issuerOptions)
     {
         this.issuerOptions = issuerOptions.Value;
-        this.serializer = serializer;
     }
 
-    public Task<VerificationResult> Verify(ProductionIssuedRequest request, ProductionCertificate? model)
+    public Task<VerificationResult> Verify(CommandStep<V1.IssueProductionCommand.Types.ProductionIssuedEvent> commandStep, ProductionCertificate? model)
     {
-        if (model != null)
-            return VerificationResult.Invalid($"Certificate with id ”{request.FederatedStreamId.StreamId}” already exists");
+        var @event = commandStep.SignedEvent.Event;
 
-        if (!request.GsrnCommitmentParameters.Verify(request.Event.GsrnCommitment))
-            return VerificationResult.Invalid("Calculated GSRN commitment does not equal the parameters");
+        var proof = commandStep.Proof as V1.IssueProductionCommand.Types.ProductionIssuedProof;
+        if (proof is null)
+            return new VerificationResult.Invalid($"Missing or invalid proof");
 
-        if (!request.QuantityCommitmentParameters.Verify(request.Event.QuantityCommitment))
-            return VerificationResult.Invalid("Calculated Quantity commitment does not equal the parameters");
+        if (model is not null)
+            return new VerificationResult.Invalid($"Certificate with id ”{commandStep.FederatedStreamId.StreamId}” already exists");
 
-        if (request.Event.QuantityParameters is not null
-            && request.QuantityCommitmentParameters != request.Event.QuantityParameters)
-            return VerificationResult.Invalid($"{nameof(request.Event.QuantityParameters)} and {nameof(request.QuantityCommitmentParameters)} are not the same");
+        if (!proof.GsrnProof.Verify(@event.GsrnCommitment))
+            return new VerificationResult.Invalid("Calculated GSRN commitment does not equal the parameters");
 
-        if (!PublicKey.TryImport(SignatureAlgorithm.Ed25519, request.Event.OwnerPublicKey, KeyBlobFormat.RawPublicKey, out _))
-            return VerificationResult.Invalid("Invalid owner key, not a valid Ed25519 publicKey");
+        if (!proof.QuantityProof.Verify(@event.QuantityCommitment))
+            return new VerificationResult.Invalid("Calculated Quantity commitment does not equal the parameters");
 
-        var publicKey = issuerOptions.AreaIssuerPublicKey(request.Event.GridArea);
+        if (@event.QuantityProof is not null
+            && !@event.QuantityProof.Equals(proof.QuantityProof))
+            return new VerificationResult.Invalid($"Private and public quantity proof does not match");
+
+        if (!PublicKey.TryImport(SignatureAlgorithm.Ed25519, @event.OwnerPublicKey.Content.ToByteArray(), KeyBlobFormat.RawPublicKey, out _))
+            return new VerificationResult.Invalid("Invalid owner key, not a valid Ed25519 publicKey");
+
+        var publicKey = issuerOptions.AreaIssuerPublicKey(@event.GridArea);
         if (publicKey is null)
-            return VerificationResult.Invalid($"No issuer found for GridArea ”{request.Event.GridArea}”");
+            return new VerificationResult.Invalid($"No issuer found for GridArea ”{@event.GridArea}”");
 
-        var data = serializer.Serialize(request.Event);
-        if (!Ed25519.Ed25519.Verify(publicKey, data, request.Signature))
-            return VerificationResult.Invalid($"Invalid issuer signature for GridArea ”{request.Event.GridArea}”");
+        if (!commandStep.SignedEvent.VerifySignature(publicKey))
+            return new VerificationResult.Invalid($"Invalid issuer signature for GridArea ”{@event.GridArea}”");
 
-        return VerificationResult.Valid;
+        return new VerificationResult.Valid();
     }
 }

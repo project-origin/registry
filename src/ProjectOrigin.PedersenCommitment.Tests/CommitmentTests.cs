@@ -5,17 +5,11 @@ namespace ProjectOrigin.PedersenCommitment.Tests;
 public class CommitmentTests
 {
     [Fact]
-    public void Commitment_CreateHardcodedData_Success()
+    public void Commitment_CreateDefaultGroup_Success()
     {
-        var q = BigInteger.Parse("1202338925383056856633248983477279053213530904230949832491043");
-        var p = BigInteger.Parse("519410415765480562065563560862184550988245350627770327636130577");
-        var g = BigInteger.Parse("101455240839796123327081946568988620614409829310312504112082811");
-        var h = BigInteger.Parse("162315825204305527697219690878071619973299472069112727941372177");
-        var group = new Group(p, q, g, h);
-
         var m = new BigInteger(51);
         var r = BigInteger.Parse("35425707649260674451675575047706194335233578342436579356033362");
-        var c = Commitment.Create(group, m, r);
+        var c = Commitment.Create(Group.Default, m, r);
 
         Assert.Equal(BigInteger.Parse("508952004547232011284116788462783521716447076625673355453585453"), c.C);
     }
@@ -23,7 +17,7 @@ public class CommitmentTests
     [Fact]
     public void Commitment_CreateOnOtherGroup_ThrowsException()
     {
-        var group1 = Group.Create();
+        var group1 = Group.Default;
         var group2 = Group.Create();
 
         var m = new Fixture().Create<BigInteger>();

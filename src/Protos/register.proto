@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package ProjectOrigin.Register.v1;
+
+service CommandService {
+    rpc SubmitCommand (Command) returns (CommandStatus);
+}
+
+enum CommandState {
+    Failed = 0;
+    Succeeded = 1;
+}
+
+message CommandStatus {
+    bytes Id = 1;
+    CommandState State = 2;
+    string Error = 3;
+}
+
+message Command {
+    bytes Id = 1;
+    string Type = 2;
+    uint32 Version = 3;
+    bytes Payload = 4;
+}

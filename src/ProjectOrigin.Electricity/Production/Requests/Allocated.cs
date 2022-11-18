@@ -1,51 +1,48 @@
 using ProjectOrigin.Electricity.Consumption;
 using ProjectOrigin.Electricity.Shared.Internal;
-using ProjectOrigin.RequestProcessor.Interfaces;
-using ProjectOrigin.RequestProcessor.Models;
+using ProjectOrigin.Register.LineProcessor.Interfaces;
+using ProjectOrigin.Register.LineProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Production.Requests;
 
-internal record ProductionAllocatedEvent(
-    Guid AllocationId,
-    FederatedStreamId ProductionCertificateId,
-    FederatedStreamId ConsumptionCertificateId,
-    Slice Slice);
-
-internal record ProductionAllocatedRequest(
-    SliceParameters SliceParameters,
-    ProductionAllocatedEvent Event,
-    byte[] Signature
-    ) : PublishRequest<ProductionAllocatedEvent>(Event.ProductionCertificateId, Signature, Event);
-
-internal class ProductionAllocatedVerifier : SliceVerifier, IRequestVerifier<ProductionAllocatedRequest, ProductionCertificate>
+internal class ProductionAllocatedVerifier : ICommandStepVerifier<V1.ClaimCommand.Types.AllocatedEvent, ProductionCertificate>
 {
     private IModelLoader loader;
 
-    public ProductionAllocatedVerifier(IEventSerializer serializer, IModelLoader loader) : base(serializer)
+    public ProductionAllocatedVerifier(IModelLoader loader)
     {
         this.loader = loader;
     }
 
-    public async Task<VerificationResult> Verify(ProductionAllocatedRequest request, ProductionCertificate? model)
+    public async Task<VerificationResult> Verify(CommandStep<V1.ClaimCommand.Types.AllocatedEvent> commandStep, ProductionCertificate? model)
     {
-        if (model is null)
-            return VerificationResult.Invalid("Certificate does not exist");
+        var @event = commandStep.SignedEvent.Event;
 
-        var sliceFound = model.GetSlice(request.Event.Slice.Source);
-        var verificationResult = VerifySlice(request, request.SliceParameters, request.Event.Slice, sliceFound);
-        if (!verificationResult.IsValid)
+        if (model is null)
+            return new VerificationResult.Invalid("Certificate does not exist");
+
+        var proof = commandStep.Proof as V1.SliceProof;
+        if (proof is null)
+            return new VerificationResult.Invalid($"Missing or invalid proof");
+
+        var certificateSlice = model.GetCertificateSlice(Slice.From(@event.Slice));
+        if (certificateSlice is null)
+            return new VerificationResult.Invalid("Slice not found");
+
+        var verificationResult = certificateSlice.Verify(commandStep.SignedEvent, proof, Slice.From(@event.Slice));
+        if (verificationResult is VerificationResult.Invalid)
             return verificationResult;
 
-        var (consumptionCertificate, _) = await loader.Get<ConsumptionCertificate>(request.Event.ConsumptionCertificateId);
+        var (consumptionCertificate, _) = await loader.Get<ConsumptionCertificate>(@event.ConsumptionCertificateId);
         if (consumptionCertificate == null)
-            return VerificationResult.Invalid("ConsumptionCertificate does not exist");
+            return new VerificationResult.Invalid("ConsumptionCertificate does not exist");
 
         if (consumptionCertificate.Period != model.Period)
-            return VerificationResult.Invalid("Certificates are not in the same period");
+            return new VerificationResult.Invalid("Certificates are not in the same period");
 
         if (consumptionCertificate.GridArea != model.GridArea)
-            return VerificationResult.Invalid("Certificates are not in the same area");
+            return new VerificationResult.Invalid("Certificates are not in the same area");
 
-        return VerificationResult.Valid;
+        return new VerificationResult.Valid();
     }
 }
