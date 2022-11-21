@@ -29,7 +29,7 @@ public class Dispatcher : ICommandStepDispatcher
 
     private ((Type modelType, Type eventType) typeKey, Func<CommandStep, Task<(VerificationResult, int)>> function) GetVerifyFunction(Type verifierType)
     {
-        Type genericInterfaceType = typeof(ICommandStepVerifier<,>);
+        var genericInterfaceType = typeof(ICommandStepVerifier<,>);
         var interfaceType = verifierType.GetInterfaces().Single(i => i.GetGenericTypeDefinition() == genericInterfaceType);
         var argumentTypes = interfaceType.GetGenericArguments();
 

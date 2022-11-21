@@ -1,5 +1,5 @@
 using ProjectOrigin.Electricity.Consumption;
-using ProjectOrigin.Electricity.Shared.Internal;
+using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Register.LineProcessor.Interfaces;
 using ProjectOrigin.Register.LineProcessor.Models;
 
@@ -19,7 +19,7 @@ internal class ProductionClaimedVerifier : ICommandStepVerifier<V1.ClaimCommand.
         if (model is null)
             return new VerificationResult.Invalid("Certificate does not exist");
 
-        var allocationId = commandStep.SignedEvent.Event.AllocationId.ToGuid();
+        var allocationId = commandStep.SignedEvent.Event.AllocationId.ToModel();
 
         var slice = model.GetAllocation(allocationId);
         if (slice is null)

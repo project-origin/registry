@@ -45,12 +45,10 @@ public record SignedEvent(IMessage Event, byte[] Signature)
 
     public byte[] Serialize()
     {
-        using (var ms = new MemoryStream())
-        {
-            var content = new SerializedSignedEvent(Event.GetType().FullName!, Event.ToByteArray(), Signature);
-            Serializer.Serialize(ms, content);
-            return ms.ToArray();
-        }
+        using var ms = new MemoryStream();
+        var content = new SerializedSignedEvent(Event.GetType().FullName!, Event.ToByteArray(), Signature);
+        Serializer.Serialize(ms, content);
+        return ms.ToArray();
     }
 
     public static SignedEvent Deserialize(byte[] bytes)

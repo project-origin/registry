@@ -4,7 +4,7 @@ using NSec.Cryptography;
 using ProjectOrigin.PedersenCommitment;
 using ProjectOrigin.Register.LineProcessor.Models;
 
-namespace ProjectOrigin.Electricity.Shared.Internal;
+namespace ProjectOrigin.Electricity.Models;
 
 internal record AllocationSlice(Commitment Commitment, PublicKey Owner, Guid AllocationId, FederatedStreamId ProductionCertificateId, FederatedStreamId ConsumptionCertificateId) : CertificateSlice(Commitment, Owner);
 
@@ -28,7 +28,7 @@ internal record CertificateSlice(Commitment Commitment, PublicKey Owner)
         if (!proof.Remainder.Verify(slice.Remainder))
             return new VerificationResult.Invalid("Calculated Remainder commitment does not equal the parameters");
 
-        if (!signedEvent.VerifySignature(this.Owner))
+        if (!signedEvent.VerifySignature(Owner))
             return new VerificationResult.Invalid($"Invalid signature");
 
         var rZero = (proof.Source.r - (proof.Quantity.r + proof.Remainder.r)).MathMod(Group.Default.q);

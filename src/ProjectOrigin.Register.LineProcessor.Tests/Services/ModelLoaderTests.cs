@@ -12,11 +12,9 @@ public class ModelLoaderTests
 {
     private byte[] Serialize(IMessage message)
     {
-        using (var ms = new MemoryStream())
-        {
-            message.WriteTo(ms);
-            return ms.ToArray();
-        }
+        using var ms = new MemoryStream();
+        message.WriteTo(ms);
+        return ms.ToArray();
     }
 
     [Fact]

@@ -2,9 +2,8 @@ using System.Numerics;
 using Google.Protobuf;
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Consumption;
+using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Production;
-using ProjectOrigin.Electricity.Shared;
-using ProjectOrigin.Electricity.Shared.Internal;
 using ProjectOrigin.PedersenCommitment;
 using ProjectOrigin.Register.LineProcessor.Models;
 
@@ -13,7 +12,7 @@ namespace ProjectOrigin.Electricity.Tests;
 internal static class FakeRegister
 {
     internal static Group Group { get => Group.Default; }
-    const string Registry = "OurReg";
+    const string registry = "OurReg";
 
     private static TimePeriod defaultPeriod = new TimePeriod(
             new DateTimeOffset(2022, 09, 25, 12, 0, 0, TimeSpan.Zero),
@@ -41,8 +40,8 @@ internal static class FakeRegister
     {
         var e = new V1.ClaimCommand.Types.ClaimedEvent()
         {
-            CertificateId = certificate.Id,
-            AllocationId = allocationId.ToUuid()
+            CertificateId = certificate.Id.ToProto(),
+            AllocationId = allocationId.ToProto()
         };
 
         certificate.Apply(e);
@@ -79,9 +78,9 @@ internal static class FakeRegister
             typeof(ProductionCertificate),
             new V1.SliceProof()
             {
-                Source = Mapper.ToProto(sourceParametersOverride ?? sourceParameters),
-                Quantity = Mapper.ToProto(transferParametersOverride ?? transferParamerters),
-                Remainder = Mapper.ToProto(remainderParametersOverride ?? remainderParameters),
+                Source = (sourceParametersOverride ?? sourceParameters).ToProto(),
+                Quantity = (transferParametersOverride ?? transferParamerters).ToProto(),
+                Remainder = (remainderParametersOverride ?? remainderParameters).ToProto(),
             }
         );
     }
@@ -93,7 +92,7 @@ internal static class FakeRegister
 
         var e = new V1.TransferProductionSliceCommand.Types.ProductionSliceTransferredEvent()
         {
-            CertificateId = id,
+            CertificateId = id.ToProto(),
             Slice = CreateSlice(sourceParameters, transferParameters, remainderParameters),
             NewOwner = ByteString.CopyFrom(newOwner)
         };
@@ -105,8 +104,8 @@ internal static class FakeRegister
     {
         var e = new V1.ClaimCommand.Types.ClaimedEvent()
         {
-            CertificateId = certificateId,
-            AllocationId = allocationId.ToUuid()
+            CertificateId = certificateId.ToProto(),
+            AllocationId = allocationId.ToProto()
         };
 
         return new CommandStep<V1.ClaimCommand.Types.ClaimedEvent>(
@@ -120,8 +119,8 @@ internal static class FakeRegister
     {
         var e = new V1.ClaimCommand.Types.ClaimedEvent()
         {
-            CertificateId = certificateId,
-            AllocationId = allocationId.ToUuid()
+            CertificateId = certificateId.ToProto(),
+            AllocationId = allocationId.ToProto()
         };
 
         return new CommandStep<V1.ClaimCommand.Types.ClaimedEvent>(
@@ -148,9 +147,9 @@ internal static class FakeRegister
             typeof(ConsumptionCertificate),
             new V1.SliceProof()
             {
-                Source = Mapper.ToProto(sourceParameters),
-                Quantity = Mapper.ToProto(transferParamerters),
-                Remainder = Mapper.ToProto(remainderParameters),
+                Source = (sourceParameters).ToProto(),
+                Quantity = (transferParamerters).ToProto(),
+                Remainder = (remainderParameters).ToProto(),
             }
         );
     }
@@ -172,9 +171,9 @@ internal static class FakeRegister
             typeof(ProductionCertificate),
             new V1.SliceProof()
             {
-                Source = Mapper.ToProto(sourceParameters),
-                Quantity = Mapper.ToProto(transferParamerters),
-                Remainder = Mapper.ToProto(remainderParameters),
+                Source = (sourceParameters).ToProto(),
+                Quantity = (transferParamerters).ToProto(),
+                Remainder = (remainderParameters).ToProto(),
             }
         );
     }
@@ -185,9 +184,9 @@ internal static class FakeRegister
 
         var e = new V1.ClaimCommand.Types.AllocatedEvent()
         {
-            AllocationId = allocationId.ToUuid(),
-            ProductionCertificateId = productionId,
-            ConsumptionCertificateId = consumptionId,
+            AllocationId = allocationId.ToProto(),
+            ProductionCertificateId = productionId.ToProto(),
+            ConsumptionCertificateId = consumptionId.ToProto(),
             Slice = CreateSlice(sourceParameters, quantityParameters, remainderParameters)
         };
 
@@ -200,9 +199,9 @@ internal static class FakeRegister
 
         var e = new V1.ClaimCommand.Types.AllocatedEvent()
         {
-            AllocationId = allocationId.ToUuid(),
-            ProductionCertificateId = productionId,
-            ConsumptionCertificateId = consumptionId,
+            AllocationId = allocationId.ToProto(),
+            ProductionCertificateId = productionId.ToProto(),
+            ConsumptionCertificateId = consumptionId.ToProto(),
             Slice = CreateSlice(sourceParameters, quantityParameters, remainderParameters)
         };
 
@@ -211,18 +210,18 @@ internal static class FakeRegister
 
     internal static (ConsumptionCertificate certificate, CommitmentParameters parameters) ConsumptionIssued(PublicKey ownerKey, long quantity, string area = "DK1", TimePeriod? period = null)
     {
-        var id = new FederatedStreamId(Registry, Guid.NewGuid());
+        var id = new FederatedStreamId(registry, Guid.NewGuid());
         var quantityCommitmentParameters = Group.Commit(quantity);
         var gsrnCommitmentParameters = Group.Commit(new Fixture().Create<long>());
 
         var e = new V1.IssueConsumptionCommand.Types.ConsumptionIssuedEvent()
         {
-            CertificateId = id,
-            Period = period ?? defaultPeriod,
+            CertificateId = id.ToProto(),
+            Period = (period ?? defaultPeriod).ToProto(),
             GridArea = area,
-            GsrnCommitment = Mapper.ToProto(gsrnCommitmentParameters.Commitment),
-            QuantityCommitment = Mapper.ToProto(quantityCommitmentParameters.Commitment),
-            OwnerPublicKey = Mapper.ToProto(ownerKey),
+            GsrnCommitment = (gsrnCommitmentParameters.Commitment).ToProto(),
+            QuantityCommitment = (quantityCommitmentParameters.Commitment).ToProto(),
+            OwnerPublicKey = (ownerKey).ToProto(),
         };
 
         var cert = new ConsumptionCertificate();
@@ -233,20 +232,20 @@ internal static class FakeRegister
 
     internal static (ProductionCertificate certificate, CommitmentParameters parameters) ProductionIssued(PublicKey ownerKey, long quantity, string area = "DK1", TimePeriod? period = null)
     {
-        var id = new FederatedStreamId(Registry, Guid.NewGuid());
+        var id = new FederatedStreamId(registry, Guid.NewGuid());
         var quantityCommitmentParameters = Group.Commit(quantity);
         var gsrnCommitmentParameters = Group.Commit(new Fixture().Create<long>());
 
         var e = new V1.IssueProductionCommand.Types.ProductionIssuedEvent()
         {
-            CertificateId = id,
-            Period = period ?? defaultPeriod,
+            CertificateId = id.ToProto(),
+            Period = (period ?? defaultPeriod).ToProto(),
             GridArea = area,
             FuelCode = "F01050100",
             TechCode = "T020002",
-            GsrnCommitment = Mapper.ToProto(gsrnCommitmentParameters.Commitment),
-            QuantityCommitment = Mapper.ToProto(quantityCommitmentParameters.Commitment),
-            OwnerPublicKey = Mapper.ToProto(ownerKey),
+            GsrnCommitment = (gsrnCommitmentParameters.Commitment).ToProto(),
+            QuantityCommitment = (quantityCommitmentParameters.Commitment).ToProto(),
+            OwnerPublicKey = (ownerKey).ToProto(),
         };
 
         var cert = new ProductionCertificate();
@@ -263,7 +262,7 @@ internal static class FakeRegister
         string? gridAreaOverride = null
         )
     {
-        var id = new FederatedStreamId(Registry, Guid.NewGuid());
+        var id = new FederatedStreamId(registry, Guid.NewGuid());
         var quantityCommitmentParameters = Group.Commit(150);
         var gsrnCommitmentParameters = Group.Commit(5700000000000001);
 
@@ -274,13 +273,13 @@ internal static class FakeRegister
 
         var e = new V1.IssueConsumptionCommand.Types.ConsumptionIssuedEvent()
         {
-            CertificateId = id,
+            CertificateId = id.ToProto(),
             Period = new TimePeriod(
                     DateTimeOffset.Now,
-                    DateTimeOffset.Now.AddHours(1)),
+                    DateTimeOffset.Now.AddHours(1)).ToProto(),
             GridArea = gridAreaOverride ?? "DK1",
-            GsrnCommitment = Mapper.ToProto(gsrnCommitmentParameters.Commitment),
-            QuantityCommitment = Mapper.ToProto(quantityCommitmentParameters.Commitment),
+            GsrnCommitment = (gsrnCommitmentParameters.Commitment).ToProto(),
+            QuantityCommitment = (quantityCommitmentParameters.Commitment).ToProto(),
             OwnerPublicKey = ownerKey,
         };
 
@@ -290,8 +289,8 @@ internal static class FakeRegister
             typeof(ConsumptionCertificate),
             new V1.IssueConsumptionCommand.Types.ConsumptionIssuedProof()
             {
-                GsrnProof = Mapper.ToProto(gsrnCommitmentOverride ?? gsrnCommitmentParameters),
-                QuantityProof = Mapper.ToProto(quantityCommitmentOverride ?? quantityCommitmentParameters)
+                GsrnProof = (gsrnCommitmentOverride ?? gsrnCommitmentParameters).ToProto(),
+                QuantityProof = (quantityCommitmentOverride ?? quantityCommitmentParameters).ToProto()
             }
         );
     }
@@ -306,7 +305,7 @@ internal static class FakeRegister
         string? gridAreaOverride = null
         )
     {
-        var id = new FederatedStreamId(Registry, Guid.NewGuid());
+        var id = new FederatedStreamId(registry, Guid.NewGuid());
         var quantityCommitmentParameters = Group.Commit(150);
         var gsrnCommitmentParameters = Group.Commit(5700000000000001);
 
@@ -317,17 +316,17 @@ internal static class FakeRegister
 
         var e = new V1.IssueProductionCommand.Types.ProductionIssuedEvent()
         {
-            CertificateId = id,
+            CertificateId = id.ToProto(),
             Period = new TimePeriod(
                     DateTimeOffset.Now,
-                    DateTimeOffset.Now.AddHours(1)),
+                    DateTimeOffset.Now.AddHours(1)).ToProto(),
             GridArea = gridAreaOverride ?? "DK1",
             FuelCode = "F01050100",
             TechCode = "T020002",
-            GsrnCommitment = Mapper.ToProto(gsrnCommitmentParameters.Commitment),
-            QuantityCommitment = Mapper.ToProto(quantityCommitmentParameters.Commitment),
+            GsrnCommitment = (gsrnCommitmentParameters.Commitment).ToProto(),
+            QuantityCommitment = (quantityCommitmentParameters.Commitment).ToProto(),
             OwnerPublicKey = ownerKey,
-            QuantityProof = publicQuantity ? Mapper.ToProto(publicQuantityCommitmentOverride ?? quantityCommitmentParameters) : null
+            QuantityProof = publicQuantity ? (publicQuantityCommitmentOverride ?? quantityCommitmentParameters).ToProto() : null
         };
 
         return new CommandStep<V1.IssueProductionCommand.Types.ProductionIssuedEvent>(
@@ -336,8 +335,8 @@ internal static class FakeRegister
             typeof(ProductionCertificate),
             new V1.IssueProductionCommand.Types.ProductionIssuedProof()
             {
-                GsrnProof = Mapper.ToProto(gsrnCommitmentOverride ?? gsrnCommitmentParameters),
-                QuantityProof = Mapper.ToProto(quantityCommitmentOverride ?? quantityCommitmentParameters)
+                GsrnProof = (gsrnCommitmentOverride ?? gsrnCommitmentParameters).ToProto(),
+                QuantityProof = (quantityCommitmentOverride ?? quantityCommitmentParameters).ToProto()
             }
         );
     }
@@ -358,9 +357,9 @@ internal static class FakeRegister
     {
         return new V1.Slice()
         {
-            Source = Mapper.ToProto(sourceParameters.Commitment),
-            Quantity = Mapper.ToProto(transferParameters.Commitment),
-            Remainder = Mapper.ToProto(remainderParameters.Commitment),
+            Source = (sourceParameters.Commitment).ToProto(),
+            Quantity = (transferParameters.Commitment).ToProto(),
+            Remainder = (remainderParameters.Commitment).ToProto(),
             ZeroR = ByteString.CopyFrom(((sourceParameters.r - (transferParameters.r + remainderParameters.r)).MathMod(Group.q)).ToByteArray())
         };
     }

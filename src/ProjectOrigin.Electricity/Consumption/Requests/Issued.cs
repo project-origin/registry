@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Options;
 using NSec.Cryptography;
-using ProjectOrigin.Electricity.Shared.Internal;
+using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Register.LineProcessor.Interfaces;
 using ProjectOrigin.Register.LineProcessor.Models;
 
@@ -26,10 +26,10 @@ internal class ConsumptionIssuedVerifier : ICommandStepVerifier<V1.IssueConsumpt
         if (proof is null)
             return new VerificationResult.Invalid($"Missing or invalid proof");
 
-        if (!proof.GsrnProof.Verify(@event.GsrnCommitment))
+        if (!proof.GsrnProof.ToModel().Verify(@event.GsrnCommitment.ToModel()))
             return new VerificationResult.Invalid("Calculated GSRN commitment does not equal the parameters");
 
-        if (!proof.QuantityProof.Verify(@event.QuantityCommitment))
+        if (!proof.QuantityProof.ToModel().Verify(@event.QuantityCommitment.ToModel()))
             return new VerificationResult.Invalid("Calculated Quantity commitment does not equal the parameters");
 
         if (!PublicKey.TryImport(SignatureAlgorithm.Ed25519, @event.OwnerPublicKey.Content.ToByteArray(), KeyBlobFormat.RawPublicKey, out _))

@@ -2,7 +2,7 @@ using Microsoft.Extensions.Options;
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Consumption;
 using ProjectOrigin.Electricity.Consumption.Requests;
-using ProjectOrigin.Electricity.Shared.Internal;
+using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Register.LineProcessor.Models;
 using ProjectOrigin.Register.LineProcessor.Services;
 

@@ -39,7 +39,7 @@ public abstract class RegisterClient : IDisposable
 
     internal Task<TransactionId> SendCommand(IMessage commandContent)
     {
-        string name = commandContent.GetType().FullName!;
+        var name = commandContent.GetType().FullName!;
 
         var command = new Register.V1.Command()
         {

@@ -1,7 +1,7 @@
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Consumption;
+using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Production.Requests;
-using ProjectOrigin.Electricity.Shared;
 using ProjectOrigin.Register.LineProcessor.Interfaces;
 using ProjectOrigin.Register.LineProcessor.Models;
 

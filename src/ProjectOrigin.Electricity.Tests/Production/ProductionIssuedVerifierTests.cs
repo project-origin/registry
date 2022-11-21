@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Options;
 using NSec.Cryptography;
+using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Production;
 using ProjectOrigin.Electricity.Production.Requests;
-using ProjectOrigin.Electricity.Shared.Internal;
 using ProjectOrigin.Register.LineProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Tests;

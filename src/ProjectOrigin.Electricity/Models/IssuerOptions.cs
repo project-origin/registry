@@ -1,5 +1,5 @@
 using NSec.Cryptography;
 
-namespace ProjectOrigin.Electricity.Shared.Internal;
+namespace ProjectOrigin.Electricity.Models;
 
 public record IssuerOptions(Func<string, PublicKey?> AreaIssuerPublicKey);

@@ -1,5 +1,5 @@
 using NSec.Cryptography;
-using ProjectOrigin.Electricity.Shared.Internal;
+using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Register.LineProcessor.Interfaces;
 using ProjectOrigin.Register.LineProcessor.Models;
 
@@ -21,11 +21,11 @@ internal class ProductionSliceTransferredVerifier : ICommandStepVerifier<V1.Tran
         if (!PublicKey.TryImport(SignatureAlgorithm.Ed25519, @event.NewOwner.ToByteArray(), KeyBlobFormat.RawPublicKey, out _))
             return new VerificationResult.Invalid("Invalid NewOwner key, not a valid Ed25519 publicKey");
 
-        var certificateSlice = model.GetCertificateSlice(Slice.From(@event.Slice));
+        var certificateSlice = model.GetCertificateSlice(@event.Slice.ToModel());
         if (certificateSlice is null)
             return new VerificationResult.Invalid("Slice not found");
 
-        var verificationResult = certificateSlice.Verify(commandStep.SignedEvent, proof, Slice.From(@event.Slice));
+        var verificationResult = certificateSlice.Verify(commandStep.SignedEvent, proof.ToModel(), @event.Slice.ToModel());
         if (verificationResult is VerificationResult.Invalid)
             return verificationResult;
 

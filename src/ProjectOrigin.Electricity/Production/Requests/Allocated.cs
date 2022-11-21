@@ -1,5 +1,5 @@
 using ProjectOrigin.Electricity.Consumption;
-using ProjectOrigin.Electricity.Shared.Internal;
+using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Register.LineProcessor.Interfaces;
 using ProjectOrigin.Register.LineProcessor.Models;
 
@@ -25,15 +25,15 @@ internal class ProductionAllocatedVerifier : ICommandStepVerifier<V1.ClaimComman
         if (proof is null)
             return new VerificationResult.Invalid($"Missing or invalid proof");
 
-        var certificateSlice = model.GetCertificateSlice(Slice.From(@event.Slice));
+        var certificateSlice = model.GetCertificateSlice(@event.Slice.ToModel());
         if (certificateSlice is null)
             return new VerificationResult.Invalid("Slice not found");
 
-        var verificationResult = certificateSlice.Verify(commandStep.SignedEvent, proof, Slice.From(@event.Slice));
+        var verificationResult = certificateSlice.Verify(commandStep.SignedEvent, proof.ToModel(), @event.Slice.ToModel());
         if (verificationResult is VerificationResult.Invalid)
             return verificationResult;
 
-        var (consumptionCertificate, _) = await loader.Get<ConsumptionCertificate>(@event.ConsumptionCertificateId);
+        var (consumptionCertificate, _) = await loader.Get<ConsumptionCertificate>(@event.ConsumptionCertificateId.ToModel());
         if (consumptionCertificate == null)
             return new VerificationResult.Invalid("ConsumptionCertificate does not exist");
 

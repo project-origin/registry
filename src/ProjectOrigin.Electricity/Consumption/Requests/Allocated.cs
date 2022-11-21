@@ -1,5 +1,5 @@
+using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Production;
-using ProjectOrigin.Electricity.Shared.Internal;
 using ProjectOrigin.Register.LineProcessor.Interfaces;
 using ProjectOrigin.Register.LineProcessor.Models;
 
@@ -25,22 +25,22 @@ internal class ConsumptionAllocatedVerifier : ICommandStepVerifier<V1.ClaimComma
         if (proof is null)
             return new VerificationResult.Invalid($"Missing or invalid proof");
 
-        var certificateSlice = model.GetCertificateSlice(Slice.From(@event.Slice));
+        var certificateSlice = model.GetCertificateSlice(@event.Slice.ToModel());
         if (certificateSlice is null)
             return new VerificationResult.Invalid("Slice not found");
 
-        var verificationResult = certificateSlice.Verify(commandStep.SignedEvent, proof, Slice.From(@event.Slice));
+        var verificationResult = certificateSlice.Verify(commandStep.SignedEvent, proof.ToModel(), @event.Slice.ToModel());
         if (verificationResult is VerificationResult.Invalid)
             return verificationResult;
 
-        var allocationId = @event.AllocationId.ToGuid();
+        var allocationId = @event.AllocationId.ToModel();
 
-        var (productionCertificate, _) = await loader.Get<ProductionCertificate>(@event.ProductionCertificateId);
+        var (productionCertificate, _) = await loader.Get<ProductionCertificate>(@event.ProductionCertificateId.ToModel());
         if (productionCertificate == null
             || !productionCertificate.HasAllocation(allocationId))
             return new VerificationResult.Invalid("Production not allocated");
 
-        if (productionCertificate.GetAllocation(allocationId)!.Commitment != Mapper.ToModel(@event.Slice.Quantity))
+        if (productionCertificate.GetAllocation(allocationId)!.Commitment != @event.Slice.Quantity.ToModel())
             return new VerificationResult.Invalid("Commmitment are not the same");
 
         return new VerificationResult.Valid();

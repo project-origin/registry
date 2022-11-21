@@ -25,14 +25,12 @@ public abstract record CommandStep(
     {
         get
         {
-            using (var ms = new MemoryStream())
-            {
-                var obj = new SerializedCommandStep(FederatedStreamId, SignedEvent.Serialize(), ModelType.FullName!, Proof?.ToByteArray());
+            using var ms = new MemoryStream();
+            var obj = new SerializedCommandStep(FederatedStreamId, SignedEvent.Serialize(), ModelType.FullName!, Proof?.ToByteArray());
 
-                Serializer.Serialize(ms, obj);
-                var hash = SHA256.HashData(ms.ToArray());
-                return new CommandStepId(hash);
-            }
+            Serializer.Serialize(ms, obj);
+            var hash = SHA256.HashData(ms.ToArray());
+            return new CommandStepId(hash);
         }
     }
 
