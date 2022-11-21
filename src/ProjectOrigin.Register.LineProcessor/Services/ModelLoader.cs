@@ -7,7 +7,7 @@ namespace ProjectOrigin.Register.LineProcessor.Services;
 
 public class ModelLoader : IModelLoader
 {
-    private ConcurrentDictionary<Type, Projector> projectorDictionary = new();
+    private ConcurrentDictionary<Type, ModelProjector> projectorDictionary = new();
 
     private ModelLoaderOptions options;
 
@@ -45,6 +45,6 @@ public class ModelLoader : IModelLoader
 
     private IModelProjector GetProjector(Type type)
     {
-        return projectorDictionary.GetOrAdd(type, (type) => new Projector(type));
+        return projectorDictionary.GetOrAdd(type, (type) => new ModelProjector(type));
     }
 }

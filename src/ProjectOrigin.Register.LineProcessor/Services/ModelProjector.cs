@@ -4,12 +4,12 @@ using ProjectOrigin.Register.LineProcessor.Interfaces;
 
 namespace ProjectOrigin.Register.LineProcessor.Services;
 
-public class Projector : IModelProjector
+public class ModelProjector : IModelProjector
 {
     private Type type;
     private Dictionary<Type, MethodInfo> applyDict;
 
-    public Projector(Type type)
+    public ModelProjector(Type type)
     {
         this.type = type;
         var methonName = nameof(IModelProjectable<object>.Apply);

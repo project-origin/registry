@@ -10,7 +10,7 @@ public class ProjectorTests
     public void Projector_ProjectEvents_Success()
     {
         var fixture = new Fixture();
-        var projector = new Projector(typeof(Chat));
+        var projector = new ModelProjector(typeof(Chat));
 
         var events = new List<IMessage>(){
             fixture.Create<ChatCreatedEvent>(),
@@ -30,7 +30,7 @@ public class ProjectorTests
     public void Projector_ProjectEventsInvalidType_Failure()
     {
         var fixture = new Fixture();
-        var projector = new Projector(typeof(Chat));
+        var projector = new ModelProjector(typeof(Chat));
 
         var events = new List<IMessage>(){
             fixture.Create<ChatCreatedEvent>(),

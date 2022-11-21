@@ -4,13 +4,13 @@ using ProjectOrigin.Register.LineProcessor.Models;
 
 namespace ProjectOrigin.Register.LineProcessor.Services;
 
-public class Dispatcher : ICommandStepDispatcher
+public class CommandStepDispatcher : ICommandStepDispatcher
 {
     private IModelLoader modelLoader;
     private ICommandStepVerifierFactory verifierFactory;
     private Dictionary<(Type modelType, Type eventType), Func<CommandStep, Task<(VerificationResult, int)>>> verifierDictionary;
 
-    public Dispatcher(IModelLoader modelLoader, ICommandStepVerifierFactory verifierFactory)
+    public CommandStepDispatcher(IModelLoader modelLoader, ICommandStepVerifierFactory verifierFactory)
     {
         this.modelLoader = modelLoader;
         this.verifierFactory = verifierFactory;

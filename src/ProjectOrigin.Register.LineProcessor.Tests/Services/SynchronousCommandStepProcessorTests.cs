@@ -21,7 +21,7 @@ public class SynchronousCommandStepProcessorTests
         var batcherMock = new Mock<IBatcher>();
         var dispatcherMock = new Mock<ICommandStepDispatcher>();
         dispatcherMock.Setup(obj => obj.Verify(It.IsAny<CommandStep>())).ReturnsAsync((new VerificationResult.Valid(), index));
-        var optionsMock = CreateOptionsMock<RequestProcessorOptions>(new RequestProcessorOptions(registryName));
+        var optionsMock = CreateOptionsMock<CommandStepProcessorOptions>(new CommandStepProcessorOptions(registryName));
 
         var processor = new SynchronousCommandStepProcessor(optionsMock, dispatcherMock.Object, batcherMock.Object);
 
@@ -42,7 +42,7 @@ public class SynchronousCommandStepProcessorTests
         var batcherMock = new Mock<IBatcher>();
         var dispatcherMock = new Mock<ICommandStepDispatcher>();
         dispatcherMock.Setup(obj => obj.Verify(It.IsAny<CommandStep>())).ReturnsAsync((new VerificationResult.Invalid(errorMessage), fixture.Create<int>()));
-        var optionsMock = CreateOptionsMock<RequestProcessorOptions>(new RequestProcessorOptions(registryName));
+        var optionsMock = CreateOptionsMock<CommandStepProcessorOptions>(new CommandStepProcessorOptions(registryName));
 
         var processor = new SynchronousCommandStepProcessor(optionsMock, dispatcherMock.Object, batcherMock.Object);
         var result = await processor.Process(request);
@@ -63,7 +63,7 @@ public class SynchronousCommandStepProcessorTests
         var batcherMock = new Mock<IBatcher>();
         var dispatcherMock = new Mock<ICommandStepDispatcher>();
         dispatcherMock.Setup(obj => obj.Verify(It.IsAny<CommandStep>())).ReturnsAsync((new VerificationResult.Valid(), 0));
-        var optionsMock = CreateOptionsMock<RequestProcessorOptions>(new RequestProcessorOptions(registryName));
+        var optionsMock = CreateOptionsMock<CommandStepProcessorOptions>(new CommandStepProcessorOptions(registryName));
 
         var processor = new SynchronousCommandStepProcessor(optionsMock, dispatcherMock.Object, batcherMock.Object);
         var ex = await Assert.ThrowsAsync<InvalidDataException>(() => processor.Process(request));

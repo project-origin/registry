@@ -23,7 +23,7 @@ public class DispatcherTests
             .ReturnsAsync((Chat.Null, 0))
             .ReturnsAsync((new Chat(), 1));
 
-        var dispatcher = new Dispatcher(modelLoaderMock.Object, new FakeVerifierFactory());
+        var dispatcher = new CommandStepDispatcher(modelLoaderMock.Object, new FakeVerifierFactory());
 
         var topicId = Guid.NewGuid();
 
@@ -45,7 +45,7 @@ public class DispatcherTests
             .ReturnsAsync((Chat.Null, 0))
             .ReturnsAsync((new Chat(), 1));
 
-        var dispatcher = new Dispatcher(modelLoaderMock.Object, new FakeVerifierFactory());
+        var dispatcher = new CommandStepDispatcher(modelLoaderMock.Object, new FakeVerifierFactory());
 
         var topicId = Guid.NewGuid();
 

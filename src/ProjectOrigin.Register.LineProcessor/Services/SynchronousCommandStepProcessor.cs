@@ -6,13 +6,13 @@ using ProjectOrigin.VerifiableEventStore.Services.Batcher;
 
 namespace ProjectOrigin.Register.LineProcessor.Services;
 
-public class SynchronousCommandStepProcessor : ICommandStepOrchestrator
+public class SynchronousCommandStepProcessor : ICommandStepProcessor
 {
-    private RequestProcessorOptions options;
+    private CommandStepProcessorOptions options;
     private ICommandStepDispatcher dispatcher;
     private IBatcher batcher;
 
-    public SynchronousCommandStepProcessor(IOptions<RequestProcessorOptions> options, ICommandStepDispatcher dispatcher, IBatcher batcher)
+    public SynchronousCommandStepProcessor(IOptions<CommandStepProcessorOptions> options, ICommandStepDispatcher dispatcher, IBatcher batcher)
     {
         this.options = options.Value;
         this.dispatcher = dispatcher;
