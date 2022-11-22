@@ -2,7 +2,7 @@ namespace System.Numerics;
 
 public static class BigIntegerExtensions
 {
-    const int defaultWitnesses = 10;
+    const int DefaultWitnesses = 10;
 
     /// <summary>
     /// Mathematical modulus where negative devidend modulo a positive devisor
@@ -14,7 +14,7 @@ public static class BigIntegerExtensions
         return (BigInteger.Abs(dividend * divisor) + dividend) % divisor;
     }
 
-    public static bool IsProbablyNotPrime(this BigInteger number, int witnesses = defaultWitnesses)
+    public static bool IsProbablyNotPrime(this BigInteger number, int witnesses = DefaultWitnesses)
     {
         return !number.IsProbablyPrime(witnesses);
     }
@@ -23,7 +23,7 @@ public static class BigIntegerExtensions
     /// Checks that a BigInteger is probably a prime based
     /// https://stackoverflow.com/a/33918233
     /// </summary>
-    public static bool IsProbablyPrime(this BigInteger number, int witnesses = defaultWitnesses)
+    public static bool IsProbablyPrime(this BigInteger number, int witnesses = DefaultWitnesses)
     {
         if (number <= 1)
             return false;

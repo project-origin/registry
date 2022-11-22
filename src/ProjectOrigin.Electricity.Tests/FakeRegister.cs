@@ -5,16 +5,16 @@ using ProjectOrigin.Electricity.Consumption;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Production;
 using ProjectOrigin.PedersenCommitment;
-using ProjectOrigin.Register.LineProcessor.Models;
+using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Tests;
 
 internal static class FakeRegister
 {
     internal static Group Group { get => Group.Default; }
-    const string registry = "OurReg";
+    const string Registry = "OurReg";
 
-    private static TimePeriod defaultPeriod = new TimePeriod(
+    private static TimePeriod _defaultPeriod = new TimePeriod(
             new DateTimeOffset(2022, 09, 25, 12, 0, 0, TimeSpan.Zero),
             new DateTimeOffset(2022, 09, 25, 13, 0, 0, TimeSpan.Zero));
 
@@ -210,14 +210,14 @@ internal static class FakeRegister
 
     internal static (ConsumptionCertificate certificate, CommitmentParameters parameters) ConsumptionIssued(PublicKey ownerKey, long quantity, string area = "DK1", TimePeriod? period = null)
     {
-        var id = new FederatedStreamId(registry, Guid.NewGuid());
+        var id = new FederatedStreamId(Registry, Guid.NewGuid());
         var quantityCommitmentParameters = Group.Commit(quantity);
         var gsrnCommitmentParameters = Group.Commit(new Fixture().Create<long>());
 
         var e = new V1.IssueConsumptionCommand.Types.ConsumptionIssuedEvent()
         {
             CertificateId = id.ToProto(),
-            Period = (period ?? defaultPeriod).ToProto(),
+            Period = (period ?? _defaultPeriod).ToProto(),
             GridArea = area,
             GsrnCommitment = (gsrnCommitmentParameters.Commitment).ToProto(),
             QuantityCommitment = (quantityCommitmentParameters.Commitment).ToProto(),
@@ -232,14 +232,14 @@ internal static class FakeRegister
 
     internal static (ProductionCertificate certificate, CommitmentParameters parameters) ProductionIssued(PublicKey ownerKey, long quantity, string area = "DK1", TimePeriod? period = null)
     {
-        var id = new FederatedStreamId(registry, Guid.NewGuid());
+        var id = new FederatedStreamId(Registry, Guid.NewGuid());
         var quantityCommitmentParameters = Group.Commit(quantity);
         var gsrnCommitmentParameters = Group.Commit(new Fixture().Create<long>());
 
         var e = new V1.IssueProductionCommand.Types.ProductionIssuedEvent()
         {
             CertificateId = id.ToProto(),
-            Period = (period ?? defaultPeriod).ToProto(),
+            Period = (period ?? _defaultPeriod).ToProto(),
             GridArea = area,
             FuelCode = "F01050100",
             TechCode = "T020002",
@@ -262,7 +262,7 @@ internal static class FakeRegister
         string? gridAreaOverride = null
         )
     {
-        var id = new FederatedStreamId(registry, Guid.NewGuid());
+        var id = new FederatedStreamId(Registry, Guid.NewGuid());
         var quantityCommitmentParameters = Group.Commit(150);
         var gsrnCommitmentParameters = Group.Commit(5700000000000001);
 
@@ -305,7 +305,7 @@ internal static class FakeRegister
         string? gridAreaOverride = null
         )
     {
-        var id = new FederatedStreamId(registry, Guid.NewGuid());
+        var id = new FederatedStreamId(Registry, Guid.NewGuid());
         var quantityCommitmentParameters = Group.Commit(150);
         var gsrnCommitmentParameters = Group.Commit(5700000000000001);
 

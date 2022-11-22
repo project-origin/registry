@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using Google.Protobuf;
 using Grpc.Net.Client;
 using NSec.Cryptography;
@@ -8,20 +9,26 @@ namespace ProjectOrigin.Electricity.Client;
 
 public abstract class RegisterClient : IDisposable
 {
-    private GrpcChannel channel;
-    private Register.V1.CommandService.CommandServiceClient grpcClient;
+    private GrpcChannel _channel;
+    private Register.V1.CommandService.CommandServiceClient _grpcClient;
 
     public event Action<CommandStatusEvent>? Events;
 
-    public Group Group { get => Group.Create(); }
+    public Group Group { get => Group.Default; }
+
+    public RegisterClient(GrpcChannel channel)
+    {
+        _channel = channel;
+        _grpcClient = new Register.V1.CommandService.CommandServiceClient(channel);
+    }
 
     public RegisterClient(string registryAddress)
     {
-        channel = GrpcChannel.ForAddress(registryAddress);
-        grpcClient = new Register.V1.CommandService.CommandServiceClient(channel);
+        _channel = GrpcChannel.ForAddress(registryAddress);
+        _grpcClient = new Register.V1.CommandService.CommandServiceClient(_channel);
     }
 
-    public void Dispose() => channel.Dispose();
+    public void Dispose() => _channel.Dispose();
 
     internal ByteString Sign(Key signerKey, IMessage e)
     {
@@ -44,11 +51,10 @@ public abstract class RegisterClient : IDisposable
         var command = new Register.V1.Command()
         {
             Type = name,
-            Version = 1,
             Payload = commandContent.ToByteString(),
         };
 
-        var commandHash = command.ToByteArray();
+        var commandHash = SHA256.HashData(command.ToByteArray());
         command.Id = ByteString.CopyFrom(commandHash);
 
         Task.Run(() => Execute(command));
@@ -62,7 +68,7 @@ public abstract class RegisterClient : IDisposable
 
         try
         {
-            var result = await grpcClient.SubmitCommandAsync(command);
+            var result = await _grpcClient.SubmitCommandAsync(command);
             TriggerEvent(new CommandStatusEvent(id, (CommandState)(int)result.State, result.Error));
         }
         catch (Exception ex)

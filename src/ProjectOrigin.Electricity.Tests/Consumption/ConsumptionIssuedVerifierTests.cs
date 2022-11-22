@@ -3,8 +3,8 @@ using NSec.Cryptography;
 using ProjectOrigin.Electricity.Consumption;
 using ProjectOrigin.Electricity.Consumption.Requests;
 using ProjectOrigin.Electricity.Models;
-using ProjectOrigin.Register.LineProcessor.Models;
-using ProjectOrigin.Register.LineProcessor.Services;
+using ProjectOrigin.Register.StepProcessor.Models;
+using ProjectOrigin.Register.StepProcessor.Services;
 
 namespace ProjectOrigin.Electricity.Tests;
 
@@ -20,7 +20,10 @@ public class ConsumptionIssuedVerifierTests
     private (ConsumptionIssuedVerifier, Key) SetupIssuer()
     {
         var issuerKey = Key.Create(SignatureAlgorithm.Ed25519);
-        var optionsMock = CreateOptionsMock(new IssuerOptions((area) => area == "DK1" ? issuerKey.PublicKey : null));
+        var optionsMock = CreateOptionsMock(new IssuerOptions()
+        {
+            AreaIssuerPublicKey = (area) => area == "DK1" ? issuerKey.PublicKey : null
+        });
 
         var processor = new ConsumptionIssuedVerifier(optionsMock);
 

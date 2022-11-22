@@ -12,15 +12,23 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.PedersenCommi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.PedersenCommitment.Tests", "ProjectOrigin.PedersenCommitment.Tests\ProjectOrigin.PedersenCommitment.Tests.csproj", "{FDA069D8-E8FE-465E-A11E-77BC15E4EB2A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.Register.LineProcessor", "ProjectOrigin.Register.LineProcessor\ProjectOrigin.Register.LineProcessor.csproj", "{EC541F55-C0A9-4694-A902-B41026E9AC73}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.Register.StepProcessor", "ProjectOrigin.Register.StepProcessor\ProjectOrigin.Register.StepProcessor.csproj", "{EC541F55-C0A9-4694-A902-B41026E9AC73}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.Register.LineProcessor.Tests", "ProjectOrigin.Register.LineProcessor.Tests\ProjectOrigin.Register.LineProcessor.Tests.csproj", "{0C7EF78A-5D77-4B04-BDC4-EBE2C5F179AA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.Register.StepProcessor.Tests", "ProjectOrigin.Register.StepProcessor.Tests\ProjectOrigin.Register.StepProcessor.Tests.csproj", "{0C7EF78A-5D77-4B04-BDC4-EBE2C5F179AA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.Electricity", "ProjectOrigin.Electricity\ProjectOrigin.Electricity.csproj", "{D7DE4F91-544E-428A-860F-339DE1D7307D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.Electricity.Tests", "ProjectOrigin.Electricity.Tests\ProjectOrigin.Electricity.Tests.csproj", "{1D4FCB87-7D78-4088-A7F9-2D8C9101DE29}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.Electricity.Client", "ProjectOrigin.Electricity.Client\ProjectOrigin.Electricity.Client.csproj", "{EE93B948-E30E-4D39-9AA3-F07D32C5A5D5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.Register.CommandProcessor", "ProjectOrigin.Register.CommandProcessor\ProjectOrigin.Register.CommandProcessor.csproj", "{1F92FC94-7D2A-4CC6-8D6E-59C0C514C9EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.Register.Utils", "ProjectOrigin.Register.Utils\ProjectOrigin.Register.Utils.csproj", "{B4B29045-A77B-4D27-BC5F-C65563BDE897}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.Electricity.Server", "ProjectOrigin.Electricity.Server\ProjectOrigin.Electricity.Server.csproj", "{5457D012-75DD-431E-A5E8-41355B3F06C5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.Electricity.IntegrationTests", "ProjectOrigin.Electricity.IntegrationTests\ProjectOrigin.Electricity.IntegrationTests.csproj", "{5FF6EF13-F05F-494E-9CD0-D130A09105E9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,5 +79,21 @@ Global
 		{EE93B948-E30E-4D39-9AA3-F07D32C5A5D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE93B948-E30E-4D39-9AA3-F07D32C5A5D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EE93B948-E30E-4D39-9AA3-F07D32C5A5D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F92FC94-7D2A-4CC6-8D6E-59C0C514C9EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F92FC94-7D2A-4CC6-8D6E-59C0C514C9EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F92FC94-7D2A-4CC6-8D6E-59C0C514C9EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F92FC94-7D2A-4CC6-8D6E-59C0C514C9EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4B29045-A77B-4D27-BC5F-C65563BDE897}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4B29045-A77B-4D27-BC5F-C65563BDE897}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4B29045-A77B-4D27-BC5F-C65563BDE897}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4B29045-A77B-4D27-BC5F-C65563BDE897}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5457D012-75DD-431E-A5E8-41355B3F06C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5457D012-75DD-431E-A5E8-41355B3F06C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5457D012-75DD-431E-A5E8-41355B3F06C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5457D012-75DD-431E-A5E8-41355B3F06C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FF6EF13-F05F-494E-9CD0-D130A09105E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FF6EF13-F05F-494E-9CD0-D130A09105E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FF6EF13-F05F-494E-9CD0-D130A09105E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FF6EF13-F05F-494E-9CD0-D130A09105E9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

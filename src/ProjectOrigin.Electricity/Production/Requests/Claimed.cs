@@ -1,17 +1,17 @@
 using ProjectOrigin.Electricity.Consumption;
 using ProjectOrigin.Electricity.Models;
-using ProjectOrigin.Register.LineProcessor.Interfaces;
-using ProjectOrigin.Register.LineProcessor.Models;
+using ProjectOrigin.Register.StepProcessor.Interfaces;
+using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Production.Requests;
 
-internal class ProductionClaimedVerifier : ICommandStepVerifier<V1.ClaimCommand.Types.ClaimedEvent, ProductionCertificate>
+public class ProductionClaimedVerifier : ICommandStepVerifier<V1.ClaimCommand.Types.ClaimedEvent, ProductionCertificate>
 {
-    private IModelLoader loader;
+    private IModelLoader _loader;
 
     public ProductionClaimedVerifier(IModelLoader loader)
     {
-        this.loader = loader;
+        _loader = loader;
     }
 
     public async Task<VerificationResult> Verify(CommandStep<V1.ClaimCommand.Types.ClaimedEvent> commandStep, ProductionCertificate? model)
@@ -28,7 +28,7 @@ internal class ProductionClaimedVerifier : ICommandStepVerifier<V1.ClaimCommand.
         if (!commandStep.SignedEvent.VerifySignature(slice.Owner))
             return new VerificationResult.Invalid($"Invalid signature");
 
-        var (consumptionCertificate, _) = await loader.Get<ConsumptionCertificate>(slice.ConsumptionCertificateId);
+        var (consumptionCertificate, _) = await _loader.Get<ConsumptionCertificate>(slice.ConsumptionCertificateId);
         if (consumptionCertificate == null || !consumptionCertificate.HasAllocation(allocationId))
             return new VerificationResult.Invalid("Consumption not allocated");
 

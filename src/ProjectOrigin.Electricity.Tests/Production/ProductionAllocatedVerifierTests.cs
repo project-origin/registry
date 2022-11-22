@@ -2,8 +2,8 @@ using NSec.Cryptography;
 using ProjectOrigin.Electricity.Consumption;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Production.Requests;
-using ProjectOrigin.Register.LineProcessor.Interfaces;
-using ProjectOrigin.Register.LineProcessor.Models;
+using ProjectOrigin.Register.StepProcessor.Interfaces;
+using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Tests;
 

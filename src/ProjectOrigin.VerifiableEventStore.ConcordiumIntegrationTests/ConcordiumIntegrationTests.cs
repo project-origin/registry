@@ -7,9 +7,9 @@ namespace ProjectOrigin.VerifiableEventStore.ConcordiumIntegrationTests;
 
 public class ConcordiumIntegrationTests
 {
-    const string nodeAddress = "http://testnet-node:10001";
-    const string nodeToken = "rpcadmin";
-    const int fiveSeconds = 5000;
+    const string NodeAddress = "http://testnet-node:10001";
+    const string NodeToken = "rpcadmin";
+    const int FiveSeconds = 5000;
 
     [Fact]
     public async Task GetRandomKnownTransaction_Success()
@@ -47,7 +47,7 @@ public class ConcordiumIntegrationTests
         var i = 0;
         do
         {
-            await Task.Delay(fiveSeconds);
+            await Task.Delay(FiveSeconds);
             block = await connector.GetBlock(transactionRef);
         }
         while (block is null && i++ < 10);
@@ -62,7 +62,7 @@ public class ConcordiumIntegrationTests
         var accountKey = GetEnvironmentVariable("AccountKey");
 
         var optionsMock = new Mock<IOptions<ConcordiumOptions>>();
-        optionsMock.Setup(obj => obj.Value).Returns(new ConcordiumOptions(nodeAddress, nodeToken, accountAddress, accountKey));
+        optionsMock.Setup(obj => obj.Value).Returns(new ConcordiumOptions(NodeAddress, NodeToken, accountAddress, accountKey));
 
         return new ConcordiumConnector(optionsMock.Object);
     }

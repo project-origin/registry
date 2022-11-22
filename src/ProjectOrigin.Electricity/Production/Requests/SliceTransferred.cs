@@ -1,11 +1,11 @@
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Models;
-using ProjectOrigin.Register.LineProcessor.Interfaces;
-using ProjectOrigin.Register.LineProcessor.Models;
+using ProjectOrigin.Register.StepProcessor.Interfaces;
+using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Production.Requests;
 
-internal class ProductionSliceTransferredVerifier : ICommandStepVerifier<V1.TransferProductionSliceCommand.Types.ProductionSliceTransferredEvent, ProductionCertificate>
+public class ProductionSliceTransferredVerifier : ICommandStepVerifier<V1.TransferProductionSliceCommand.Types.ProductionSliceTransferredEvent, ProductionCertificate>
 {
     public Task<VerificationResult> Verify(CommandStep<V1.TransferProductionSliceCommand.Types.ProductionSliceTransferredEvent> commandStep, ProductionCertificate? model)
     {

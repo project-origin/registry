@@ -2,13 +2,13 @@
 
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
-    <ProjectReference Include="..\ProjectOrigin.PedersenCommitment\ProjectOrigin.PedersenCommitment.csproj" />
-    <ProjectReference Include="..\ProjectOrigin.Register.LineProcessor\ProjectOrigin.Register.LineProcessor.csproj" />
     <PackageReference Include="NSec.Cryptography" Version="22.4.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ProjectOrigin.VerifiableEventStore\ProjectOrigin.VerifiableEventStore.csproj" />
+    <ProjectReference Include="..\ProjectOrigin.PedersenCommitment\ProjectOrigin.PedersenCommitment.csproj" />
+    <ProjectReference Include="..\ProjectOrigin.Register.CommandProcessor\ProjectOrigin.Register.CommandProcessor.csproj" />
+    <ProjectReference Include="..\ProjectOrigin.Register.StepProcessor\ProjectOrigin.Register.StepProcessor.csproj" />
   </ItemGroup>
 
   <ItemGroup>

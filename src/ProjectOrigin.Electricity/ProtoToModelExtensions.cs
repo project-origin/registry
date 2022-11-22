@@ -1,7 +1,7 @@
 using System.Numerics;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.PedersenCommitment;
-using ProjectOrigin.Register.LineProcessor.Models;
+using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity;
 

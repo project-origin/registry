@@ -6,16 +6,16 @@ namespace ProjectOrigin.VerifiableEventStore.Services.EventProver;
 
 public class EventProverService : IEventProver
 {
-    private IEventStore eventStore;
+    private IEventStore _eventStore;
 
     public EventProverService(IEventStore eventStore)
     {
-        this.eventStore = eventStore;
+        _eventStore = eventStore;
     }
 
     public async Task<MerkleProof?> GetMerkleProof(EventId eventId)
     {
-        var batch = await eventStore.GetBatch(eventId);
+        var batch = await _eventStore.GetBatch(eventId);
         if (batch is null)
         {
             return null;

@@ -1,16 +1,14 @@
 using System.Numerics;
-using Google.Protobuf;
 using NSec.Cryptography;
 using ProjectOrigin.PedersenCommitment;
-using ProjectOrigin.Register.LineProcessor.Models;
+using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Models;
 
-internal record AllocationSlice(Commitment Commitment, PublicKey Owner, Guid AllocationId, FederatedStreamId ProductionCertificateId, FederatedStreamId ConsumptionCertificateId) : CertificateSlice(Commitment, Owner);
+public record AllocationSlice(Commitment Commitment, PublicKey Owner, Guid AllocationId, FederatedStreamId ProductionCertificateId, FederatedStreamId ConsumptionCertificateId) : CertificateSlice(Commitment, Owner);
 
-internal record CertificateSlice(Commitment Commitment, PublicKey Owner)
+public record CertificateSlice(Commitment Commitment, PublicKey Owner)
 {
-
     public VerificationResult Verify(SignedEvent signedEvent, SliceProof proof, Slice slice)
     {
         if (proof.Quantity.m > proof.Source.m)
@@ -28,9 +26,6 @@ internal record CertificateSlice(Commitment Commitment, PublicKey Owner)
         if (!proof.Remainder.Verify(slice.Remainder))
             return new VerificationResult.Invalid("Calculated Remainder commitment does not equal the parameters");
 
-        if (!signedEvent.VerifySignature(Owner))
-            return new VerificationResult.Invalid($"Invalid signature");
-
         var rZero = (proof.Source.r - (proof.Quantity.r + proof.Remainder.r)).MathMod(Group.Default.q);
         if (slice.ZeroR != rZero)
             return new VerificationResult.Invalid("R to zero is not valid");
@@ -38,6 +33,9 @@ internal record CertificateSlice(Commitment Commitment, PublicKey Owner)
         var calculatedCommitmentToZero = Commitment.Create(Group.Default, 0, rZero).C;
         if (calculatedCommitmentToZero != (slice.Source / (slice.Quantity * slice.Remainder)).C)
             return new VerificationResult.Invalid("R to zero is not valid");
+
+        if (!signedEvent.VerifySignature(Owner))
+            return new VerificationResult.Invalid($"Invalid signature");
 
         return new VerificationResult.Valid();
     }

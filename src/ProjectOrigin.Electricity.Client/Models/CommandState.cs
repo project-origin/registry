@@ -6,4 +6,4 @@ public enum CommandState
     Succeeded = 1,
 }
 
-public record CommandStatusEvent(TransactionId id, CommandState state, string? Error);
+public record CommandStatusEvent(TransactionId Id, CommandState State, string? Error);

@@ -2,9 +2,9 @@ using Microsoft.Extensions.Options;
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Production.Requests;
 using ProjectOrigin.PedersenCommitment;
-using ProjectOrigin.Register.LineProcessor.Interfaces;
-using ProjectOrigin.Register.LineProcessor.Models;
-using ProjectOrigin.Register.LineProcessor.Services;
+using ProjectOrigin.Register.StepProcessor.Interfaces;
+using ProjectOrigin.Register.StepProcessor.Models;
+using ProjectOrigin.Register.StepProcessor.Services;
 
 namespace ProjectOrigin.Electricity.Tests;
 

@@ -1,17 +1,16 @@
-using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Production;
-using ProjectOrigin.Register.LineProcessor.Interfaces;
-using ProjectOrigin.Register.LineProcessor.Models;
+using ProjectOrigin.Register.StepProcessor.Interfaces;
+using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Consumption.Requests;
 
-internal class ConsumptionAllocatedVerifier : ICommandStepVerifier<V1.ClaimCommand.Types.AllocatedEvent, ConsumptionCertificate>
+public class ConsumptionAllocatedVerifier : ICommandStepVerifier<V1.ClaimCommand.Types.AllocatedEvent, ConsumptionCertificate>
 {
-    private IModelLoader loader;
+    private IModelLoader _loader;
 
     public ConsumptionAllocatedVerifier(IModelLoader loader)
     {
-        this.loader = loader;
+        _loader = loader;
     }
 
     public async Task<VerificationResult> Verify(CommandStep<V1.ClaimCommand.Types.AllocatedEvent> commandStep, ConsumptionCertificate? model)
@@ -35,7 +34,7 @@ internal class ConsumptionAllocatedVerifier : ICommandStepVerifier<V1.ClaimComma
 
         var allocationId = @event.AllocationId.ToModel();
 
-        var (productionCertificate, _) = await loader.Get<ProductionCertificate>(@event.ProductionCertificateId.ToModel());
+        var (productionCertificate, _) = await _loader.Get<ProductionCertificate>(@event.ProductionCertificateId.ToModel());
         if (productionCertificate == null
             || !productionCertificate.HasAllocation(allocationId))
             return new VerificationResult.Invalid("Production not allocated");

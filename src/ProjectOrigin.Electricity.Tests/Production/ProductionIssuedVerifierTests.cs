@@ -3,7 +3,7 @@ using NSec.Cryptography;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Production;
 using ProjectOrigin.Electricity.Production.Requests;
-using ProjectOrigin.Register.LineProcessor.Models;
+using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Tests;
 
@@ -19,7 +19,10 @@ public class ProductionIssuedVerifierTests
     private (ProductionIssuedVerifier, Key) SetupIssuer()
     {
         var issuerKey = Key.Create(SignatureAlgorithm.Ed25519);
-        var optionsMock = CreateOptionsMock(new IssuerOptions((area) => area == "DK1" ? issuerKey.PublicKey : null));
+        var optionsMock = CreateOptionsMock(new IssuerOptions()
+        {
+            AreaIssuerPublicKey = (area) => area == "DK1" ? issuerKey.PublicKey : null
+        });
 
         var processor = new ProductionIssuedVerifier(optionsMock);
 

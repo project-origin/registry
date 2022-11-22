@@ -1,17 +1,17 @@
 using ProjectOrigin.Electricity.Consumption;
 using ProjectOrigin.Electricity.Models;
-using ProjectOrigin.Register.LineProcessor.Interfaces;
-using ProjectOrigin.Register.LineProcessor.Models;
+using ProjectOrigin.Register.StepProcessor.Interfaces;
+using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Production.Requests;
 
-internal class ProductionAllocatedVerifier : ICommandStepVerifier<V1.ClaimCommand.Types.AllocatedEvent, ProductionCertificate>
+public class ProductionAllocatedVerifier : ICommandStepVerifier<V1.ClaimCommand.Types.AllocatedEvent, ProductionCertificate>
 {
-    private IModelLoader loader;
+    private IModelLoader _loader;
 
     public ProductionAllocatedVerifier(IModelLoader loader)
     {
-        this.loader = loader;
+        _loader = loader;
     }
 
     public async Task<VerificationResult> Verify(CommandStep<V1.ClaimCommand.Types.AllocatedEvent> commandStep, ProductionCertificate? model)
@@ -33,7 +33,7 @@ internal class ProductionAllocatedVerifier : ICommandStepVerifier<V1.ClaimComman
         if (verificationResult is VerificationResult.Invalid)
             return verificationResult;
 
-        var (consumptionCertificate, _) = await loader.Get<ConsumptionCertificate>(@event.ConsumptionCertificateId.ToModel());
+        var (consumptionCertificate, _) = await _loader.Get<ConsumptionCertificate>(@event.ConsumptionCertificateId.ToModel());
         if (consumptionCertificate == null)
             return new VerificationResult.Invalid("ConsumptionCertificate does not exist");
 

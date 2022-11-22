@@ -2,7 +2,7 @@ namespace System.Numerics;
 
 public static class RandomExtensions
 {
-    const int bitsInByte = 8;
+    const int BitsInByte = 8;
 
     /// <summary>
     /// Generates a random BigInteger between 0 and pow(2,bits) - 1.

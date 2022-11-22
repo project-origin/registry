@@ -1,18 +1,18 @@
 using Microsoft.Extensions.Options;
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Models;
-using ProjectOrigin.Register.LineProcessor.Interfaces;
-using ProjectOrigin.Register.LineProcessor.Models;
+using ProjectOrigin.Register.StepProcessor.Interfaces;
+using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Consumption.Requests;
 
-internal class ConsumptionIssuedVerifier : ICommandStepVerifier<V1.IssueConsumptionCommand.Types.ConsumptionIssuedEvent, ConsumptionCertificate>
+public class ConsumptionIssuedVerifier : ICommandStepVerifier<V1.IssueConsumptionCommand.Types.ConsumptionIssuedEvent, ConsumptionCertificate>
 {
-    private IssuerOptions issuerOptions;
+    private IssuerOptions _issuerOptions;
 
     public ConsumptionIssuedVerifier(IOptions<IssuerOptions> issuerOptions)
     {
-        this.issuerOptions = issuerOptions.Value;
+        _issuerOptions = issuerOptions.Value;
     }
 
     public Task<VerificationResult> Verify(CommandStep<V1.IssueConsumptionCommand.Types.ConsumptionIssuedEvent> commandStep, ConsumptionCertificate? model)
@@ -35,7 +35,7 @@ internal class ConsumptionIssuedVerifier : ICommandStepVerifier<V1.IssueConsumpt
         if (!PublicKey.TryImport(SignatureAlgorithm.Ed25519, @event.OwnerPublicKey.Content.ToByteArray(), KeyBlobFormat.RawPublicKey, out _))
             return new VerificationResult.Invalid("Invalid owner key, not a valid Ed25519 publicKey");
 
-        var publicKey = issuerOptions.AreaIssuerPublicKey(@event.GridArea);
+        var publicKey = _issuerOptions.AreaIssuerPublicKey(@event.GridArea);
         if (publicKey is null)
             return new VerificationResult.Invalid($"No issuer found for GridArea ”{@event.GridArea}”");
 

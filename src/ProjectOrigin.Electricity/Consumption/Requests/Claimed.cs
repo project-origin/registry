@@ -1,18 +1,16 @@
-using NSec.Cryptography;
-using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Production;
-using ProjectOrigin.Register.LineProcessor.Interfaces;
-using ProjectOrigin.Register.LineProcessor.Models;
+using ProjectOrigin.Register.StepProcessor.Interfaces;
+using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Consumption.Requests;
 
-internal class ConsumptionClaimedVerifier : ICommandStepVerifier<V1.ClaimCommand.Types.ClaimedEvent, ConsumptionCertificate>
+public class ConsumptionClaimedVerifier : ICommandStepVerifier<V1.ClaimCommand.Types.ClaimedEvent, ConsumptionCertificate>
 {
-    private IModelLoader loader;
+    private IModelLoader _loader;
 
     public ConsumptionClaimedVerifier(IModelLoader loader)
     {
-        this.loader = loader;
+        _loader = loader;
     }
 
     public async Task<VerificationResult> Verify(CommandStep<V1.ClaimCommand.Types.ClaimedEvent> commandStep, ConsumptionCertificate? model)
@@ -29,7 +27,7 @@ internal class ConsumptionClaimedVerifier : ICommandStepVerifier<V1.ClaimCommand
         if (!commandStep.SignedEvent.VerifySignature(slice.Owner))
             return new VerificationResult.Invalid($"Invalid signature");
 
-        var (productionCertificate, _) = await loader.Get<ProductionCertificate>(slice.ProductionCertificateId);
+        var (productionCertificate, _) = await _loader.Get<ProductionCertificate>(slice.ProductionCertificateId);
         if (productionCertificate == null || !productionCertificate.HasClaim(allocationId))
             return new VerificationResult.Invalid("Production not claimed");
 
