@@ -9,12 +9,12 @@ services:
         TOKEN: ${GITHUB_RUNNER_TOKEN}
         REPOSITORY: https://github.com/project-origin/registry
         NAME: concordium-workflow-runner
-        LABELS: concordium-test
+        LABELS: concordium-testnet
     restart: always
     container_name: github-runner
   testnet-node:
     container_name: testnet-node
-    image: concordium/testnet-node:4.2.3-0
+    image: concordium/testnet-node:5.0.6-0
     pull_policy: always
     environment:
       # Environment specific configuration
@@ -81,7 +81,7 @@ services:
   # that is desired.
   testnet-node-collector:
     container_name: testnet-node-collector
-    image: concordium/testnet-node:4.2.3-0
+    image: concordium/testnet-node:5.0.6-0
     pull_policy: always
     environment:
       # Settings that should be customized by the user.
