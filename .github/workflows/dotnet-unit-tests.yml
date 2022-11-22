@@ -22,5 +22,5 @@ jobs:
       - name: Build code
         run: make build
 
-      - name: Run unit tests
-        run: make unit-tests
+      - name: Run tests
+        run: make test
