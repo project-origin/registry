@@ -234,14 +234,13 @@ public class FlowTests : ElectricityClientTestBase
     void AssertValidResponse(TransactionId id, CommandStatusEvent? res)
     {
         Assert.NotNull(res);
-        Assert.Equal(id.hash, res.Id.hash);
+        Assert.Equal(id.hash, res!.Id.hash);
         if (!string.IsNullOrEmpty(res.Error)) throw new Xunit.Sdk.XunitException(res.Error);
         Assert.Equal(CommandState.Succeeded, res.State);
     }
 }
 
-
-public static class extensiopnss
+public static class Extensions
 {
     public static Client.Models.ShieldedValue ToShieldedValue(this PedersenCommitment.CommitmentParameters cm)
     {

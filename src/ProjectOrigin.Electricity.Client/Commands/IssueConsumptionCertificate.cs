@@ -8,6 +8,18 @@ namespace ProjectOrigin.Electricity.Client;
 
 public partial class ElectricityClient
 {
+    /// <summary>
+    /// This is used to issue a Consumption GC
+    /// </summary>
+    /// <param name="registry">the name or identifier of the registry to issue the certificate to.</param>
+    /// <param name="certificateId">the unique Uuid of the certificate.</param>
+    /// <param name="dateFrom">DateTimeOffset from when the certificate begins.</param>
+    /// <param name="dateTo">DateTimeOffset from when the certificate ends, must be larger that dateFrom.</param>
+    /// <param name="gridArea">the gridArea/PriceArea of which the Meter is a part of.</param>
+    /// <param name="gsrn">a shieldedValue of the GSRN of the Meter.</param>
+    /// <param name="quantity">a shieldedValue of the quantity in Wh the meter has used in the period.</param>
+    /// <param name="owner">the Ed25519 publicKey which should be set as the owner of the certificate.</param>
+    /// <param name="issuingBodySigner">the signing key for the issuing body.</param>
     public Task<TransactionId> IssueConsumptionCertificate(
         string registry,
         Guid certificateId,
@@ -17,7 +29,7 @@ public partial class ElectricityClient
         ShieldedValue gsrn,
         ShieldedValue quantity,
         PublicKey owner,
-        Key signer
+        Key issuingBodySigner
     )
     {
         var @event = new V1.IssueConsumptionCommand.Types.ConsumptionIssuedEvent()
@@ -64,7 +76,7 @@ public partial class ElectricityClient
             }
         };
 
-        var signature = Sign(signer, @event);
+        var signature = Sign(issuingBodySigner, @event);
 
         var commandContent = new V1.IssueConsumptionCommand()
         {

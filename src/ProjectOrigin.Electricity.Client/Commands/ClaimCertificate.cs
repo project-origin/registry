@@ -10,6 +10,22 @@ namespace ProjectOrigin.Electricity.Client;
 
 public partial class ElectricityClient
 {
+
+    /// <summary>
+    /// This is used to claim a slice from a <b>production certificate</b> to a <b>consumption certificate</b>.
+    /// </summary>
+    /// <param name="quantity">a shieldedValue containing the amount to claim.</param>
+    /// <param name="consumptionRegistry">the name or identifier of the registry where the <b>consumption certificate</b> resides.</param>
+    /// <param name="consumptionCertificateId">the unique Uuid of the <b>consumption certificate</b>.</param>
+    /// <param name="consumptionSource">a shieldedValue of the source slice on the <b>consumption certificate</b> from which to create the new slices.</param>
+    /// <param name="consumptionRemainder">a shieldedValue of the remainder slice on the <b>consumption certificate</b>, a Zero slice should be provided if all is transfered.</param>
+    /// <param name="consumptionSigner">the signing key for the owner of the <b>consumption certificate</b>.</param>
+
+    /// <param name="productionRegistry">the name or identifier of the registry where the <b>production certificate</b> resides.</param>
+    /// <param name="productionCertificateId">the unique Uuid of the <b>production certificate</b>.</param>
+    /// <param name="productionSource">a shieldedValue of the source slice on the <b>production certificate</b> from which to create the new slices.</param>
+    /// <param name="productionRemainder">a shieldedValue of the remainder slice on the <b>production certificate</b>, a Zero slice should be provided if all is transfered.</param>
+    /// <param name="productionSigner">the signing key for the current owner of the slice on the <b>production certificate</b>.</param>
     public Task<TransactionId> ClaimCertificate(
         ShieldedValue quantity,
         string consumptionRegistry,
