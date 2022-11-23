@@ -2,7 +2,7 @@
 
 The verifiable event store container has the responsibility to store events as public date.
 
-It arranges them in a series of merkle-treens, where each root is published in series to a blockchain,
+It arranges them in a series of merkle-trees, where each root is published in series to a blockchain,
 this ensures it is tamper proof after the root has been published.
 
 The container also has the responsibility to calculate MerkleProofs as requested by users,

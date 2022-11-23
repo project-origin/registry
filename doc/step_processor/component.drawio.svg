@@ -46,7 +46,7 @@
                                 <div>
                                     <font style="font-size: 11px">
                                         <font color="#E6E6E6">
-                                            Stores events as public data, and arranges them in a series of merkel trees, each root publishes to the blockchain after a set time or number of events.
+                                            Stores events as public data, and arranges them in a series of merkle trees, each root publishes to the blockchain after a set time or number of events.
                                         </font>
                                     </font>
                                 </div>
