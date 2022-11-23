@@ -10,7 +10,6 @@ namespace ProjectOrigin.Electricity.Client;
 
 public partial class ElectricityClient
 {
-
     /// <summary>
     /// This is used to claim a slice from a <b>production certificate</b> to a <b>consumption certificate</b>.
     /// </summary>
@@ -96,7 +95,7 @@ public partial class ElectricityClient
     }
 
 
-    private static FederatedStreamId ToProtoId(string productionRegistry, Guid productionCertificateId) => new Register.V1.FederatedStreamId()
+    protected static FederatedStreamId ToProtoId(string productionRegistry, Guid productionCertificateId) => new Register.V1.FederatedStreamId()
     {
         Registry = productionRegistry,
         StreamId = new Register.V1.Uuid()
@@ -105,32 +104,14 @@ public partial class ElectricityClient
         }
     };
 
-    private V1.Commitment ToProtoCommitment(ShieldedValue sv)
-    {
-        var commitmentParameters = new CommitmentParameters(sv.message, sv.r, Group);
-        return new V1.Commitment()
-        {
-            C = ByteString.CopyFrom(commitmentParameters.C.ToByteArray())
-        };
-    }
-
-    private V1.CommitmentProof ToProtoCommitmentProof(ShieldedValue sv)
-    {
-        return new V1.CommitmentProof()
-        {
-            M = sv.message,
-            R = ByteString.CopyFrom(sv.r.ToByteArray())
-        };
-    }
-
     private V1.Slice CreateSlice(ShieldedValue source, ShieldedValue quantity, ShieldedValue remainder)
     {
         return new V1.Slice()
         {
-            Source = ToProtoCommitment(source),
-            Quantity = ToProtoCommitment(quantity),
-            Remainder = ToProtoCommitment(remainder),
-            ZeroR = ByteString.CopyFrom(((source.r - (quantity.r + remainder.r)).MathMod(Group.q)).ToByteArray())
+            Source = source.ToProtoCommitment(),
+            Quantity = quantity.ToProtoCommitment(),
+            Remainder = remainder.ToProtoCommitment(),
+            ZeroR = ByteString.CopyFrom(((source.R - (quantity.R + remainder.R)).MathMod(Group.Default.q)).ToByteArray())
         };
     }
 
@@ -138,9 +119,9 @@ public partial class ElectricityClient
     {
         return new V1.SliceProof()
         {
-            Source = ToProtoCommitmentProof(productionSource),
-            Quantity = ToProtoCommitmentProof(quantity),
-            Remainder = ToProtoCommitmentProof(productionRemainder),
+            Source = productionSource.ToProtoCommitmentProof(),
+            Quantity = quantity.ToProtoCommitmentProof(),
+            Remainder = productionRemainder.ToProtoCommitmentProof(),
         };
     }
 }

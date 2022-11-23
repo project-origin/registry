@@ -54,14 +54,8 @@ public partial class ElectricityClient
             GridArea = gridArea,
             FuelCode = fuelCode,
             TechCode = techCode,
-            GsrnCommitment = new V1.Commitment()
-            {
-                C = ByteString.CopyFrom(Commitment.Create(Group, gsrn.message, gsrn.r).C.ToByteArray())
-            },
-            QuantityCommitment = new V1.Commitment()
-            {
-                C = ByteString.CopyFrom(Commitment.Create(Group, quantity.message, quantity.r).C.ToByteArray())
-            },
+            GsrnCommitment = gsrn.ToProtoCommitment(),
+            QuantityCommitment = quantity.ToProtoCommitment(),
             OwnerPublicKey = new V1.PublicKey()
             {
                 Content = ByteString.CopyFrom(owner.Export(KeyBlobFormat.RawPublicKey))
@@ -70,16 +64,8 @@ public partial class ElectricityClient
 
         var proof = new V1.IssueProductionCommand.Types.ProductionIssuedProof()
         {
-            GsrnProof = new V1.CommitmentProof()
-            {
-                M = (ulong)gsrn.message,
-                R = ByteString.CopyFrom(gsrn.r.ToByteArray()),
-            },
-            QuantityProof = new V1.CommitmentProof()
-            {
-                M = (ulong)quantity.message,
-                R = ByteString.CopyFrom(quantity.r.ToByteArray()),
-            }
+            GsrnProof = gsrn.ToProtoCommitmentProof(),
+            QuantityProof = quantity.ToProtoCommitmentProof()
         };
 
         var signature = Sign(issuingBodySigner, @event);
