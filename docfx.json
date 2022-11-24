@@ -22,9 +22,11 @@
             },
             {
                 "files": [
-                    "toc.yml",
-                    "*.md"
-                ]
+                    "**/toc.yml",
+                    "**/*.md"
+                ],
+                "src": "doc",
+                "dest": ""
             }
         ],
         "globalMetadata": {
@@ -32,6 +34,6 @@
             "_enableSearch": true
         },
         "markdownEngineName": "markdig",
-        "dest": "_site"
+        "dest": "docfx_site"
     }
 }
