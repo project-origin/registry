@@ -1,9 +1,0 @@
-Title
-=====
-
-Section
--------
-
-Subsection
-~~~~~~~~~~
-

@@ -1,0 +1,37 @@
+{
+    "metadata": [
+        {
+            "src": [
+                {
+                    "files": [
+                        "src/ProjectOrigin.Electricity.Client/ProjectOrigin.Electricity.Client.csproj"
+                    ]
+                }
+            ],
+            "dest": "obj/api"
+        }
+    ],
+    "build": {
+        "content": [
+            {
+                "files": [
+                    "**/*.yml"
+                ],
+                "src": "obj/api",
+                "dest": "api"
+            },
+            {
+                "files": [
+                    "toc.yml",
+                    "*.md"
+                ]
+            }
+        ],
+        "globalMetadata": {
+            "_appTitle": "Project Origin",
+            "_enableSearch": true
+        },
+        "markdownEngineName": "markdig",
+        "dest": "_site"
+    }
+}
