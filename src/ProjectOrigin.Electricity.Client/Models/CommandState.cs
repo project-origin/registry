@@ -6,4 +6,16 @@ public enum CommandState
     Succeeded = 1,
 }
 
-public record CommandStatusEvent(TransactionId Id, CommandState State, string? Error);
+public struct CommandStatusEvent
+{
+    public TransactionId Id { get; init; }
+    public CommandState State { get; init; }
+    public string? Error { get; init; }
+
+    public CommandStatusEvent(TransactionId id, CommandState state, string? error)
+    {
+        Id = id;
+        State = state;
+        Error = error;
+    }
+}

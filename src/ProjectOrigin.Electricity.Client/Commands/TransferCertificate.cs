@@ -9,8 +9,8 @@ public partial class ElectricityClient
     /// <summary>
     /// This is used to transfer a GC slice from the current owner to a new owner.
     /// </summary>
-    /// <param name="registry">the name or identifier of the registry where the certificate resides.</param>
-    /// <param name="certificateId">the unique Uuid of the certificate.</param>
+    /// <param name="consumptionRegistry">the name or identifier of the registry where the certificate resides.</param>
+    /// <param name="consumptionCertificateId">the unique Uuid of the certificate.</param>
     /// <param name="source">a shieldedValue of the source slice on the certificate from which to create the new slices.</param>
     /// <param name="quantity">a shieldedValue of the new slice.</param>
     /// <param name="remainder">a shieldedValue of the remainder slice, a Zero slice should be provided if all is transfered.</param>

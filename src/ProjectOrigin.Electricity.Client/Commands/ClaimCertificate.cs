@@ -95,7 +95,7 @@ public partial class ElectricityClient
     }
 
 
-    protected static FederatedStreamId ToProtoId(string productionRegistry, Guid productionCertificateId) => new Register.V1.FederatedStreamId()
+    private static FederatedStreamId ToProtoId(string productionRegistry, Guid productionCertificateId) => new Register.V1.FederatedStreamId()
     {
         Registry = productionRegistry,
         StreamId = new Register.V1.Uuid()
