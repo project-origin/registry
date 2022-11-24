@@ -31,5 +31,3 @@ jobs:
           push: true
           message: added docfx outtput
           new_branch: docfx
-          committer_name: GitHub Actions
-          committer_email: 41898282+github-actions[bot]@users.noreply.github.com
