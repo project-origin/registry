@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     name: A job to say hello
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
       - uses: nikeee/docfx-action@v1.0.0
         name: Build Documentation
@@ -27,6 +27,7 @@ jobs:
 
       - uses: EndBug/add-and-commit@v9
         with:
+          default_author: github_actions
           add: '_site'
           push: true
           message: added docfx outtput
