@@ -3,7 +3,7 @@ using ProjectOrigin.PedersenCommitment;
 
 namespace ProjectOrigin.Electricity.Client.Models;
 
-public static class Extensions
+internal static class Extensions
 {
     public static V1.Commitment ToProtoCommitment(this ShieldedValue sv)
     {
