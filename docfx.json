@@ -29,6 +29,15 @@
                 "dest": ""
             }
         ],
+        "resource": [
+            {
+                "files": [
+                    "**/*.svg"
+                ],
+                "src": "doc",
+                "dest": ""
+            }
+        ],
         "globalMetadata": {
             "_appTitle": "Project Origin",
             "_enableSearch": true
