@@ -26,6 +26,9 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     name: Deploy documentation to GitHub pages
+    defaults:
+      run:
+        working-directory: ./doc
     steps:
       - uses: actions/checkout@v2
 

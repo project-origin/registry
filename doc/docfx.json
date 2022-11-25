@@ -1,15 +1,12 @@
 {
     "metadata": [
         {
-            "src": [
-                {
-                    "files": [
-                        "**/*.sln",
-                        "src/**/*.csproj",
-                        "src/ProjectOrigin.Electricity.Client/ProjectOrigin.Electricity.Client.csproj"
-                    ]
-                }
+            "files": [
+                "**/*.sln",
+                "**/*.csproj",
+                "ProjectOrigin.Electricity.Client/ProjectOrigin.Electricity.Client.csproj"
             ],
+            "src": "../src",
             "dest": "obj/api"
         }
     ],
@@ -26,18 +23,14 @@
                 "files": [
                     "**/toc.yml",
                     "**/*.md"
-                ],
-                "src": "doc",
-                "dest": ""
+                ]
             }
         ],
         "resource": [
             {
                 "files": [
                     "**/*.svg"
-                ],
-                "src": "doc",
-                "dest": ""
+                ]
             }
         ],
         "globalMetadata": {
