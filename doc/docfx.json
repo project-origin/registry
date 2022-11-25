@@ -4,7 +4,6 @@
             "src": [
                 {
                     "files": [
-                        "*.sln",
                         "**/ProjectOrigin.Electricity.Client.csproj"
                     ],
                     "src": "../src"
@@ -25,7 +24,6 @@
             {
                 "files": [
                     "toc.yml",
-                    "**/toc.yml",
                     "**/*.md"
                 ]
             }

@@ -233,10 +233,10 @@ public class FlowTests : ElectricityClientTestBase
 
     void AssertValidResponse(TransactionId id, CommandStatusEvent? res)
     {
-        Assert.NotNull(res);
-        Assert.Equal(id.hash, res!.Id.hash);
-        if (!string.IsNullOrEmpty(res.Error)) throw new Xunit.Sdk.XunitException(res.Error);
-        Assert.Equal(CommandState.Succeeded, res.State);
+        Assert.True(res.HasValue);
+        Assert.Equal(id.hash, res!.Value.Id.hash);
+        if (!string.IsNullOrEmpty(res!.Value.Error)) throw new Xunit.Sdk.XunitException(res!.Value.Error);
+        Assert.Equal(CommandState.Succeeded, res!.Value.State);
     }
 }
 
