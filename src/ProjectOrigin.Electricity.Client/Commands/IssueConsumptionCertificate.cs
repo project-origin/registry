@@ -6,8 +6,11 @@ namespace ProjectOrigin.Electricity.Client;
 
 public partial class ElectricityClient
 {
+
+    <a href = "xref:granular_certificate" > Granular Certificate</a>
+
     /// <summary>
-    /// This is used to issue a Consumption @granular_certificate
+    /// This is used to issue a Consumption <a href="xref:granular_certificate">Granular Certificate</a>
     /// </summary>
     /// <param name="id">the federated certicate id for the certificate.</param>
     /// <param name="inteval">the interval for the certificate, contains a start and end date.</param>
