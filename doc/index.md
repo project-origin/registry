@@ -24,4 +24,4 @@ Below is a [system context diagram](https://c4model.com/#SystemContextDiagram) s
 
 ![C4 system diagram](system_diagram.drawio.svg)
 
-More in depth information can be found in the [architecture description](architecture.md).
+More in depth information can be found in the [architecture description](architecture).

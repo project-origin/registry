@@ -1,4 +1,6 @@
-- name: Home
-  href: index.md
+- name: Concepts
+  href: concept/
+- name: Architecture
+  href: architecture/
 - name: Client API Documentation
   href: obj/api/
