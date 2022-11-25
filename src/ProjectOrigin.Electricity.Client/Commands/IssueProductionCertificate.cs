@@ -7,7 +7,7 @@ namespace ProjectOrigin.Electricity.Client;
 public partial class ElectricityClient
 {
     /// <summary>
-    /// This is used to issue a Production Granular Certificate
+    /// This is used to issue a Production @granular_certificate
     /// </summary>
     /// <param name="id">the federated certicate id for the certificate.</param>
     /// <param name="inteval">the interval for the certificate, contains a start and end date.</param>

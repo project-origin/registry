@@ -1,8 +1,8 @@
 namespace ProjectOrigin.Electricity.Client.Models;
 
 /// <summary>
-/// A FederatedCertifcateId contains the unique CertificateId of the Granular Certificate,
-/// aswell as the identifier for the registry that the Granular Certificate lives on.
+/// A FederatedCertifcateId contains the unique CertificateId of the @granular_certificate,
+/// aswell as the identifier for the registry that the @granular_certificate lives on.
 /// </summary>
 public class FederatedCertifcateId
 {
