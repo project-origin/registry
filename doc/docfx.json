@@ -5,8 +5,7 @@
                 {
                     "files": [
                         "*.sln",
-                        "**/*.csproj",
-                        "ProjectOrigin.Electricity.Client/ProjectOrigin.Electricity.Client.csproj"
+                        "**/ProjectOrigin.Electricity.Client.csproj"
                     ],
                     "src": "../src"
                 }
@@ -25,6 +24,7 @@
             },
             {
                 "files": [
+                    "toc.yml",
                     "**/toc.yml",
                     "**/*.md"
                 ]
@@ -42,6 +42,9 @@
             "_enableSearch": true
         },
         "markdownEngineName": "markdig",
-        "dest": "_site"
+        "dest": "_site",
+        "xrefService": [
+            "https://xref.docs.microsoft.com/query?uid={uid}"
+        ]
     }
 }
