@@ -22,6 +22,6 @@ The registry will enable the following:
 
 Below is a [system context diagram](https://c4model.com/#SystemContextDiagram) showing what systems the registry integrates with.
 
-![C4 system diagram](/system_diagram.drawio.svg)
+![C4 system diagram](system_diagram.drawio.svg)
 
 More in depth information can be found in the [architecture description](architecture.md).

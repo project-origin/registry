@@ -231,12 +231,12 @@ public class FlowTests : ElectricityClientTestBase
         AssertValidResponse(id_3, res_3);
     }
 
-    void AssertValidResponse(TransactionId id, CommandStatusEvent? res)
+    void AssertValidResponse(CommandId id, CommandStatusEvent? res)
     {
-        Assert.True(res.HasValue);
-        Assert.Equal(id.hash, res!.Value.Id.hash);
-        if (!string.IsNullOrEmpty(res!.Value.Error)) throw new Xunit.Sdk.XunitException(res!.Value.Error);
-        Assert.Equal(CommandState.Succeeded, res!.Value.State);
+        Assert.NotNull(res);
+        Assert.Equal(id.Hash, res!.Id.Hash);
+        if (!string.IsNullOrEmpty(res.Error)) throw new Xunit.Sdk.XunitException(res.Error);
+        Assert.Equal(CommandState.Succeeded, res.State);
     }
 }
 

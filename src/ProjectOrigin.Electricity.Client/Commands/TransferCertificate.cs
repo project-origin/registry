@@ -16,7 +16,7 @@ public partial class ElectricityClient
     /// <param name="remainder">a shieldedValue of the remainder slice, a Zero slice should be provided if all is transfered.</param>
     /// <param name="currentOwnerSigner">the signing key for the current owner of the slice.</param>
     /// <param name="newOwner">the Ed25519 publicKey which should be set as the owner of the certificate.</param>
-    public Task<TransactionId> TransferCertificate(
+    public Task<CommandId> TransferCertificate(
         string consumptionRegistry,
         Guid consumptionCertificateId,
         ShieldedValue source,

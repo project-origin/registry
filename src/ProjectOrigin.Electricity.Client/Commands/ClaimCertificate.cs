@@ -1,12 +1,7 @@
-using System.Numerics;
-using Google.Protobuf;
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Client.Models;
-using ProjectOrigin.PedersenCommitment;
-using ProjectOrigin.Register.V1;
 
 namespace ProjectOrigin.Electricity.Client;
-
 
 public partial class ElectricityClient
 {
@@ -19,13 +14,12 @@ public partial class ElectricityClient
     /// <param name="consumptionSource">a shieldedValue of the source slice on the <b>consumption certificate</b> from which to create the new slices.</param>
     /// <param name="consumptionRemainder">a shieldedValue of the remainder slice on the <b>consumption certificate</b>, a Zero slice should be provided if all is transfered.</param>
     /// <param name="consumptionSigner">the signing key for the owner of the <b>consumption certificate</b>.</param>
-
     /// <param name="productionRegistry">the name or identifier of the registry where the <b>production certificate</b> resides.</param>
     /// <param name="productionCertificateId">the unique Uuid of the <b>production certificate</b>.</param>
     /// <param name="productionSource">a shieldedValue of the source slice on the <b>production certificate</b> from which to create the new slices.</param>
     /// <param name="productionRemainder">a shieldedValue of the remainder slice on the <b>production certificate</b>, a Zero slice should be provided if all is transfered.</param>
     /// <param name="productionSigner">the signing key for the current owner of the slice on the <b>production certificate</b>.</param>
-    public Task<TransactionId> ClaimCertificate(
+    public Task<CommandId> ClaimCertificate(
         ShieldedValue quantity,
         string consumptionRegistry,
         Guid consumptionCertificateId,
@@ -92,36 +86,5 @@ public partial class ElectricityClient
         };
 
         return SendCommand(command);
-    }
-
-
-    private static FederatedStreamId ToProtoId(string productionRegistry, Guid productionCertificateId) => new Register.V1.FederatedStreamId()
-    {
-        Registry = productionRegistry,
-        StreamId = new Register.V1.Uuid()
-        {
-            Value = productionCertificateId.ToString()
-        }
-    };
-
-    private V1.Slice CreateSlice(ShieldedValue source, ShieldedValue quantity, ShieldedValue remainder)
-    {
-        return new V1.Slice()
-        {
-            Source = source.ToProtoCommitment(),
-            Quantity = quantity.ToProtoCommitment(),
-            Remainder = remainder.ToProtoCommitment(),
-            ZeroR = ByteString.CopyFrom(((source.R - (quantity.R + remainder.R)).MathMod(Group.Default.q)).ToByteArray())
-        };
-    }
-
-    private V1.SliceProof CreateSliceProof(ShieldedValue productionSource, ShieldedValue quantity, ShieldedValue productionRemainder)
-    {
-        return new V1.SliceProof()
-        {
-            Source = productionSource.ToProtoCommitmentProof(),
-            Quantity = quantity.ToProtoCommitmentProof(),
-            Remainder = productionRemainder.ToProtoCommitmentProof(),
-        };
     }
 }

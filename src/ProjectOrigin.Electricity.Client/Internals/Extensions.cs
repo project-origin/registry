@@ -1,7 +1,8 @@
 using Google.Protobuf;
+using ProjectOrigin.Electricity.Client.Models;
 using ProjectOrigin.PedersenCommitment;
 
-namespace ProjectOrigin.Electricity.Client.Models;
+namespace ProjectOrigin.Electricity.Client.Internals;
 
 internal static class Extensions
 {

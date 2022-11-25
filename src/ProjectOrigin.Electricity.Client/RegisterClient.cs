@@ -3,31 +3,46 @@ using Google.Protobuf;
 using Grpc.Net.Client;
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Client.Models;
-using ProjectOrigin.PedersenCommitment;
 
 namespace ProjectOrigin.Electricity.Client;
 
+/// <summary>
+/// Abstract RegisterClient that can be extended to enable specific functionality required.
+/// </summary>
 public abstract class RegisterClient : IDisposable
 {
     private GrpcChannel _channel;
     private Register.V1.CommandService.CommandServiceClient _grpcClient;
 
+    /// <summary>
+    /// Enables one to subscribe to CommandStatusEvent for commands one has initiated.
+    /// </summary>
     public event Action<CommandStatusEvent>? Events;
 
-    public Group Group { get => Group.Default; }
-
+    /// <summary>
+    /// Create a RegisterClient based on an existing GrpcChannel.
+    /// </summary>
+    /// <param name="channel">the channel to use.</param>
     public RegisterClient(GrpcChannel channel)
     {
         _channel = channel;
         _grpcClient = new Register.V1.CommandService.CommandServiceClient(channel);
     }
 
+    /// <summary>
+    /// Create a RegisterClient based on a string url for the address of the gRPC endpoint for the registry.
+    /// </summary>
+    /// <param name="registryAddress">the url with the address to the registry.</param>
     public RegisterClient(string registryAddress)
     {
         _channel = GrpcChannel.ForAddress(registryAddress);
         _grpcClient = new Register.V1.CommandService.CommandServiceClient(_channel);
     }
 
+    /// <summary>
+    /// Disposes the RegisterClient and the <b>GrpcChannel</b>,
+    /// beware if constructed with channel that is used elsewhere.
+    /// </summary>
     public void Dispose() => _channel.Dispose();
 
     internal ByteString Sign(Key signerKey, IMessage e)
@@ -44,7 +59,7 @@ public abstract class RegisterClient : IDisposable
         }
     }
 
-    internal Task<TransactionId> SendCommand(IMessage commandContent)
+    internal Task<CommandId> SendCommand(IMessage commandContent)
     {
         var name = commandContent.GetType().FullName!;
 
@@ -59,12 +74,12 @@ public abstract class RegisterClient : IDisposable
 
         Task.Run(() => Execute(command));
 
-        return Task.FromResult(new TransactionId(commandHash));
+        return Task.FromResult(new CommandId(commandHash));
     }
 
     internal async Task Execute(Register.V1.Command command)
     {
-        var id = new TransactionId(command.Id.ToByteArray());
+        var id = new CommandId(command.Id.ToByteArray());
 
         try
         {

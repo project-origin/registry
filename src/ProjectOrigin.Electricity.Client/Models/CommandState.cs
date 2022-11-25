@@ -1,21 +1,17 @@
 namespace ProjectOrigin.Electricity.Client.Models;
 
+/// <summary>
+/// A CommandState is an enum that describes the state of the command on the registry.
+/// </summary>
 public enum CommandState
 {
+    /// <summary>
+    /// Denotes that the command failed to be executed on the registry.
+    /// </summary>
     Failed = 0,
+
+    /// <summary>
+    /// Denotes that the command succeeded.
+    /// </summary>
     Succeeded = 1,
-}
-
-public struct CommandStatusEvent
-{
-    public TransactionId Id { get; init; }
-    public CommandState State { get; init; }
-    public string? Error { get; init; }
-
-    public CommandStatusEvent(TransactionId id, CommandState state, string? error)
-    {
-        Id = id;
-        State = state;
-        Error = error;
-    }
 }

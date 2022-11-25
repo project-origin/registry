@@ -1,8 +1,8 @@
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using NSec.Cryptography;
+using ProjectOrigin.Electricity.Client.Internals;
 using ProjectOrigin.Electricity.Client.Models;
-using ProjectOrigin.PedersenCommitment;
 
 namespace ProjectOrigin.Electricity.Client;
 
@@ -22,7 +22,7 @@ public partial class ElectricityClient
     /// <param name="quantity">a shieldedValue of the quantity in Wh the meter has used in the period.</param>
     /// <param name="owner">the Ed25519 publicKey which should be set as the owner of the certificate.</param>
     /// <param name="issuingBodySigner">the signing key for the issuing body.</param>
-    public Task<TransactionId> IssueProductionCertificate(
+    public Task<CommandId> IssueProductionCertificate(
         string registry,
         Guid certificateId,
         DateTimeOffset dateFrom,

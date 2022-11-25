@@ -1,4 +1,10 @@
+using System.Numerics;
+using Google.Protobuf;
 using Grpc.Net.Client;
+using ProjectOrigin.Electricity.Client.Internals;
+using ProjectOrigin.Electricity.Client.Models;
+using ProjectOrigin.Register.V1;
+using ProjectOrigin.PedersenCommitment;
 
 namespace ProjectOrigin.Electricity.Client;
 
@@ -21,5 +27,41 @@ public partial class ElectricityClient : RegisterClient
     /// <param name="channel">the channel to use.</param>
     public ElectricityClient(GrpcChannel channel) : base(channel)
     {
+    }
+
+    /// <summary>
+    /// Returns and instance of the Pedersen Commitment Group
+    /// which should be used when creating Shielded values.
+    /// </summary>
+    public Group Group { get => Group.Default; }
+
+    private static FederatedStreamId ToProtoId(string productionRegistry, Guid productionCertificateId) => new Register.V1.FederatedStreamId()
+    {
+        Registry = productionRegistry,
+        StreamId = new Register.V1.Uuid()
+        {
+            Value = productionCertificateId.ToString()
+        }
+    };
+
+    private V1.Slice CreateSlice(ShieldedValue source, ShieldedValue quantity, ShieldedValue remainder)
+    {
+        return new V1.Slice()
+        {
+            Source = source.ToProtoCommitment(),
+            Quantity = quantity.ToProtoCommitment(),
+            Remainder = remainder.ToProtoCommitment(),
+            ZeroR = ByteString.CopyFrom(((source.R - (quantity.R + remainder.R)).MathMod(Group.Default.q)).ToByteArray())
+        };
+    }
+
+    private V1.SliceProof CreateSliceProof(ShieldedValue productionSource, ShieldedValue quantity, ShieldedValue productionRemainder)
+    {
+        return new V1.SliceProof()
+        {
+            Source = productionSource.ToProtoCommitmentProof(),
+            Quantity = quantity.ToProtoCommitmentProof(),
+            Remainder = productionRemainder.ToProtoCommitmentProof(),
+        };
     }
 }
