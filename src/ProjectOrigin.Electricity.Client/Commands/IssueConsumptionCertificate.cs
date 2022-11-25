@@ -6,9 +6,6 @@ namespace ProjectOrigin.Electricity.Client;
 
 public partial class ElectricityClient
 {
-
-    <a href = "xref:granular_certificate" > Granular Certificate</a>
-
     /// <summary>
     /// This is used to issue a Consumption <a href="xref:granular_certificate">Granular Certificate</a>
     /// </summary>

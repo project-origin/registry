@@ -7,7 +7,7 @@ namespace ProjectOrigin.Electricity.Client;
 public partial class ElectricityClient
 {
     /// <summary>
-    /// This is used to transfer a @granular_certificate#slice from the current owner to a new owner.
+    /// This is used to transfer a <a href="xref:granular_certificate#slice">Granular Certificate slice</a> from the current owner to a new owner.
     /// </summary>
     /// <param name="id">the federated certicate id for the certificate.</param>
     /// <param name="source">a shieldedValue of the source slice on the certificate from which to create the new slices.</param>

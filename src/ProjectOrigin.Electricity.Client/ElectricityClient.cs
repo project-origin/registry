@@ -1,9 +1,7 @@
 using System.Numerics;
 using Google.Protobuf;
 using Grpc.Net.Client;
-using ProjectOrigin.Electricity.Client.Internals;
 using ProjectOrigin.Electricity.Client.Models;
-using ProjectOrigin.Register.V1;
 using ProjectOrigin.PedersenCommitment;
 
 namespace ProjectOrigin.Electricity.Client;
