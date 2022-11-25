@@ -35,15 +35,6 @@ public partial class ElectricityClient : RegisterClient
     /// </summary>
     public Group Group { get => Group.Default; }
 
-    private static FederatedStreamId ToProtoId(string productionRegistry, Guid productionCertificateId) => new Register.V1.FederatedStreamId()
-    {
-        Registry = productionRegistry,
-        StreamId = new Register.V1.Uuid()
-        {
-            Value = productionCertificateId.ToString()
-        }
-    };
-
     private V1.Slice CreateSlice(ShieldedValue source, ShieldedValue quantity, ShieldedValue remainder)
     {
         return new V1.Slice()

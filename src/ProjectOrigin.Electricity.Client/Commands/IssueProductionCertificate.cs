@@ -1,7 +1,5 @@
 using Google.Protobuf;
-using Google.Protobuf.WellKnownTypes;
 using NSec.Cryptography;
-using ProjectOrigin.Electricity.Client.Internals;
 using ProjectOrigin.Electricity.Client.Models;
 
 namespace ProjectOrigin.Electricity.Client;
@@ -9,7 +7,7 @@ namespace ProjectOrigin.Electricity.Client;
 public partial class ElectricityClient
 {
     /// <summary>
-    /// This is used to issue a Production GC
+    /// This is used to issue a Production Granular Certificate
     /// </summary>
     /// <param name="id">the federated certicate id for the certificate.</param>
     /// <param name="inteval">the interval for the certificate, contains a start and end date.</param>
