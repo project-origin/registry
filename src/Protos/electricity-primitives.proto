@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package ProjectOrigin.Electricity.v1;
+
+message Slice {
+    Commitment Source = 1;
+    Commitment Quantity = 2;
+    Commitment Remainder = 3;
+    bytes ZeroR = 4;
+}
+
+message Commitment {
+    bytes C = 1;
+}
+
+message TimePeriod {
+    google.protobuf.Timestamp DateTimeFrom = 1;
+    google.protobuf.Timestamp DateTimeTo = 2;
+}
+
+message SliceProof {
+    CommitmentProof Source = 1;
+    CommitmentProof Quantity = 2;
+    CommitmentProof Remainder = 3;
+}
+
+message CommitmentProof {
+    uint64 m = 1;
+    bytes r = 2;
+}
+
+message PublicKey {
+    bytes Content = 1;
+}

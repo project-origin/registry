@@ -1,0 +1,8 @@
+{
+    "omnisharp.defaultLaunchSolution": "src/Registry.sln",
+    "dotnet-test-explorer.testProjectPath": "src/*.Tests/*.csproj", // filter for .Test to not find Integration tests
+    "dotnet-test-explorer.testArguments": "--collect:\"XPlat Code Coverage\"",
+    "coverage-gutters.coverageFileNames": [
+        "coverage.cobertura.xml"
+    ]
+}

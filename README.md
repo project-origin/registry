@@ -10,13 +10,13 @@ The goal of [this project](https://github.com/orgs/project-origin/projects/1) is
 The registry will enable the following:
 
 - [ ] Data in the registry is publicly verifiable.
-- [ ] Enable the issuance of Granular Certificates.
-- [ ] Privacy of the individual quantities is hidden behind a Pedersen-commitments.
-- [ ] Enable the claim of Granular Certificates to some consumption.
+- [x] Enable the issuance of Granular Certificates.
+- [x] Privacy of the individual quantities is hidden behind a Pedersen-commitments.
+- [x] Enable the claim of Granular Certificates to some consumption.
 - [ ] Users can verify that they have a provable quantity of a Granular Certificate, that mathematically proves it is only used once.
 - [ ] Federated setup enabling multiple registries to create a shared truth.
-- [ ] The registry handles ownership based on public-private key-pairs.
-- [ ] Users can transfer ownership of a sub-part of a certificate to another private-key.
+- [x] The registry handles ownership based on public-private key-pairs.
+- [x] Users can transfer ownership of a sub-part of a certificate to another private-key.
 
 ## Architecture
 

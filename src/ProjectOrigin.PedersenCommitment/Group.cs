@@ -4,14 +4,29 @@ namespace ProjectOrigin.PedersenCommitment;
 
 public record Group
 {
-    private const int defaultBitLength = 200;
+    private const int DefaultBitLength = 200;
+
+    private static Lazy<Group> _lazyDefault = new Lazy<Group>(() => new Group(
+        p: BigInteger.Parse("519410415765480562065563560862184550988245350627770327636130577"),
+        q: BigInteger.Parse("1202338925383056856633248983477279053213530904230949832491043"),
+        g: BigInteger.Parse("101455240839796123327081946568988620614409829310312504112082811"),
+        h: BigInteger.Parse("162315825204305527697219690878071619973299472069112727941372177")
+    ), true);
+
+    public static Group Default
+    {
+        get
+        {
+            return _lazyDefault.Value;
+        }
+    }
 
     public BigInteger p { get; }
     public BigInteger q { get; }
     public BigInteger g { get; }
     public BigInteger h { get; }
 
-    private Random random;
+    private Random _random;
 
     public Group(BigInteger p, BigInteger q, BigInteger g, BigInteger h, Random? random = null)
     {
@@ -33,12 +48,12 @@ public record Group
         this.p = p;
         this.g = g;
         this.h = h;
-        this.random = random ?? Random.Shared;
+        _random = random ?? Random.Shared;
     }
 
     public BigInteger RandomR()
     {
-        return random.NextBigInteger(1, q);
+        return _random.NextBigInteger(1, q);
     }
 
     public CommitmentParameters Commit(BigInteger m)
@@ -46,7 +61,7 @@ public record Group
         return new CommitmentParameters(m, RandomR(), this);
     }
 
-    public static Group Create(int numberOfBits = defaultBitLength, Random? random = null)
+    public static Group Create(int numberOfBits = DefaultBitLength, Random? random = null)
     {
         random = random ?? Random.Shared;
 
