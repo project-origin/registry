@@ -11,20 +11,16 @@ public partial class ElectricityClient
     /// <summary>
     /// This is used to issue a Consumption GC
     /// </summary>
-    /// <param name="registry">the name or identifier of the registry to issue the certificate to.</param>
-    /// <param name="certificateId">the unique Uuid of the certificate.</param>
-    /// <param name="dateFrom">DateTimeOffset from when the certificate begins.</param>
-    /// <param name="dateTo">DateTimeOffset from when the certificate ends, must be larger that dateFrom.</param>
+    /// <param name="id">the federated certicate id for the certificate.</param>
+    /// <param name="inteval">the interval for the certificate, contains a start and end date.</param>
     /// <param name="gridArea">the gridArea/PriceArea of which the Meter is a part of.</param>
     /// <param name="gsrn">a shieldedValue of the GSRN of the Meter.</param>
     /// <param name="quantity">a shieldedValue of the quantity in Wh the meter has used in the period.</param>
     /// <param name="owner">the Ed25519 publicKey which should be set as the owner of the certificate.</param>
     /// <param name="issuingBodySigner">the signing key for the issuing body.</param>
     public Task<CommandId> IssueConsumptionCertificate(
-        string registry,
-        Guid certificateId,
-        DateTimeOffset dateFrom,
-        DateTimeOffset dateTo,
+        FederatedCertifcateId id,
+        DateInterval inteval,
         string gridArea,
         ShieldedValue gsrn,
         ShieldedValue quantity,
@@ -34,12 +30,8 @@ public partial class ElectricityClient
     {
         var @event = new V1.IssueConsumptionCommand.Types.ConsumptionIssuedEvent()
         {
-            CertificateId = ToProtoId(registry, certificateId),
-            Period = new V1.TimePeriod()
-            {
-                DateTimeFrom = Timestamp.FromDateTimeOffset(dateFrom),
-                DateTimeTo = Timestamp.FromDateTimeOffset(dateTo),
-            },
+            CertificateId = id.ToProto(),
+            Period = inteval.ToProto(),
             GridArea = gridArea,
             GsrnCommitment = gsrn.ToProtoCommitment(),
             QuantityCommitment = quantity.ToProtoCommitment(),

@@ -43,12 +43,12 @@ internal static class ModelToProtoExtensions
         };
     }
 
-    internal static V1.TimePeriod ToProto(this TimePeriod model)
+    internal static V1.DateInterval ToProto(this DateInterval model)
     {
-        return new V1.TimePeriod()
+        return new V1.DateInterval()
         {
-            DateTimeFrom = Timestamp.FromDateTimeOffset(model.DateTimeFrom),
-            DateTimeTo = Timestamp.FromDateTimeOffset(model.DateTimeTo),
+            Start = Timestamp.FromDateTimeOffset(model.Start),
+            End = Timestamp.FromDateTimeOffset(model.End),
         };
     }
 

@@ -1,3 +1,3 @@
 namespace ProjectOrigin.Electricity.Models;
 
-public record TimePeriod(DateTimeOffset DateTimeFrom, DateTimeOffset DateTimeTo);
+public record DateInterval(DateTimeOffset Start, DateTimeOffset End);

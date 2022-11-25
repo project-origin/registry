@@ -14,7 +14,7 @@ internal static class FakeRegister
     internal static Group Group { get => Group.Default; }
     const string Registry = "OurReg";
 
-    private static TimePeriod _defaultPeriod = new TimePeriod(
+    private static DateInterval _defaultPeriod = new DateInterval(
             new DateTimeOffset(2022, 09, 25, 12, 0, 0, TimeSpan.Zero),
             new DateTimeOffset(2022, 09, 25, 13, 0, 0, TimeSpan.Zero));
 
@@ -208,7 +208,7 @@ internal static class FakeRegister
         return (e, quantityParameters, remainderParameters);
     }
 
-    internal static (ConsumptionCertificate certificate, CommitmentParameters parameters) ConsumptionIssued(PublicKey ownerKey, long quantity, string area = "DK1", TimePeriod? period = null)
+    internal static (ConsumptionCertificate certificate, CommitmentParameters parameters) ConsumptionIssued(PublicKey ownerKey, long quantity, string area = "DK1", DateInterval? period = null)
     {
         var id = new FederatedStreamId(Registry, Guid.NewGuid());
         var quantityCommitmentParameters = Group.Commit(quantity);
@@ -230,7 +230,7 @@ internal static class FakeRegister
         return (cert, quantityCommitmentParameters);
     }
 
-    internal static (ProductionCertificate certificate, CommitmentParameters parameters) ProductionIssued(PublicKey ownerKey, long quantity, string area = "DK1", TimePeriod? period = null)
+    internal static (ProductionCertificate certificate, CommitmentParameters parameters) ProductionIssued(PublicKey ownerKey, long quantity, string area = "DK1", DateInterval? period = null)
     {
         var id = new FederatedStreamId(Registry, Guid.NewGuid());
         var quantityCommitmentParameters = Group.Commit(quantity);
@@ -274,7 +274,7 @@ internal static class FakeRegister
         var e = new V1.IssueConsumptionCommand.Types.ConsumptionIssuedEvent()
         {
             CertificateId = id.ToProto(),
-            Period = new TimePeriod(
+            Period = new DateInterval(
                     DateTimeOffset.Now,
                     DateTimeOffset.Now.AddHours(1)).ToProto(),
             GridArea = gridAreaOverride ?? "DK1",
@@ -317,7 +317,7 @@ internal static class FakeRegister
         var e = new V1.IssueProductionCommand.Types.ProductionIssuedEvent()
         {
             CertificateId = id.ToProto(),
-            Period = new TimePeriod(
+            Period = new DateInterval(
                     DateTimeOffset.Now,
                     DateTimeOffset.Now.AddHours(1)).ToProto(),
             GridArea = gridAreaOverride ?? "DK1",

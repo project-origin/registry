@@ -11,10 +11,8 @@ public partial class ElectricityClient
     /// <summary>
     /// This is used to issue a Production GC
     /// </summary>
-    /// <param name="registry">the name or identifier of the registry to issue the certificate to.</param>
-    /// <param name="certificateId">the unique Uuid of the certificate.</param>
-    /// <param name="dateFrom">DateTimeOffset from when the certificate begins.</param>
-    /// <param name="dateTo">DateTimeOffset from when the certificate ends, must be larger that dateFrom.</param>
+    /// <param name="id">the federated certicate id for the certificate.</param>
+    /// <param name="inteval">the interval for the certificate, contains a start and end date.</param>
     /// <param name="gridArea">the gridArea/PriceArea of which the Meter is a part of.</param>
     /// <param name="fuelCode">the AIB standard fuelCode.</param>
     /// <param name="techCode">the AIB standard techCode.</param>
@@ -23,10 +21,8 @@ public partial class ElectricityClient
     /// <param name="owner">the Ed25519 publicKey which should be set as the owner of the certificate.</param>
     /// <param name="issuingBodySigner">the signing key for the issuing body.</param>
     public Task<CommandId> IssueProductionCertificate(
-        string registry,
-        Guid certificateId,
-        DateTimeOffset dateFrom,
-        DateTimeOffset dateTo,
+        FederatedCertifcateId id,
+        DateInterval inteval,
         string gridArea,
         string fuelCode,
         string techCode,
@@ -38,19 +34,8 @@ public partial class ElectricityClient
     {
         var @event = new V1.IssueProductionCommand.Types.ProductionIssuedEvent()
         {
-            CertificateId = new Register.V1.FederatedStreamId()
-            {
-                Registry = registry,
-                StreamId = new Register.V1.Uuid()
-                {
-                    Value = certificateId.ToString()
-                }
-            },
-            Period = new V1.TimePeriod()
-            {
-                DateTimeFrom = Timestamp.FromDateTimeOffset(dateFrom),
-                DateTimeTo = Timestamp.FromDateTimeOffset(dateTo),
-            },
+            CertificateId = id.ToProto(),
+            Period = inteval.ToProto(),
             GridArea = gridArea,
             FuelCode = fuelCode,
             TechCode = techCode,
