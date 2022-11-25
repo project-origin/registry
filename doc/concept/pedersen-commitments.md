@@ -8,6 +8,7 @@ In order to obfuscate sensitive data in the certificates to only be accesible an
 
 ## Pedersen commitments are defined as follows:
 $$c=C(m,r)$$
+
 |identifier|property|usage|accessability|
 |---|---|---|---|
 `c` | commitment | the commitment itself | public |
