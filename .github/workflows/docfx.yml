@@ -31,16 +31,14 @@ jobs:
 
       - name: Build Documentation
         uses: nikeee/docfx-action@v1.0.0
-        working-directory: ./doc
         with:
-          args: docfx.json
+          args: ./doc/docfx.json
 
       - name: Setup Pages
         uses: actions/configure-pages@v2
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
-        working-directory: ./doc
         with:
           path: 'docfx_site'
 
