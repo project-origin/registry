@@ -6,7 +6,7 @@ namespace ProjectOrigin.Electricity.Client.Models;
 
 /// <summary>
 /// A ShieldedValue contains a Message and a random R
-/// which hides the message with the help of a Pedersen Commitment.
+/// which hides the message with the help of a <xref:pedersen_commitment>Pedersen Commitment</xref:pedersen_commitment>.
 /// </summary>
 public class ShieldedValue
 {
