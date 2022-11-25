@@ -26,14 +26,12 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     name: Deploy documentation to GitHub pages
-    defaults:
-      run:
-        working-directory: ./doc
     steps:
       - uses: actions/checkout@v2
 
       - uses: nikeee/docfx-action@v1.0.0
         name: Build Documentation
+        working-directory: ./doc
         with:
           args: docfx.json
 
@@ -42,6 +40,7 @@ jobs:
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
+        name: Build Documentation
         with:
           path: 'docfx_site'
 
