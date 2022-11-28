@@ -31,7 +31,7 @@ public static class ProtoToModelExtensions
 
     public static CommitmentParameters ToModel(this V1.CommitmentProof proto)
     {
-        return new CommitmentParameters(proto.M, new BigInteger(proto.R.ToByteArray()), Group.Default);
+        return new CommitmentParameters(proto.Message, new BigInteger(proto.RValue.ToByteArray()), Group.Default);
     }
 
     public static Guid ToModel(this Register.V1.Uuid allocationId) => Guid.Parse(allocationId.Value);

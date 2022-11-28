@@ -55,8 +55,8 @@ public class ShieldedValue
     {
         return new V1.CommitmentProof()
         {
-            M = (ulong)_commitmentParameters.m,
-            R = ByteString.CopyFrom(_commitmentParameters.r.ToByteArray())
+            Message = (ulong)_commitmentParameters.m,
+            RValue = ByteString.CopyFrom(_commitmentParameters.r.ToByteArray())
         };
     }
 }

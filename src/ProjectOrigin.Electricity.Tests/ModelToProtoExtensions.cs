@@ -29,8 +29,8 @@ internal static class ModelToProtoExtensions
     {
         return new V1.CommitmentProof()
         {
-            M = (ulong)obj.m,
-            R = ByteString.CopyFrom(obj.r.ToByteArray())
+            Message = (ulong)obj.m,
+            RValue = ByteString.CopyFrom(obj.r.ToByteArray())
         };
     }
 
