@@ -15,9 +15,9 @@ message Commitment {
     bytes C = 1;
 }
 
-message TimePeriod {
-    google.protobuf.Timestamp DateTimeFrom = 1;
-    google.protobuf.Timestamp DateTimeTo = 2;
+message DateInterval {
+    google.protobuf.Timestamp Start = 1;
+    google.protobuf.Timestamp End = 2;
 }
 
 message SliceProof {
@@ -27,8 +27,8 @@ message SliceProof {
 }
 
 message CommitmentProof {
-    uint64 m = 1;
-    bytes r = 2;
+    uint64 Message = 1;
+    bytes RValue = 2;
 }
 
 message PublicKey {

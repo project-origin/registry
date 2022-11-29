@@ -4,6 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,7 +19,7 @@
     <Protobuf Include="..\Protos\electricity.proto" />
     <Protobuf Include="..\Protos\electricity-primitives.proto" />
     <Protobuf Include="..\Protos\primitives.proto" />
-    <Protobuf Include="..\Protos\register.proto" GrpcServices="Client" />
+    <Protobuf Include="..\Protos\register.proto" GrpcServices="Client" Access="internal" />
   </ItemGroup>
 
 </Project>

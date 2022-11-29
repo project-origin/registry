@@ -52,10 +52,14 @@ public class FlowTests : ElectricityClientTestBase
         var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
 
         var id = await Client.IssueConsumptionCertificate(
-            Registries.RegistryA,
-            Guid.NewGuid(),
-            new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
-            new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero),
+            new FederatedCertifcateId(
+                Registries.RegistryA,
+                Guid.NewGuid()
+            ),
+            new Client.Models.DateInterval(
+                new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
+                new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
+            ),
             Area_DK1,
             new Client.Models.ShieldedValue(150, gsrn.r),
             new Client.Models.ShieldedValue(250, quantity.r),
@@ -76,10 +80,14 @@ public class FlowTests : ElectricityClientTestBase
         var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
 
         var id = await Client.IssueProductionCertificate(
-            Registries.RegistryB,
-            Guid.NewGuid(),
-            new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
-            new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero),
+            new FederatedCertifcateId(
+                Registries.RegistryB,
+                Guid.NewGuid()
+            ),
+            new Client.Models.DateInterval(
+                new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
+                new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
+            ),
             Area_DK2,
             "F01050100",
             "T020002",
@@ -98,7 +106,6 @@ public class FlowTests : ElectricityClientTestBase
     [Fact]
     public async Task TransferCertificate_Success()
     {
-        var certId = Guid.NewGuid();
         var gsrn = Client.Group.Commit(570000000001213);
 
         var quantity = Client.Group.Commit(250);
@@ -112,12 +119,18 @@ public class FlowTests : ElectricityClientTestBase
         var ownerKey2 = Key.Create(SignatureAlgorithm.Ed25519);
         var ownerKey3 = Key.Create(SignatureAlgorithm.Ed25519);
 
+        var certId = new FederatedCertifcateId(
+            Registries.RegistryB,
+            Guid.NewGuid()
+        );
+
         {
             var id = await Client.IssueProductionCertificate(
-                Registries.RegistryB,
                 certId,
-                new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
-                new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero),
+                new Client.Models.DateInterval(
+                    new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
+                    new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
+                ),
                 Area_DK2,
                 "F01050100",
                 "T020002",
@@ -132,7 +145,6 @@ public class FlowTests : ElectricityClientTestBase
 
         {
             var id = await Client.TransferCertificate(
-                Registries.RegistryB,
                 certId,
                 quantity.ToShieldedValue(),
                 transfer1.ToShieldedValue(),
@@ -146,7 +158,6 @@ public class FlowTests : ElectricityClientTestBase
 
         {
             var id = await Client.TransferCertificate(
-                Registries.RegistryB,
                 certId,
                 transfer1.ToShieldedValue(),
                 transfer2.ToShieldedValue(),
@@ -165,19 +176,27 @@ public class FlowTests : ElectricityClientTestBase
     {
         var gsrn = Client.Group.Commit(570000000001213);
 
-        var consCertId = Guid.NewGuid();
+
+        var consCertId = new FederatedCertifcateId(
+            Registries.RegistryB,
+            Guid.NewGuid()
+        );
         var consQuantity = Client.Group.Commit(150);
 
-        var prodCertId = Guid.NewGuid();
+        var prodCertId = new FederatedCertifcateId(
+            Registries.RegistryB,
+            Guid.NewGuid()
+        );
         var prodQuantity = Client.Group.Commit(250);
 
         var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
 
         var id_1 = await Client.IssueConsumptionCertificate(
-            Registries.RegistryA,
             consCertId,
-            new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
-            new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero),
+            new Client.Models.DateInterval(
+                new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
+                new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
+            ),
             Area_DK1,
             gsrn.ToShieldedValue(),
             consQuantity.ToShieldedValue(),
@@ -189,10 +208,11 @@ public class FlowTests : ElectricityClientTestBase
         AssertValidResponse(id_1, res_1);
 
         var id_2 = await Client.IssueProductionCertificate(
-            Registries.RegistryB,
             prodCertId,
-            new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
-            new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero),
+            new Client.Models.DateInterval(
+                new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
+                new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
+            ),
             Area_DK1,
             "F01050100",
             "T020002",
@@ -205,22 +225,16 @@ public class FlowTests : ElectricityClientTestBase
         var res_2 = await GetResult();
         AssertValidResponse(id_2, res_2);
 
-
-
         var claimQuantity = Client.Group.Commit(150);
         var consRemainder = Client.Group.Commit(0);
         var prodRemainder = Client.Group.Commit(100);
 
         var id_3 = await Client.ClaimCertificate(
             claimQuantity.ToShieldedValue(),
-
-            Registries.RegistryA,
             consCertId,
             consQuantity.ToShieldedValue(),
             consRemainder.ToShieldedValue(),
             ownerKey,
-
-            Registries.RegistryB,
             prodCertId,
             prodQuantity.ToShieldedValue(),
             prodRemainder.ToShieldedValue(),
@@ -231,10 +245,10 @@ public class FlowTests : ElectricityClientTestBase
         AssertValidResponse(id_3, res_3);
     }
 
-    void AssertValidResponse(TransactionId id, CommandStatusEvent? res)
+    void AssertValidResponse(CommandId id, CommandStatusEvent? res)
     {
         Assert.NotNull(res);
-        Assert.Equal(id.hash, res!.Id.hash);
+        Assert.Equal(id.Hash, res!.Id.Hash);
         if (!string.IsNullOrEmpty(res.Error)) throw new Xunit.Sdk.XunitException(res.Error);
         Assert.Equal(CommandState.Succeeded, res.State);
     }

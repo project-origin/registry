@@ -1,20 +1,16 @@
 using Google.Protobuf;
-using Google.Protobuf.WellKnownTypes;
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Client.Models;
-using ProjectOrigin.PedersenCommitment;
 
 namespace ProjectOrigin.Electricity.Client;
 
 public partial class ElectricityClient
 {
     /// <summary>
-    /// This is used to issue a Production GC
+    /// This is used to issue a Production <a href="xref:granular_certificate">Granular Certificate</a>
     /// </summary>
-    /// <param name="registry">the name or identifier of the registry to issue the certificate to.</param>
-    /// <param name="certificateId">the unique Uuid of the certificate.</param>
-    /// <param name="dateFrom">DateTimeOffset from when the certificate begins.</param>
-    /// <param name="dateTo">DateTimeOffset from when the certificate ends, must be larger that dateFrom.</param>
+    /// <param name="id">the federated certicate id for the certificate.</param>
+    /// <param name="inteval">the interval for the certificate, contains a start and end date.</param>
     /// <param name="gridArea">the gridArea/PriceArea of which the Meter is a part of.</param>
     /// <param name="fuelCode">the AIB standard fuelCode.</param>
     /// <param name="techCode">the AIB standard techCode.</param>
@@ -22,11 +18,9 @@ public partial class ElectricityClient
     /// <param name="quantity">a shieldedValue of the quantity in Wh the meter has used in the period.</param>
     /// <param name="owner">the Ed25519 publicKey which should be set as the owner of the certificate.</param>
     /// <param name="issuingBodySigner">the signing key for the issuing body.</param>
-    public Task<TransactionId> IssueProductionCertificate(
-        string registry,
-        Guid certificateId,
-        DateTimeOffset dateFrom,
-        DateTimeOffset dateTo,
+    public Task<CommandId> IssueProductionCertificate(
+        FederatedCertifcateId id,
+        DateInterval inteval,
         string gridArea,
         string fuelCode,
         string techCode,
@@ -38,30 +32,13 @@ public partial class ElectricityClient
     {
         var @event = new V1.IssueProductionCommand.Types.ProductionIssuedEvent()
         {
-            CertificateId = new Register.V1.FederatedStreamId()
-            {
-                Registry = registry,
-                StreamId = new Register.V1.Uuid()
-                {
-                    Value = certificateId.ToString()
-                }
-            },
-            Period = new V1.TimePeriod()
-            {
-                DateTimeFrom = Timestamp.FromDateTimeOffset(dateFrom),
-                DateTimeTo = Timestamp.FromDateTimeOffset(dateTo),
-            },
+            CertificateId = id.ToProto(),
+            Period = inteval.ToProto(),
             GridArea = gridArea,
             FuelCode = fuelCode,
             TechCode = techCode,
-            GsrnCommitment = new V1.Commitment()
-            {
-                C = ByteString.CopyFrom(Commitment.Create(Group, gsrn.message, gsrn.r).C.ToByteArray())
-            },
-            QuantityCommitment = new V1.Commitment()
-            {
-                C = ByteString.CopyFrom(Commitment.Create(Group, quantity.message, quantity.r).C.ToByteArray())
-            },
+            GsrnCommitment = gsrn.ToProtoCommitment(),
+            QuantityCommitment = quantity.ToProtoCommitment(),
             OwnerPublicKey = new V1.PublicKey()
             {
                 Content = ByteString.CopyFrom(owner.Export(KeyBlobFormat.RawPublicKey))
@@ -70,16 +47,8 @@ public partial class ElectricityClient
 
         var proof = new V1.IssueProductionCommand.Types.ProductionIssuedProof()
         {
-            GsrnProof = new V1.CommitmentProof()
-            {
-                M = (ulong)gsrn.message,
-                R = ByteString.CopyFrom(gsrn.r.ToByteArray()),
-            },
-            QuantityProof = new V1.CommitmentProof()
-            {
-                M = (ulong)quantity.message,
-                R = ByteString.CopyFrom(quantity.r.ToByteArray()),
-            }
+            GsrnProof = gsrn.ToProtoCommitmentProof(),
+            QuantityProof = quantity.ToProtoCommitmentProof()
         };
 
         var signature = Sign(issuingBodySigner, @event);

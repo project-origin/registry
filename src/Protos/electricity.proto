@@ -8,7 +8,7 @@ package ProjectOrigin.Electricity.v1;
 message IssueConsumptionCommand {
     message ConsumptionIssuedEvent {
         ProjectOrigin.Register.v1.FederatedStreamId CertificateId = 1;
-        TimePeriod Period = 2;
+        DateInterval Period = 2;
         string GridArea = 3;
         Commitment GsrnCommitment = 4;
         Commitment QuantityCommitment = 5;
@@ -28,7 +28,7 @@ message IssueConsumptionCommand {
 message IssueProductionCommand {
     message ProductionIssuedEvent {
         ProjectOrigin.Register.v1.FederatedStreamId CertificateId = 1;
-        TimePeriod Period = 2;
+        DateInterval Period = 2;
         string GridArea = 3;
         string FuelCode = 4;
         string TechCode = 5;
