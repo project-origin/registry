@@ -1,10 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageId>ProjectOrigin.Electricity.Client</PackageId>
+    <Version>0.1.0-alpha-1</Version>
+    <Company>Project-Origin</Company>
+    <PackageTags>Project Origin;ProjectOrigin</PackageTags>
+     <Description>
+      This client library enables communicating with a ProjectOrigin Registry V1, supporting the Electricity Commands V1.
+      Read more about how to use the library in the <a href="https://project-origin.github.io/registry/api/ProjectOrigin.Electricity.Client.ElectricityClient.html">documenation</a>.
+    </Description>
   </PropertyGroup>
 
   <ItemGroup>
