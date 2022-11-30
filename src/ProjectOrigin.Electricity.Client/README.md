@@ -8,7 +8,7 @@ Read more about how to use the library in the <a href="https://project-origin.gi
 
 Simple example on how to issue a Consumption Granular Certificate
 
-```c#
+```csharp
 var client = new ElectricityClient("http://my-registry")
 var dk1IssuerKey = Key.Create(SignatureAlgorithm.Ed25519);
 
