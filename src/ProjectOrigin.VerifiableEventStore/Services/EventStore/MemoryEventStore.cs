@@ -23,4 +23,6 @@ public class MemoryEventStore : IEventStore
         var events = _batches.SelectMany(b => b.Events.Where(e => e.Id.EventStreamId == streamId));
         return Task.FromResult(events);
     }
+
+    public Task Store(VerifiableEvent @event) => throw new NotImplementedException();
 }
