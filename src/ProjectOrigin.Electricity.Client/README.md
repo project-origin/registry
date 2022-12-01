@@ -2,7 +2,7 @@
 
 This client library enables communicating with a ProjectOrigin Registry V1, supporting the Electricity Commands V1.
 
-Read more about how to use the library in the <a href="https://project-origin.github.io/registry/api/ProjectOrigin.Electricity.Client.ElectricityClient.html">documenation</a>.
+Read more about how to use the library in the [documentation](https://project-origin.github.io/registry/api/ProjectOrigin.Electricity.Client.ElectricityClient.html).
 
 ## Example
 
