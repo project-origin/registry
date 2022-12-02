@@ -15,5 +15,7 @@
     ],
     "postCreateCommand": "dotnet restore",
     "remoteUser": "vscode",
-    "features": {}
+    "features": {
+        "ghcr.io/devcontainers/features/docker-from-docker:1": {},
+    }
 }
