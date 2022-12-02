@@ -21,7 +21,7 @@ namespace ProjectOrigin.VerifiableEventStore.Tests
         public async Task PostgresqlEventStoreEventStore_StoreEvents_ReturnsBatch()
         {
             var fixture = new Fixture();
-            const int NUMBER_OF_EVENTS = 90;
+            const int NUMBER_OF_EVENTS = 10000;
             var batches = new List<Batch>();
             for (var i = 0; i < NUMBER_OF_EVENTS; i++)
             {
@@ -65,6 +65,8 @@ namespace ProjectOrigin.VerifiableEventStore.Tests
             }
             var events = await _eventStore.GetEventsForEventStream(eventId.EventStreamId);
             Assert.Single(events);
+            var batch = await _eventStore.GetBatch(eventId);
+            Assert.NotNull(batch);
         }
 
         [Fact]

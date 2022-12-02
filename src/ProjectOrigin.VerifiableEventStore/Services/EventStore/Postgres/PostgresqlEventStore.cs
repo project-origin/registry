@@ -35,10 +35,18 @@ public sealed class PostgresqlEventStore : IEventStore, IDisposable
 
     public async Task<Batch?> GetBatch(EventId eventId)
     {
-        await using var command = _dataSource.CreateCommand("SELECT * from get_batch($1,$2)");
-        command.Parameters.Add(new() { Value = eventId.EventStreamId });
-        command.Parameters.Add(new() { Value = eventId.Index });
+        await using var connection = _dataSource.CreateConnection();
+        await using var command = new NpgsqlCommand("SELECT * from get_batch($1,$2)", connection)
+        {
+            Parameters =
+            {
+                new(){Value = eventId.EventStreamId},
+                new(){Value = eventId.Index}
+            }
+        };
+        await connection.OpenAsync();
 
+        await command.PrepareAsync();
         await using var reader = await command.ExecuteReaderAsync();
         var events = new List<VerifiableEvent>();
         var blockId = string.Empty;
@@ -59,8 +67,17 @@ public sealed class PostgresqlEventStore : IEventStore, IDisposable
 
     public async Task<IEnumerable<VerifiableEvent>> GetEventsForEventStream(Guid topic)
     {
-        await using var command = _dataSource.CreateCommand("SELECT stream_id, index, data FROM events where stream_id=$1");
-        command.Parameters.Add(new() { Value = topic });
+        await using var connection = _dataSource.CreateConnection();
+        await using var command = new NpgsqlCommand("SELECT stream_id, index, data FROM events where stream_id=$1", connection)
+        {
+            Parameters =
+            {
+                new(){ Value = topic}
+            }
+        };
+
+        await connection.OpenAsync();
+        await command.PrepareAsync();
         await using var reader = await command.ExecuteReaderAsync();
         var events = new List<VerifiableEvent>();
         while (await reader.ReadAsync())
@@ -73,18 +90,21 @@ public sealed class PostgresqlEventStore : IEventStore, IDisposable
 
     public async Task Store(VerifiableEvent @event)
     {
-        await using var command = _dataSource.CreateCommand("SELECT append_event($1,$2,$3)");
-        var data = new NpgsqlParameter() { Value = @event.Content };
-        data.NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Bytea;
-        command.Parameters.Add(data);
-        var stream_id = new NpgsqlParameter() { Value = @event.Id.EventStreamId };
-        command.Parameters.Add(stream_id);
-        var version = new NpgsqlParameter() { Value = @event.Id.Index };
-        command.Parameters.Add(version);
-        await using var reader = await command.ExecuteReaderAsync();
-        await reader.ReadAsync();
-        var success = (bool)reader[0];
-        if (!success)
+        await using var connection = _dataSource.CreateConnection();
+        await using var command = new NpgsqlCommand("SELECT append_event($1,$2,$3)", connection)
+        {
+            Parameters =
+            {
+                new() { Value = @event.Content, NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Bytea },
+                new() { Value = @event.Id.EventStreamId },
+                new() { Value = @event.Id.Index }
+            }
+        };
+
+        await connection.OpenAsync();
+        await command.PrepareAsync();
+        var result = (bool?)await command.ExecuteScalarAsync();
+        if (result.HasValue && !result.Value)
         {
             throw new OutOfOrderException();
         }
@@ -293,7 +313,6 @@ CREATE INDEX IF NOT EXISTS fki_stream_id
 CREATE INDEX IF NOT EXISTS stream_id_and_version_incl
     ON public.events USING btree
     (stream_id ASC NULLS LAST, index ASC NULLS LAST)
-    INCLUDE(data)
     TABLESPACE pg_default;
 ";
         using var cmd = _dataSource.CreateCommand(creatEventsTableSql);
