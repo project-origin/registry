@@ -50,5 +50,4 @@ CREATE INDEX IF NOT EXISTS fki_stream_id
 CREATE INDEX IF NOT EXISTS stream_id_and_version_incl
     ON public.events USING btree
     (stream_id ASC NULLS LAST, index ASC NULLS LAST)
-    INCLUDE(data)
     TABLESPACE pg_default;

@@ -96,8 +96,8 @@ public sealed class PostgresqlEventStore : IEventStore, IDisposable
             Parameters =
             {
                 new() { Value = @event.Content, NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Bytea },
-                new() { Value = @event.Id.EventStreamId },
-                new() { Value = @event.Id.Index }
+                new() { Value = @event.Id.EventStreamId, NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Uuid },
+                new() { Value = @event.Id.Index, NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Integer}
             }
         };
 
@@ -186,25 +186,25 @@ $BODY$;
     {
         const string creatAppendEventSql =
        @"CREATE OR REPLACE FUNCTION public.append_event(
-	                data bytea,
-	                stream_id uuid,
-	                expected_stream_version bigint DEFAULT NULL::bigint)
-                    RETURNS boolean
-                    LANGUAGE 'plpgsql'
-                    COST 100
-                    VOLATILE PARALLEL UNSAFE
-                AS $BODY$
-
+	data bytea,
+	stream_id uuid,
+	expected_stream_version integer DEFAULT NULL::bigint)
+    RETURNS boolean
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
 
                             DECLARE
 	                            current_batch uuid;
 	                            total_number_of_events bigint;
 	                            stream_version int;
+								batches_state smallint;
 	                            BEGIN
 		                            -- Get current batch 
 		                            SELECT b.id, b.number_of_events INTO current_batch, total_number_of_events
 		                            FROM batches b
-		                            WHERE b.open = true AND number_of_events < 100;
+		                            WHERE b.state = 1;-- AND number_of_events < 100;
 		
 		                            IF current_batch is NULL THEN
 			                            current_batch := uuid_generate_v1();
@@ -236,11 +236,18 @@ $BODY$;
 		                            -- insert event
 		                            INSERT INTO events(stream_id, data, index, batch_id)
 		                            VALUES (stream_id, data, stream_version, current_batch);
+									
 		                            -- update batches
+									total_number_of_events := total_number_of_events + 1;
+									batches_state = 1;
+									IF total_number_of_events = 100 THEN
+										batches_state = 2;
+									END IF;
 		                            UPDATE batches as b
-			                            SET number_of_events = total_number_of_events + 1
+			                            SET number_of_events = total_number_of_events, state = batches_state
 		                            WHERE
 			                            b.id = current_batch;
+										
 		                            -- update stream
 		                            stream_version := stream_version +1;	
 		                            UPDATE streams as s
@@ -251,10 +258,11 @@ $BODY$;
 	                            END;
 
             
-                $BODY$;
+                
+$BODY$;
 
-                ALTER FUNCTION public.append_event(bytea, uuid, bigint)
-                    OWNER TO postgres;
+ALTER FUNCTION public.append_event(bytea, uuid, integer)
+    OWNER TO postgres;
 
 ";
         using var cmd = _dataSource.CreateCommand(creatAppendEventSql);
@@ -344,31 +352,30 @@ CREATE INDEX IF NOT EXISTS stream_id_and_version_incl
     {
         const string creatBatchesTableSql =
         @"CREATE EXTENSION IF NOT EXISTS ""uuid-ossp"";
-                CREATE TABLE IF NOT EXISTS public.batches
-                (
-                    id uuid NOT NULL DEFAULT uuid_generate_v1(),
-                    block_id text COLLATE pg_catalog.""default"",
-                    transaction_id text COLLATE pg_catalog.""default"",
-                    open boolean NOT NULL DEFAULT true,
-                    number_of_events bigint DEFAULT 0,
-                    CONSTRAINT batches_pkey PRIMARY KEY (id),
-                    CONSTRAINT batch_size CHECK (number_of_events < 1000)
-                )
-                WITH (
-                    OIDS = FALSE
-                )
-                TABLESPACE pg_default;
+CREATE TABLE IF NOT EXISTS public.batches
+(
+    id uuid NOT NULL DEFAULT uuid_generate_v1(),
+    block_id text COLLATE pg_catalog.""default"",
+    transaction_id text COLLATE pg_catalog.""default"",
+    number_of_events bigint DEFAULT 0,
+    state smallint DEFAULT 1,
+    CONSTRAINT batches_pkey PRIMARY KEY (id)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
 
-                ALTER TABLE IF EXISTS public.batches
-                    OWNER to postgres;
-                -- Index: open_number_of_events
+ALTER TABLE IF EXISTS public.batches
+    OWNER to postgres;
+-- Index: idx_state
 
-                -- DROP INDEX IF EXISTS public.open_number_of_events;
+-- DROP INDEX IF EXISTS public.idx_state;
 
-                CREATE INDEX IF NOT EXISTS open_number_of_events
-                    ON public.batches USING btree
-                    (open ASC NULLS LAST, number_of_events ASC NULLS LAST)
-                    TABLESPACE pg_default;
+CREATE INDEX IF NOT EXISTS idx_state
+    ON public.batches USING btree
+    (state ASC NULLS LAST)
+    TABLESPACE pg_default;
 ";
         using var cmd = _dataSource.CreateCommand(creatBatchesTableSql);
         var result = cmd.ExecuteNonQuery();

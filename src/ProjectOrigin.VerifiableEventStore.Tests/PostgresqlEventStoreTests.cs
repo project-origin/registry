@@ -21,7 +21,7 @@ namespace ProjectOrigin.VerifiableEventStore.Tests
         public async Task PostgresqlEventStoreEventStore_StoreEvents_ReturnsBatch()
         {
             var fixture = new Fixture();
-            const int NUMBER_OF_EVENTS = 10000;
+            const int NUMBER_OF_EVENTS = 1000;
             var batches = new List<Batch>();
             for (var i = 0; i < NUMBER_OF_EVENTS; i++)
             {
