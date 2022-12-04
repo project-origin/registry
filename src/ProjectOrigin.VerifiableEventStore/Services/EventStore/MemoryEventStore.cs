@@ -28,9 +28,6 @@ public class MemoryEventStore : IEventStore
             return Task.FromResult<Batch?>(null);
         }
         return Task.FromResult<Batch?>(b.Batch);
-
-        // var batch = _batches.Where(b => b.Events.Select(e => e.Id).Contains(eventId)).SingleOrDefault();
-        // return Task.FromResult(batch);
     }
 
     public Task<IEnumerable<VerifiableEvent>> GetEventsForBatch(Guid batchId)
@@ -41,12 +38,11 @@ public class MemoryEventStore : IEventStore
             return Task.FromResult(Enumerable.Empty<VerifiableEvent>());
         }
         return Task.FromResult(batchWrapper.Batch.Events.AsEnumerable());
-        // return Task.FromResult(_verifiableEvents.AsEnumerable());
     }
 
     public Task<IEnumerable<VerifiableEvent>> GetEventsForEventStream(Guid streamId)
     {
-        var events = _batches.SelectMany(b => b.Events.Where(e => e.Id.EventStreamId == streamId));
+        var events = _verifiableEvents.Where(x => x.Id.EventStreamId == streamId);
         return Task.FromResult(events);
     }
 
