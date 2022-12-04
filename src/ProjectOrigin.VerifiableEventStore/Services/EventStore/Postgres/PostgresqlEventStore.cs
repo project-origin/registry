@@ -65,6 +65,7 @@ public sealed class PostgresqlEventStore : IEventStore, IDisposable
         return events.Count > 0 ? new Batch(blockId, transactionId, events) : null;
     }
 
+    public Task FinalizeBatch(Guid batchId, string blockId, string transactionHash) => throw new NotImplementedException();
     public async Task<IEnumerable<VerifiableEvent>> GetEventsForEventStream(Guid topic)
     {
         await using var connection = _dataSource.CreateConnection();
@@ -147,16 +148,19 @@ public sealed class PostgresqlEventStore : IEventStore, IDisposable
         finally { await connection.CloseAsync(); }
     }
 
+    public Task<IEnumerable<VerifiableEvent>> GetEventsForBatch(Guid batchId) => throw new NotImplementedException();
+    public Task<IEnumerable<Guid>> GetBatchesForFinalization() => throw new NotImplementedException();
+
     private void CreateGetBatchFunction()
     {
         const string creatGetBatcheSql =
        @"CREATE OR REPLACE FUNCTION public.get_batch(
 	event_id uuid,
 	idx integer)
-    RETURNS TABLE(stream_id uuid, index integer, data bytea,block_id text, transaction_id text) 
+    RETURNS TABLE(stream_id uuid, index integer, data bytea,block_id text, transaction_id text)
     LANGUAGE 'plpgsql'
     COST 100
-    STABLE PARALLEL SAFE 
+    STABLE PARALLEL SAFE
     ROWS 1000
 
 AS $BODY$
@@ -201,18 +205,18 @@ AS $BODY$
 	                            stream_version int;
 								batches_state smallint;
 	                            BEGIN
-		                            -- Get current batch 
+		                            -- Get current batch
 		                            SELECT b.id, b.number_of_events INTO current_batch, total_number_of_events
 		                            FROM batches b
 		                            WHERE b.state = 1;-- AND number_of_events < 100;
-		
+
 		                            IF current_batch is NULL THEN
 			                            current_batch := uuid_generate_v1();
 			                            total_number_of_events := 0;
 			                            INSERT INTO batches(id)
 			                            VALUES (current_batch);
 		                            END IF;
-				
+
 		                            -- get stream version
 		                            SELECT
 			                            version INTO stream_version
@@ -228,7 +232,7 @@ AS $BODY$
 			                            VALUES
 				                            (stream_id, stream_version);
 		                            END IF;
-		
+
 		                            -- check optimistic concurrency
 		                            IF expected_stream_version IS NOT NULL AND stream_version != expected_stream_version THEN
 			                            RETURN FALSE;
@@ -236,7 +240,7 @@ AS $BODY$
 		                            -- insert event
 		                            INSERT INTO events(stream_id, data, index, batch_id)
 		                            VALUES (stream_id, data, stream_version, current_batch);
-									
+
 		                            -- update batches
 									total_number_of_events := total_number_of_events + 1;
 									batches_state = 1;
@@ -247,9 +251,9 @@ AS $BODY$
 			                            SET number_of_events = total_number_of_events, state = batches_state
 		                            WHERE
 			                            b.id = current_batch;
-										
+
 		                            -- update stream
-		                            stream_version := stream_version +1;	
+		                            stream_version := stream_version +1;
 		                            UPDATE streams as s
 			                            SET version = stream_version
 		                            WHERE
@@ -257,8 +261,8 @@ AS $BODY$
 		                            RETURN TRUE;
 	                            END;
 
-            
-                
+
+
 $BODY$;
 
 ALTER FUNCTION public.append_event(bytea, uuid, integer)

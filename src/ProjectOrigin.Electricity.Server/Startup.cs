@@ -16,8 +16,9 @@ public class Startup
 {
     public void ConfigureServices(IServiceCollection services)
     {
-        var memorystore_dk1 = new ves.EventStore.MemoryEventStore();
-        var memorystore_dk2 = new ves.EventStore.MemoryEventStore();
+        var batcherOptions = new BatcherOptions() { BatchSizeExponent = 2 };
+        var memorystore_dk1 = new ves.EventStore.MemoryEventStore(batcherOptions);
+        var memorystore_dk2 = new ves.EventStore.MemoryEventStore(batcherOptions);
 
         services.AddGrpc();
         services.AddSingleton<IProtoSerializer>(new ProtoSerializer(typeof(V1.ClaimCommand).Assembly));
