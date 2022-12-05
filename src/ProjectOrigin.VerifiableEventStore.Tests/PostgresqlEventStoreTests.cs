@@ -3,16 +3,18 @@ using ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres;
 
 namespace ProjectOrigin.VerifiableEventStore.Tests
 {
-    public class PostgresqlEventStoreTests : IClassFixture<DatabaseFixture>
+    public class PostgresqlEventStoreTests : IDisposable//, IClassFixture<DatabaseFixture>
     {
         private readonly PostgresqlEventStore _eventStore;
 
-        public PostgresqlEventStoreTests(DatabaseFixture fixture)
+        public PostgresqlEventStoreTests()
         {
             var storeOptions = new PostgresqlEventStoreOptions
             {
-                ConnectionString = fixture.Database.ConnectionString,
-                CreateSchema = true
+                //ConnectionString = fixture.Database.ConnectionString,
+                ConnectionString = "Host=localhost;Port=5432;Username=postgres;Password=password;Database=mmi",
+                CreateSchema = true,
+                BatchExponent = 10
             };
             _eventStore = new PostgresqlEventStore(storeOptions);
         }
@@ -73,7 +75,7 @@ namespace ProjectOrigin.VerifiableEventStore.Tests
         public async Task Can_Insert_Many_Events_On_Same_Stream_LoopAsync()
         {
             var fixture = new Fixture();
-            const int NUMBER_OF_EVENTS = 150;
+            const int NUMBER_OF_EVENTS = 2500;
             var streamId = Guid.NewGuid();
             for (var i = 0; i < NUMBER_OF_EVENTS; i++)
             {
@@ -90,16 +92,22 @@ namespace ProjectOrigin.VerifiableEventStore.Tests
         public async Task Can_insert_eventAsync()
         {
             var fixture = new Fixture();
+            //var @event = new VerifiableEvent(new EventId(Guid.Parse("3566b4d9-4b7e-4a84-b355-8150dd9ef0a8"), 0), fixture.Create<byte[]>());
+
             var @event = new VerifiableEvent(new EventId(Guid.NewGuid(), 0), fixture.Create<byte[]>());
 
             await _eventStore.Store(@event);
-
             var eventStream = await _eventStore.GetEventsForEventStream(@event.Id.EventStreamId);
             var fromDatabase = eventStream.First();
             Assert.NotNull(fromDatabase);
             Assert.Equal(@event.Id.EventStreamId, fromDatabase.Id.EventStreamId);
             Assert.Equal(@event.Id.Index, fromDatabase.Id.Index);
             Assert.Equal(@event.Content, fromDatabase.Content);
+        }
+
+        public void Dispose()
+        {
+            _eventStore.Dispose();
         }
 
         [Fact]

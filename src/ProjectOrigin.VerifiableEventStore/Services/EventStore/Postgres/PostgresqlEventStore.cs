@@ -1,4 +1,3 @@
-using System.Reflection.PortableExecutable;
 using Npgsql;
 using ProjectOrigin.VerifiableEventStore.Models;
 
@@ -7,6 +6,7 @@ namespace ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres;
 public sealed class PostgresqlEventStore : IEventStore, IDisposable
 {
     private readonly NpgsqlDataSource _dataSource;
+    private readonly long _batchSize;
 
     public PostgresqlEventStore(NpgsqlDataSource dataSource)
     {
@@ -23,7 +23,9 @@ public sealed class PostgresqlEventStore : IEventStore, IDisposable
             CreateEventsTable();
             CreateAppendEventFunction();
             CreateGetBatchFunction();
+            CreateBatchesForFinalization();
         }
+        _batchSize = (long)Math.Pow(2, storeOptions.BatchExponent);
     }
 
     public static PostgresqlEventStore Create(string connectionString)
@@ -32,7 +34,10 @@ public sealed class PostgresqlEventStore : IEventStore, IDisposable
         return new PostgresqlEventStore(dataSource);
     }
 
-    public void Dispose() => _dataSource.Dispose();
+    public void Dispose()
+    {
+        _dataSource.Dispose();
+    }
 
     public async Task<Batch?> GetBatch(EventId eventId)
     {
@@ -66,11 +71,10 @@ public sealed class PostgresqlEventStore : IEventStore, IDisposable
         return events.Count > 0 ? new Batch(blockId, transactionId, events) : null;
     }
 
-    public Task FinalizeBatch(Guid batchId, string blockId, string transactionHash) => throw new NotImplementedException();
     public async Task<IEnumerable<VerifiableEvent>> GetEventsForEventStream(Guid topic)
     {
         await using var connection = _dataSource.CreateConnection();
-        await using var command = new NpgsqlCommand("SELECT stream_id, index, data FROM batchIds where stream_id=$1", connection)
+        await using var command = new NpgsqlCommand("SELECT stream_id, index, data FROM events where stream_id=$1", connection)
         {
             Parameters =
             {
@@ -93,12 +97,13 @@ public sealed class PostgresqlEventStore : IEventStore, IDisposable
     public async Task Store(VerifiableEvent @event)
     {
         await using var connection = _dataSource.CreateConnection();
-        await using var command = new NpgsqlCommand("SELECT append_event($1,$2,$3)", connection)
+        await using var command = new NpgsqlCommand("SELECT append_event($1,$2,$3,$4)", connection)
         {
             Parameters =
             {
                 new() { Value = @event.Content, NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Bytea },
                 new() { Value = @event.Id.EventStreamId, NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Uuid },
+                new() { Value = _batchSize, NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Integer },
                 new() { Value = @event.Id.Index, NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Integer}
             }
         };
@@ -120,12 +125,14 @@ public sealed class PostgresqlEventStore : IEventStore, IDisposable
         foreach (var item in batch.Events)
         {
             var bc = batchJob.CreateBatchCommand();
-            bc.CommandText = "SELECT append_event($1,$2,$3)";
+            bc.CommandText = "SELECT append_event($1,$2,$3,$4)";
             var data = new NpgsqlParameter() { Value = item.Content };
             data.NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Bytea;
             bc.Parameters.Add(data);
             var stream_id = new NpgsqlParameter() { Value = item.Id.EventStreamId };
             bc.Parameters.Add(stream_id);
+            var batch_size = new NpgsqlParameter() { Value = _batchSize, NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Integer };
+            bc.Parameters.Add(batch_size);
             var version = new NpgsqlParameter() { Value = item.Id.Index };
             bc.Parameters.Add(version);
             batchJob.BatchCommands.Add(bc);
@@ -187,9 +194,27 @@ public sealed class PostgresqlEventStore : IEventStore, IDisposable
         return batchIds;
     }
 
+    public async Task FinalizeBatch(Guid batchId, string blockId, string transactionHash)
+    {
+        await using var connection = _dataSource.CreateConnection();
+        await using var command = new NpgsqlCommand("UPDATE batches SET block_id=$1, transaction_id=$2, state=4 WHERE id=$3", connection)
+        {
+            Parameters =
+            {
+                new() { Value = blockId },
+                new() { Value = transactionHash },
+                new() { Value = batchId },
+            }
+        };
+        await connection.OpenAsync();
+        await command.PrepareAsync();
+
+        await command.ExecuteNonQueryAsync();
+    }
+
     private void CreateGetBatchFunction()
     {
-        const string creatGetBatcheSql =
+        const string sql =
        @"CREATE OR REPLACE FUNCTION public.get_batch(
 	event_id uuid,
 	idx integer)
@@ -205,12 +230,12 @@ DECLARE
 	batchId uuid;
 BEGIN
 	SELECT e.batch_id INTO batchId
-	FROM batchIds as e
+	FROM events as e
 	WHERE
 		e.stream_id = event_id and e.index = idx;
 
 	RETURN QUERY SELECT b.id, e.index, e.data,b.block_id,b.transaction_id FROM batches b
-		JOIN batchIds e
+		JOIN events e
 		on e.batch_id = b.id
 		WHERE b.id = batchId;
 
@@ -218,16 +243,17 @@ END;
 $BODY$;
 
 ";
-        using var cmd = _dataSource.CreateCommand(creatGetBatcheSql);
+        using var cmd = _dataSource.CreateCommand(sql);
         cmd.ExecuteNonQuery();
     }
 
     private void CreateAppendEventFunction()
     {
-        const string creatAppendEventSql =
+        const string sql =
        @"CREATE OR REPLACE FUNCTION public.append_event(
 	data bytea,
 	stream_id uuid,
+    batch_size integer,
 	expected_stream_version integer DEFAULT NULL::bigint)
     RETURNS boolean
     LANGUAGE 'plpgsql'
@@ -274,13 +300,13 @@ AS $BODY$
 			                            RETURN FALSE;
 		                            END IF;
 		                            -- insert event
-		                            INSERT INTO batchIds(stream_id, data, index, batch_id)
+		                            INSERT INTO events(stream_id, data, index, batch_id)
 		                            VALUES (stream_id, data, stream_version, current_batch);
 
 		                            -- update batches
 									total_number_of_events := total_number_of_events + 1;
 									batches_state = 1;
-									IF total_number_of_events = 100 THEN
+									IF total_number_of_events = batch_size THEN
 										batches_state = 2;
 									END IF;
 		                            UPDATE batches as b
@@ -297,22 +323,20 @@ AS $BODY$
 		                            RETURN TRUE;
 	                            END;
 
-
-
 $BODY$;
 
-ALTER FUNCTION public.append_event(bytea, uuid, integer)
+ALTER FUNCTION public.append_event(bytea, uuid, integer, integer)
     OWNER TO postgres;
 
 ";
-        using var cmd = _dataSource.CreateCommand(creatAppendEventSql);
+        using var cmd = _dataSource.CreateCommand(sql);
         cmd.ExecuteNonQuery();
     }
 
     private void CreateEventsTable()
     {
-        const string creatEventsTableSql =
-        @"CREATE TABLE IF NOT EXISTS public.batchIds
+        const string sql =
+        @"CREATE TABLE IF NOT EXISTS public.events
             (
                 id uuid NOT NULL DEFAULT uuid_generate_v1(),
                 stream_id uuid NOT NULL,
@@ -336,14 +360,14 @@ ALTER FUNCTION public.append_event(bytea, uuid, integer)
             )
             TABLESPACE pg_default;
 
-            ALTER TABLE IF EXISTS public.batchIds
+            ALTER TABLE IF EXISTS public.events
     OWNER to postgres;
 -- Index: fki_batch_id
 
 -- DROP INDEX IF EXISTS public.fki_batch_id;
 
 CREATE INDEX IF NOT EXISTS fki_batch_id
-    ON public.batchIds USING btree
+    ON public.events USING btree
     (batch_id ASC NULLS LAST)
     TABLESPACE pg_default;
 -- Index: fki_stream_id
@@ -351,7 +375,7 @@ CREATE INDEX IF NOT EXISTS fki_batch_id
 -- DROP INDEX IF EXISTS public.fki_stream_id;
 
 CREATE INDEX IF NOT EXISTS fki_stream_id
-    ON public.batchIds USING btree
+    ON public.events USING btree
     (stream_id ASC NULLS LAST)
     TABLESPACE pg_default;
 -- Index: stream_id_and_version_incl
@@ -359,17 +383,17 @@ CREATE INDEX IF NOT EXISTS fki_stream_id
 -- DROP INDEX IF EXISTS public.stream_id_and_version_incl;
 
 CREATE INDEX IF NOT EXISTS stream_id_and_version_incl
-    ON public.batchIds USING btree
+    ON public.events USING btree
     (stream_id ASC NULLS LAST, index ASC NULLS LAST)
     TABLESPACE pg_default;
 ";
-        using var cmd = _dataSource.CreateCommand(creatEventsTableSql);
+        using var cmd = _dataSource.CreateCommand(sql);
         cmd.ExecuteNonQuery();
     }
 
     private void CreateStreamsTable()
     {
-        const string creatStreamsTableSql =
+        const string sql =
         @"CREATE TABLE IF NOT EXISTS public.streams
                 (
                     id uuid NOT NULL,
@@ -384,13 +408,13 @@ CREATE INDEX IF NOT EXISTS stream_id_and_version_incl
                 ALTER TABLE IF EXISTS public.streams
                     OWNER to postgres;
                 ";
-        using var cmd = _dataSource.CreateCommand(creatStreamsTableSql);
+        using var cmd = _dataSource.CreateCommand(sql);
         cmd.ExecuteNonQuery();
     }
 
     private void CreateBatchesTable()
     {
-        const string creatBatchesTableSql =
+        const string sql =
         @"CREATE EXTENSION IF NOT EXISTS ""uuid-ossp"";
 CREATE TABLE IF NOT EXISTS public.batches
 (
@@ -417,7 +441,54 @@ CREATE INDEX IF NOT EXISTS idx_state
     (state ASC NULLS LAST)
     TABLESPACE pg_default;
 ";
-        using var cmd = _dataSource.CreateCommand(creatBatchesTableSql);
+        using var cmd = _dataSource.CreateCommand(sql);
+        var result = cmd.ExecuteNonQuery();
+    }
+
+    private void CreateBatchesForFinalization()
+    {
+        const string sql =
+@"CREATE OR REPLACE FUNCTION public.batches_for_finalization(
+	number_of_batches integer)
+    RETURNS TABLE(batch_id uuid)
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+
+BEGIN
+
+	-- Select the batchid´s
+	CREATE TEMP TABLE IF NOT EXISTS temp_table AS
+    SELECT id
+    FROM batches b
+	where b.state=2
+	order by id
+	limit number_of_batches;
+
+	-- Update the batches to Publishing
+	UPDATE batches AS b
+	SET state=3
+	WHERE b.id in(SELECT id from temp_table);
+
+	RETURN QUERY
+	SELECT id
+	from temp_table;
+DROP TABLE temp_table;
+
+--	RETURN QUERY SELECT b.id FROM batches b
+--		WHERE b.state = 2 order by id limit number_of_batches;
+
+END;
+$BODY$;
+
+ALTER FUNCTION public.batches_for_finalization(integer)
+    OWNER TO postgres;
+
+";
+        using var cmd = _dataSource.CreateCommand(sql);
         var result = cmd.ExecuteNonQuery();
     }
 }
