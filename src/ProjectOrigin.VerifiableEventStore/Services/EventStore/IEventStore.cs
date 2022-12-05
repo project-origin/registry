@@ -9,6 +9,6 @@ public interface IEventStore
     Task<Batch?> GetBatch(EventId eventId);
     Task<IEnumerable<VerifiableEvent>> GetEventsForEventStream(Guid streamId);
     Task<IEnumerable<VerifiableEvent>> GetEventsForBatch(Guid batchId);
-    public Task<IEnumerable<Guid>> GetBatchesForFinalization();
+    Task<IEnumerable<Guid>> GetBatchesForFinalization();
     Task FinalizeBatch(Guid batchId, string blockId, string transactionHash);
 }

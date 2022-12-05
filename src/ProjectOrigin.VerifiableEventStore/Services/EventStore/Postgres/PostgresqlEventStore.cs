@@ -1,3 +1,4 @@
+using System.Reflection.PortableExecutable;
 using Npgsql;
 using ProjectOrigin.VerifiableEventStore.Models;
 
@@ -69,7 +70,7 @@ public sealed class PostgresqlEventStore : IEventStore, IDisposable
     public async Task<IEnumerable<VerifiableEvent>> GetEventsForEventStream(Guid topic)
     {
         await using var connection = _dataSource.CreateConnection();
-        await using var command = new NpgsqlCommand("SELECT stream_id, index, data FROM events where stream_id=$1", connection)
+        await using var command = new NpgsqlCommand("SELECT stream_id, index, data FROM batchIds where stream_id=$1", connection)
         {
             Parameters =
             {
@@ -148,8 +149,43 @@ public sealed class PostgresqlEventStore : IEventStore, IDisposable
         finally { await connection.CloseAsync(); }
     }
 
-    public Task<IEnumerable<VerifiableEvent>> GetEventsForBatch(Guid batchId) => throw new NotImplementedException();
-    public Task<IEnumerable<Guid>> GetBatchesForFinalization() => throw new NotImplementedException();
+    public async Task<IEnumerable<VerifiableEvent>> GetEventsForBatch(Guid batchId)
+    {
+        await using var connection = _dataSource.CreateConnection();
+        await using var command = new NpgsqlCommand("SELECT stream_id, index, data FROM events where batch_id=$1", connection)
+        {
+            Parameters =
+            {
+                new(){ Value = batchId }
+            }
+        };
+
+        await connection.OpenAsync();
+        await command.PrepareAsync();
+        await using var reader = await command.ExecuteReaderAsync();
+        var events = new List<VerifiableEvent>();
+        while (await reader.ReadAsync())
+        {
+            var evt = new VerifiableEvent(new EventId(reader.GetGuid(0), reader.GetInt32(1)), (byte[])reader[2]);
+            events.Add(evt);
+        }
+        return events;
+    }
+
+    public async Task<IEnumerable<Guid>> GetBatchesForFinalization()
+    {
+        await using var connection = _dataSource.CreateConnection();
+        await using var command = new NpgsqlCommand("SELECT * FROM batches_for_finalization", connection);
+        await connection.OpenAsync();
+        await command.PrepareAsync();
+        await using var reader = await command.ExecuteReaderAsync();
+        var batchIds = new List<Guid>();
+        while (await reader.ReadAsync())
+        {
+            batchIds.Add(reader.GetGuid(0));
+        }
+        return batchIds;
+    }
 
     private void CreateGetBatchFunction()
     {
@@ -169,12 +205,12 @@ DECLARE
 	batchId uuid;
 BEGIN
 	SELECT e.batch_id INTO batchId
-	FROM events as e
+	FROM batchIds as e
 	WHERE
 		e.stream_id = event_id and e.index = idx;
 
 	RETURN QUERY SELECT b.id, e.index, e.data,b.block_id,b.transaction_id FROM batches b
-		JOIN events e
+		JOIN batchIds e
 		on e.batch_id = b.id
 		WHERE b.id = batchId;
 
@@ -238,7 +274,7 @@ AS $BODY$
 			                            RETURN FALSE;
 		                            END IF;
 		                            -- insert event
-		                            INSERT INTO events(stream_id, data, index, batch_id)
+		                            INSERT INTO batchIds(stream_id, data, index, batch_id)
 		                            VALUES (stream_id, data, stream_version, current_batch);
 
 		                            -- update batches
@@ -276,7 +312,7 @@ ALTER FUNCTION public.append_event(bytea, uuid, integer)
     private void CreateEventsTable()
     {
         const string creatEventsTableSql =
-        @"CREATE TABLE IF NOT EXISTS public.events
+        @"CREATE TABLE IF NOT EXISTS public.batchIds
             (
                 id uuid NOT NULL DEFAULT uuid_generate_v1(),
                 stream_id uuid NOT NULL,
@@ -300,14 +336,14 @@ ALTER FUNCTION public.append_event(bytea, uuid, integer)
             )
             TABLESPACE pg_default;
 
-            ALTER TABLE IF EXISTS public.events
+            ALTER TABLE IF EXISTS public.batchIds
     OWNER to postgres;
 -- Index: fki_batch_id
 
 -- DROP INDEX IF EXISTS public.fki_batch_id;
 
 CREATE INDEX IF NOT EXISTS fki_batch_id
-    ON public.events USING btree
+    ON public.batchIds USING btree
     (batch_id ASC NULLS LAST)
     TABLESPACE pg_default;
 -- Index: fki_stream_id
@@ -315,7 +351,7 @@ CREATE INDEX IF NOT EXISTS fki_batch_id
 -- DROP INDEX IF EXISTS public.fki_stream_id;
 
 CREATE INDEX IF NOT EXISTS fki_stream_id
-    ON public.events USING btree
+    ON public.batchIds USING btree
     (stream_id ASC NULLS LAST)
     TABLESPACE pg_default;
 -- Index: stream_id_and_version_incl
@@ -323,7 +359,7 @@ CREATE INDEX IF NOT EXISTS fki_stream_id
 -- DROP INDEX IF EXISTS public.stream_id_and_version_incl;
 
 CREATE INDEX IF NOT EXISTS stream_id_and_version_incl
-    ON public.events USING btree
+    ON public.batchIds USING btree
     (stream_id ASC NULLS LAST, index ASC NULLS LAST)
     TABLESPACE pg_default;
 ";
