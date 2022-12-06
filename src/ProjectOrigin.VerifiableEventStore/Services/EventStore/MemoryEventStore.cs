@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using ProjectOrigin.VerifiableEventStore.Models;
 using ProjectOrigin.VerifiableEventStore.Services.Batcher;
 
@@ -7,12 +8,12 @@ public class MemoryEventStore : IEventStore
 {
     private readonly List<Batch> _batches = new List<Batch>();
     private readonly List<BatchWrapper> _batchWrappers = new();
-    private readonly BatcherOptions _options;
+    private readonly long _batchSize;
     private List<VerifiableEvent> _verifiableEvents = new List<VerifiableEvent>();
 
     public MemoryEventStore(BatcherOptions options)
     {
-        _options = options;
+        _batchSize = (long)Math.Pow(2, options.BatchSizeExponent);
     }
     public Task StoreBatch(Batch batch)
     {
@@ -22,7 +23,7 @@ public class MemoryEventStore : IEventStore
 
     public Task<Batch?> GetBatch(EventId eventId)
     {
-        var b = _batchWrappers.Where(b => b.Batch.Events.Select(e => e.Id).Contains(eventId)).SingleOrDefault();
+        var b = _batchWrappers.SingleOrDefault(b => b.Batch.Events.Select(e => e.Id).Contains(eventId));
         if (b is null || b.Batch is null)
         {
             return Task.FromResult<Batch?>(null);
@@ -42,7 +43,7 @@ public class MemoryEventStore : IEventStore
 
     public Task<IEnumerable<VerifiableEvent>> GetEventsForEventStream(Guid streamId)
     {
-        var events = _verifiableEvents.Where(x => x.Id.EventStreamId == streamId);
+        var events = _batchWrappers.SelectMany(b => b.Batch.Events.Where(e => e.Id.EventStreamId == streamId));
         return Task.FromResult(events);
     }
 
@@ -50,7 +51,7 @@ public class MemoryEventStore : IEventStore
     {
         _verifiableEvents.Add(@event);
 
-        if (_verifiableEvents.Count >= _options.BatchSizeExponent)
+        if (_verifiableEvents.Count >= _batchSize)
         {
             var batchEvents = _verifiableEvents;
             _verifiableEvents = new List<VerifiableEvent>();
@@ -74,7 +75,7 @@ public class MemoryEventStore : IEventStore
         return Task.CompletedTask;
     }
 
-    public Task<IEnumerable<Guid>> GetBatchesForFinalization()
+    public Task<IEnumerable<Guid>> GetBatchesForFinalization(int numberOfBatches)
     {
         var batches = _batchWrappers.Where(x => x.Batch.BlockId == string.Empty && x.Batch.TransactionId == string.Empty).ToList();
         return Task.FromResult(batches.Select(b => b.Guid));

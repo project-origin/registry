@@ -66,8 +66,11 @@ public sealed class PostgresqlEventStore : IEventStore, IDisposable
             var id = (Guid)reader[0];
             var index = (int)reader[1];
             var data = (byte[])reader[2];
-            //blockId = reader.GetString(3);
-            //transactionId = reader.GetString(4);
+            if (!reader.IsDBNull(3))
+                blockId = reader.GetString(3);
+            if (!reader.IsDBNull(4))
+                transactionId = reader.GetString(4);
+
             var @event = new VerifiableEvent(new EventId(id, index), data);
             events.Add(@event);
         }
@@ -183,10 +186,16 @@ public sealed class PostgresqlEventStore : IEventStore, IDisposable
         return events;
     }
 
-    public async Task<IEnumerable<Guid>> GetBatchesForFinalization()
+    public async Task<IEnumerable<Guid>> GetBatchesForFinalization(int numberOfBatches)
     {
         await using var connection = _dataSource.CreateConnection();
-        await using var command = new NpgsqlCommand("SELECT * FROM batches_for_finalization", connection);
+        await using var command = new NpgsqlCommand("SELECT * FROM batches_for_finalization($1)", connection)
+        {
+            Parameters =
+            {
+                new(){ Value = numberOfBatches, NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Integer }
+            }
+        };
         await connection.OpenAsync();
         await command.PrepareAsync();
         await using var reader = await command.ExecuteReaderAsync();
@@ -446,7 +455,7 @@ ALTER TABLE IF EXISTS public.streams
 
 -- Trigger: set_timestamp
 
--- DROP TRIGGER IF EXISTS set_timestamp ON public.streams;
+DROP TRIGGER IF EXISTS set_timestamp ON public.streams;
 
 CREATE TRIGGER set_timestamp
     BEFORE UPDATE 
@@ -492,7 +501,7 @@ CREATE INDEX IF NOT EXISTS idx_state
 
 -- Trigger: set_timestamp
 
--- DROP TRIGGER IF EXISTS set_timestamp ON public.batches;
+DROP TRIGGER IF EXISTS set_timestamp ON public.batches;
 
 CREATE TRIGGER set_timestamp
     BEFORE UPDATE 

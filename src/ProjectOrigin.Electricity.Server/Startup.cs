@@ -16,7 +16,7 @@ public class Startup
 {
     public void ConfigureServices(IServiceCollection services)
     {
-        var batcherOptions = new BatcherOptions() { BatchSizeExponent = 2 };
+        var batcherOptions = new BatcherOptions() { BatchSizeExponent = 0 };
         var memorystore_dk1 = new ves.EventStore.MemoryEventStore(batcherOptions);
         var memorystore_dk2 = new ves.EventStore.MemoryEventStore(batcherOptions);
 

@@ -1,5 +1,4 @@
 using System.Security.Cryptography;
-using AutoFixture;
 using ProjectOrigin.VerifiableEventStore.Models;
 using ProjectOrigin.VerifiableEventStore.Services.Batcher;
 using ProjectOrigin.VerifiableEventStore.Services.Batcher.Postgres;
@@ -33,7 +32,7 @@ public class BatchProcessorJobTests
         // When
         await job.Execute(CancellationToken.None);
         // Then
-        var result = await eventStore.GetBatchesForFinalization();
+        var result = await eventStore.GetBatchesForFinalization(10);
         Assert.Empty(result);
     }
 

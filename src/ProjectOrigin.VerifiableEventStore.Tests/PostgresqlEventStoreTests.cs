@@ -11,8 +11,7 @@ namespace ProjectOrigin.VerifiableEventStore.Tests
         {
             var storeOptions = new PostgresqlEventStoreOptions
             {
-                //ConnectionString = fixture.Database.ConnectionString,
-                ConnectionString = "Host=localhost;Port=5432;Username=postgres;Password=password;Database=ProjectOrigin",
+                ConnectionString = fixture.Database.ConnectionString,
                 CreateSchema = true,
                 BatchExponent = 10
             };
@@ -75,7 +74,7 @@ namespace ProjectOrigin.VerifiableEventStore.Tests
         public async Task Can_Insert_Many_Events_On_Same_Stream_LoopAsync()
         {
             var fixture = new Fixture();
-            const int NUMBER_OF_EVENTS = 2500;
+            const int NUMBER_OF_EVENTS = 1500;
             var streamId = Guid.NewGuid();
             for (var i = 0; i < NUMBER_OF_EVENTS; i++)
             {
@@ -86,6 +85,47 @@ namespace ProjectOrigin.VerifiableEventStore.Tests
             var events = await _eventStore.GetEventsForEventStream(streamId);
             Assert.NotEmpty(events);
             Assert.Equal(NUMBER_OF_EVENTS, events.Count());
+        }
+
+        [Fact]
+        public async Task Can_Get_Batches_For_Finalization()
+        {
+            var fixture = new Fixture();
+            const int NUMBER_OF_EVENTS = 1500;
+            var streamId = Guid.NewGuid();
+            for (var i = 0; i < NUMBER_OF_EVENTS; i++)
+            {
+                var eventId = new EventId(streamId, i);
+                var @event = new VerifiableEvent(eventId, fixture.Create<byte[]>());
+                await _eventStore.Store(@event);
+            }
+            var batches = await _eventStore.GetBatchesForFinalization(10);
+            Assert.NotEmpty(batches);
+        }
+
+        [Fact]
+        public async Task Can_FinalizeBatch()
+        {
+            var fixture = new Fixture();
+            const int NUMBER_OF_EVENTS = 1100;
+            var streamId = Guid.NewGuid();
+            for (var i = 0; i < NUMBER_OF_EVENTS; i++)
+            {
+                var eventId = new EventId(streamId, i);
+                var @event = new VerifiableEvent(eventId, fixture.Create<byte[]>());
+                await _eventStore.Store(@event);
+            }
+            var batches = await _eventStore.GetBatchesForFinalization(10);
+            foreach (var batchId in batches)
+            {
+                await _eventStore.FinalizeBatch(batchId, fixture.Create<string>(), fixture.Create<string>());
+            }
+            var events = await _eventStore.GetEventsForBatch(batches.First());
+
+            var batch = await _eventStore.GetBatch(events.First().Id);
+            Assert.NotEqual(string.Empty, batch?.TransactionId);
+            Assert.NotEqual(string.Empty, batch?.BlockId);
+
         }
 
         [Fact]
