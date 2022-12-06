@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Identity;
 using ProjectOrigin.VerifiableEventStore.Models;
 using ProjectOrigin.VerifiableEventStore.Services.Batcher;
 
@@ -15,6 +14,7 @@ public class MemoryEventStore : IEventStore
     {
         _batchSize = (long)Math.Pow(2, options.BatchSizeExponent);
     }
+
     public Task StoreBatch(Batch batch)
     {
         _batches.Add(batch);

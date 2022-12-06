@@ -30,8 +30,6 @@ public sealed class PostgresqlEventStore : IEventStore, IDisposable
         _batchSize = (long)Math.Pow(2, storeOptions.BatchExponent);
     }
 
-
-
     public static PostgresqlEventStore Create(string connectionString)
     {
         var dataSource = NpgsqlDataSource.Create(connectionString);
@@ -122,45 +120,6 @@ public sealed class PostgresqlEventStore : IEventStore, IDisposable
         {
             throw new OutOfOrderException();
         }
-    }
-
-    public async Task StoreBatch(Batch batch)
-    {
-        using var connection = _dataSource.CreateConnection();
-
-        using var batchJob = new NpgsqlBatch(connection);
-        foreach (var item in batch.Events)
-        {
-            var bc = batchJob.CreateBatchCommand();
-            bc.CommandText = "SELECT append_event($1,$2,$3,$4)";
-            var data = new NpgsqlParameter() { Value = item.Content };
-            data.NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Bytea;
-            bc.Parameters.Add(data);
-            var stream_id = new NpgsqlParameter() { Value = item.Id.EventStreamId };
-            bc.Parameters.Add(stream_id);
-            var batch_size = new NpgsqlParameter() { Value = _batchSize, NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Integer };
-            bc.Parameters.Add(batch_size);
-            var version = new NpgsqlParameter() { Value = item.Id.Index };
-            bc.Parameters.Add(version);
-            batchJob.BatchCommands.Add(bc);
-        }
-        try
-        {
-            await connection.OpenAsync();
-            await batchJob.PrepareAsync();
-            await using var reader = await batchJob.ExecuteReaderAsync();
-            await reader.ReadAsync();
-            var success = (bool)reader[0];
-            if (!success)
-            {
-                throw new OutOfOrderException();
-            }
-        }
-        catch (Exception)
-        {
-            throw;
-        }
-        finally { await connection.CloseAsync(); }
     }
 
     public async Task<IEnumerable<VerifiableEvent>> GetEventsForBatch(Guid batchId)
@@ -259,14 +218,13 @@ ALTER FUNCTION public.trigger_set_timestamp()
        @"CREATE OR REPLACE FUNCTION public.get_batch(
 	event_id uuid,
 	idx integer)
-    RETURNS TABLE(stream_id uuid, index integer, data bytea, block_id text, transaction_id text) 
+    RETURNS TABLE(stream_id uuid, index integer, data bytea, block_id text, transaction_id text)
     LANGUAGE 'plpgsql'
     COST 100
-    STABLE PARALLEL SAFE 
+    STABLE PARALLEL SAFE
     ROWS 1000
 
 AS $BODY$
-
 
 DECLARE
 	batchId uuid;
@@ -304,7 +262,6 @@ ALTER FUNCTION public.get_batch(uuid, integer)
     COST 100
     VOLATILE PARALLEL UNSAFE
 AS $BODY$
-
 
                             DECLARE
 	                            current_batch uuid;
@@ -458,7 +415,7 @@ ALTER TABLE IF EXISTS public.streams
 DROP TRIGGER IF EXISTS set_timestamp ON public.streams;
 
 CREATE TRIGGER set_timestamp
-    BEFORE UPDATE 
+    BEFORE UPDATE
     ON public.streams
     FOR EACH ROW
     EXECUTE FUNCTION public.trigger_set_timestamp();
@@ -504,7 +461,7 @@ CREATE INDEX IF NOT EXISTS idx_state
 DROP TRIGGER IF EXISTS set_timestamp ON public.batches;
 
 CREATE TRIGGER set_timestamp
-    BEFORE UPDATE 
+    BEFORE UPDATE
     ON public.batches
     FOR EACH ROW
     EXECUTE FUNCTION public.trigger_set_timestamp();
@@ -519,14 +476,13 @@ CREATE TRIGGER set_timestamp
         const string sql =
 @"CREATE OR REPLACE FUNCTION public.batches_for_finalization(
 	number_of_batches integer)
-    RETURNS TABLE(batch_id uuid) 
+    RETURNS TABLE(batch_id uuid)
     LANGUAGE 'plpgsql'
     COST 100
     VOLATILE PARALLEL UNSAFE
     ROWS 1000
 
 AS $BODY$
-
 
 BEGIN
 

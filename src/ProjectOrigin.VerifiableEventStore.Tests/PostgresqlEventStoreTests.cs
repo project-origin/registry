@@ -19,40 +19,6 @@ namespace ProjectOrigin.VerifiableEventStore.Tests
         }
 
         [Fact]
-        public async Task PostgresqlEventStoreEventStore_StoreEvents_ReturnsBatch()
-        {
-            var fixture = new Fixture();
-            const int NUMBER_OF_EVENTS = 1000;
-            var batches = new List<Batch>();
-            for (var i = 0; i < NUMBER_OF_EVENTS; i++)
-            {
-                var events = new List<VerifiableEvent>();
-                var streamId = Guid.NewGuid();
-                for (var index = 0; index < 13; index++)
-                {
-                    events.Add(new VerifiableEvent(new EventId(streamId, index), fixture.Create<byte[]>()));
-                }
-
-                var batch = new Batch(fixture.Create<string>(), fixture.Create<string>(), events);
-                batches.Add(batch);
-            }
-
-            foreach (var item in batches)
-            {
-                await _eventStore.StoreBatch(item);
-            }
-
-            var firstBatch = batches[0];
-            var eventStream = await _eventStore.GetEventsForEventStream(firstBatch.Events[0].Id.EventStreamId);
-            Assert.NotNull(eventStream);
-            Assert.Equal(firstBatch.Events.Count, eventStream.Count());
-
-            var batchResult = await _eventStore.GetBatch(firstBatch.Events.First().Id);
-            Assert.NotNull(batchResult);
-            Assert.NotEmpty(batchResult.Events);
-        }
-
-        [Fact]
         public async Task Can_InsertEvent_In_LoopAsync()
         {
             var fixture = new Fixture();
@@ -125,7 +91,6 @@ namespace ProjectOrigin.VerifiableEventStore.Tests
             var batch = await _eventStore.GetBatch(events.First().Id);
             Assert.NotEqual(string.Empty, batch?.TransactionId);
             Assert.NotEqual(string.Empty, batch?.BlockId);
-
         }
 
         [Fact]

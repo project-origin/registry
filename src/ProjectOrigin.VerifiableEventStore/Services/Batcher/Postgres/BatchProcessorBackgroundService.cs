@@ -27,7 +27,6 @@ public class BatchProcessorBackgroundService : BackgroundService
         {
             _logger.LogInformation("Executing BatchProcesser");
 
-
             using var scope = _serviceProvider.CreateScope();
             var blockchainConnector = scope.ServiceProvider.GetRequiredService<IBlockchainConnector>();
             var eventStore = scope.ServiceProvider.GetRequiredService<IEventStore>();

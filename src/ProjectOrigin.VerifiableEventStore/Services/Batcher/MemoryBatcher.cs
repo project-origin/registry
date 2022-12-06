@@ -23,16 +23,7 @@ public class MemoryBatcher : IBatcher
 
     public async Task PublishEvent(VerifiableEvent e)
     {
-        _events.Add(e);
         await _eventStore.Store(e);
-        if (_events.Count >= _batchSize)
-        {
-            var batchEvents = _events;
-            _events = new List<VerifiableEvent>();
-
-            var batch = await PublishBatch(batchEvents);
-            await _eventStore.StoreBatch(batch);
-        }
     }
 
     private async Task<Batch> PublishBatch(List<VerifiableEvent> batchEvents)
