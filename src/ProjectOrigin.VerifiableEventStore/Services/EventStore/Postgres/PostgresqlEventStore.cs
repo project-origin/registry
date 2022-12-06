@@ -18,6 +18,8 @@ public sealed class PostgresqlEventStore : IEventStore, IDisposable
         _dataSource = NpgsqlDataSource.Create(storeOptions.ConnectionString);
         if (storeOptions.CreateSchema)
         {
+            SetupTriggers();
+            EnableExtensions();
             CreateBatchesTable();
             CreateStreamsTable();
             CreateEventsTable();
@@ -27,6 +29,8 @@ public sealed class PostgresqlEventStore : IEventStore, IDisposable
         }
         _batchSize = (long)Math.Pow(2, storeOptions.BatchExponent);
     }
+
+
 
     public static PostgresqlEventStore Create(string connectionString)
     {
@@ -212,19 +216,48 @@ public sealed class PostgresqlEventStore : IEventStore, IDisposable
         await command.ExecuteNonQueryAsync();
     }
 
+    private void EnableExtensions()
+    {
+        const string sql =
+            @"CREATE EXTENSION IF NOT EXISTS ""uuid-ossp"";";
+        using var cmd = _dataSource.CreateCommand(sql);
+        cmd.ExecuteNonQuery();
+    }
+
+    private void SetupTriggers()
+    {
+        const string sql = @"CREATE OR REPLACE FUNCTION public.trigger_set_timestamp()
+    RETURNS trigger
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE NOT LEAKPROOF
+AS $BODY$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$BODY$;
+
+ALTER FUNCTION public.trigger_set_timestamp()
+    OWNER TO postgres;";
+        using var cmd = _dataSource.CreateCommand(sql);
+        cmd.ExecuteNonQuery();
+    }
+
     private void CreateGetBatchFunction()
     {
         const string sql =
        @"CREATE OR REPLACE FUNCTION public.get_batch(
 	event_id uuid,
 	idx integer)
-    RETURNS TABLE(stream_id uuid, index integer, data bytea,block_id text, transaction_id text)
+    RETURNS TABLE(stream_id uuid, index integer, data bytea, block_id text, transaction_id text) 
     LANGUAGE 'plpgsql'
     COST 100
-    STABLE PARALLEL SAFE
+    STABLE PARALLEL SAFE 
     ROWS 1000
 
 AS $BODY$
+
 
 DECLARE
 	batchId uuid;
@@ -242,6 +275,8 @@ BEGIN
 END;
 $BODY$;
 
+ALTER FUNCTION public.get_batch(uuid, integer)
+    OWNER TO postgres;
 ";
         using var cmd = _dataSource.CreateCommand(sql);
         cmd.ExecuteNonQuery();
@@ -253,13 +288,14 @@ $BODY$;
        @"CREATE OR REPLACE FUNCTION public.append_event(
 	data bytea,
 	stream_id uuid,
-    batch_size integer,
+	batch_size integer,
 	expected_stream_version integer DEFAULT NULL::bigint)
     RETURNS boolean
     LANGUAGE 'plpgsql'
     COST 100
     VOLATILE PARALLEL UNSAFE
 AS $BODY$
+
 
                             DECLARE
 	                            current_batch uuid;
@@ -270,7 +306,7 @@ AS $BODY$
 		                            -- Get current batch
 		                            SELECT b.id, b.number_of_events INTO current_batch, total_number_of_events
 		                            FROM batches b
-		                            WHERE b.state = 1;-- AND number_of_events < 100;
+		                            WHERE b.state = 1;
 
 		                            IF current_batch is NULL THEN
 			                            current_batch := uuid_generate_v1();
@@ -288,7 +324,6 @@ AS $BODY$
 		                            -- if stream doesn't exist - create new one with version 0
 		                            IF stream_version IS NULL THEN
 			                            stream_version := 0;
-			                            raise notice 'Inserting into streams';
 			                            INSERT INTO streams
 				                            (id, version)
 			                            VALUES
@@ -337,30 +372,29 @@ ALTER FUNCTION public.append_event(bytea, uuid, integer, integer)
     {
         const string sql =
         @"CREATE TABLE IF NOT EXISTS public.events
-            (
-                id uuid NOT NULL DEFAULT uuid_generate_v1(),
-                stream_id uuid NOT NULL,
-                data bytea NOT NULL,
-                index integer NOT NULL,
-                batch_id uuid NOT NULL,
-                created_at timestamp with time zone DEFAULT now(),
-                CONSTRAINT events_pkey PRIMARY KEY (id),
-                CONSTRAINT batch_id FOREIGN KEY (batch_id)
-                    REFERENCES public.batches (id) MATCH SIMPLE
-                    ON UPDATE NO ACTION
-                    ON DELETE NO ACTION
-                    NOT VALID,
-                CONSTRAINT stream_id FOREIGN KEY (stream_id)
-                    REFERENCES public.streams (id) MATCH SIMPLE
-                    ON UPDATE NO ACTION
-                    ON DELETE NO ACTION
-            )
-            WITH (
-                OIDS = FALSE
-            )
-            TABLESPACE pg_default;
+(
+    id uuid NOT NULL DEFAULT uuid_generate_v1(),
+    stream_id uuid NOT NULL,
+    data bytea NOT NULL,
+    index integer NOT NULL,
+    batch_id uuid NOT NULL,
+    created_at timestamp with time zone DEFAULT now(),
+    CONSTRAINT events_pkey PRIMARY KEY (id),
+    CONSTRAINT batch_id FOREIGN KEY (batch_id)
+        REFERENCES public.batches (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT stream_id FOREIGN KEY (stream_id)
+        REFERENCES public.streams (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
 
-            ALTER TABLE IF EXISTS public.events
+ALTER TABLE IF EXISTS public.events
     OWNER to postgres;
 -- Index: fki_batch_id
 
@@ -395,18 +429,31 @@ CREATE INDEX IF NOT EXISTS stream_id_and_version_incl
     {
         const string sql =
         @"CREATE TABLE IF NOT EXISTS public.streams
-                (
-                    id uuid NOT NULL,
-                    version bigint NOT NULL,
-                    CONSTRAINT streams_pkey PRIMARY KEY (id)
-                )
-                WITH (
-                    OIDS = FALSE
-                )
-                TABLESPACE pg_default;
+(
+    id uuid NOT NULL,
+    version integer NOT NULL,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone,
+    CONSTRAINT streams_pkey PRIMARY KEY (id)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
 
-                ALTER TABLE IF EXISTS public.streams
-                    OWNER to postgres;
+ALTER TABLE IF EXISTS public.streams
+    OWNER to postgres;
+
+-- Trigger: set_timestamp
+
+-- DROP TRIGGER IF EXISTS set_timestamp ON public.streams;
+
+CREATE TRIGGER set_timestamp
+    BEFORE UPDATE 
+    ON public.streams
+    FOR EACH ROW
+    EXECUTE FUNCTION public.trigger_set_timestamp();
+
                 ";
         using var cmd = _dataSource.CreateCommand(sql);
         cmd.ExecuteNonQuery();
@@ -415,7 +462,7 @@ CREATE INDEX IF NOT EXISTS stream_id_and_version_incl
     private void CreateBatchesTable()
     {
         const string sql =
-        @"CREATE EXTENSION IF NOT EXISTS ""uuid-ossp"";
+        @"
 CREATE TABLE IF NOT EXISTS public.batches
 (
     id uuid NOT NULL DEFAULT uuid_generate_v1(),
@@ -423,6 +470,8 @@ CREATE TABLE IF NOT EXISTS public.batches
     transaction_id text COLLATE pg_catalog.""default"",
     number_of_events bigint DEFAULT 0,
     state smallint DEFAULT 1,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone,
     CONSTRAINT batches_pkey PRIMARY KEY (id)
 )
 WITH (
@@ -440,6 +489,17 @@ CREATE INDEX IF NOT EXISTS idx_state
     ON public.batches USING btree
     (state ASC NULLS LAST)
     TABLESPACE pg_default;
+
+-- Trigger: set_timestamp
+
+-- DROP TRIGGER IF EXISTS set_timestamp ON public.batches;
+
+CREATE TRIGGER set_timestamp
+    BEFORE UPDATE 
+    ON public.batches
+    FOR EACH ROW
+    EXECUTE FUNCTION public.trigger_set_timestamp();
+
 ";
         using var cmd = _dataSource.CreateCommand(sql);
         var result = cmd.ExecuteNonQuery();
@@ -450,13 +510,14 @@ CREATE INDEX IF NOT EXISTS idx_state
         const string sql =
 @"CREATE OR REPLACE FUNCTION public.batches_for_finalization(
 	number_of_batches integer)
-    RETURNS TABLE(batch_id uuid)
+    RETURNS TABLE(batch_id uuid) 
     LANGUAGE 'plpgsql'
     COST 100
     VOLATILE PARALLEL UNSAFE
     ROWS 1000
 
 AS $BODY$
+
 
 BEGIN
 
@@ -477,9 +538,6 @@ BEGIN
 	SELECT id
 	from temp_table;
 DROP TABLE temp_table;
-
---	RETURN QUERY SELECT b.id FROM batches b
---		WHERE b.state = 2 order by id limit number_of_batches;
 
 END;
 $BODY$;

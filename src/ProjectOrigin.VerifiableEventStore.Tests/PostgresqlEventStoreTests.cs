@@ -3,16 +3,16 @@ using ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres;
 
 namespace ProjectOrigin.VerifiableEventStore.Tests
 {
-    public class PostgresqlEventStoreTests : IDisposable//, IClassFixture<DatabaseFixture>
+    public class PostgresqlEventStoreTests : IDisposable, IClassFixture<DatabaseFixture>
     {
         private readonly PostgresqlEventStore _eventStore;
 
-        public PostgresqlEventStoreTests()
+        public PostgresqlEventStoreTests(DatabaseFixture fixture)
         {
             var storeOptions = new PostgresqlEventStoreOptions
             {
                 //ConnectionString = fixture.Database.ConnectionString,
-                ConnectionString = "Host=localhost;Port=5432;Username=postgres;Password=password;Database=mmi",
+                ConnectionString = "Host=localhost;Port=5432;Username=postgres;Password=password;Database=ProjectOrigin",
                 CreateSchema = true,
                 BatchExponent = 10
             };
@@ -92,8 +92,6 @@ namespace ProjectOrigin.VerifiableEventStore.Tests
         public async Task Can_insert_eventAsync()
         {
             var fixture = new Fixture();
-            //var @event = new VerifiableEvent(new EventId(Guid.Parse("3566b4d9-4b7e-4a84-b355-8150dd9ef0a8"), 0), fixture.Create<byte[]>());
-
             var @event = new VerifiableEvent(new EventId(Guid.NewGuid(), 0), fixture.Create<byte[]>());
 
             await _eventStore.Store(@event);
