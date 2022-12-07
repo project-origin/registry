@@ -18,6 +18,9 @@ public record CommitmentParameters
     [IgnoreDataMember]
     public BigInteger C { get => Commitment.C; }
 
+    [IgnoreDataMember]
+    public ReadOnlySpan<byte> RangeProof { get => ReadOnlySpan<byte>.Empty; } //TODO!!!
+
     public CommitmentParameters(BigInteger m, BigInteger r, Group group)
     {
         this.m = m;

@@ -10,6 +10,7 @@
     <PackageReference Include="Google.Protobuf" Version="3.21.9" />
     <PackageReference Include="Grpc.Tools" Version="2.50.0" />
     <Protobuf Include="..\Protos\primitives.proto" />
+    <Protobuf Include="..\Protos\register.proto" />
   </ItemGroup>
 
 </Project>

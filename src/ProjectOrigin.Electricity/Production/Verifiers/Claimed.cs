@@ -1,15 +1,15 @@
 using Google.Protobuf;
 using NSec.Cryptography;
+using ProjectOrigin.Electricity.Consumption;
 using ProjectOrigin.Electricity.Interfaces;
-using ProjectOrigin.Electricity.Production;
 using ProjectOrigin.Electricity.V1;
 using ProjectOrigin.Register.StepProcessor.Models;
 
-namespace ProjectOrigin.Electricity.Consumption.Requests;
+namespace ProjectOrigin.Electricity.Production.Requests;
 
-internal class ConsumptionClaimedVerifier : IEventVerifier<ConsumptionCertificate, V1.ClaimedEvent>
+internal class ProductionClaimedEventVerifier : IEventVerifier<ProductionCertificate, V1.ClaimedEvent>
 {
-    public Task<VerificationResult> Verify(VerificationRequest<ConsumptionCertificate, ClaimedEvent> request)
+    public Task<VerificationResult> Verify(VerificationRequest<ProductionCertificate, ClaimedEvent> request)
     {
         var hydrator = new ModelHydrater();
 
@@ -25,9 +25,9 @@ internal class ConsumptionClaimedVerifier : IEventVerifier<ConsumptionCertificat
         if (!Ed25519.Ed25519.Verify(slice.Owner, request.Event.ToByteArray(), request.Signature))
             return new VerificationResult.Invalid($"Invalid signature for slice");
 
-        if (request.AdditionalStreams.TryGetValue(slice.ProductionCertificateId, out var events)
-            && !hydrator.HydrateModel<ProductionCertificate>(events).HasClaim(allocationId))
-            return new VerificationResult.Invalid("Production not claimed");
+        if (request.AdditionalStreams.TryGetValue(slice.ConsumptionCertificateId, out var events)
+            && !hydrator.HydrateModel<ConsumptionCertificate>(events).HasAllocation(allocationId))
+            return new VerificationResult.Invalid("Consumption not allocated");
 
         return new VerificationResult.Valid();
     }
