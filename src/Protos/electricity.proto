@@ -1,5 +1,6 @@
 syntax = "proto3";
 
+import "google/protobuf/timestamp.proto";
 import "primitives.proto";
 
 package ProjectOrigin.Electricity.v1;
@@ -21,17 +22,17 @@ message ProductionIssuedEvent {
     string TechCode = 5;
     Commitment GsrnCommitment = 6;
     Commitment QuantityCommitment = 7;
-    CommitmentPublication QuantityProof = 8;
+    CommitmentPublication QuantityPublication = 8;
     PublicKey OwnerPublicKey = 9;
 }
 
-message TransferOwnershipEvent{
+message TransferredEvent{
     ProjectOrigin.Register.v1.FederatedStreamId CertificateId = 1;
     SliceId SourceSlice = 2;
-    PublicKey NewOwner = 2;
+    PublicKey NewOwner = 3;
 }
 
-message CreateSlicesEvent{
+message SlicedEvent{
     message Slice {
         Commitment Quantity = 1;
         PublicKey NewOwner = 2;
@@ -40,14 +41,16 @@ message CreateSlicesEvent{
     ProjectOrigin.Register.v1.FederatedStreamId CertificateId = 1;
     SliceId SourceSlice = 2;
     repeated Slice NewSlices = 3;
+    bytes SumProof = 4;
 }
 
 message AllocatedEvent {
     ProjectOrigin.Register.v1.Uuid AllocationId = 1;
     ProjectOrigin.Register.v1.FederatedStreamId  ProductionCertificateId = 2;
     ProjectOrigin.Register.v1.FederatedStreamId  ConsumptionCertificateId = 3;
-    SliceId SourceSlice = 4;
-    Commitment Quantity = 5;
+    SliceId ProductionSourceSlice = 4;
+    SliceId ConsumptionSourceSlice = 5;
+    bytes EqualityProof = 6;
 }
 
 message ClaimedEvent {

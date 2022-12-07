@@ -1,51 +1,57 @@
 using System.Numerics;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.PedersenCommitment;
-using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity;
 
 public static class ProtoToModelExtensions
 {
-    public static SliceProof ToModel(this V1.SliceProof proto)
+
+    internal static bool VerifyCommitment(this V1.Commitment commitment)
     {
-        return new SliceProof(
-            proto.Source.ToModel(),
-            proto.Quantity.ToModel(),
-            proto.Remainder.ToModel());
+        new Commitment(new BigInteger(commitment.Content.ToByteArray()), Group.Default);
+        return commitment.RangeProof.IsEmpty;
     }
 
-    public static Slice ToModel(this V1.Slice proto)
+    internal static bool VerifyPublication(this V1.Commitment commitment, V1.CommitmentPublication publication)
     {
-        return new Slice(
-            proto.Source.ToModel(),
-            proto.Quantity.ToModel(),
-            proto.Remainder.ToModel(),
-            new BigInteger(proto.ZeroR.ToByteArray()));
+        var cp = new CommitmentParameters(publication.Message, new BigInteger(publication.RValue.ToByteArray()), Group.Default);
+        return cp.Verify(new BigInteger(commitment.Content.ToByteArray()));
     }
 
-    public static Commitment ToModel(this V1.Commitment proto)
+    // public static SliceProof ToModel(this V1.SliceProof proto)
+    // {
+    //     return new SliceProof(
+    //         proto.Source.ToModel(),
+    //         proto.Quantity.ToModel(),
+    //         proto.Remainder.ToModel());
+    // }
+
+    // public static Slice ToModel(this V1.Slice proto)
+    // {
+    //     return new Slice(
+    //         proto.Source.ToModel(),
+    //         proto.Quantity.ToModel(),
+    //         proto.Remainder.ToModel(),
+    //         new BigInteger(proto.ZeroR.ToByteArray()));
+    // }
+
+    internal static Commitment ToModel(this V1.Commitment proto)
     {
-        return new Commitment(new BigInteger(proto.C.ToByteArray()), Group.Default);
+        return new Commitment(new BigInteger(proto.Content.ToByteArray()), Group.Default);
     }
 
-    public static CommitmentParameters ToModel(this V1.CommitmentProof proto)
+    internal static CommitmentParameters ToModel(this V1.CommitmentPublication proto)
     {
         return new CommitmentParameters(proto.Message, new BigInteger(proto.RValue.ToByteArray()), Group.Default);
     }
 
-    public static Guid ToModel(this Register.V1.Uuid allocationId) => Guid.Parse(allocationId.Value);
+    internal static Guid ToModel(this Register.V1.Uuid allocationId) => Guid.Parse(allocationId.Value);
 
-    public static DateInterval ToModel(this V1.DateInterval proto)
+    internal static DateInterval ToModel(this V1.DateInterval proto)
     {
         return new DateInterval(
             proto.Start.ToDateTimeOffset(),
             proto.End.ToDateTimeOffset());
     }
-
-    public static FederatedStreamId ToModel(this Register.V1.FederatedStreamId proto)
-    {
-        return new FederatedStreamId(proto.Registry, Guid.Parse(proto.StreamId.Value));
-    }
-
 }

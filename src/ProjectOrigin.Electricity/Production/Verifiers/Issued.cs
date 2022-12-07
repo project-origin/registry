@@ -5,19 +5,18 @@ using ProjectOrigin.Electricity.Interfaces;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Register.StepProcessor.Models;
 
-namespace ProjectOrigin.Electricity.Consumption.Requests;
+namespace ProjectOrigin.Electricity.Production.Verifiers;
 
-
-internal class ConsumptionIssuedVerifier : IEventVerifier<ConsumptionCertificate, V1.ConsumptionIssuedEvent>
+internal class ProductionIssuedEventVerifier : IEventVerifier<ProductionCertificate, V1.ProductionIssuedEvent>
 {
     private IssuerOptions _issuerOptions;
 
-    public ConsumptionIssuedVerifier(IOptions<IssuerOptions> issuerOptions)
+    public ProductionIssuedEventVerifier(IOptions<IssuerOptions> issuerOptions)
     {
         _issuerOptions = issuerOptions.Value;
     }
 
-    public Task<VerificationResult> Verify(VerificationRequest<ConsumptionCertificate, V1.ConsumptionIssuedEvent> request)
+    public Task<VerificationResult> Verify(VerificationRequest<ProductionCertificate, V1.ProductionIssuedEvent> request)
     {
         if (request.Model is not null)
             return new VerificationResult.Invalid($"Certificate with id ”{request.Event.CertificateId.StreamId}” already exists");
@@ -27,6 +26,10 @@ internal class ConsumptionIssuedVerifier : IEventVerifier<ConsumptionCertificate
 
         if (!request.Event.QuantityCommitment.VerifyCommitment())
             return new VerificationResult.Invalid("Invalid range proof forr Quantity commitment");
+
+        if (request.Event.QuantityPublication is not null
+            && !request.Event.QuantityCommitment.VerifyPublication(request.Event.QuantityPublication))
+            return new VerificationResult.Invalid($"Private and public quantity proof does not match");
 
         if (!PublicKey.TryImport(SignatureAlgorithm.Ed25519, request.Event.OwnerPublicKey.Content.ToByteArray(), KeyBlobFormat.RawPublicKey, out _))
             return new VerificationResult.Invalid("Invalid owner key, not a valid Ed25519 publicKey");

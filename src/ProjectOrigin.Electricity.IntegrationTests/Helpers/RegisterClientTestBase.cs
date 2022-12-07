@@ -5,17 +5,17 @@ using Xunit.Abstractions;
 
 namespace ProjectOrigin.Electricity.IntegrationTests.Helpers
 {
-    public class ElectricityClientTestBase : IntegrationTestBase, IDisposable
+    public class RegisterClientTestBase : IntegrationTestBase, IDisposable
     {
-        private ElectricityClient? _client;
+        private RegisterClient? _client;
         private SemaphoreSlim _semaphore = new SemaphoreSlim(0, 1);
         private CommandStatusEvent? _result;
 
-        protected ElectricityClient Client => _client ??= CreateClient();
+        protected RegisterClient Client => _client ??= CreateClient();
 
-        private ElectricityClient CreateClient()
+        private RegisterClient CreateClient()
         {
-            var client = new ElectricityClient(Channel);
+            var client = new RegisterClient(Channel);
             client.Events += (result) =>
             {
                 _result = result;
@@ -31,7 +31,7 @@ namespace ProjectOrigin.Electricity.IntegrationTests.Helpers
             return _result;
         }
 
-        public ElectricityClientTestBase(GrpcTestFixture<Startup> fixture, ITestOutputHelper outputHelper) : base(fixture, outputHelper)
+        public RegisterClientTestBase(GrpcTestFixture<Startup> fixture, ITestOutputHelper outputHelper) : base(fixture, outputHelper)
         {
         }
 

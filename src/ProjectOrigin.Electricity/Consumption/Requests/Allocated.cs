@@ -1,46 +1,39 @@
+using Google.Protobuf;
+using NSec.Cryptography;
+using ProjectOrigin.Electricity.Interfaces;
 using ProjectOrigin.Electricity.Production;
-using ProjectOrigin.Register.StepProcessor.Interfaces;
+using ProjectOrigin.Electricity.V1;
 using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Consumption.Requests;
 
-public class ConsumptionAllocatedVerifier : ICommandStepVerifier<V1.ClaimCommand.Types.AllocatedEvent, ConsumptionCertificate>
+internal class ConsumptionAllocatedVerifier : IEventVerifier<ConsumptionCertificate, V1.AllocatedEvent>
 {
-    private IModelLoader _loader;
-
-    public ConsumptionAllocatedVerifier(IModelLoader loader)
+    public Task<VerificationResult> Verify(VerificationRequest<ConsumptionCertificate, AllocatedEvent> request)
     {
-        _loader = loader;
-    }
+        var hydrator = new ModelHydrater();
 
-    public async Task<VerificationResult> Verify(CommandStep<V1.ClaimCommand.Types.AllocatedEvent> commandStep, ConsumptionCertificate? model)
-    {
-        var @event = commandStep.SignedEvent.Event;
-
-        if (model is null)
+        if (request.Model is null)
             return new VerificationResult.Invalid("Certificate does not exist");
 
-        var proof = commandStep.Proof as V1.SliceProof;
-        if (proof is null)
-            return new VerificationResult.Invalid($"Missing or invalid proof");
-
-        var certificateSlice = model.GetCertificateSlice(@event.Slice.ToModel());
-        if (certificateSlice is null)
+        var consumptionSlice = request.Model.GetCertificateSlice(request.Event.ConsumptionSourceSlice);
+        if (consumptionSlice is null)
             return new VerificationResult.Invalid("Slice not found");
 
-        var verificationResult = certificateSlice.Verify(commandStep.SignedEvent, proof.ToModel(), @event.Slice.ToModel());
-        if (verificationResult is VerificationResult.Invalid)
-            return verificationResult;
+        if (!Ed25519.Ed25519.Verify(consumptionSlice.Owner, request.Event.ToByteArray(), request.Signature))
+            return new VerificationResult.Invalid($"Invalid signature for slice");
 
-        var allocationId = @event.AllocationId.ToModel();
+        if (!request.AdditionalStreams.TryGetValue(request.Event.ProductionCertificateId, out var events))
+            return new VerificationResult.Invalid($"Invalid signature for slice");
 
-        var (productionCertificate, _) = await _loader.Get<ProductionCertificate>(@event.ProductionCertificateId.ToModel());
-        if (productionCertificate == null
-            || !productionCertificate.HasAllocation(allocationId))
-            return new VerificationResult.Invalid("Production not allocated");
+        var productionCertificate = hydrator.HydrateModel<ProductionCertificate>(events);
+        if (productionCertificate == null)
+            return new VerificationResult.Invalid("ProductionCertificate does not exist");
 
-        if (productionCertificate.GetAllocation(allocationId)!.Commitment != @event.Slice.Quantity.ToModel())
-            return new VerificationResult.Invalid("Commmitment are not the same");
+        var allocationId = request.Event.AllocationId.ToModel();
+
+        if (productionCertificate.HasAllocation(allocationId))
+            return new VerificationResult.Invalid("Consumption not allocated");
 
         return new VerificationResult.Valid();
     }

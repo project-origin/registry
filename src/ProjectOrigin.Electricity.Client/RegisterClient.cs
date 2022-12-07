@@ -9,7 +9,7 @@ namespace ProjectOrigin.Electricity.Client;
 /// <summary>
 /// Abstract RegisterClient that can be extended to enable specific functionality required.
 /// </summary>
-public abstract class RegisterClient : IDisposable
+public class RegisterClient : IDisposable
 {
     private GrpcChannel _channel;
     private Register.V1.CommandService.CommandServiceClient _grpcClient;
@@ -45,7 +45,7 @@ public abstract class RegisterClient : IDisposable
     /// </summary>
     public void Dispose() => _channel.Dispose();
 
-    internal ByteString Sign(Key signerKey, IMessage e)
+    internal static ByteString Sign(Key signerKey, IMessage e)
     {
         return ByteString.CopyFrom(NSec.Cryptography.Ed25519.Ed25519.Sign(signerKey, e.ToByteArray()));
     }
@@ -59,36 +59,37 @@ public abstract class RegisterClient : IDisposable
         }
     }
 
-    internal Task<CommandId> SendCommand(IMessage commandContent)
+    internal Task<CommandId> Execute(Register.V1.Command command)
     {
-        var name = commandContent.GetType().FullName!;
+        Task.Run(() => TaskExecute(command));
 
-        var command = new Register.V1.Command()
-        {
-            Type = name,
-            Payload = commandContent.ToByteString(),
-        };
-
-        var commandHash = SHA256.HashData(command.ToByteArray());
-        command.Id = ByteString.CopyFrom(commandHash);
-
-        Task.Run(() => Execute(command));
-
-        return Task.FromResult(new CommandId(commandHash));
+        return Task.FromResult(new CommandId(command.Id.ToByteArray()));
     }
 
-    internal async Task Execute(Register.V1.Command command)
+    internal async Task TaskExecute(Register.V1.Command command)
     {
         var id = new CommandId(command.Id.ToByteArray());
 
         try
         {
             var result = await _grpcClient.SubmitCommandAsync(command);
-            TriggerEvent(new CommandStatusEvent(id, (CommandState)(int)result.State, result.Error));
+            TriggerEvent(new CommandStatusEvent(id, (CommandState)(int)result.State, result.Steps.SingleOrDefault(x => x.State == Register.V1.CommandState.Failed)?.Error));
         }
         catch (Exception ex)
         {
             TriggerEvent(new CommandStatusEvent(id, CommandState.Failed, ex.Message));
         }
     }
+
+    internal Register.V1.CommandStep CreateAndSignCommandStep(Key issuingBodySigner, Register.V1.FederatedStreamId federatedId, IMessage @event) =>
+            new Register.V1.CommandStep()
+            {
+                RoutingId = federatedId,
+                SignedEvent = new Register.V1.SignedEvent()
+                {
+                    Type = V1.ConsumptionIssuedEvent.Descriptor.FullName,
+                    Payload = @event.ToByteString(),
+                    Signature = Sign(issuingBodySigner, @event)
+                }
+            };
 }

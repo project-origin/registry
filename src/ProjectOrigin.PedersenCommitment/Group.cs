@@ -61,6 +61,16 @@ public record Group
         return new CommitmentParameters(m, RandomR(), this);
     }
 
+    public byte[] CreateEqualityProof(CommitmentParameters sourceParams, params CommitmentParameters[] fs)
+    {
+        return new byte[0]; //TODO
+    }
+
+    public bool VerifyEqualityProof(byte[] bytes, Commitment commitment1, Commitment commitment2)
+    {
+        return bytes.Length == 0;  //TODO
+    }
+
     public static Group Create(int numberOfBits = DefaultBitLength, Random? random = null)
     {
         random = random ?? Random.Shared;
@@ -114,4 +124,5 @@ public record Group
 
         return gh;
     }
+
 }

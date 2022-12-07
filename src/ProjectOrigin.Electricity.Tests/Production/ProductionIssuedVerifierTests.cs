@@ -1,8 +1,9 @@
 using Microsoft.Extensions.Options;
 using NSec.Cryptography;
+using ProjectOrigin.Electricity.Interfaces;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Production;
-using ProjectOrigin.Electricity.Production.Requests;
+using ProjectOrigin.Electricity.Production.Verifiers;
 using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Tests;
@@ -16,7 +17,7 @@ public class ProductionIssuedVerifierTests
         return optionsMock.Object;
     }
 
-    private (ProductionIssuedVerifier, Key) SetupIssuer()
+    private (ProductionIssuedEventVerifier, Key) SetupIssuer()
     {
         var issuerKey = Key.Create(SignatureAlgorithm.Ed25519);
         var optionsMock = CreateOptionsMock(new IssuerOptions()
@@ -24,7 +25,7 @@ public class ProductionIssuedVerifierTests
             AreaIssuerPublicKey = (area) => area == "DK1" ? issuerKey.PublicKey : null
         });
 
-        var processor = new ProductionIssuedVerifier(optionsMock);
+        var processor = new ProductionIssuedEventVerifier(optionsMock);
 
         return (processor, issuerKey);
     }
@@ -36,7 +37,7 @@ public class ProductionIssuedVerifierTests
 
         var request = FakeRegister.CreateProductionIssuedRequest(issuerKey);
 
-        await processor.Verify(request, null);
+        await processor.Verify(request);
     }
 
     [Fact]
@@ -46,7 +47,7 @@ public class ProductionIssuedVerifierTests
 
         var request = FakeRegister.CreateProductionIssuedRequest(issuerKey, publicQuantity: true);
 
-        await processor.Verify(request, null);
+        await processor.Verify(request);
     }
 
     [Fact]
@@ -55,12 +56,17 @@ public class ProductionIssuedVerifierTests
         var (processor, issuerKey) = SetupIssuer();
 
         var request = FakeRegister.CreateProductionIssuedRequest(issuerKey);
+        var modifiedRequest = new VerificationRequest<ProductionCertificate, V1.ProductionIssuedEvent>(
+            new(request.Event),
+            request.Event,
+            request.Signature,
+            request.AdditionalStreams
+        );
 
-        var result = await processor.Verify(request, new ProductionCertificate());
+        var result = await processor.Verify(modifiedRequest);
 
-        var invalid = result as VerificationResult.Invalid;
-        Assert.NotNull(invalid);
-        Assert.Equal($"Certificate with id ”{request.FederatedStreamId.StreamId}” already exists", invalid!.ErrorMessage);
+        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
+        Assert.Equal($"Certificate with id ”{request.Event.CertificateId.StreamId}” already exists", invalid!.ErrorMessage);
     }
 
     [Fact]
@@ -68,13 +74,12 @@ public class ProductionIssuedVerifierTests
     {
         var (processor, issuerKey) = SetupIssuer();
 
-        var request = FakeRegister.CreateProductionIssuedRequest(issuerKey, gsrnCommitmentOverride: FakeRegister.Group.Commit(57682));
+        var request = FakeRegister.CreateProductionIssuedRequest(issuerKey, gsrnCommitmentOverride: FakeRegister.InvalidCommitment());
 
-        var result = await processor.Verify(request, null);
+        var result = await processor.Verify(request);
 
-        var invalid = result as VerificationResult.Invalid;
-        Assert.NotNull(invalid);
-        Assert.Equal("Calculated GSRN commitment does not equal the parameters", invalid!.ErrorMessage);
+        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
+        Assert.Equal("Invalid range proof forr GSRN commitment", invalid!.ErrorMessage);
     }
 
     [Fact]
@@ -82,13 +87,12 @@ public class ProductionIssuedVerifierTests
     {
         var (processor, issuerKey) = SetupIssuer();
 
-        var request = FakeRegister.CreateProductionIssuedRequest(issuerKey, quantityCommitmentOverride: FakeRegister.Group.Commit(695956));
+        var request = FakeRegister.CreateProductionIssuedRequest(issuerKey, quantityCommitmentOverride: FakeRegister.InvalidCommitment());
 
-        var result = await processor.Verify(request, null);
+        var result = await processor.Verify(request);
 
-        var invalid = result as VerificationResult.Invalid;
-        Assert.NotNull(invalid);
-        Assert.Equal("Calculated Quantity commitment does not equal the parameters", invalid!.ErrorMessage);
+        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
+        Assert.Equal("Invalid range proof forr Quantity commitment", invalid!.ErrorMessage);
     }
 
     [Fact]
@@ -98,10 +102,9 @@ public class ProductionIssuedVerifierTests
 
         var request = FakeRegister.CreateProductionIssuedRequest(issuerKey, publicQuantityCommitmentOverride: FakeRegister.Group.Commit(695956), publicQuantity: true);
 
-        var result = await processor.Verify(request, null);
+        var result = await processor.Verify(request);
 
-        var invalid = result as VerificationResult.Invalid;
-        Assert.NotNull(invalid);
+        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
         Assert.Equal("Private and public quantity proof does not match", invalid!.ErrorMessage);
     }
 
@@ -110,13 +113,16 @@ public class ProductionIssuedVerifierTests
     {
         var (processor, issuerKey) = SetupIssuer();
 
-        var randomOwnerKeyData = new Fixture().Create<byte[]>();
+        var randomOwnerKeyData = new V1.PublicKey
+        {
+            Content = Google.Protobuf.ByteString.CopyFrom(new Fixture().Create<byte[]>())
+        };
+
         var request = FakeRegister.CreateProductionIssuedRequest(issuerKey, ownerKeyOverride: randomOwnerKeyData);
 
-        var result = await processor.Verify(request, null);
+        var result = await processor.Verify(request);
 
-        var invalid = result as VerificationResult.Invalid;
-        Assert.NotNull(invalid);
+        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
         Assert.Equal("Invalid owner key, not a valid Ed25519 publicKey", invalid!.ErrorMessage);
     }
 
@@ -129,10 +135,9 @@ public class ProductionIssuedVerifierTests
 
         var request = FakeRegister.CreateProductionIssuedRequest(someOtherKey);
 
-        var result = await processor.Verify(request, null);
+        var result = await processor.Verify(request);
 
-        var invalid = result as VerificationResult.Invalid;
-        Assert.NotNull(invalid);
+        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
         Assert.Equal("Invalid issuer signature for GridArea ”DK1”", invalid!.ErrorMessage);
     }
 
@@ -145,10 +150,9 @@ public class ProductionIssuedVerifierTests
 
         var request = FakeRegister.CreateProductionIssuedRequest(someOtherKey, gridAreaOverride: "DK2");
 
-        var result = await processor.Verify(request, null);
+        var result = await processor.Verify(request);
 
-        var invalid = result as VerificationResult.Invalid;
-        Assert.NotNull(invalid);
+        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
         Assert.Equal("No issuer found for GridArea ”DK2”", invalid!.ErrorMessage);
     }
 }
