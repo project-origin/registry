@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/dotnet:6.0-bullseye-slim
+FROM mcr.microsoft.com/devcontainers/dotnet:7.0
 
 # Install Mono and DocFX v2.59.4
 RUN sudo apt install apt-transport-https dirmngr gnupg ca-certificates &&\
