@@ -10,7 +10,6 @@
     <PackageReference Include="Grpc.Tools" Version="2.50.0" />
     <PackageReference Include="Grpc.Net.Client" Version="2.50.0" />
     <Protobuf Include="..\Protos\electricity.proto" />
-    <Protobuf Include="..\Protos\electricity-primitives.proto" />
     <Protobuf Include="..\Protos\primitives.proto" />
     <Protobuf Include="..\Protos\register.proto" GrpcServices="Client" Access="internal" />
   </ItemGroup>

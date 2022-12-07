@@ -21,7 +21,6 @@
     <PackageReference Include="Google.Protobuf" Version="3.21.9" />
     <PackageReference Include="Grpc.Tools" Version="2.50.0" />
     <Protobuf Include="..\Protos\electricity.proto" />
-    <Protobuf Include="..\Protos\electricity-primitives.proto" />
   </ItemGroup>
 
 </Project>

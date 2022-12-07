@@ -14,11 +14,22 @@ enum CommandState {
 message CommandStatus {
     bytes Id = 1;
     CommandState State = 2;
-    string Error = 3;
+    repeated CommandStepStatus Steps = 3;
+}
+
+message CommandStepStatus {
+    CommandState State = 1;
+    string Error = 2;
 }
 
 message Command {
     bytes Id = 1;
+    repeated CommandStep Steps = 2;
+}
+
+message CommandStep {
+    ProjectOrigin.Register.v1.FederatedStreamId  RoutingId = 1;
     string Type = 2;
     bytes Payload = 3;
+    bytes Signature = 4;
 }
