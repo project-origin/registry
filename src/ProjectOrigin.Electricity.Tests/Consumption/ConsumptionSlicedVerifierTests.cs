@@ -1,11 +1,11 @@
 using Google.Protobuf;
 using Microsoft.Extensions.Options;
 using NSec.Cryptography;
-using ProjectOrigin.Electricity.Interfaces;
 using ProjectOrigin.Electricity.Consumption;
+using ProjectOrigin.Electricity.Interfaces;
+using ProjectOrigin.Electricity.Production.Requests;
 using ProjectOrigin.PedersenCommitment;
 using ProjectOrigin.Register.StepProcessor.Models;
-using ProjectOrigin.Electricity.Production.Requests;
 
 namespace ProjectOrigin.Electricity.Tests;
 

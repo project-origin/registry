@@ -129,7 +129,7 @@ internal static class FakeRegister
     private static V1.SlicedEvent CreateSliceEvent(FederatedStreamId id, CommitmentParameters sourceParams, int quantity, Key ownerKey, V1.PublicKey? newOwnerOverride, ByteString? sumOverride)
     {
         var slice = Group.Commit(quantity);
-        var remainder = Group.Commit(sourceParams.m - quantity);
+        var remainder = Group.Commit(sourceParams.Message - quantity);
 
         var newOwner = newOwnerOverride ?? Key.Create(SignatureAlgorithm.Ed25519).PublicKey.ToProto();
 

@@ -14,12 +14,12 @@ public class ShieldedValue
     /// <summary>
     /// Contains the message that the shielded value should protect.
     /// </summary>
-    public uint Message { get => (uint)_commitmentParameters.m; }
+    public uint Message { get => (uint)_commitmentParameters.Message; }
 
     /// <summary>
     /// The random value that protects the message.
     /// </summary>
-    public BigInteger RValue { get => _commitmentParameters.r; }
+    public BigInteger RValue { get => _commitmentParameters.RValue; }
 
     private CommitmentParameters _commitmentParameters;
 
@@ -31,7 +31,7 @@ public class ShieldedValue
     /// <param name="r">contains the random value that hides the message.</param>
     public ShieldedValue(uint message, BigInteger r)
     {
-        _commitmentParameters = new CommitmentParameters(message, r, Group.Default);
+        _commitmentParameters = Group.Default.CreateParameters(message, r);
     }
 
     /// <summary>
@@ -54,7 +54,7 @@ public class ShieldedValue
 
     internal CommitmentParameters ToParams()
     {
-        return new CommitmentParameters(Message, RValue, Group.Default);
+        return Group.Default.CreateParameters(Message, RValue);
     }
 
     internal V1.Commitment ToProtoCommitment()

@@ -1,6 +1,6 @@
 namespace System.Numerics;
 
-public static class RandomExtensions
+internal static class RandomExtensions
 {
     const int BitsInByte = 8;
 

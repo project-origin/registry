@@ -7,16 +7,16 @@ namespace ProjectOrigin.Electricity;
 public static class ProtoToModelExtensions
 {
 
-    internal static bool VerifyCommitment(this V1.Commitment commitment)
+    internal static bool VerifyCommitment(this V1.Commitment protoCommitment)
     {
-        new Commitment(new BigInteger(commitment.Content.ToByteArray()), Group.Default);
-        return commitment.RangeProof.IsEmpty;
+        var commitment = Group.Default.CreateCommitment(new BigInteger(protoCommitment.Content.ToByteArray()));
+        return Group.Default.VerifyRangeProof(protoCommitment.RangeProof.Span, commitment);
     }
 
     internal static bool VerifyPublication(this V1.Commitment commitment, V1.CommitmentPublication publication)
     {
-        var cp = new CommitmentParameters(publication.Message, new BigInteger(publication.RValue.ToByteArray()), Group.Default);
-        return cp.Verify(new BigInteger(commitment.Content.ToByteArray()));
+        var cp = Group.Default.CreateParameters(publication.Message, new BigInteger(publication.RValue.ToByteArray()));
+        return commitment.Content.Span.SequenceEqual(cp.C.ToByteArray());
     }
 
     // public static SliceProof ToModel(this V1.SliceProof proto)
@@ -38,12 +38,12 @@ public static class ProtoToModelExtensions
 
     internal static Commitment ToModel(this V1.Commitment proto)
     {
-        return new Commitment(new BigInteger(proto.Content.ToByteArray()), Group.Default);
+        return Group.Default.CreateCommitment(new BigInteger(proto.Content.ToByteArray()));
     }
 
     internal static CommitmentParameters ToModel(this V1.CommitmentPublication proto)
     {
-        return new CommitmentParameters(proto.Message, new BigInteger(proto.RValue.ToByteArray()), Group.Default);
+        return Group.Default.CreateParameters(proto.Message, new BigInteger(proto.RValue.ToByteArray()));
     }
 
     internal static Guid ToModel(this Register.V1.Uuid allocationId) => Guid.Parse(allocationId.Value);
