@@ -3,7 +3,7 @@ using ProjectOrigin.Electricity.Consumption.Verifiers;
 
 namespace ProjectOrigin.Electricity.Tests;
 
-public class ConsumptionAllocatedVerifierTests : AbstractVerifierTest
+public class ConsumptionAllocatedVerifierTests : AbstractVerifierTests
 {
     private ConsumptionAllocatedVerifier Verifier { get => new ConsumptionAllocatedVerifier(); }
 

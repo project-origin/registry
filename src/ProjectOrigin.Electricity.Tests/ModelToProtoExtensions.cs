@@ -4,7 +4,6 @@ using Google.Protobuf.WellKnownTypes;
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.PedersenCommitment;
-using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Tests;
 

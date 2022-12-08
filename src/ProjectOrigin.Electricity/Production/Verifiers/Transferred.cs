@@ -5,7 +5,7 @@ using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Production.Verifiers;
 
-internal class ProductionTransferOwnershipEventVerifier : IEventVerifier<ProductionCertificate, V1.TransferredEvent>
+internal class ProductionTransferredVerifier : IEventVerifier<ProductionCertificate, V1.TransferredEvent>
 {
     public Task<VerificationResult> Verify(VerificationRequest<ProductionCertificate, V1.TransferredEvent> request)
     {

@@ -5,7 +5,7 @@ using ProjectOrigin.Electricity.Models;
 
 namespace ProjectOrigin.Electricity.Tests;
 
-public class ConsumptionIssuedVerifierTests : AbstractVerifierTest
+public class ConsumptionIssuedVerifierTests : AbstractVerifierTests
 {
     private IOptions<T> CreateOptionsMock<T>(T content) where T : class
     {

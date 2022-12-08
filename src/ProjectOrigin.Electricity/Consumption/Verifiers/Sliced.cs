@@ -7,7 +7,7 @@ using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Production.Verifiers;
 
-internal class ConsumptionSlicedEventVerifier : IEventVerifier<ConsumptionCertificate, V1.SlicedEvent>
+internal class ConsumptionSlicedVerifier : IEventVerifier<ConsumptionCertificate, V1.SlicedEvent>
 {
     public Task<VerificationResult> Verify(VerificationRequest<ConsumptionCertificate, V1.SlicedEvent> request)
     {

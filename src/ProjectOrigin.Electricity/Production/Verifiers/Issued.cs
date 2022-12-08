@@ -7,11 +7,11 @@ using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Production.Verifiers;
 
-internal class ProductionIssuedEventVerifier : IEventVerifier<ProductionCertificate, V1.ProductionIssuedEvent>
+internal class ProductionIssuedVerifier : IEventVerifier<ProductionCertificate, V1.ProductionIssuedEvent>
 {
     private IssuerOptions _issuerOptions;
 
-    public ProductionIssuedEventVerifier(IOptions<IssuerOptions> issuerOptions)
+    public ProductionIssuedVerifier(IOptions<IssuerOptions> issuerOptions)
     {
         _issuerOptions = issuerOptions.Value;
     }

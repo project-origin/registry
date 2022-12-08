@@ -4,9 +4,9 @@ using ProjectOrigin.Electricity.Production.Verifiers;
 
 namespace ProjectOrigin.Electricity.Tests;
 
-public class ProductionAllocatedVerifierTests : AbstractVerifierTest
+public class ProductionAllocatedVerifierTests : AbstractVerifierTests
 {
-    private ProductionAllocatedEventVerifier Verifier { get => new ProductionAllocatedEventVerifier(); }
+    private ProductionAllocatedVerifier Verifier { get => new ProductionAllocatedVerifier(); }
 
     [Fact]
     public async Task Verifier_AllocateCertificate_Valid()

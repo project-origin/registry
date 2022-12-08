@@ -5,7 +5,7 @@ using ProjectOrigin.Electricity.Production.Verifiers;
 
 namespace ProjectOrigin.Electricity.Tests;
 
-public class ProductionIssuedVerifierTests : AbstractVerifierTest
+public class ProductionIssuedVerifierTests : AbstractVerifierTests
 {
     private IOptions<T> CreateOptionsMock<T>(T content) where T : class
     {
@@ -14,7 +14,7 @@ public class ProductionIssuedVerifierTests : AbstractVerifierTest
         return optionsMock.Object;
     }
 
-    private (ProductionIssuedEventVerifier, Key) SetupIssuer()
+    private (ProductionIssuedVerifier, Key) SetupIssuer()
     {
         var issuerKey = Key.Create(SignatureAlgorithm.Ed25519);
         var optionsMock = CreateOptionsMock(new IssuerOptions()
@@ -22,7 +22,7 @@ public class ProductionIssuedVerifierTests : AbstractVerifierTest
             AreaIssuerPublicKey = (area) => area == "DK1" ? issuerKey.PublicKey : null
         });
 
-        var processor = new ProductionIssuedEventVerifier(optionsMock);
+        var processor = new ProductionIssuedVerifier(optionsMock);
 
         return (processor, issuerKey);
     }

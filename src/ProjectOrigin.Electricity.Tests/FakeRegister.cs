@@ -28,10 +28,8 @@ internal static class FakeRegister
         return allocationId;
     }
 
-    internal static Guid Allocated(this ConsumptionCertificate consSert, ProductionCertificate prodCert, CommitmentParameters produtionParameters, CommitmentParameters sourceParameters, Key signer, Guid? allocationIdOverride = null)
+    internal static Guid Allocated(this ConsumptionCertificate consSert, Guid allocationId, ProductionCertificate prodCert, CommitmentParameters produtionParameters, CommitmentParameters sourceParameters, Key signer)
     {
-        var allocationId = allocationIdOverride ?? Guid.NewGuid();
-
         var request = CreateConsumptionAllocationRequest(allocationId, prodCert, consSert, produtionParameters, sourceParameters, signer);
         consSert.Apply(request.Event);
 
@@ -202,20 +200,30 @@ internal static class FakeRegister
     //     return (e, transferParameters, remainderParameters);
     // }
 
-    // internal static CommandStep<V1.ClaimCommand.Types.ClaimedEvent> CreateProductionClaim(Register.V1.FederatedStreamId certificateId, Guid allocationId, Key signerKey)
-    // {
-    //     var e = new V1.ClaimCommand.Types.ClaimedEvent()
-    //     {
-    //         CertificateId = certificateId.ToProto(),
-    //         AllocationId = allocationId.ToProto()
-    //     };
+    internal static VerificationRequest<ProductionCertificate, V1.ClaimedEvent> CreateProductionClaim(
+        Guid allocationId,
+        ProductionCertificate productionCertificate,
+        ConsumptionCertificate consumptionCertificate,
+        Key signerKey,
+        bool exists = true,
+        bool otherExists = true
+        )
+    {
+        var @event = new V1.ClaimedEvent()
+        {
+            CertificateId = productionCertificate.Id,
+            AllocationId = allocationId.ToProto()
+        };
 
-    //     return new CommandStep<V1.ClaimCommand.Types.ClaimedEvent>(
-    //         certificateId,
-    //         SignEvent(signerKey, e),
-    //         typeof(ProductionCertificate)
-    //     );
-    // }
+        return new VerificationRequest<ProductionCertificate, V1.ClaimedEvent>(
+            exists ? productionCertificate : null,
+            @event,
+            Sign(signerKey, @event),
+            otherExists ? new(){
+                {consumptionCertificate.Id, consumptionCertificate}
+            } : null
+        );
+    }
 
     // internal static CommandStep<V1.ClaimCommand.Types.ClaimedEvent> CreateConsumptionClaim(Register.V1.FederatedStreamId certificateId, Guid allocationId, Key signerKey)
     // {

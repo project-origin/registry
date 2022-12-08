@@ -7,7 +7,7 @@ using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Production.Verifiers;
 
-internal class ProductionClaimedEventVerifier : IEventVerifier<ProductionCertificate, V1.ClaimedEvent>
+internal class ProductionClaimedVerifier : IEventVerifier<ProductionCertificate, V1.ClaimedEvent>
 {
     public Task<VerificationResult> Verify(VerificationRequest<ProductionCertificate, ClaimedEvent> request)
     {
@@ -25,7 +25,7 @@ internal class ProductionClaimedEventVerifier : IEventVerifier<ProductionCertifi
         if (consumptionCertificate == null)
             return new VerificationResult.Invalid("ConsumptionCertificate does not exist");
 
-        if (consumptionCertificate.HasAllocation(request.Event.AllocationId))
+        if (!consumptionCertificate.HasAllocation(request.Event.AllocationId))
             return new VerificationResult.Invalid("Consumption not allocated");
 
         return new VerificationResult.Valid();
