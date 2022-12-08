@@ -71,7 +71,8 @@ internal static class FakeRegister
         ProductionCertificate certificate,
         CommitmentParameters sourceSliceParameters,
         V1.PublicKey newOwner,
-        Key signerKey
+        Key signerKey,
+        bool exists = true
     )
     {
         var @event = new V1.TransferredEvent
@@ -82,10 +83,9 @@ internal static class FakeRegister
         };
 
         return new VerificationRequest<ProductionCertificate, V1.TransferredEvent>(
-            certificate,
+            exists ? certificate : null,
             @event,
-            Sign(signerKey, @event),
-            new Dictionary<FederatedStreamId, IEnumerable<SignedEvent>>()
+            Sign(signerKey, @event)
         );
     }
 
@@ -95,15 +95,15 @@ internal static class FakeRegister
         int quantity,
         Key ownerKey,
         V1.PublicKey? newOwnerOverride = null,
-        ByteString? sumOverride = null)
+        ByteString? sumOverride = null,
+        bool exists = true)
     {
         var @event = CreateSliceEvent(certificate.Id, sourceParams, quantity, ownerKey, newOwnerOverride, sumOverride);
 
         return new VerificationRequest<ProductionCertificate, V1.SlicedEvent>(
-            certificate,
+            exists ? certificate : null,
             @event,
-            Sign(ownerKey, @event),
-            new Dictionary<FederatedStreamId, IEnumerable<SignedEvent>>()
+            Sign(ownerKey, @event)
         );
     }
 
@@ -113,15 +113,15 @@ internal static class FakeRegister
     int quantity,
     Key ownerKey,
     V1.PublicKey? newOwnerOverride = null,
-    ByteString? sumOverride = null)
+    ByteString? sumOverride = null,
+    bool exists = true)
     {
         var @event = CreateSliceEvent(certificate.Id, sourceParams, quantity, ownerKey, newOwnerOverride, sumOverride);
 
         return new VerificationRequest<ConsumptionCertificate, V1.SlicedEvent>(
-            certificate,
+            exists ? certificate : null,
             @event,
-            Sign(ownerKey, @event),
-            new Dictionary<FederatedStreamId, IEnumerable<SignedEvent>>()
+            Sign(ownerKey, @event)
         );
     }
 
@@ -256,38 +256,61 @@ internal static class FakeRegister
     //     );
     // }
 
-    // internal static VerificationRequest<ProductionCertificate, V1.AllocatedEvent> CreateProductionAllocationRequest(
-    // Register.V1.FederatedStreamId productionId,
-    // Register.V1.FederatedStreamId consumptionId,
-    // CommitmentParameters sourceParameters,
-    // CommitmentParameters quantityParameters,
-    // Key signerKey
-    // )
-    // {
-    //     var allocationId = Guid.NewGuid();
-    //     var (e, transferParamerters, remainderParameters) = CreateProductionAllocatedEvent(allocationId, productionId, consumptionId, quantityParameters, sourceParameters);
+    internal static VerificationRequest<ConsumptionCertificate, V1.AllocatedEvent> CreateConsumptionAllocationRequest(
+    ProductionCertificate production,
+    ConsumptionCertificate consumption,
+    CommitmentParameters productionSlice,
+    CommitmentParameters consumptionSlice,
+    Key signerKey,
+    bool exists = true,
+    bool otherExists = true,
+     byte[]? overwrideEqualityProof = null
+    )
+    {
+        var allocationId = Guid.NewGuid();
+        var @event = CreateAllocationEvent(allocationId, production.Id, consumption.Id, productionSlice, consumptionSlice, overwrideEqualityProof);
 
-    //     return new VerificationRequest<ProductionCertificate, V1.AllocatedEvent>(
+        return new VerificationRequest<ConsumptionCertificate, V1.AllocatedEvent>(
+            exists ? consumption : null,
+            @event,
+            Sign(signerKey, @event),
+            otherExists ? new(){
+                {production.Id, production}
+            } : null
+        );
+    }
 
-    //     )
-    //         productionId,
-    //         SignEvent(signerKey, e),
-    //         typeof(ProductionCertificate),
-    //         new V1.SliceProof()
-    //         {
-    //             Source = (sourceParameters).ToProto(),
-    //             Quantity = (transferParamerters).ToProto(),
-    //             Remainder = (remainderParameters).ToProto(),
-    //         }
-    //     );
-    // }
+    internal static VerificationRequest<ProductionCertificate, V1.AllocatedEvent> CreateProductionAllocationRequest(
+    ProductionCertificate production,
+    ConsumptionCertificate consumption,
+    CommitmentParameters productionSlice,
+    CommitmentParameters consumptionSlice,
+    Key signerKey,
+    bool exists = true,
+    bool otherExists = true,
+    byte[]? overwrideEqualityProof = null
+    )
+    {
+        var allocationId = Guid.NewGuid();
+        var @event = CreateAllocationEvent(allocationId, production.Id, consumption.Id, productionSlice, consumptionSlice, overwrideEqualityProof);
+
+        return new VerificationRequest<ProductionCertificate, V1.AllocatedEvent>(
+            exists ? production : null,
+            @event,
+            Sign(signerKey, @event),
+            otherExists ? new(){
+                {consumption.Id, consumption}
+            } : null
+        );
+    }
 
     internal static V1.AllocatedEvent CreateAllocationEvent(
         Guid allocationId,
         Register.V1.FederatedStreamId productionId,
         Register.V1.FederatedStreamId consumptionId,
-        V1.SliceId productionSlice,
-        V1.SliceId consumptionSlice
+        CommitmentParameters productionSlice,
+        CommitmentParameters consumptionSlice,
+        byte[]? overwrideEqualityProof
         )
     {
         return new V1.AllocatedEvent()
@@ -295,9 +318,9 @@ internal static class FakeRegister
             AllocationId = allocationId.ToProto(),
             ProductionCertificateId = productionId,
             ConsumptionCertificateId = consumptionId,
-            ProductionSourceSlice = productionSlice,
-            ConsumptionSourceSlice = consumptionSlice,
-            EqualityProof = ByteString.Empty
+            ProductionSourceSlice = productionSlice.ToSliceId(),
+            ConsumptionSourceSlice = consumptionSlice.ToSliceId(),
+            EqualityProof = ByteString.CopyFrom(overwrideEqualityProof ?? Group.CreateEqualityProof(consumptionSlice, productionSlice))
         };
     }
 
@@ -365,7 +388,8 @@ internal static class FakeRegister
         V1.PublicKey? ownerKeyOverride = null,
         V1.Commitment? gsrnCommitmentOverride = null,
         V1.Commitment? quantityCommitmentOverride = null,
-        string? gridAreaOverride = null
+        string? gridAreaOverride = null,
+        bool exists = false
         )
     {
         var id = CreateFederatedId();
@@ -384,10 +408,9 @@ internal static class FakeRegister
         };
 
         return new VerificationRequest<ConsumptionCertificate, V1.ConsumptionIssuedEvent>(
-            null,
+            exists ? new(@event) : null,
             @event,
-            Sign(signerKey, @event),
-            new Dictionary<FederatedStreamId, IEnumerable<SignedEvent>>()
+            Sign(signerKey, @event)
         );
     }
 
@@ -407,7 +430,8 @@ internal static class FakeRegister
         V1.PublicKey? ownerKeyOverride = null,
         bool publicQuantity = false,
         CommitmentParameters? publicQuantityCommitmentOverride = null,
-        string? gridAreaOverride = null
+        string? gridAreaOverride = null,
+        bool exists = false
         )
     {
         var id = CreateFederatedId();
@@ -430,10 +454,9 @@ internal static class FakeRegister
         };
 
         return new VerificationRequest<ProductionCertificate, V1.ProductionIssuedEvent>(
-            null,
+            exists ? new(@event) : null,
             @event,
-            Sign(signerKey, @event),
-            new Dictionary<FederatedStreamId, IEnumerable<SignedEvent>>()
+            Sign(signerKey, @event)
         );
     }
 

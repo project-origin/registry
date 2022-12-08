@@ -1,9 +1,7 @@
 using Google.Protobuf;
 using Microsoft.Extensions.Options;
 using NSec.Cryptography;
-using ProjectOrigin.Electricity.Consumption;
-using ProjectOrigin.Electricity.Interfaces;
-using ProjectOrigin.Electricity.Production.Requests;
+using ProjectOrigin.Electricity.Production.Verifiers;
 using ProjectOrigin.PedersenCommitment;
 using ProjectOrigin.Register.StepProcessor.Models;
 
@@ -41,15 +39,8 @@ public class ConsumptionSlicedVerifierTests
         var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
         var (cert, sourceParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
 
-        var request = FakeRegister.CreateSlices(cert, sourceParams, 150, ownerKey);
-        var modifiedRequest = new VerificationRequest<ConsumptionCertificate, V1.SlicedEvent>(
-            null,
-            request.Event,
-            request.Signature,
-            request.AdditionalStreams
-        );
-
-        var result = await Verifier.Verify(modifiedRequest);
+        var request = FakeRegister.CreateSlices(cert, sourceParams, 150, ownerKey, exists: false);
+        var result = await Verifier.Verify(request);
 
         var invalid = Assert.IsType<VerificationResult.Invalid>(result);
         Assert.Equal($"Certificate does not exist", invalid!.ErrorMessage);

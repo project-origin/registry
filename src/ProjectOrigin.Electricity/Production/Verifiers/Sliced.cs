@@ -4,7 +4,7 @@ using ProjectOrigin.Electricity.Interfaces;
 using ProjectOrigin.PedersenCommitment;
 using ProjectOrigin.Register.StepProcessor.Models;
 
-namespace ProjectOrigin.Electricity.Production.Requests;
+namespace ProjectOrigin.Electricity.Production.Verifiers;
 
 internal class ProductionSlicedEventVerifier : IEventVerifier<ProductionCertificate, V1.SlicedEvent>
 {
