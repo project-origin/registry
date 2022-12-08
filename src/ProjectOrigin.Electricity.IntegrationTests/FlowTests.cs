@@ -254,6 +254,6 @@ public static class Extensions
 {
     public static ShieldedValue ToShieldedValue(this CommitmentParameters cm)
     {
-        return new ShieldedValue((uint)cm.m, cm.r);
+        return new ShieldedValue((uint)cm.Message, cm.RValue);
     }
 }

@@ -5,7 +5,6 @@ namespace ProjectOrigin.Electricity.Client;
 
 internal static class Extensions
 {
-
     internal static V1.PublicKey ToProto(this PublicKey key)
     {
         return new V1.PublicKey()

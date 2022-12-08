@@ -6,7 +6,6 @@ using ProjectOrigin.Register.StepProcessor.Services;
 using ProjectOrigin.VerifiableEventStore.Services.Batcher;
 using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector;
 using ProjectOrigin.VerifiableEventStore.Services.EventStore;
-using ves = ProjectOrigin.VerifiableEventStore.Services;
 
 namespace ProjectOrigin.Electricity.Server;
 
@@ -14,8 +13,8 @@ public class Startup
 {
     public void ConfigureServices(IServiceCollection services)
     {
-        var memorystoreRegA = new ves.EventStore.MemoryEventStore();
-        var memorystoreRegB = new ves.EventStore.MemoryEventStore();
+        var memorystoreRegA = new MemoryEventStore();
+        var memorystoreRegB = new MemoryEventStore();
 
         services.AddGrpc();
         services.AddTransient<ICommandStepVerifier, ElectricityStepVerifier>();
