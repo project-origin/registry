@@ -14,9 +14,7 @@ internal class ConsumptionClaimedVerifier : IEventVerifier<ConsumptionCertificat
         if (request.Model is null)
             return new VerificationResult.Invalid("Certificate does not exist");
 
-        var allocationId = request.Event.AllocationId.ToModel();
-
-        var slice = request.Model.GetAllocation(allocationId);
+        var slice = request.Model.GetAllocation(request.Event.AllocationId);
         if (slice is null)
             return new VerificationResult.Invalid("Allocation does not exist");
 
@@ -27,7 +25,7 @@ internal class ConsumptionClaimedVerifier : IEventVerifier<ConsumptionCertificat
         if (productionCertificate == null)
             return new VerificationResult.Invalid("ProductionCertificate does not exist");
 
-        if (productionCertificate.HasClaim(allocationId))
+        if (productionCertificate.HasClaim(request.Event.AllocationId))
             return new VerificationResult.Invalid("Production not claimed");
 
         return new VerificationResult.Valid();

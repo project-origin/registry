@@ -4,7 +4,7 @@ using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Tests;
 
-public class ProductionTransferredVerifierTests
+public class ProductionTransferredVerifierTests : AbstractVerifierTest
 {
     private ProductionTransferOwnershipEventVerifier Verifier { get => new ProductionTransferOwnershipEventVerifier(); }
 
@@ -19,7 +19,7 @@ public class ProductionTransferredVerifierTests
 
         var result = await Verifier.Verify(request);
 
-        Assert.IsType<VerificationResult.Valid>(result);
+        AssertValid(result);
     }
 
     [Fact]
@@ -32,8 +32,7 @@ public class ProductionTransferredVerifierTests
         var request = FakeRegister.CreateTransfer(cert, sourceParams, newOwnerKey.PublicKey.ToProto(), ownerKey, exists: false);
         var result = await Verifier.Verify(request);
 
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("Certificate does not exist", invalid!.ErrorMessage);
+        AssertInvalid(result, "Certificate does not exist");
     }
 
     [Fact]
@@ -52,8 +51,7 @@ public class ProductionTransferredVerifierTests
 
         var result = await Verifier.Verify(request);
 
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("Invalid NewOwner key, not a valid Ed25519 publicKey", invalid!.ErrorMessage);
+        AssertInvalid(result, "Invalid NewOwner key, not a valid Ed25519 publicKey");
     }
 
     [Fact]
@@ -68,8 +66,7 @@ public class ProductionTransferredVerifierTests
 
         var result = await Verifier.Verify(request);
 
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("Slice not found", invalid!.ErrorMessage);
+        AssertInvalid(result, "Slice not found");
     }
 
     [Fact]
@@ -83,7 +80,6 @@ public class ProductionTransferredVerifierTests
 
         var result = await Verifier.Verify(request);
 
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("Invalid signature for slice", invalid!.ErrorMessage);
+        AssertInvalid(result, "Invalid signature for slice");
     }
 }

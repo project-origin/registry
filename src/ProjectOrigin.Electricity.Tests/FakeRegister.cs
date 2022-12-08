@@ -1,4 +1,3 @@
-using System.Numerics;
 using Google.Protobuf;
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Consumption;
@@ -6,7 +5,6 @@ using ProjectOrigin.Electricity.Interfaces;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Production;
 using ProjectOrigin.PedersenCommitment;
-using ProjectOrigin.Register.StepProcessor.Models;
 using ProjectOrigin.Register.V1;
 
 namespace ProjectOrigin.Electricity.Tests;
@@ -20,23 +18,25 @@ internal static class FakeRegister
             new DateTimeOffset(2022, 09, 25, 12, 0, 0, TimeSpan.Zero),
             new DateTimeOffset(2022, 09, 25, 13, 0, 0, TimeSpan.Zero)).ToProto();
 
-    // internal static (Guid allocationId, CommitmentParameters quantityParams) Allocated(this ProductionCertificate cert, CommitmentParameters sourceParameters, Register.V1.FederatedStreamId consumptionId, CommitmentParameters quantityParameters)
-    // {
-    //     var allocationId = Guid.NewGuid();
+    internal static Guid Allocated(this ProductionCertificate prodCert, ConsumptionCertificate consCert, CommitmentParameters produtionParameters, CommitmentParameters sourceParameters, Key signer, Guid? allocationIdOverride = null)
+    {
+        var allocationId = allocationIdOverride ?? Guid.NewGuid();
 
-    //     var e = CreateProductionAllocatedEvent(allocationId, cert.Id, consumptionId, quantityParameters, sourceParameters);
-    //     cert.Apply(e.e);
+        var request = CreateProductionAllocationRequest(prodCert, consCert, produtionParameters, sourceParameters, signer, allocationIdOverride: allocationId);
+        prodCert.Apply(request.Event);
 
-    //     return (allocationId, e.transfer);
-    // }
+        return allocationId;
+    }
 
-    // internal static (Guid allocationId, CommitmentParameters quantityParams) Allocated(this ConsumptionCertificate cert, Guid allocationId, CommitmentParameters sourceParameters, Register.V1.FederatedStreamId productionId, CommitmentParameters quantityParameters)
-    // {
-    //     var e = CreateConsumptionAllocatedEvent(allocationId, productionId, cert.Id, quantityParameters, sourceParameters);
-    //     cert.Apply(e.e);
+    internal static Guid Allocated(this ConsumptionCertificate consSert, ProductionCertificate prodCert, CommitmentParameters produtionParameters, CommitmentParameters sourceParameters, Key signer, Guid? allocationIdOverride = null)
+    {
+        var allocationId = allocationIdOverride ?? Guid.NewGuid();
 
-    //     return (allocationId, e.transfer);
-    // }
+        var request = CreateConsumptionAllocationRequest(allocationId, prodCert, consSert, produtionParameters, sourceParameters, signer);
+        consSert.Apply(request.Event);
+
+        return allocationId;
+    }
 
     internal static V1.Commitment InvalidCommitment(ulong quantity = 150)
     {
@@ -257,6 +257,7 @@ internal static class FakeRegister
     // }
 
     internal static VerificationRequest<ConsumptionCertificate, V1.AllocatedEvent> CreateConsumptionAllocationRequest(
+    Guid allocationId,
     ProductionCertificate production,
     ConsumptionCertificate consumption,
     CommitmentParameters productionSlice,
@@ -267,7 +268,6 @@ internal static class FakeRegister
      byte[]? overwrideEqualityProof = null
     )
     {
-        var allocationId = Guid.NewGuid();
         var @event = CreateAllocationEvent(allocationId, production.Id, consumption.Id, productionSlice, consumptionSlice, overwrideEqualityProof);
 
         return new VerificationRequest<ConsumptionCertificate, V1.AllocatedEvent>(
@@ -288,10 +288,11 @@ internal static class FakeRegister
     Key signerKey,
     bool exists = true,
     bool otherExists = true,
-    byte[]? overwrideEqualityProof = null
+    byte[]? overwrideEqualityProof = null,
+    Guid? allocationIdOverride = null
     )
     {
-        var allocationId = Guid.NewGuid();
+        var allocationId = allocationIdOverride ?? Guid.NewGuid();
         var @event = CreateAllocationEvent(allocationId, production.Id, consumption.Id, productionSlice, consumptionSlice, overwrideEqualityProof);
 
         return new VerificationRequest<ProductionCertificate, V1.AllocatedEvent>(

@@ -2,11 +2,10 @@ using Microsoft.Extensions.Options;
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Production.Verifiers;
-using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Tests;
 
-public class ProductionIssuedVerifierTests
+public class ProductionIssuedVerifierTests : AbstractVerifierTest
 {
     private IOptions<T> CreateOptionsMock<T>(T content) where T : class
     {
@@ -35,7 +34,9 @@ public class ProductionIssuedVerifierTests
 
         var request = FakeRegister.CreateProductionIssuedRequest(issuerKey);
 
-        await processor.Verify(request);
+        var result = await processor.Verify(request);
+
+        AssertValid(result);
     }
 
     [Fact]
@@ -45,7 +46,9 @@ public class ProductionIssuedVerifierTests
 
         var request = FakeRegister.CreateProductionIssuedRequest(issuerKey, publicQuantity: true);
 
-        await processor.Verify(request);
+        var result = await processor.Verify(request);
+
+        AssertValid(result);
     }
 
     [Fact]
@@ -56,8 +59,7 @@ public class ProductionIssuedVerifierTests
         var request = FakeRegister.CreateProductionIssuedRequest(issuerKey, exists: true);
         var result = await processor.Verify(request);
 
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal($"Certificate with id ”{request.Event.CertificateId.StreamId}” already exists", invalid!.ErrorMessage);
+        AssertInvalid(result, $"Certificate with id ”{request.Event.CertificateId.StreamId}” already exists");
     }
 
     [Fact]
@@ -69,8 +71,7 @@ public class ProductionIssuedVerifierTests
 
         var result = await processor.Verify(request);
 
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("Invalid range proof forr GSRN commitment", invalid!.ErrorMessage);
+        AssertInvalid(result, "Invalid range proof forr GSRN commitment");
     }
 
     [Fact]
@@ -82,8 +83,7 @@ public class ProductionIssuedVerifierTests
 
         var result = await processor.Verify(request);
 
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("Invalid range proof forr Quantity commitment", invalid!.ErrorMessage);
+        AssertInvalid(result, "Invalid range proof forr Quantity commitment");
     }
 
     [Fact]
@@ -95,8 +95,7 @@ public class ProductionIssuedVerifierTests
 
         var result = await processor.Verify(request);
 
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("Private and public quantity proof does not match", invalid!.ErrorMessage);
+        AssertInvalid(result, "Private and public quantity proof does not match");
     }
 
     [Fact]
@@ -113,8 +112,7 @@ public class ProductionIssuedVerifierTests
 
         var result = await processor.Verify(request);
 
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("Invalid owner key, not a valid Ed25519 publicKey", invalid!.ErrorMessage);
+        AssertInvalid(result, "Invalid owner key, not a valid Ed25519 publicKey");
     }
 
     [Fact]
@@ -128,8 +126,7 @@ public class ProductionIssuedVerifierTests
 
         var result = await processor.Verify(request);
 
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("Invalid issuer signature for GridArea ”DK1”", invalid!.ErrorMessage);
+        AssertInvalid(result, "Invalid issuer signature for GridArea ”DK1”");
     }
 
     [Fact]
@@ -143,7 +140,6 @@ public class ProductionIssuedVerifierTests
 
         var result = await processor.Verify(request);
 
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("No issuer found for GridArea ”DK2”", invalid!.ErrorMessage);
+        AssertInvalid(result, "No issuer found for GridArea ”DK2”");
     }
 }

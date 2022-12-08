@@ -3,11 +3,10 @@ using Microsoft.Extensions.Options;
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Production.Verifiers;
 using ProjectOrigin.PedersenCommitment;
-using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Tests;
 
-public class ConsumptionSlicedVerifierTests
+public class ConsumptionSlicedVerifierTests : AbstractVerifierTest
 {
     private IOptions<T> CreateOptionsMock<T>(T content) where T : class
     {
@@ -30,7 +29,7 @@ public class ConsumptionSlicedVerifierTests
 
         var result = await Verifier.Verify(request);
 
-        Assert.IsType<VerificationResult.Valid>(result);
+        AssertValid(result);
     }
 
     [Fact]
@@ -42,8 +41,7 @@ public class ConsumptionSlicedVerifierTests
         var request = FakeRegister.CreateSlices(cert, sourceParams, 150, ownerKey, exists: false);
         var result = await Verifier.Verify(request);
 
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal($"Certificate does not exist", invalid!.ErrorMessage);
+        AssertInvalid(result, "Certificate does not exist");
     }
 
     [Fact]
@@ -58,8 +56,7 @@ public class ConsumptionSlicedVerifierTests
 
         var result = await Verifier.Verify(request);
 
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("Slice not found", invalid!.ErrorMessage);
+        AssertInvalid(result, "Slice not found");
     }
 
     [Fact]
@@ -73,8 +70,7 @@ public class ConsumptionSlicedVerifierTests
 
         var result = await Verifier.Verify(request);
 
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("Invalid signature for slice", invalid!.ErrorMessage);
+        AssertInvalid(result, "Invalid signature for slice");
     }
 
 
@@ -93,8 +89,7 @@ public class ConsumptionSlicedVerifierTests
 
         var result = await Verifier.Verify(request);
 
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("Invalid NewOwner key, not a valid Ed25519 publicKey", invalid!.ErrorMessage);
+        AssertInvalid(result, "Invalid NewOwner key, not a valid Ed25519 publicKey");
     }
 
     [Fact]
@@ -109,7 +104,6 @@ public class ConsumptionSlicedVerifierTests
 
         var result = await Verifier.Verify(request);
 
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("Invalid sum proof", invalid!.ErrorMessage);
+        AssertInvalid(result, "Invalid sum proof");
     }
 }

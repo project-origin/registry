@@ -10,16 +10,14 @@ internal class ConsumptionCertificate
     public string GridArea { get => _issued.GridArea; }
 
     internal CertificateSlice? GetCertificateSlice(V1.SliceId id) => _availableSlices.GetValueOrDefault(id);
-
-    public bool HasClaim(Guid allocationId) => _claimedSlices.SingleOrDefault(x => x.AllocationId == allocationId) is not null;
-    public bool HasAllocation(Guid allocationId) => _allocationSlices.SingleOrDefault(a => a.AllocationId == allocationId) is not null;
-    public AllocationSlice? GetAllocation(Guid allocationId) => _allocationSlices.SingleOrDefault(x => x.AllocationId == allocationId);
+    public bool HasClaim(Register.V1.Uuid allocationId) => _claimedSlices.ContainsKey(allocationId);
+    public bool HasAllocation(Register.V1.Uuid allocationId) => _allocationSlices.ContainsKey(allocationId);
+    public AllocationSlice? GetAllocation(Register.V1.Uuid allocationId) => _allocationSlices.GetValueOrDefault(allocationId);
 
     private V1.ConsumptionIssuedEvent _issued;
     private Dictionary<V1.SliceId, CertificateSlice> _availableSlices = new Dictionary<V1.SliceId, CertificateSlice>();
-
-    private List<AllocationSlice> _allocationSlices = new List<AllocationSlice>();
-    private List<AllocationSlice> _claimedSlices = new List<AllocationSlice>();
+    private Dictionary<Register.V1.Uuid, AllocationSlice> _allocationSlices = new Dictionary<Register.V1.Uuid, AllocationSlice>();
+    private Dictionary<Register.V1.Uuid, AllocationSlice> _claimedSlices = new Dictionary<Register.V1.Uuid, AllocationSlice>();
 
     public ConsumptionCertificate(V1.ConsumptionIssuedEvent e)
     {
@@ -44,17 +42,16 @@ internal class ConsumptionCertificate
 
     public void Apply(V1.AllocatedEvent e)
     {
-        throw new NotImplementedException();
-        // var oldSlice = _availableSlices.Single(slice => slice.Commitment == e.Slice.Source.ToModel());
-        // _availableSlices.Remove(oldSlice);
-        // _allocationSlices.Add(new(e.Slice.Quantity.ToModel(), oldSlice.Owner, e.AllocationId.ToModel(), e.ProductionCertificateId.ToModel(), e.ConsumptionCertificateId.ToModel()));
-        // _availableSlices.Add(new(e.Slice.Remainder.ToModel(), oldSlice.Owner));
+        var oldSlice = GetCertificateSlice(e.ProductionSourceSlice) ?? throw new Exception("Invalid state");
+        var newSlice = new AllocationSlice(oldSlice.Commitment, oldSlice.Owner, e.AllocationId, e.ProductionCertificateId, e.ConsumptionCertificateId);
+        _availableSlices.Remove(e.ProductionSourceSlice);
+        _allocationSlices.Add(e.AllocationId, newSlice);
     }
 
     public void Apply(V1.ClaimedEvent e)
     {
-        var allocationSlice = _allocationSlices.Single(slice => slice.AllocationId == e.AllocationId.ToModel());
-        _allocationSlices.Remove(allocationSlice);
-        _claimedSlices.Add(allocationSlice);
+        var slice = GetAllocation(e.AllocationId) ?? throw new Exception("Invalid state");
+        _allocationSlices.Remove(e.AllocationId);
+        _claimedSlices.Add(e.AllocationId, slice);
     }
 }
