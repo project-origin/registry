@@ -1,11 +1,10 @@
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Production.Verifiers;
-using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Tests;
 
-public class ProductionAllocatedVerifierTests
+public class ProductionAllocatedVerifierTests : AbstractVerifierTest
 {
     private ProductionAllocatedEventVerifier Verifier { get => new ProductionAllocatedEventVerifier(); }
 
@@ -19,7 +18,7 @@ public class ProductionAllocatedVerifierTests
         var request = FakeRegister.CreateProductionAllocationRequest(prodCert, consCert, prodParams, consParams, ownerKey);
         var result = await Verifier.Verify(request);
 
-        Assert.IsType<VerificationResult.Valid>(result);
+        AssertValid(result);
     }
 
     [Fact]
@@ -32,8 +31,7 @@ public class ProductionAllocatedVerifierTests
         var request = FakeRegister.CreateProductionAllocationRequest(prodCert, consCert, prodParams, consParams, ownerKey, exists: false);
         var result = await Verifier.Verify(request);
 
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("Certificate does not exist", invalid!.ErrorMessage);
+        AssertInvalid(result, "Certificate does not exist");
     }
 
     [Fact]
@@ -46,8 +44,7 @@ public class ProductionAllocatedVerifierTests
         var request = FakeRegister.CreateProductionAllocationRequest(prodCert, consCert, consParams, consParams, ownerKey);
         var result = await Verifier.Verify(request);
 
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("Production slice does not exist", invalid!.ErrorMessage);
+        AssertInvalid(result, "Production slice does not exist");
     }
 
     [Fact]
@@ -61,8 +58,7 @@ public class ProductionAllocatedVerifierTests
         var request = FakeRegister.CreateProductionAllocationRequest(prodCert, consCert, prodParams, consParams, otherKey);
         var result = await Verifier.Verify(request);
 
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("Invalid signature for slice", invalid!.ErrorMessage);
+        AssertInvalid(result, "Invalid signature for slice");
     }
 
     [Fact]
@@ -75,8 +71,7 @@ public class ProductionAllocatedVerifierTests
         var request = FakeRegister.CreateProductionAllocationRequest(prodCert, consCert, prodParams, consParams, ownerKey, otherExists: false);
         var result = await Verifier.Verify(request);
 
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("ConsumptionCertificate does not exist", invalid!.ErrorMessage);
+        AssertInvalid(result, "ConsumptionCertificate does not exist");
     }
 
     [Fact]
@@ -90,8 +85,7 @@ public class ProductionAllocatedVerifierTests
         var request = FakeRegister.CreateProductionAllocationRequest(prodCert, consCert, prodParams, consParams, ownerKey);
         var result = await Verifier.Verify(request);
 
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("Certificates are not in the same period", invalid!.ErrorMessage);
+        AssertInvalid(result, "Certificates are not in the same period");
     }
 
     [Fact]
@@ -104,8 +98,7 @@ public class ProductionAllocatedVerifierTests
         var request = FakeRegister.CreateProductionAllocationRequest(prodCert, consCert, prodParams, consParams, ownerKey);
         var result = await Verifier.Verify(request);
 
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("Certificates are not in the same area", invalid!.ErrorMessage);
+        AssertInvalid(result, "Certificates are not in the same area");
     }
 
     [Fact]
@@ -118,8 +111,7 @@ public class ProductionAllocatedVerifierTests
         var request = FakeRegister.CreateProductionAllocationRequest(prodCert, consCert, prodParams, prodParams, ownerKey);
         var result = await Verifier.Verify(request);
 
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("Consumption slice does not exist", invalid!.ErrorMessage);
+        AssertInvalid(result, "Consumption slice does not exist");
     }
 
     [Fact]
@@ -132,7 +124,6 @@ public class ProductionAllocatedVerifierTests
         var request = FakeRegister.CreateProductionAllocationRequest(prodCert, consCert, prodParams, consParams, ownerKey, overwrideEqualityProof: new Fixture().Create<byte[]>());
         var result = await Verifier.Verify(request);
 
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("Invalid Equality proof", invalid!.ErrorMessage);
+        AssertInvalid(result, "Invalid Equality proof");
     }
 }

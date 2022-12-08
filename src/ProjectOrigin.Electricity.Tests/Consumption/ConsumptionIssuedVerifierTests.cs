@@ -2,11 +2,10 @@ using Microsoft.Extensions.Options;
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Consumption.Verifiers;
 using ProjectOrigin.Electricity.Models;
-using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Tests;
 
-public class ConsumptionIssuedVerifierTests
+public class ConsumptionIssuedVerifierTests : AbstractVerifierTest
 {
     private IOptions<T> CreateOptionsMock<T>(T content) where T : class
     {
@@ -35,7 +34,9 @@ public class ConsumptionIssuedVerifierTests
 
         var request = FakeRegister.CreateConsumptionIssuedRequest(issuerKey);
 
-        await processor.Verify(request);
+        var result = await processor.Verify(request);
+
+        AssertValid(result);
     }
 
     [Fact]
@@ -46,8 +47,8 @@ public class ConsumptionIssuedVerifierTests
         var request = FakeRegister.CreateConsumptionIssuedRequest(issuerKey, exists: true);
 
         var result = await processor.Verify(request);
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal($"Certificate with id ”{request.Event.CertificateId.StreamId}” already exists", invalid!.ErrorMessage);
+
+        AssertInvalid(result, $"Certificate with id ”{request.Event.CertificateId.StreamId}” already exists");
     }
 
     [Fact]
@@ -59,8 +60,7 @@ public class ConsumptionIssuedVerifierTests
 
         var result = await processor.Verify(request);
 
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("Invalid range proof forr GSRN commitment", invalid!.ErrorMessage);
+        AssertInvalid(result, "Invalid range proof forr GSRN commitment");
     }
 
     [Fact]
@@ -71,8 +71,8 @@ public class ConsumptionIssuedVerifierTests
         var request = FakeRegister.CreateConsumptionIssuedRequest(issuerKey, quantityCommitmentOverride: FakeRegister.InvalidCommitment());
 
         var result = await processor.Verify(request);
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("Invalid range proof forr Quantity commitment", invalid!.ErrorMessage);
+
+        AssertInvalid(result, "Invalid range proof forr Quantity commitment");
     }
 
     [Fact]
@@ -88,8 +88,8 @@ public class ConsumptionIssuedVerifierTests
         var request = FakeRegister.CreateConsumptionIssuedRequest(issuerKey, ownerKeyOverride: randomOwnerKeyData);
 
         var result = await processor.Verify(request);
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("Invalid owner key, not a valid Ed25519 publicKey", invalid!.ErrorMessage);
+
+        AssertInvalid(result, "Invalid owner key, not a valid Ed25519 publicKey");
     }
 
     [Fact]
@@ -102,8 +102,8 @@ public class ConsumptionIssuedVerifierTests
         var request = FakeRegister.CreateConsumptionIssuedRequest(someOtherKey);
 
         var result = await processor.Verify(request);
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("Invalid issuer signature for GridArea ”DK1”", invalid!.ErrorMessage);
+
+        AssertInvalid(result, "Invalid issuer signature for GridArea ”DK1”");
     }
 
     [Fact]
@@ -116,7 +116,7 @@ public class ConsumptionIssuedVerifierTests
         var request = FakeRegister.CreateConsumptionIssuedRequest(someOtherKey, gridAreaOverride: "DK2");
 
         var result = await processor.Verify(request);
-        var invalid = Assert.IsType<VerificationResult.Invalid>(result);
-        Assert.Equal("No issuer found for GridArea ”DK2”", invalid!.ErrorMessage);
+
+        AssertInvalid(result, "No issuer found for GridArea ”DK2”");
     }
 }

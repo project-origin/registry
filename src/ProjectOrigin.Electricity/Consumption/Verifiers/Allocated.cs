@@ -25,10 +25,8 @@ internal class ConsumptionAllocatedVerifier : IEventVerifier<ConsumptionCertific
         if (productionCertificate == null)
             return new VerificationResult.Invalid("ProductionCertificate does not exist");
 
-        var allocationId = request.Event.AllocationId.ToModel();
-
-        if (productionCertificate.HasAllocation(allocationId))
-            return new VerificationResult.Invalid("Consumption not allocated");
+        if (!productionCertificate.HasAllocation(request.Event.AllocationId))
+            return new VerificationResult.Invalid("Production not allocated");
 
         return new VerificationResult.Valid();
     }
