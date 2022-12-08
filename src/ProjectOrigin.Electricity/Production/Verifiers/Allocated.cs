@@ -8,7 +8,7 @@ using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Production.Verifiers;
 
-internal class ProductionAllocatedEventVerifier : IEventVerifier<ProductionCertificate, V1.AllocatedEvent>
+internal class ProductionAllocatedVerifier : IEventVerifier<ProductionCertificate, V1.AllocatedEvent>
 {
     public Task<VerificationResult> Verify(VerificationRequest<ProductionCertificate, AllocatedEvent> request)
     {

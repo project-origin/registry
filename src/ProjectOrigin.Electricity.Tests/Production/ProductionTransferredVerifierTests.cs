@@ -4,9 +4,9 @@ using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Tests;
 
-public class ProductionTransferredVerifierTests : AbstractVerifierTest
+public class ProductionTransferredVerifierTests : AbstractVerifierTests
 {
-    private ProductionTransferOwnershipEventVerifier Verifier { get => new ProductionTransferOwnershipEventVerifier(); }
+    private ProductionTransferredVerifier Verifier { get => new ProductionTransferredVerifier(); }
 
     [Fact]
     public async Task ProductionTransferredVerifierTests_TransferCertificate_Valid()

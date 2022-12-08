@@ -6,7 +6,7 @@ using ProjectOrigin.PedersenCommitment;
 
 namespace ProjectOrigin.Electricity.Tests;
 
-public class ProductionSlicedVerifierTests : AbstractVerifierTest
+public class ProductionSlicedVerifierTests : AbstractVerifierTests
 {
     private IOptions<T> CreateOptionsMock<T>(T content) where T : class
     {
@@ -17,7 +17,7 @@ public class ProductionSlicedVerifierTests : AbstractVerifierTest
 
     private Group Group { get => FakeRegister.Group; }
 
-    private ProductionSlicedEventVerifier Verifier { get => new ProductionSlicedEventVerifier(); }
+    private ProductionSlicedVerifier Verifier { get => new ProductionSlicedVerifier(); }
 
     [Fact]
     public async Task ProductionSlicedEventVerifier_TransferCertificate_Valid()

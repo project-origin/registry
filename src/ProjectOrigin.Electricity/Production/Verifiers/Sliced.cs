@@ -6,7 +6,7 @@ using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Production.Verifiers;
 
-internal class ProductionSlicedEventVerifier : IEventVerifier<ProductionCertificate, V1.SlicedEvent>
+internal class ProductionSlicedVerifier : IEventVerifier<ProductionCertificate, V1.SlicedEvent>
 {
     public Task<VerificationResult> Verify(VerificationRequest<ProductionCertificate, V1.SlicedEvent> request)
     {

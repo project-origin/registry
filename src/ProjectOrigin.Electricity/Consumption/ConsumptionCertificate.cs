@@ -42,9 +42,9 @@ internal class ConsumptionCertificate
 
     public void Apply(V1.AllocatedEvent e)
     {
-        var oldSlice = GetCertificateSlice(e.ProductionSourceSlice) ?? throw new Exception("Invalid state");
+        var oldSlice = GetCertificateSlice(e.ConsumptionSourceSlice) ?? throw new Exception("Invalid state");
         var newSlice = new AllocationSlice(oldSlice.Commitment, oldSlice.Owner, e.AllocationId, e.ProductionCertificateId, e.ConsumptionCertificateId);
-        _availableSlices.Remove(e.ProductionSourceSlice);
+        _availableSlices.Remove(e.ConsumptionSourceSlice);
         _allocationSlices.Add(e.AllocationId, newSlice);
     }
 

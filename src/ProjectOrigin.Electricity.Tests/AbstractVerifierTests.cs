@@ -1,8 +1,7 @@
 using ProjectOrigin.Register.StepProcessor.Models;
 
-public abstract class AbstractVerifierTest
+public abstract class AbstractVerifierTests
 {
-
     public void AssertValid(VerificationResult result)
     {
         var invalid = result as VerificationResult.Invalid;
