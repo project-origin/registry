@@ -1,26 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackageId>ProjectOrigin.Electricity.Client</PackageId>
-    <Company>Project-Origin</Company>
-    <PackageTags>Project Origin;ProjectOrigin</PackageTags>
-    <Description> Client Library for Electricit Granular Certificates on ProjectOrigin Registry</Description>
-    <Summary>Client Library for Electricit Granular Certificates on ProjectOrigin Registry</Summary>
-    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageIcon>packageIcon.png</PackageIcon>
-    <RepositoryUrl>https://github.com/project-origin/registry.git</RepositoryUrl>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="README.md" Pack="true" PackagePath="\" />
-    <None Include="packageIcon.png" Pack="true" PackagePath="\" />
-  </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="NSec.Cryptography" Version="22.4.0" />
     <ProjectReference Include="..\ProjectOrigin.PedersenCommitment\ProjectOrigin.PedersenCommitment.csproj" />
