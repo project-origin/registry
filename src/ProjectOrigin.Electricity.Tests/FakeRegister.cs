@@ -56,15 +56,6 @@ internal static class FakeRegister
         certificate.Apply(e);
     }
 
-    // internal static (CommitmentParameters transfer, CommitmentParameters remainder) Transferred(this ProductionCertificate cert, CommitmentParameters sourceParams, long quantity, PublicKey newOwner)
-    // {
-    //     var e = CreateTransferEvent(cert.Id, sourceParams, quantity, newOwner.Export(KeyBlobFormat.RawPublicKey));
-
-    //     cert.Apply(e.e);
-
-    //     return (e.transfer, e.remainder);
-    // }
-
     internal static VerificationRequest<ProductionCertificate, V1.TransferredEvent> CreateTransfer(
         ProductionCertificate certificate,
         CommitmentParameters sourceSliceParameters,
@@ -155,51 +146,6 @@ internal static class FakeRegister
     }
 
 
-
-    // internal static CommandStep<V1.TransferProductionSliceCommand.Types.ProductionSliceTransferredEvent> CreateTransfer(
-    //    Register.V1.FederatedStreamId id,
-    //    CommitmentParameters sourceParameters,
-    //    long quantity,
-    //    Key signerKey,
-    //    CommitmentParameters? sourceParametersOverride = null,
-    //    CommitmentParameters? transferParametersOverride = null,
-    //    CommitmentParameters? remainderParametersOverride = null,
-    //    long quantityOffset = 0,
-    //    byte[]? newOwnerOverride = null
-    //    )
-    // {
-    //     var newOwner = newOwnerOverride ?? Key.Create(SignatureAlgorithm.Ed25519).PublicKey.Export(KeyBlobFormat.RawPublicKey);
-
-    //     var (e, transferParamerters, remainderParameters) = CreateTransferEvent(id, sourceParameters, quantity, newOwner, quantityOffset);
-
-    //     return new CommandStep<V1.TransferProductionSliceCommand.Types.ProductionSliceTransferredEvent>(
-    //         id,
-    //         SignEvent(signerKey, e),
-    //         typeof(ProductionCertificate),
-    //         new V1.SliceProof()
-    //         {
-    //             Source = (sourceParametersOverride ?? sourceParameters).ToProto(),
-    //             Quantity = (transferParametersOverride ?? transferParamerters).ToProto(),
-    //             Remainder = (remainderParametersOverride ?? remainderParameters).ToProto(),
-    //         }
-    //     );
-    // }
-
-    // internal static (V1.TransferProductionSliceCommand.Types.ProductionSliceTransferredEvent e, CommitmentParameters transfer, CommitmentParameters remainder) CreateTransferEvent(Register.V1.FederatedStreamId id, CommitmentParameters sourceParameters, long quantity, byte[] newOwner, long quantityOffset = 0)
-    // {
-    //     var transferParameters = Group.Commit(quantity);
-    //     var remainderParameters = Group.Commit(sourceParameters.m - quantity + quantityOffset);
-
-    //     var e = new V1.TransferProductionSliceCommand.Types.ProductionSliceTransferredEvent()
-    //     {
-    //         CertificateId = id.ToProto(),
-    //         Slice = CreateSlice(sourceParameters, transferParameters, remainderParameters),
-    //         NewOwner = ByteString.CopyFrom(newOwner)
-    //     };
-
-    //     return (e, transferParameters, remainderParameters);
-    // }
-
     internal static VerificationRequest<ProductionCertificate, V1.ClaimedEvent> CreateProductionClaim(
         Guid allocationId,
         ProductionCertificate productionCertificate,
@@ -225,44 +171,30 @@ internal static class FakeRegister
         );
     }
 
-    // internal static CommandStep<V1.ClaimCommand.Types.ClaimedEvent> CreateConsumptionClaim(Register.V1.FederatedStreamId certificateId, Guid allocationId, Key signerKey)
-    // {
-    //     var e = new V1.ClaimCommand.Types.ClaimedEvent()
-    //     {
-    //         CertificateId = certificateId.ToProto(),
-    //         AllocationId = allocationId.ToProto()
-    //     };
+    internal static VerificationRequest<ConsumptionCertificate, V1.ClaimedEvent> CreateConsumptionClaim(
+       Guid allocationId,
+       ProductionCertificate productionCertificate,
+       ConsumptionCertificate consumptionCertificate,
+       Key signerKey,
+       bool exists = true,
+       bool otherExists = true
+       )
+    {
+        var @event = new V1.ClaimedEvent()
+        {
+            CertificateId = consumptionCertificate.Id,
+            AllocationId = allocationId.ToProto()
+        };
 
-    //     return new CommandStep<V1.ClaimCommand.Types.ClaimedEvent>(
-    //         certificateId,
-    //         SignEvent(signerKey, e),
-    //         typeof(ConsumptionCertificate)
-    //     );
-    // }
-
-    // internal static CommandStep<V1.ClaimCommand.Types.AllocatedEvent> CreateConsumptionAllocationRequest(
-    //     Guid allocationId,
-    //     Register.V1.FederatedStreamId productionId,
-    //     Register.V1.FederatedStreamId consumptionId,
-    //     CommitmentParameters sourceParameters,
-    //     CommitmentParameters quantityParameters,
-    //     Key signerKey
-    //     )
-    // {
-    //     var (e, transferParamerters, remainderParameters) = CreateConsumptionAllocatedEvent(allocationId, productionId, consumptionId, quantityParameters, sourceParameters);
-
-    //     return new CommandStep<V1.ClaimCommand.Types.AllocatedEvent>(
-    //         consumptionId,
-    //         SignEvent(signerKey, e),
-    //         typeof(ConsumptionCertificate),
-    //         new V1.SliceProof()
-    //         {
-    //             Source = (sourceParameters).ToProto(),
-    //             Quantity = (transferParamerters).ToProto(),
-    //             Remainder = (remainderParameters).ToProto(),
-    //         }
-    //     );
-    // }
+        return new VerificationRequest<ConsumptionCertificate, V1.ClaimedEvent>(
+            exists ? consumptionCertificate : null,
+            @event,
+            Sign(signerKey, @event),
+            otherExists ? new(){
+                {productionCertificate.Id, productionCertificate}
+            } : null
+        );
+    }
 
     internal static VerificationRequest<ConsumptionCertificate, V1.AllocatedEvent> CreateConsumptionAllocationRequest(
     Guid allocationId,
@@ -332,21 +264,6 @@ internal static class FakeRegister
             EqualityProof = ByteString.CopyFrom(overwrideEqualityProof ?? Group.CreateEqualityProof(consumptionSlice, productionSlice))
         };
     }
-
-    // internal static (V1.ClaimCommand.Types.AllocatedEvent e, CommitmentParameters transfer, CommitmentParameters remainder) CreateConsumptionAllocatedEvent(Guid allocationId, Register.V1.FederatedStreamId productionId, Register.V1.FederatedStreamId consumptionId, CommitmentParameters quantityParameters, CommitmentParameters sourceParameters)
-    // {
-    //     var remainderParameters = Group.Commit(sourceParameters.m - quantityParameters.m);
-
-    //     var e = new V1.ClaimCommand.Types.AllocatedEvent()
-    //     {
-    //         AllocationId = allocationId.ToProto(),
-    //         ProductionCertificateId = productionId.ToProto(),
-    //         ConsumptionCertificateId = consumptionId.ToProto(),
-    //         Slice = CreateSlice(sourceParameters, quantityParameters, remainderParameters)
-    //     };
-
-    //     return (e, quantityParameters, remainderParameters);
-    // }
 
     internal static (ConsumptionCertificate certificate, CommitmentParameters parameters) ConsumptionIssued(PublicKey ownerKey, long quantity, string area = "DK1", DateInterval? periodOverride = null)
     {
@@ -473,15 +390,4 @@ internal static class FakeRegister
     {
         return NSec.Cryptography.Ed25519.Ed25519.Sign(signerKey, e.ToByteArray());
     }
-
-    // private static V1.Slice CreateSlice(CommitmentParameters sourceParameters, CommitmentParameters transferParameters, CommitmentParameters remainderParameters)
-    // {
-    //     return new V1.Slice()
-    //     {
-    //         Source = (sourceParameters.Commitment).ToProto(),
-    //         Quantity = (transferParameters.Commitment).ToProto(),
-    //         Remainder = (remainderParameters.Commitment).ToProto(),
-    //         ZeroR = ByteString.CopyFrom(((sourceParameters.r - (transferParameters.r + remainderParameters.r)).MathMod(Group.q)).ToByteArray())
-    //     };
-    // }
 }
