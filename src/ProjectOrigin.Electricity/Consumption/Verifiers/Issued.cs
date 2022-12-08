@@ -5,7 +5,7 @@ using ProjectOrigin.Electricity.Interfaces;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Register.StepProcessor.Models;
 
-namespace ProjectOrigin.Electricity.Consumption.Requests;
+namespace ProjectOrigin.Electricity.Consumption.Verifiers;
 
 
 internal class ConsumptionIssuedVerifier : IEventVerifier<ConsumptionCertificate, V1.ConsumptionIssuedEvent>

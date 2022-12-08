@@ -3,7 +3,7 @@ using NSec.Cryptography;
 using ProjectOrigin.Electricity.Interfaces;
 using ProjectOrigin.Register.StepProcessor.Models;
 
-namespace ProjectOrigin.Electricity.Production.Requests;
+namespace ProjectOrigin.Electricity.Production.Verifiers;
 
 internal class ProductionTransferOwnershipEventVerifier : IEventVerifier<ProductionCertificate, V1.TransferredEvent>
 {

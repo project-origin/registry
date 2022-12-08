@@ -1,8 +1,6 @@
 using Microsoft.Extensions.Options;
 using NSec.Cryptography;
-using ProjectOrigin.Electricity.Interfaces;
 using ProjectOrigin.Electricity.Models;
-using ProjectOrigin.Electricity.Production;
 using ProjectOrigin.Electricity.Production.Verifiers;
 using ProjectOrigin.Register.StepProcessor.Models;
 
@@ -55,15 +53,8 @@ public class ProductionIssuedVerifierTests
     {
         var (processor, issuerKey) = SetupIssuer();
 
-        var request = FakeRegister.CreateProductionIssuedRequest(issuerKey);
-        var modifiedRequest = new VerificationRequest<ProductionCertificate, V1.ProductionIssuedEvent>(
-            new(request.Event),
-            request.Event,
-            request.Signature,
-            request.AdditionalStreams
-        );
-
-        var result = await processor.Verify(modifiedRequest);
+        var request = FakeRegister.CreateProductionIssuedRequest(issuerKey, exists: true);
+        var result = await processor.Verify(request);
 
         var invalid = Assert.IsType<VerificationResult.Invalid>(result);
         Assert.Equal($"Certificate with id ”{request.Event.CertificateId.StreamId}” already exists", invalid!.ErrorMessage);

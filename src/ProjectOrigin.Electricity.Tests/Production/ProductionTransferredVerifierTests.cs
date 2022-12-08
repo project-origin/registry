@@ -1,7 +1,5 @@
 using NSec.Cryptography;
-using ProjectOrigin.Electricity.Interfaces;
-using ProjectOrigin.Electricity.Production;
-using ProjectOrigin.Electricity.Production.Requests;
+using ProjectOrigin.Electricity.Production.Verifiers;
 using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Tests;
@@ -31,15 +29,8 @@ public class ProductionTransferredVerifierTests
         var newOwnerKey = Key.Create(SignatureAlgorithm.Ed25519);
         var (cert, sourceParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
 
-        var request = FakeRegister.CreateTransfer(cert, sourceParams, newOwnerKey.PublicKey.ToProto(), ownerKey);
-        var modifiedRequest = new VerificationRequest<ProductionCertificate, V1.TransferredEvent>(
-             null,
-             request.Event,
-             request.Signature,
-             request.AdditionalStreams
-         );
-
-        var result = await Verifier.Verify(modifiedRequest);
+        var request = FakeRegister.CreateTransfer(cert, sourceParams, newOwnerKey.PublicKey.ToProto(), ownerKey, exists: false);
+        var result = await Verifier.Verify(request);
 
         var invalid = Assert.IsType<VerificationResult.Invalid>(result);
         Assert.Equal("Certificate does not exist", invalid!.ErrorMessage);

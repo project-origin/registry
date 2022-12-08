@@ -5,14 +5,12 @@ using ProjectOrigin.Electricity.Production;
 using ProjectOrigin.Electricity.V1;
 using ProjectOrigin.Register.StepProcessor.Models;
 
-namespace ProjectOrigin.Electricity.Consumption.Requests;
+namespace ProjectOrigin.Electricity.Consumption.Verifiers;
 
 internal class ConsumptionClaimedVerifier : IEventVerifier<ConsumptionCertificate, V1.ClaimedEvent>
 {
     public Task<VerificationResult> Verify(VerificationRequest<ConsumptionCertificate, ClaimedEvent> request)
     {
-        var hydrator = new ModelHydrater();
-
         if (request.Model is null)
             return new VerificationResult.Invalid("Certificate does not exist");
 
@@ -25,8 +23,11 @@ internal class ConsumptionClaimedVerifier : IEventVerifier<ConsumptionCertificat
         if (!Ed25519.Ed25519.Verify(slice.Owner, request.Event.ToByteArray(), request.Signature))
             return new VerificationResult.Invalid($"Invalid signature for slice");
 
-        if (request.AdditionalStreams.TryGetValue(slice.ProductionCertificateId, out var events)
-            && !hydrator.HydrateModel<ProductionCertificate>(events).HasClaim(allocationId))
+        var productionCertificate = request.GetModel<ProductionCertificate>(slice.ProductionCertificateId);
+        if (productionCertificate == null)
+            return new VerificationResult.Invalid("ProductionCertificate does not exist");
+
+        if (productionCertificate.HasClaim(allocationId))
             return new VerificationResult.Invalid("Production not claimed");
 
         return new VerificationResult.Valid();

@@ -1,8 +1,6 @@
 using Microsoft.Extensions.Options;
 using NSec.Cryptography;
-using ProjectOrigin.Electricity.Consumption;
-using ProjectOrigin.Electricity.Consumption.Requests;
-using ProjectOrigin.Electricity.Interfaces;
+using ProjectOrigin.Electricity.Consumption.Verifiers;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Register.StepProcessor.Models;
 
@@ -45,18 +43,9 @@ public class ConsumptionIssuedVerifierTests
     {
         var (processor, issuerKey) = SetupIssuer();
 
+        var request = FakeRegister.CreateConsumptionIssuedRequest(issuerKey, exists: true);
 
-        var request = FakeRegister.CreateConsumptionIssuedRequest(issuerKey);
-
-
-        var changedRequest = new VerificationRequest<ConsumptionCertificate, V1.ConsumptionIssuedEvent>(
-            new(request.Event),
-            request.Event,
-            request.Signature,
-            request.AdditionalStreams
-        );
-
-        var result = await processor.Verify(changedRequest);
+        var result = await processor.Verify(request);
         var invalid = Assert.IsType<VerificationResult.Invalid>(result);
         Assert.Equal($"Certificate with id ”{request.Event.CertificateId.StreamId}” already exists", invalid!.ErrorMessage);
     }
