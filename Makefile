@@ -1,5 +1,7 @@
 src_path = src
 
+.PHONY: help test clean build
+
 default: help
 
 help: # Show help for each of the Makefile recipes.
