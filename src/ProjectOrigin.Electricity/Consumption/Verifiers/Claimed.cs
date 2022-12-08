@@ -25,7 +25,7 @@ internal class ConsumptionClaimedVerifier : IEventVerifier<ConsumptionCertificat
         if (productionCertificate == null)
             return new VerificationResult.Invalid("ProductionCertificate does not exist");
 
-        if (productionCertificate.HasClaim(request.Event.AllocationId))
+        if (!productionCertificate.HasClaim(request.Event.AllocationId))
             return new VerificationResult.Invalid("Production not claimed");
 
         return new VerificationResult.Valid();
