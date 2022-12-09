@@ -13,13 +13,13 @@ public class Startup
 {
     public void ConfigureServices(IServiceCollection services)
     {
+        VerifierConfiguration.ConfigureServices(services);
+
         var memorystoreRegA = new MemoryEventStore();
         var memorystoreRegB = new MemoryEventStore();
 
         services.AddGrpc();
-        services.AddTransient<ICommandStepVerifier, ElectricityStepVerifier>();
         services.AddTransient<IBlockchainConnector, ConcordiumConnector>();
-
         services.AddSingleton<ICommandStepProcessor>((serviceProvider) =>
         {
             var eventStoreDictionary = new Dictionary<string, IEventStore>{
@@ -27,17 +27,21 @@ public class Startup
                 { Registries.RegistryB, memorystoreRegB}
             };
 
-            var batcher_dk1 = new MemoryBatcher(serviceProvider.GetService<IBlockchainConnector>()!, memorystoreRegA, Options.Create(new BatcherOptions { BatchSizeExponent = 0 }));
-            var batcher_dk2 = new MemoryBatcher(serviceProvider.GetService<IBlockchainConnector>()!, memorystoreRegB, Options.Create(new BatcherOptions { BatchSizeExponent = 0 }));
+            var batcherRegA = new MemoryBatcher(serviceProvider.GetService<IBlockchainConnector>()!, memorystoreRegA, Options.Create(new BatcherOptions { BatchSizeExponent = 0 }));
+            var batcherRegB = new MemoryBatcher(serviceProvider.GetService<IBlockchainConnector>()!, memorystoreRegB, Options.Create(new BatcherOptions { BatchSizeExponent = 0 }));
 
-            var processor_dk1 = new CommandStepProcessor(Options.Create(new CommandStepProcessorOptions(Registries.RegistryA, eventStoreDictionary)), serviceProvider.GetService<ICommandStepVerifier>()!, batcher_dk1);
-            var processor_dk2 = new CommandStepProcessor(Options.Create(new CommandStepProcessorOptions(Registries.RegistryB, eventStoreDictionary)), serviceProvider.GetService<ICommandStepVerifier>()!, batcher_dk2);
+            var fesRegA = new InProcessFederatedEventStore(batcherRegA, eventStoreDictionary);
+            var fesRegB = new InProcessFederatedEventStore(batcherRegB, eventStoreDictionary);
+
+            var processorRegA = new CommandStepProcessor(Options.Create(new CommandStepProcessorOptions(Registries.RegistryA)), fesRegA, serviceProvider.GetService<ICommandStepVerifiere>()!);
+            var processorRegB = new CommandStepProcessor(Options.Create(new CommandStepProcessorOptions(Registries.RegistryB)), fesRegB, serviceProvider.GetService<ICommandStepVerifiere>()!);
 
             return new CommandStepRouter(new Dictionary<string, ICommandStepProcessor>(){
-                { Registries.RegistryA, processor_dk1 },
-                { Registries.RegistryB, processor_dk2 },
+                { Registries.RegistryA, processorRegA },
+                { Registries.RegistryB, processorRegB },
             });
         });
+
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

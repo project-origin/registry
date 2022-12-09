@@ -99,6 +99,11 @@ public class ElectricityCommandBuilder
             TechCode = techCode,
             GsrnCommitment = gsrn.ToProtoCommitment(),
             QuantityCommitment = quantity.ToProtoCommitment(),
+            // QuantityPublication = new V1.CommitmentPublication()
+            // {
+            //     Message = quantity.Message,
+            //     RValue = ByteString.CopyFrom(quantity.RValue.ToByteArray())
+            // },
             OwnerPublicKey = owner.ToProto(),
         };
 
@@ -222,28 +227,29 @@ public class ElectricityCommandBuilder
             CertificateId = consCertId,
         };
 
-        SignCommandAndAddStep(consumptionSigner, consCertId, allocatedEvent);
-        SignCommandAndAddStep(productionSigner, prodCertId, allocatedEvent);
-        SignCommandAndAddStep(consumptionSigner, consCertId, consumptionClaimedEvent);
-        SignCommandAndAddStep(productionSigner, prodCertId, productionClaimedEvent);
+        SignCommandAndAddStep(productionSigner, prodCertId, allocatedEvent, consCertId);
+        SignCommandAndAddStep(consumptionSigner, consCertId, allocatedEvent, prodCertId);
+        SignCommandAndAddStep(productionSigner, prodCertId, productionClaimedEvent, consCertId);
+        SignCommandAndAddStep(consumptionSigner, consCertId, consumptionClaimedEvent, prodCertId);
 
         return this;
     }
 
-
     private List<Register.V1.CommandStep> _steps = new List<Register.V1.CommandStep>();
 
-    internal void SignCommandAndAddStep(Key issuingBodySigner, Register.V1.FederatedStreamId federatedId, IMessage @event)
+    internal void SignCommandAndAddStep(Key issuingBodySigner, Register.V1.FederatedStreamId federatedId, IMessage @event, params Register.V1.FederatedStreamId[] other)
     {
-        _steps.Add(new Register.V1.CommandStep()
+        var a = new Register.V1.CommandStep()
         {
             RoutingId = federatedId,
             SignedEvent = new Register.V1.SignedEvent()
             {
-                Type = V1.ConsumptionIssuedEvent.Descriptor.FullName,
+                Type = @event.Descriptor.FullName,
                 Payload = @event.ToByteString(),
                 Signature = RegisterClient.Sign(issuingBodySigner, @event)
             }
-        });
+        };
+        a.OtherStreams.AddRange(other);
+        _steps.Add(a);
     }
 }

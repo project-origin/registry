@@ -4,9 +4,8 @@ using ProjectOrigin.PedersenCommitment;
 
 namespace ProjectOrigin.Electricity;
 
-public static class ProtoToModelExtensions
+internal static class ProtoToModelExtensions
 {
-
     internal static bool VerifyCommitment(this V1.Commitment protoCommitment)
     {
         var commitment = Group.Default.CreateCommitment(new BigInteger(protoCommitment.Content.ToByteArray()));
@@ -18,23 +17,6 @@ public static class ProtoToModelExtensions
         var cp = Group.Default.CreateParameters(publication.Message, new BigInteger(publication.RValue.ToByteArray()));
         return commitment.Content.Span.SequenceEqual(cp.C.ToByteArray());
     }
-
-    // public static SliceProof ToModel(this V1.SliceProof proto)
-    // {
-    //     return new SliceProof(
-    //         proto.Source.ToModel(),
-    //         proto.Quantity.ToModel(),
-    //         proto.Remainder.ToModel());
-    // }
-
-    // public static Slice ToModel(this V1.Slice proto)
-    // {
-    //     return new Slice(
-    //         proto.Source.ToModel(),
-    //         proto.Quantity.ToModel(),
-    //         proto.Remainder.ToModel(),
-    //         new BigInteger(proto.ZeroR.ToByteArray()));
-    // }
 
     internal static Commitment ToModel(this V1.Commitment proto)
     {
