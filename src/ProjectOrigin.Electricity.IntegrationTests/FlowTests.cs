@@ -46,207 +46,251 @@ public class FlowTests : RegisterClientTestBase
         });
     }
 
-    // [Fact]
-    // public async Task IssueConsumptionCertificate_Success()
-    // {
-    //     var commandBuilder = new ElectricityCommandBuilder();
-    //     var gsrn = Group.Default.Commit(150);
-    //     var quantity = Group.Default.Commit(250);
-    //     var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
+    [Fact]
+    public async Task IssueConsumptionCertificate_Success()
+    {
+        var commandBuilder = new ElectricityCommandBuilder();
+        var gsrn = Group.Default.Commit(150);
+        var quantity = Group.Default.Commit(250);
+        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
 
-    //     var id = await commandBuilder
-    //         .IssueConsumptionCertificate(
-    //             new FederatedCertifcateId(
-    //                 Registries.RegistryA,
-    //                 Guid.NewGuid()
-    //             ),
-    //             new Client.Models.DateInterval(
-    //                 new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
-    //                 new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
-    //             ),
-    //             Area_DK1,
-    //             new Client.Models.ShieldedValue(150, gsrn.r),
-    //             new Client.Models.ShieldedValue(250, quantity.r),
-    //             ownerKey.PublicKey,
-    //             _dk1_issuer_key
-    //             )
-    //         .Execute(Client);
+        var id = await commandBuilder
+            .IssueConsumptionCertificate(
+                new FederatedCertifcateId(
+                    Registries.RegistryA,
+                    Guid.NewGuid()
+                ),
+                new Client.Models.DateInterval(
+                    new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
+                    new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
+                ),
+                Area_DK1,
+                new Client.Models.ShieldedValue(150, gsrn.RValue),
+                new Client.Models.ShieldedValue(250, quantity.RValue),
+                ownerKey.PublicKey,
+                _dk1_issuer_key
+                )
+            .Execute(Client);
 
-    //     var res = await GetResult();
+        var res = await GetResult();
 
-    //     AssertValidResponse(id, res);
-    // }
+        AssertValid(id, res);
+    }
 
-    // [Fact]
-    // public async Task IssueProductionCertificate_Success()
-    // {
-    //     var commandBuilder = new ElectricityCommandBuilder();
-    //     var gsrn = Group.Default.Commit(150);
-    //     var quantity = Group.Default.Commit(250);
-    //     var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
+    [Fact]
+    public async Task IssueConsumptionCertificate_Invalid()
+    {
+        var commandBuilder = new ElectricityCommandBuilder();
+        var gsrn = Group.Default.Commit(150);
+        var quantity = Group.Default.Commit(250);
+        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
 
-    //     var id = await commandBuilder
-    //         .IssueProductionCertificate(
-    //         new FederatedCertifcateId(
-    //             Registries.RegistryB,
-    //             Guid.NewGuid()
-    //         ),
-    //         new Client.Models.DateInterval(
-    //             new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
-    //             new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
-    //         ),
-    //         Area_DK2,
-    //         "F01050100",
-    //         "T020002",
-    //         new Client.Models.ShieldedValue(150, gsrn.r),
-    //         new Client.Models.ShieldedValue(250, quantity.r),
-    //         ownerKey.PublicKey,
-    //         _dk2_issuer_key
-    //         )
-    //         .Execute(Client);
+        var id = await commandBuilder
+            .IssueConsumptionCertificate(
+                new FederatedCertifcateId(
+                    Registries.RegistryA,
+                    Guid.NewGuid()
+                ),
+                new Client.Models.DateInterval(
+                    new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
+                    new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
+                ),
+                Area_DK1,
+                new Client.Models.ShieldedValue(150, gsrn.RValue),
+                new Client.Models.ShieldedValue(250, quantity.RValue),
+                ownerKey.PublicKey,
+                ownerKey
+                )
+            .Execute(Client);
 
-    //     var res = await GetResult();
+        var res = await GetResult();
 
-    //     AssertValidResponse(id, res);
-    // }
+        AssertInvalid(id, res, "Invalid issuer signature for GridArea ”Area_DK1”");
+    }
 
+    [Fact]
+    public async Task IssueProductionCertificate_Success()
+    {
+        var commandBuilder = new ElectricityCommandBuilder();
+        var gsrn = Group.Default.Commit(150);
+        var quantity = Group.Default.Commit(250);
+        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
 
-    // [Fact]
-    // public async Task SliceCertificate_Success()
-    // {
-    //     var commandBuilder = new ElectricityCommandBuilder();
-    //     var gsrn = Group.Default.Commit(570000000001213);
+        var id = await commandBuilder
+            .IssueProductionCertificate(
+            new FederatedCertifcateId(
+                Registries.RegistryB,
+                Guid.NewGuid()
+            ),
+            new Client.Models.DateInterval(
+                new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
+                new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
+            ),
+            Area_DK2,
+            "F01050100",
+            "T020002",
+            new Client.Models.ShieldedValue(150, gsrn.RValue),
+            new Client.Models.ShieldedValue(250, quantity.RValue),
+            ownerKey.PublicKey,
+            _dk2_issuer_key
+            )
+            .Execute(Client);
 
-    //     var ownerKey1 = Key.Create(SignatureAlgorithm.Ed25519);
-    //     var ownerKey2 = Key.Create(SignatureAlgorithm.Ed25519);
-    //     var ownerKey3 = Key.Create(SignatureAlgorithm.Ed25519);
+        var res = await GetResult();
 
-    //     var slice_0 = new ShieldedValue(250);
-    //     var slice_1 = new ShieldedValue(150);
-    //     var slice_1_1 = new ShieldedValue(100);
-    //     var slice_1_2 = new ShieldedValue(50);
+        AssertValid(id, res);
+    }
 
-    //     var slicer = new Slicer(slice_0);
-    //     slicer.CreateSlice(slice_1, ownerKey2.PublicKey);
-    //     var collection1 = slicer.Collect();
-    //     Assert.NotNull(collection1.Remainder);
+    [Fact]
+    public async Task SliceCertificate_Success()
+    {
+        var commandBuilder = new ElectricityCommandBuilder();
+        var gsrn = Group.Default.Commit(570000000001213);
 
-    //     var slicer2 = new Slicer(slice_1);
-    //     slicer2.CreateSlice(slice_1_1, ownerKey3.PublicKey);
-    //     slicer2.CreateSlice(slice_1_2, ownerKey1.PublicKey);
-    //     var collection2 = slicer2.Collect();
-    //     Assert.Null(collection2.Remainder);
+        var ownerKey1 = Key.Create(SignatureAlgorithm.Ed25519);
+        var ownerKey2 = Key.Create(SignatureAlgorithm.Ed25519);
+        var ownerKey3 = Key.Create(SignatureAlgorithm.Ed25519);
 
-    //     var certId = new FederatedCertifcateId(
-    //         Registries.RegistryB,
-    //         Guid.NewGuid()
-    //     );
+        var slice_0 = new ShieldedValue(250);
+        var slice_1 = new ShieldedValue(150);
+        var slice_1_1 = new ShieldedValue(100);
+        var slice_1_2 = new ShieldedValue(50);
 
-    //     var id = await commandBuilder
-    //         .IssueProductionCertificate(
-    //             certId,
-    //             new Client.Models.DateInterval(
-    //                 new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
-    //                 new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
-    //             ),
-    //             Area_DK2,
-    //             "F01050100",
-    //             "T020002",
-    //             gsrn.ToShieldedValue(),
-    //             slice_0,
-    //             ownerKey1.PublicKey,
-    //             _dk2_issuer_key
-    //             )
-    //         .SliceCertificate(
-    //             certId,
-    //             collection1,
-    //             ownerKey1
-    //             )
-    //         .SliceCertificate(
-    //             certId,
-    //             collection2,
-    //             ownerKey2
-    //             )
-    //         .Execute(Client);
+        var slicer = new Slicer(slice_0);
+        slicer.CreateSlice(slice_1, ownerKey2.PublicKey);
+        var collection1 = slicer.Collect();
+        Assert.NotNull(collection1.Remainder);
 
-    //     var res = await GetResult();
-    //     AssertValidResponse(id, res);
-    // }
+        var slicer2 = new Slicer(slice_1);
+        slicer2.CreateSlice(slice_1_1, ownerKey3.PublicKey);
+        slicer2.CreateSlice(slice_1_2, ownerKey1.PublicKey);
+        var collection2 = slicer2.Collect();
+        Assert.Null(collection2.Remainder);
 
-    // [Fact]
-    // public async Task ClaimCertificate_Success()
-    // {
-    //     var commandBuilder = new ElectricityCommandBuilder();
-    //     var gsrn = Group.Default.Commit(570000000001213);
-    //     var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
+        var certId = new FederatedCertifcateId(
+            Registries.RegistryB,
+            Guid.NewGuid()
+        );
 
-    //     var consCertId = new FederatedCertifcateId(
-    //         Registries.RegistryB,
-    //         Guid.NewGuid()
-    //     );
-    //     var consQuantity = new ShieldedValue(150);
+        var id = await commandBuilder
+            .IssueProductionCertificate(
+                certId,
+                new Client.Models.DateInterval(
+                    new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
+                    new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
+                ),
+                Area_DK2,
+                "F01050100",
+                "T020002",
+                gsrn.ToShieldedValue(),
+                slice_0,
+                ownerKey1.PublicKey,
+                _dk2_issuer_key
+                )
+            .SliceCertificate(
+                certId,
+                collection1,
+                ownerKey1
+                )
+            .SliceCertificate(
+                certId,
+                collection2,
+                ownerKey2
+                )
+            .Execute(Client);
 
-    //     var prodCertId = new FederatedCertifcateId(
-    //         Registries.RegistryB,
-    //         Guid.NewGuid()
-    //     );
-    //     var prodQuantity = new ShieldedValue(250);
-    //     var prod_slice = new ShieldedValue(150);
+        var res = await GetResult();
+        AssertValid(id, res);
+    }
 
-    //     var claimQuantity = new ShieldedValue(150);
+    [Fact]
+    public async Task ClaimCertificate_Success()
+    {
+        var commandBuilder = new ElectricityCommandBuilder();
+        var gsrn = Group.Default.Commit(570000000001213);
+        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
 
-    //     var slicer = new Slicer(prodQuantity);
-    //     slicer.CreateSlice(prod_slice, ownerKey.PublicKey);
-    //     var collection1 = slicer.Collect();
-    //     Assert.NotNull(collection1.Remainder);
+        var consCertId = new FederatedCertifcateId(
+            Registries.RegistryB,
+            Guid.NewGuid()
+        );
+        var consQuantity = new ShieldedValue(150);
 
-    //     var id = await commandBuilder
-    //         .IssueProductionCertificate(
-    //             prodCertId,
-    //             new Client.Models.DateInterval(
-    //                 new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
-    //                 new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
-    //             ),
-    //             Area_DK1,
-    //             "F01050100",
-    //             "T020002",
-    //             gsrn.ToShieldedValue(),
-    //             prodQuantity,
-    //             ownerKey.PublicKey,
-    //             _dk1_issuer_key
-    //         )
-    //         .IssueConsumptionCertificate(
-    //             consCertId,
-    //             new Client.Models.DateInterval(
-    //                 new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
-    //                 new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
-    //             ),
-    //             Area_DK1,
-    //             gsrn.ToShieldedValue(),
-    //             consQuantity,
-    //             ownerKey.PublicKey,
-    //             _dk1_issuer_key
-    //             )
-    //         .ClaimCertificate(
-    //             claimQuantity,
-    //             consCertId,
-    //             consQuantity,
-    //             ownerKey,
-    //             prodCertId,
-    //             prod_slice,
-    //             ownerKey
-    //         )
-    //         .Execute(Client);
+        var prodCertId = new FederatedCertifcateId(
+            Registries.RegistryB,
+            Guid.NewGuid()
+        );
+        var prodQuantity = new ShieldedValue(250);
+        var prod_slice = new ShieldedValue(150);
 
-    //     AssertValidResponse(id, await GetResult());
-    // }
+        var claimQuantity = new ShieldedValue(150);
 
-    void AssertValidResponse(CommandId id, CommandStatusEvent? res)
+        var slicer = new Slicer(prodQuantity);
+        slicer.CreateSlice(prod_slice, ownerKey.PublicKey);
+        var collection1 = slicer.Collect();
+        Assert.NotNull(collection1.Remainder);
+
+        var id = await commandBuilder
+            .IssueProductionCertificate(
+                prodCertId,
+                new Client.Models.DateInterval(
+                    new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
+                    new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
+                ),
+                Area_DK1,
+                "F01050100",
+                "T020002",
+                gsrn.ToShieldedValue(),
+                prodQuantity,
+                ownerKey.PublicKey,
+                _dk1_issuer_key
+            )
+            .IssueConsumptionCertificate(
+                consCertId,
+                new Client.Models.DateInterval(
+                    new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
+                    new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
+                ),
+                Area_DK1,
+                gsrn.ToShieldedValue(),
+                consQuantity,
+                ownerKey.PublicKey,
+                _dk1_issuer_key
+                )
+            .SliceCertificate(
+                prodCertId,
+                collection1,
+                ownerKey
+                )
+            .ClaimCertificate(
+                claimQuantity,
+                consCertId,
+                consQuantity,
+                ownerKey,
+                prodCertId,
+                prod_slice,
+                ownerKey
+            )
+            .Execute(Client);
+
+        AssertValid(id, await GetResult());
+    }
+
+    private static void AssertValid(CommandId id, CommandStatusEvent? res)
     {
         Assert.NotNull(res);
         Assert.Equal(id.Hash, res!.Id.Hash);
         if (!string.IsNullOrEmpty(res.Error)) throw new Xunit.Sdk.XunitException(res.Error);
         Assert.Equal(CommandState.Succeeded, res.State);
+    }
+
+    private static void AssertInvalid(CommandId id, CommandStatusEvent? res, string expectedError)
+    {
+        Assert.NotNull(res);
+        Assert.Equal(id.Hash, res!.Id.Hash);
+        if (string.IsNullOrEmpty(res.Error)) throw new Xunit.Sdk.XunitException($"Error field is empty, expected ”{expectedError}”");
+        Assert.Equal(expectedError, res.Error);
+        Assert.Equal(CommandState.Failed, res.State);
     }
 }
 
@@ -254,6 +298,6 @@ public static class Extensions
 {
     public static ShieldedValue ToShieldedValue(this CommitmentParameters cm)
     {
-        return new ShieldedValue((uint)cm.Message, cm.RValue);
+        return new ShieldedValue((ulong)cm.Message, cm.RValue);
     }
 }

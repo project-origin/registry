@@ -1,11 +1,8 @@
-using Google.Protobuf;
 using Microsoft.Extensions.Options;
 using ProjectOrigin.Register.StepProcessor.Interfaces;
 using ProjectOrigin.Register.StepProcessor.Models;
 using ProjectOrigin.Register.StepProcessor.Services;
 using ProjectOrigin.VerifiableEventStore.Models;
-using ProjectOrigin.VerifiableEventStore.Services.Batcher;
-using ProjectOrigin.VerifiableEventStore.Services.EventStore;
 
 namespace ProjectOrigin.Register.StepProcessor.Tests;
 
@@ -19,18 +16,17 @@ public class SynchronousCommandStepProcessorTests
         var index = fixture.Create<int>();
         var request = NewRequest(registryName);
 
-        var batcherMock = new Mock<IBatcher>();
-        var dispatcherMock = new Mock<ICommandStepVerifier>();
+        var federatedEventStoreMock = MockFederatedEventStore(index);
+        var dispatcherMock = new Mock<ICommandStepVerifiere>();
         dispatcherMock.Setup(obj => obj.Verify(It.IsAny<V1.CommandStep>(), It.IsAny<Dictionary<V1.FederatedStreamId, IEnumerable<V1.SignedEvent>>>())).ReturnsAsync(new VerificationResult.Valid());
-        var optionsMock = CreateOptions(registryName, registryName, index);
-
-        var processor = new CommandStepProcessor(optionsMock, dispatcherMock.Object, batcherMock.Object);
+        var optionsMock = CreateOptions(registryName);
+        var processor = new CommandStepProcessor(optionsMock, federatedEventStoreMock.Object, dispatcherMock.Object);
 
         await processor.Process(request);
 
         var streamId = Guid.Parse(request.RoutingId.StreamId.Value);
 
-        batcherMock.Verify(obj => obj.PublishEvent(It.Is<VerifiableEvent>(e => e.Id == new EventId(streamId, index))), Times.Once);
+        federatedEventStoreMock.Verify(obj => obj.PublishEvent(It.Is<VerifiableEvent>(e => e.Id == new EventId(streamId, index))), Times.Once);
     }
 
     [Fact]
@@ -42,12 +38,12 @@ public class SynchronousCommandStepProcessorTests
 
         var errorMessage = fixture.Create<string>();
 
-        var batcherMock = new Mock<IBatcher>();
-        var dispatcherMock = new Mock<ICommandStepVerifier>();
+        var federatedEventStoreMock = MockFederatedEventStore(1);
+        var dispatcherMock = new Mock<ICommandStepVerifiere>();
         dispatcherMock.Setup(obj => obj.Verify(It.IsAny<V1.CommandStep>(), It.IsAny<Dictionary<V1.FederatedStreamId, IEnumerable<V1.SignedEvent>>>())).ReturnsAsync(new VerificationResult.Invalid(errorMessage));
-        var optionsMock = CreateOptions(registryName, registryName, 1);
+        var optionsMock = CreateOptions(registryName);
 
-        var processor = new CommandStepProcessor(optionsMock, dispatcherMock.Object, batcherMock.Object);
+        var processor = new CommandStepProcessor(optionsMock, federatedEventStoreMock.Object, dispatcherMock.Object);
         var result = await processor.Process(request);
 
         Assert.Equal(V1.CommandState.Failed, result.State);
@@ -63,50 +59,36 @@ public class SynchronousCommandStepProcessorTests
         var request = NewRequest(otherRegistryName);
         var errorMessage = fixture.Create<string>();
 
-        var batcherMock = new Mock<IBatcher>();
-        var dispatcherMock = new Mock<ICommandStepVerifier>();
+        var federatedEventStoreMock = MockFederatedEventStore(1);
+        var dispatcherMock = new Mock<ICommandStepVerifiere>();
         dispatcherMock.Setup(obj => obj.Verify(It.IsAny<V1.CommandStep>(), It.IsAny<Dictionary<V1.FederatedStreamId, IEnumerable<V1.SignedEvent>>>())).ReturnsAsync(new VerificationResult.Valid());
-        var optionsMock = CreateOptions(registryName, registryName, 1);
+        var optionsMock = CreateOptions(registryName);
 
-        var processor = new CommandStepProcessor(optionsMock, dispatcherMock.Object, batcherMock.Object);
+        var processor = new CommandStepProcessor(optionsMock, federatedEventStoreMock.Object, dispatcherMock.Object);
         var ex = await Assert.ThrowsAsync<InvalidDataException>(() => processor.Process(request));
 
         Assert.Equal("Invalid registry for request", ex.Message);
     }
 
-    [Fact]
-    public async Task RequestProcessor_CouldNotFindEventStore_ThrowsException()
+    private Mock<IFederatedEventStore> MockFederatedEventStore(int i)
     {
         var fixture = new Fixture();
-        var registryName = fixture.Create<string>();
-        var eventStoreName = fixture.Create<string>();
-        var request = NewRequest(registryName);
-        var errorMessage = fixture.Create<string>();
+        var federatedEventStoreMock = new Mock<IFederatedEventStore>();
+        federatedEventStoreMock.Setup(obj => obj.GetStreams((It.IsAny<IEnumerable<V1.FederatedStreamId>>()))).Returns<IEnumerable<V1.FederatedStreamId>>(
+            (fids) =>
+            {
+                IDictionary<V1.FederatedStreamId, IEnumerable<V1.SignedEvent>> dictionary = fids.Select(x => (fid: x, events: fixture.CreateMany<V1.SignedEvent>(i)))
+                    .ToDictionary(x => x.fid, x => x.events);
 
-        var batcherMock = new Mock<IBatcher>();
-        var dispatcherMock = new Mock<ICommandStepVerifier>();
-        dispatcherMock.Setup(obj => obj.Verify(It.IsAny<V1.CommandStep>(), It.IsAny<Dictionary<V1.FederatedStreamId, IEnumerable<V1.SignedEvent>>>())).ReturnsAsync(new VerificationResult.Valid());
-        var optionsMock = CreateOptions(registryName, eventStoreName, 1);
+                return Task.FromResult(dictionary);
+            });
 
-        var processor = new CommandStepProcessor(optionsMock, dispatcherMock.Object, batcherMock.Object);
-        var ex = await Assert.ThrowsAsync<NullReferenceException>(() => processor.Process(request));
-
-        Assert.Equal($"Connection to EventStore for registry ”{registryName}” could not be found", ex.Message);
+        return federatedEventStoreMock;
     }
 
-    private IOptions<CommandStepProcessorOptions> CreateOptions(string registryName, string eventStoreName, int i)
+    private IOptions<CommandStepProcessorOptions> CreateOptions(string registryName)
     {
-        var fixture = new Fixture();
-
-        var b = fixture.CreateMany<V1.SignedEvent>(i);
-        var c = b.Select(x => new VerifiableEvent(fixture.Create<EventId>(), x.ToByteArray()));
-
-        var eventStoreMock = new Mock<IEventStore>();
-        eventStoreMock.Setup(obj => obj.GetEventsForEventStream(It.IsAny<Guid>())).ReturnsAsync(c);
-        return CreateOptionsMock<CommandStepProcessorOptions>(new CommandStepProcessorOptions(registryName, new Dictionary<string, IEventStore>()
-        {
-            {eventStoreName, eventStoreMock.Object}
-        }));
+        return CreateOptionsMock<CommandStepProcessorOptions>(new CommandStepProcessorOptions(registryName));
     }
 
     private IOptions<T> CreateOptionsMock<T>(T content) where T : class

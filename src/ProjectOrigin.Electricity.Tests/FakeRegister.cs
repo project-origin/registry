@@ -1,10 +1,10 @@
 using Google.Protobuf;
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Consumption;
-using ProjectOrigin.Electricity.Interfaces;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Production;
 using ProjectOrigin.PedersenCommitment;
+using ProjectOrigin.Register.StepProcessor.Interfaces;
 using ProjectOrigin.Register.V1;
 
 namespace ProjectOrigin.Electricity.Tests;
@@ -56,7 +56,7 @@ internal static class FakeRegister
         certificate.Apply(e);
     }
 
-    internal static VerificationRequest<ProductionCertificate, V1.TransferredEvent> CreateTransfer(
+    internal static VerificationRequest<V1.TransferredEvent> CreateTransfer(
         ProductionCertificate certificate,
         CommitmentParameters sourceSliceParameters,
         V1.PublicKey newOwner,
@@ -71,14 +71,16 @@ internal static class FakeRegister
             NewOwner = newOwner
         };
 
-        return new VerificationRequest<ProductionCertificate, V1.TransferredEvent>(
-            exists ? certificate : null,
+        return new VerificationRequest<V1.TransferredEvent>(
             @event,
-            Sign(signerKey, @event)
+            Sign(signerKey, @event),
+            exists ? new(){
+                {certificate.Id, certificate}
+            } : new()
         );
     }
 
-    internal static VerificationRequest<ProductionCertificate, V1.SlicedEvent> CreateSlices(
+    internal static VerificationRequest<V1.SlicedEvent> CreateSlices(
         ProductionCertificate certificate,
         CommitmentParameters sourceParams,
         int quantity,
@@ -89,14 +91,16 @@ internal static class FakeRegister
     {
         var @event = CreateSliceEvent(certificate.Id, sourceParams, quantity, ownerKey, newOwnerOverride, sumOverride);
 
-        return new VerificationRequest<ProductionCertificate, V1.SlicedEvent>(
-            exists ? certificate : null,
+        return new VerificationRequest<V1.SlicedEvent>(
             @event,
-            Sign(ownerKey, @event)
+            Sign(ownerKey, @event),
+            exists ? new(){
+                {certificate.Id, certificate}
+            } : new()
         );
     }
 
-    internal static VerificationRequest<ConsumptionCertificate, V1.SlicedEvent> CreateSlices(
+    internal static VerificationRequest<V1.SlicedEvent> CreateSlices(
     ConsumptionCertificate certificate,
     CommitmentParameters sourceParams,
     int quantity,
@@ -107,10 +111,12 @@ internal static class FakeRegister
     {
         var @event = CreateSliceEvent(certificate.Id, sourceParams, quantity, ownerKey, newOwnerOverride, sumOverride);
 
-        return new VerificationRequest<ConsumptionCertificate, V1.SlicedEvent>(
-            exists ? certificate : null,
+        return new VerificationRequest<V1.SlicedEvent>(
             @event,
-            Sign(ownerKey, @event)
+            Sign(ownerKey, @event),
+            exists ? new(){
+                {certificate.Id, certificate}
+            } : new()
         );
     }
 
@@ -121,9 +127,6 @@ internal static class FakeRegister
         var remainder = Group.Commit(sourceParams.Message - quantity);
 
         var newOwner = newOwnerOverride ?? Key.Create(SignatureAlgorithm.Ed25519).PublicKey.ToProto();
-
-
-
 
         var @event = new V1.SlicedEvent
         {
@@ -146,7 +149,7 @@ internal static class FakeRegister
     }
 
 
-    internal static VerificationRequest<ProductionCertificate, V1.ClaimedEvent> CreateProductionClaim(
+    internal static VerificationRequest<V1.ClaimedEvent> CreateProductionClaim(
         Guid allocationId,
         ProductionCertificate productionCertificate,
         ConsumptionCertificate consumptionCertificate,
@@ -161,17 +164,18 @@ internal static class FakeRegister
             AllocationId = allocationId.ToProto()
         };
 
-        return new VerificationRequest<ProductionCertificate, V1.ClaimedEvent>(
-            exists ? productionCertificate : null,
+        var models = new Dictionary<FederatedStreamId, object>();
+        if (exists) models.Add(productionCertificate.Id, productionCertificate);
+        if (otherExists) models.Add(consumptionCertificate.Id, consumptionCertificate);
+
+        return new VerificationRequest<V1.ClaimedEvent>(
             @event,
             Sign(signerKey, @event),
-            otherExists ? new(){
-                {consumptionCertificate.Id, consumptionCertificate}
-            } : null
+            models
         );
     }
 
-    internal static VerificationRequest<ConsumptionCertificate, V1.ClaimedEvent> CreateConsumptionClaim(
+    internal static VerificationRequest<V1.ClaimedEvent> CreateConsumptionClaim(
        Guid allocationId,
        ProductionCertificate productionCertificate,
        ConsumptionCertificate consumptionCertificate,
@@ -186,17 +190,18 @@ internal static class FakeRegister
             AllocationId = allocationId.ToProto()
         };
 
-        return new VerificationRequest<ConsumptionCertificate, V1.ClaimedEvent>(
-            exists ? consumptionCertificate : null,
+        var models = new Dictionary<FederatedStreamId, object>();
+        if (exists) models.Add(consumptionCertificate.Id, consumptionCertificate);
+        if (otherExists) models.Add(productionCertificate.Id, productionCertificate);
+
+        return new VerificationRequest<V1.ClaimedEvent>(
             @event,
             Sign(signerKey, @event),
-            otherExists ? new(){
-                {productionCertificate.Id, productionCertificate}
-            } : null
+            models
         );
     }
 
-    internal static VerificationRequest<ConsumptionCertificate, V1.AllocatedEvent> CreateConsumptionAllocationRequest(
+    internal static VerificationRequest<V1.AllocatedEvent> CreateConsumptionAllocationRequest(
     Guid allocationId,
     ProductionCertificate production,
     ConsumptionCertificate consumption,
@@ -210,17 +215,18 @@ internal static class FakeRegister
     {
         var @event = CreateAllocationEvent(allocationId, production.Id, consumption.Id, productionSlice, consumptionSlice, overwrideEqualityProof);
 
-        return new VerificationRequest<ConsumptionCertificate, V1.AllocatedEvent>(
-            exists ? consumption : null,
+        var models = new Dictionary<FederatedStreamId, object>();
+        if (exists) models.Add(consumption.Id, consumption);
+        if (otherExists) models.Add(production.Id, production);
+
+        return new VerificationRequest<V1.AllocatedEvent>(
             @event,
             Sign(signerKey, @event),
-            otherExists ? new(){
-                {production.Id, production}
-            } : null
+            models
         );
     }
 
-    internal static VerificationRequest<ProductionCertificate, V1.AllocatedEvent> CreateProductionAllocationRequest(
+    internal static VerificationRequest<V1.AllocatedEvent> CreateProductionAllocationRequest(
     ProductionCertificate production,
     ConsumptionCertificate consumption,
     CommitmentParameters productionSlice,
@@ -235,13 +241,14 @@ internal static class FakeRegister
         var allocationId = allocationIdOverride ?? Guid.NewGuid();
         var @event = CreateAllocationEvent(allocationId, production.Id, consumption.Id, productionSlice, consumptionSlice, overwrideEqualityProof);
 
-        return new VerificationRequest<ProductionCertificate, V1.AllocatedEvent>(
-            exists ? production : null,
+        var models = new Dictionary<FederatedStreamId, object>();
+        if (exists) models.Add(production.Id, production);
+        if (otherExists) models.Add(consumption.Id, consumption);
+
+        return new VerificationRequest<V1.AllocatedEvent>(
             @event,
             Sign(signerKey, @event),
-            otherExists ? new(){
-                {consumption.Id, consumption}
-            } : null
+            models
         );
     }
 
@@ -309,7 +316,7 @@ internal static class FakeRegister
         return (cert, quantityCommitmentParameters);
     }
 
-    internal static VerificationRequest<ConsumptionCertificate, V1.ConsumptionIssuedEvent> CreateConsumptionIssuedRequest(
+    internal static VerificationRequest<V1.ConsumptionIssuedEvent> CreateConsumptionIssuedRequest(
         Key signerKey,
         V1.PublicKey? ownerKeyOverride = null,
         V1.Commitment? gsrnCommitmentOverride = null,
@@ -333,10 +340,12 @@ internal static class FakeRegister
             OwnerPublicKey = owner,
         };
 
-        return new VerificationRequest<ConsumptionCertificate, V1.ConsumptionIssuedEvent>(
-            exists ? new(@event) : null,
+        return new VerificationRequest<V1.ConsumptionIssuedEvent>(
             @event,
-            Sign(signerKey, @event)
+            Sign(signerKey, @event),
+            exists ? new(){
+                {id, new ConsumptionCertificate(@event)}
+            } : new()
         );
     }
 
@@ -349,7 +358,7 @@ internal static class FakeRegister
         }
     };
 
-    internal static VerificationRequest<ProductionCertificate, V1.ProductionIssuedEvent> CreateProductionIssuedRequest(
+    internal static VerificationRequest<V1.ProductionIssuedEvent> CreateProductionIssuedRequest(
         Key signerKey,
         V1.Commitment? gsrnCommitmentOverride = null,
         V1.Commitment? quantityCommitmentOverride = null,
@@ -379,10 +388,12 @@ internal static class FakeRegister
             QuantityPublication = publicQuantity ? (publicQuantityCommitmentOverride ?? quantityCommmitmentParams).ToProto() : null
         };
 
-        return new VerificationRequest<ProductionCertificate, V1.ProductionIssuedEvent>(
-            exists ? new(@event) : null,
+        return new VerificationRequest<V1.ProductionIssuedEvent>(
             @event,
-            Sign(signerKey, @event)
+            Sign(signerKey, @event),
+            exists ? new(){
+                {id, new ProductionCertificate(@event)}
+            } : new()
         );
     }
 

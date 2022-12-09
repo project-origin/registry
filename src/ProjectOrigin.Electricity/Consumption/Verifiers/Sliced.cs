@@ -1,20 +1,20 @@
 using Google.Protobuf;
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Consumption;
-using ProjectOrigin.Electricity.Interfaces;
 using ProjectOrigin.PedersenCommitment;
+using ProjectOrigin.Register.StepProcessor.Interfaces;
 using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Production.Verifiers;
 
 internal class ConsumptionSlicedVerifier : IEventVerifier<ConsumptionCertificate, V1.SlicedEvent>
 {
-    public Task<VerificationResult> Verify(VerificationRequest<ConsumptionCertificate, V1.SlicedEvent> request)
+    public Task<VerificationResult> Verify(Register.StepProcessor.Interfaces.VerificationRequest<V1.SlicedEvent> request)
     {
-        if (request.Model is null)
+        if (!request.TryGetModel<ConsumptionCertificate>(request.Event.CertificateId, out var consumptionCertificate))
             return new VerificationResult.Invalid("Certificate does not exist");
 
-        var certificateSlice = request.Model.GetCertificateSlice(request.Event.SourceSlice);
+        var certificateSlice = consumptionCertificate.GetCertificateSlice(request.Event.SourceSlice);
         if (certificateSlice is null)
             return new VerificationResult.Invalid("Slice not found");
 

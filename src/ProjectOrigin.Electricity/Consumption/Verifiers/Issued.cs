@@ -1,14 +1,14 @@
 using Google.Protobuf;
 using Microsoft.Extensions.Options;
 using NSec.Cryptography;
-using ProjectOrigin.Electricity.Interfaces;
 using ProjectOrigin.Electricity.Models;
+using ProjectOrigin.Register.StepProcessor.Interfaces;
 using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Consumption.Verifiers;
 
 
-internal class ConsumptionIssuedVerifier : IEventVerifier<ConsumptionCertificate, V1.ConsumptionIssuedEvent>
+internal class ConsumptionIssuedVerifier : IEventVerifier<V1.ConsumptionIssuedEvent>
 {
     private IssuerOptions _issuerOptions;
 
@@ -17,9 +17,9 @@ internal class ConsumptionIssuedVerifier : IEventVerifier<ConsumptionCertificate
         _issuerOptions = issuerOptions.Value;
     }
 
-    public Task<VerificationResult> Verify(VerificationRequest<ConsumptionCertificate, V1.ConsumptionIssuedEvent> request)
+    public Task<VerificationResult> Verify(Register.StepProcessor.Interfaces.VerificationRequest<V1.ConsumptionIssuedEvent> request)
     {
-        if (request.Model is not null)
+        if (request.TryGetModel<ConsumptionCertificate>(request.Event.CertificateId, out _))
             return new VerificationResult.Invalid($"Certificate with id ”{request.Event.CertificateId.StreamId}” already exists");
 
         if (!request.Event.GsrnCommitment.VerifyCommitment())

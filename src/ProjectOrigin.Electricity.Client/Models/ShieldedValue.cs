@@ -14,7 +14,7 @@ public class ShieldedValue
     /// <summary>
     /// Contains the message that the shielded value should protect.
     /// </summary>
-    public uint Message { get => (uint)_commitmentParameters.Message; }
+    public ulong Message { get => (ulong)_commitmentParameters.Message; }
 
     /// <summary>
     /// The random value that protects the message.
@@ -29,7 +29,7 @@ public class ShieldedValue
     /// </summary>
     /// <param name="message">contains the message that one wants to hide.</param>
     /// <param name="r">contains the random value that hides the message.</param>
-    public ShieldedValue(uint message, BigInteger r)
+    public ShieldedValue(ulong message, BigInteger r)
     {
         _commitmentParameters = Group.Default.CreateParameters(message, r);
     }
@@ -39,7 +39,7 @@ public class ShieldedValue
     /// automatically creates a random value to hide the message.
     /// </summary>
     /// <param name="message">contains the message that one wants to hide.</param>
-    public ShieldedValue(uint message)
+    public ShieldedValue(ulong message)
     {
         _commitmentParameters = Group.Default.Commit(message);
     }
