@@ -1,6 +1,11 @@
 using ProjectOrigin.Electricity.Server;
 
-WebApplication.CreateBuilder(args).WebHost
-    .UseStartup<Startup>()
-    .Build()
-    .Run();
+var startup = new Startup();
+
+var builder = WebApplication.CreateBuilder(args);
+startup.ConfigureServices(builder.Services);
+
+var app = builder.Build();
+startup.Configure(app, builder.Environment);
+
+app.Run();
