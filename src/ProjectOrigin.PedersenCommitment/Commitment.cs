@@ -1,4 +1,6 @@
 using System.Numerics;
+using System.Runtime.Serialization;
+using System.Runtime.InteropServices;
 
 namespace ProjectOrigin.PedersenCommitment;
 
@@ -25,4 +27,8 @@ public record Commitment
         if (left._group != right._group) throw new InvalidOperationException("Operator / between two commitments in different groups are not allowed");
         return left._group.InverseProduct(left.C, right.C);
     }
+
+
+    [DllImport("rust_ffi", EntryPoint = "hello")]
+    public static extern void Hello();
 }

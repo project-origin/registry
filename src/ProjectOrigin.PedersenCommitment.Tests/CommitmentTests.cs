@@ -74,4 +74,8 @@ public class CommitmentTests
         Assert.NotNull(group.Commit(m));
     }
 
+    [Fact]
+    public void TestHello() {
+        Commitment.Hello();
+    }
 }
