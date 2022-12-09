@@ -19,7 +19,8 @@
                 "EditorConfig.EditorConfig",
                 "ms-dotnettools.csharp",
                 "formulahendry.dotnet-test-explorer",
-                "ryanluker.vscode-coverage-gutters"
+                "ryanluker.vscode-coverage-gutters",
+                "DotJoshJohnson.xml"
             ],
             "settings": {
                 "editor.formatOnSave": true
