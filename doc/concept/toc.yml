@@ -1,7 +1,23 @@
 - name: Granular Certificate
   items:
   - name: Granular Certificate
-    href: granular-certificate.md
+    href: granular-certificates/readme.md
+  - name: Certificate ID
+    href: granular-certificates/federated-certifate-id.md
+  - name: Attributes
+    href: granular-certificates/attributes.md
+- name: Commands
+  items:
+  - name: Transfer
+    href: granular-certificates/commands/transfer.md
+  - name: Slice
+    href: granular-certificates/commands/slice.md
+  - name: Claim
+    href: granular-certificates/commands/claim.md
+- name: Registry
+  items:
+  - name: What is a registry
+    href: registry.md
 - name: Commitments
   items:
   - name: Pedersen Commitment

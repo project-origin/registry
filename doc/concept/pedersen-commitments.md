@@ -4,17 +4,21 @@ uid: pedersen_commitment
 
 # Pedersen Commitments
 
+> **_tl;dr_**
+> EnablesTOODO
+
+
 In order to obfuscate sensitive data in the certificates to only be accesible and readable to the owner and verifiable to the reciver of the data ie GSRN numbers, quantity of energy that is being transferred, etc, the data is encrypted using Pedersen commitments. The Pedersen commitment is a commitment scheme that allows the holder of the commitment to commit to a value without revealing the value itself. The commitment can be opened to reveal the value. The holder cannot open it to reveal another value. The commitment scheme is homomorphic in the sense that the product of two commitments will be a commitment to the sum of the two values.
 
 ## Pedersen commitments are defined as follows:
 
 $$c=C(m,r)$$
 
-|identifier|property|usage|accessability|
-|---|---|---|---|
-`c` | commitment | the commitment itself | public |
-`m` | message | the message that is being committed to | private |
-`r` | randomness | the randomness used to commit to the message | private |
+| identifier | property   | usage                                        | accessability |
+| ---------- | ---------- | -------------------------------------------- | ------------- |
+| `c`        | commitment | the commitment itself                        | public        |
+| `m`        | message    | the message that is being committed to       | private       |
+| `r`        | randomness | the randomness used to commit to the message | private       |
 
 ```mermaid
 graph TD
@@ -83,12 +87,12 @@ $$C´= Ctotal / (Ctransactions * Cremainder)$$
 The value in a production certificate may be divided up among several owners (several commitments) and there may be several claims. In this case, we want to show that the product of commitments in the first certificate divided by the product of commitments in the second is a `C´` - commitment to 0 (so the sum of energy quantities is the same in the two certificates).
 
 The possible transactions in the certificate are:
-|Type|description|
-|---|---|
-|Transfer|transfer of ownership X quantity of units ie. Wh from user A to B|
-|Claim|claim of ownership of production certificate X to consumption certificate Y|
-|Expire|expiration of remainder of production certificate|
-|Withdraw|withdrawal of remainder of production certificate|
+| Type     | description                                                                 |
+| -------- | --------------------------------------------------------------------------- |
+| Transfer | transfer of ownership X quantity of units ie. Wh from user A to B           |
+| Claim    | claim of ownership of production certificate X to consumption certificate Y |
+| Expire   | expiration of remainder of production certificate                           |
+| Withdraw | withdrawal of remainder of production certificate                           |
 
 By having unique and random `r` randomness for each transaction, we can prove that the sum of the transactions is equal to the committed value in the original production certificate,
 

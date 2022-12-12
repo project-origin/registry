@@ -40,7 +40,17 @@
             "_appTitle": "Project Origin",
             "_enableSearch": true
         },
+        "template": [
+            "default",
+            "template/mermaid"
+        ],
         "markdownEngineName": "markdig",
+        "markdownEngineProperties": {
+            "markdigExtensions": [
+                "footnotes",
+                "diagrams"
+            ]
+        },
         "dest": "_site",
         "xrefService": [
             "https://xref.docs.microsoft.com/query?uid={uid}"
