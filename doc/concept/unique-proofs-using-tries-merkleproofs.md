@@ -1,10 +1,4 @@
-# D-03-002 Unique proofs using tries
-
-- Feature Name:`unique_proofs_using_tries`
-- Start Date: 2022-07-14
-- Assignees: @MartinSchmidt, @wisbech
- 
-## Unique proofs using Merkle Trees / tries
+# Unique proofs using tries / merkle proofs
 
 A unique digital proof is prerequisite for claims and immutability of certificates
 
