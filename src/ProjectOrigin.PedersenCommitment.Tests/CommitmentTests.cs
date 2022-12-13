@@ -75,7 +75,15 @@ public class CommitmentTests
     }
 
     [Fact]
-    public void TestHello() {
-        Commitment.Hello();
+    public void TestSunshine() {
+        var gen = new Generator();
+        var m = new BigInteger(51);
+        var r = BigInteger.Parse("35425707649260674451675575047706194335233578342436579356033363");
+        var point = gen.Commit(m, r);
+
+        var thing = point.Compress();
+        var str = Convert.ToBase64String(thing.bytes);
+        Console.WriteLine(str);
+
     }
 }

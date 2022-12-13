@@ -28,7 +28,4 @@ public record Commitment
         return left._group.InverseProduct(left.C, right.C);
     }
 
-
-    [DllImport("rust_ffi", EntryPoint = "hello")]
-    public static extern void Hello();
 }
