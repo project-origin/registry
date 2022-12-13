@@ -61,3 +61,7 @@ The owner of a slice only knowns the quantity of their own slice.
 >
 > Similar, if I create slice-F and transfer it to another part,
 > I do not know what size the new slices they might create (G and H) only they are proveable sum to the 500wh I transferred.
+
+## How to
+
+Look at the [Command builder API doc](xref:ProjectOrigin.Electricity.Client.ElectricityCommandBuilder) for how to perform the command.

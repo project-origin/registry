@@ -32,7 +32,8 @@
         "resource": [
             {
                 "files": [
-                    "**/*.svg"
+                    "**/*.svg",
+                    "logo.png"
                 ]
             }
         ],

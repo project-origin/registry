@@ -6,7 +6,7 @@
     href: granular-certificates/federated-certifate-id.md
   - name: Attributes
     href: granular-certificates/attributes.md
-- name: Commands
+- name: GC Commands
   items:
   - name: Transfer
     href: granular-certificates/commands/transfer.md
@@ -14,9 +14,11 @@
     href: granular-certificates/commands/slice.md
   - name: Claim
     href: granular-certificates/commands/claim.md
-- name: Registry
+- name: How
   items:
   - name: What is a registry
+    href: registry.md
+  - name: Command and events
     href: registry.md
 - name: Commitments
   items:

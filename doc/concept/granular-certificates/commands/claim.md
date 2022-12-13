@@ -2,7 +2,7 @@
 
 The claim command is where production and consumption certificates "cancel" each other out.
 
-To use the claim command one has to specify two slices, **one production** and **one consumption**, and they have to be of qual quantity [because of proofs](#privacy-and-mathematics).
+To use the claim command one has to specify two slices, **one production** and **one consumption**, and they have to be of qual quantity [because of proofs](#privacy-and-zero-knowledge-proofs).
 
 This might require one to perform some slice commands to make them fit together.
 
@@ -42,3 +42,7 @@ ConSlice-B [200] Consumption
 As in the [slice command](slice.md#privacy-and-mathematics), all the quantities are hidden with the help of [Pedersen Commitments](../../pedersen-commitments.md) and Zero Knowledge proofs.
 
 The Zero Knowledge proof can prove the two pedersen-commitments in each slice are equal without revealing the actually numbers.
+
+## How to
+
+Look at the [Command builder API doc](xref:ProjectOrigin.Electricity.Client.ElectricityCommandBuilder) for how to perform the command.

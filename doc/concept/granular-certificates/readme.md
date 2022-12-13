@@ -17,9 +17,12 @@ In ProjectOrigin, a Granular Certificate (GC) can describe either a **production
 
 A GC is immutable, in that the data on a GC cannot be changed after it has been issued.
 
-All commands and the life-cycle for a GC happens through its [slices](#Slices).
+All commands and the life-cycle for a GC happens through its [slices](#slices).
 
-A GC describes a [quantity](#quantity) of energy, which is consumed or produced by a specific [meter](#gsrn), within a [grid area](#grid-area), and a set [period](#period),
+A GC describes a [quantity](attributes.md#quantity) of energy,
+which is consumed or produced by a specific [meter](attributes.md#gsrn),
+within a [grid area](attributes.md#grid-area),
+and a set [period](attributes.md#period),
 
 More on the attributes of a certificate can be found in the [attributes section](attributes.md)
 
@@ -51,20 +54,26 @@ Note that most commands are final, in there is no way to reverse them once perfo
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Active: Slice created
+    [*] --> Active
     Active --> Active: Transfer command
     Active --> Claimed: Claim command
     Active --> Removed: Slice command
-    Removed: Removed*
+    Active --> Expired: Expires automatically
+
     note right of Removed
         Removed slices are are <b>not</b>
         counted when calculating the total,
         since new slices representing the
         amount was created.
     end note
-    Active --> Expired: Expires automatically
+
+    note left of [*]
+        A slice can be created by an IssueCommand to create a new GC.
+        Or a SliceCommand on an existing GC slice to create new slices.
+    end note
 ```
 
+- [Issue command](commands/issue.md): Used by an `Issuing Body` to issue a new GC.
 - [Transfer command](commands/transfer.md): Transfers the ownership of a slice to a new owner.
 - [Slice command](commands/slice.md): Create new slices from an existing slice.
 - [Claim command](commands/claim.md): Claim a production slice to a consumption slice of same quantity.

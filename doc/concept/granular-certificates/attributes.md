@@ -5,14 +5,14 @@ A GC has a series of attributes, these are currently spit into two categories,
 
 ## Primary attributes
 
-**Primary attributes** are used by the [registry](registry.md)
-to perform verification of [commands](#commands) performed.
+**Primary attributes** are used by the [registry](../registry.md)
+to perform verification of commands performed.
 
 ### CertificateID
 
 Is a [Federated Certificate ID](federated-certifate-id.md), it is the unique identifier for a certificate.
 It consist of two parts
-- RegistryId: of the [registry](registry.md) holding the certificate.
+- RegistryId: of the [registry](../registry.md) holding the certificate.
 - StreamId: Is the unique id of the certificate, it is a Uuid4.
 
 ### GSRN
