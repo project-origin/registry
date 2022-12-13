@@ -4,9 +4,17 @@ uid: pedersen_commitment
 
 # Pedersen Commitments
 
-> **_tl;dr_**
-> EnablesTOODO
-
+> ## tl;dr
+> A Pedersen Commitment is a [homomorphic encryption](https://en.wikipedia.org/wiki/Homomorphic_encryption)
+> which enables one to perform calculations on the encrypted data.
+>
+> The data (`m`) is encrypted with the help of a random value (`r`) which outputs the commitment (`c`).
+>
+> Commitments enables calculations like `C = C1 * C2` (simplified) where one can verify that
+> `C` contains the **sum** of the two messages in `C1` and `C2`.
+>
+> This enables ProjectOrigin to prove that the sum of [GC slices](granular-certificates/readme.md?slices)
+> are the same as the slice they were created from.
 
 In order to obfuscate sensitive data in the certificates to only be accesible and readable to the owner and verifiable to the reciver of the data ie GSRN numbers, quantity of energy that is being transferred, etc, the data is encrypted using Pedersen commitments. The Pedersen commitment is a commitment scheme that allows the holder of the commitment to commit to a value without revealing the value itself. The commitment can be opened to reveal the value. The holder cannot open it to reveal another value. The commitment scheme is homomorphic in the sense that the product of two commitments will be a commitment to the sum of the two values.
 
