@@ -54,7 +54,6 @@ stateDiagram-v2
     [*] --> Active: Slice created
     Active --> Active: Transfer command
     Active --> Claimed: Claim command
-    Active --> Expired: Expires automatically
     Active --> Removed: Slice command
     Removed: Removed*
     note right of Removed
@@ -63,6 +62,7 @@ stateDiagram-v2
         since new slices representing the
         amount was created.
     end note
+    Active --> Expired: Expires automatically
 ```
 
 - [Transfer command](commands/transfer.md): Transfers the ownership of a slice to a new owner.
