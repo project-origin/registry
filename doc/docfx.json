@@ -48,8 +48,8 @@
         "markdownEngineName": "markdig",
         "markdownEngineProperties": {
             "markdigExtensions": [
-                "footnotes",
-                "diagrams"
+                "mathematics",
+                "footnotes"
             ]
         },
         "dest": "_site",
