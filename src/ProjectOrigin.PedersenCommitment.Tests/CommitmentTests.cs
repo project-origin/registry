@@ -81,9 +81,41 @@ public class CommitmentTests
         var r = BigInteger.Parse("35425707649260674451675575047706194335233578342436579356033363");
         var point = gen.Commit(m, r);
 
-        var thing = point.Compress();
-        var str = Convert.ToBase64String(thing.bytes);
-        Console.WriteLine(str);
+        var a = point.Compress();
+        var str = Convert.ToBase64String(a.bytes);
+
+        var b = a.Decompress();
+        var c = b.Compress();
+
+        Assert.Equal(a, c);
+    }
+
+
+    [Fact]
+    public void TestElligator() {
+        var seed = new byte[64];
+        seed[0] = 2;
+        var p = Ristretto.Point.FromUniformBytes(seed);
+    }
+
+    [Fact]
+    public void TestMulScalar() {
+        var seed = new byte[64];
+        var p = Ristretto.Point.FromUniformBytes(seed);
+
+        var p1 = p * new BigInteger(1);
+        Assert.Equal(p, p1);
+
+        var p2 = p * new BigInteger(2);
+        Assert.NotEqual(p, p2); // fails
+
+        var p3 = p * new BigInteger(3);
+
+        var p5 = p2 + p3;
+
+        var p5_ = p * new BigInteger(5);
+
+        Assert.Equal(p5, p5_);
 
     }
 }
