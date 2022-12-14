@@ -14,7 +14,10 @@ pub unsafe extern "C" fn pedersen_gens_new(
 ) -> *mut PedersenGens {
     let g = *g;
     let h = *h; // consider if Rust steals these Points?
-    Box::into_raw(Box::new(PedersenGens { B: g, B_blinding: h }))
+    Box::into_raw(Box::new(PedersenGens {
+        B: g,
+        B_blinding: h,
+    }))
 }
 
 #[no_mangle]
@@ -32,7 +35,6 @@ pub unsafe extern "C" fn pedersen_gens_commit(
 
     Box::into_raw(Box::new(this.commit(value, blinding)))
 }
-
 
 #[no_mangle]
 pub extern "C" fn pedersen_gens_free(this: *mut PedersenGens) {
