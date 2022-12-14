@@ -16,6 +16,12 @@
       href: granular-certificates/commands/slice.md
     - name: Claim
       href: granular-certificates/commands/claim.md
+    - name: Withdraw
+      href: granular-certificates/commands/withdraw.md
+    - name: Expire
+      href: granular-certificates/commands/expire.md
+  - name: C# client example flow
+    href: granular-certificates/example.md
 - name: Registers
   items:
   - name: What is a registry

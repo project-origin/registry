@@ -45,4 +45,4 @@ The Zero Knowledge proof can prove the two pedersen-commitments in each slice ar
 
 ## How to
 
-Look at the [Command builder API doc](xref:ProjectOrigin.Electricity.Client.ElectricityCommandBuilder) for how to perform the command.
+Look at the CommandBuilder for how to perform the [ClaimCommand](xref:ProjectOrigin.Electricity.Client.ElectricityCommandBuilder.ClaimCertificate(ProjectOrigin.Electricity.Client.Models.ShieldedValue,ProjectOrigin.Electricity.Client.Models.FederatedCertifcateId,ProjectOrigin.Electricity.Client.Models.ShieldedValue,Key,ProjectOrigin.Electricity.Client.Models.FederatedCertifcateId,ProjectOrigin.Electricity.Client.Models.ShieldedValue,Key))

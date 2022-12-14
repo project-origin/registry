@@ -64,4 +64,5 @@ The owner of a slice only knowns the quantity of their own slice.
 
 ## How to
 
-Look at the [Command builder API doc](xref:ProjectOrigin.Electricity.Client.ElectricityCommandBuilder) for how to perform the command.
+Look at the [Slicer](xref:ProjectOrigin.Electricity.Client.Slicer) for how to create a SliceCollection,
+and the CommandBuilder to how to execute the [SliceCommand](xref:ProjectOrigin.Electricity.Client.ElectricityCommandBuilder.SliceCertificate(ProjectOrigin.Electricity.Client.Models.FederatedCertifcateId,ProjectOrigin.Electricity.Client.Models.SliceCollection,Key))

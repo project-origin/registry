@@ -6,4 +6,5 @@ It enables the current owner of a slice to transfer the ownership of the slice t
 
 ## How to
 
-Look at the [Command builder API doc](xref:ProjectOrigin.Electricity.Client.ElectricityCommandBuilder) for how to perform the command.
+Look at the CommandBuilder for how to perform the
+[TransferCommand](xref:ProjectOrigin.Electricity.Client.ElectricityCommandBuilder.TransferCertificate(ProjectOrigin.Electricity.Client.Models.FederatedCertifcateId,ProjectOrigin.Electricity.Client.Models.ShieldedValue,Key,PublicKey))

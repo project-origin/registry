@@ -1,3 +1,7 @@
+---
+uid: federated_certificate_id
+---
+
 # Federated Certificate ID
 
 The **Federated Certificate ID** (FID) is a combination of two parts:
