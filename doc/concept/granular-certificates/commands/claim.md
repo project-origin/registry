@@ -64,19 +64,19 @@ sequenceDiagram
     prod --) cons: Verify Slice exists
     prod --) prod: Verify Area and period are equal
     prod ->> prod: Create AllocatedEvent
-    prod ->> cons: #
+    prod ->> cons: a
     deactivate prod
 
     activate cons
     cons --) prod: Verify allocationt exists
     cons ->> cons: Create AllocatedEvent
-    cons ->> prod: #
+    cons ->> prod: a
     deactivate cons
 
     activate prod
     prod --) cons: Verify allocationt exists
     prod ->> prod: Create ClaimedEvent
-    prod ->> cons: #
+    prod ->> cons: a
     deactivate prod
 
     activate cons
