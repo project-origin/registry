@@ -16,7 +16,7 @@ clean: # Does a dotnet clean
 	dotnet clean $(src_path)
 
 doc-serve: # Generate docfx site and serve, navigate to 127.0.0.1:8080
-	docfx build doc/docfx.json
+	docfx doc/docfx.json
 	docfx serve doc/_site -n 127.0.0.1
 
 restore: # Restores all dotnet projectts

@@ -32,15 +32,27 @@
         "resource": [
             {
                 "files": [
-                    "**/*.svg"
+                    "**/*.svg",
+                    "logo.png"
                 ]
             }
         ],
+        "overwrite": "api-overrides/*.md",
         "globalMetadata": {
             "_appTitle": "Project Origin",
             "_enableSearch": true
         },
+        "template": [
+            "default",
+            "template/mermaid"
+        ],
         "markdownEngineName": "markdig",
+        "markdownEngineProperties": {
+            "markdigExtensions": [
+                "mathematics",
+                "footnotes"
+            ]
+        },
         "dest": "_site",
         "xrefService": [
             "https://xref.docs.microsoft.com/query?uid={uid}"
