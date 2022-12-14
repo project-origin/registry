@@ -1,5 +1,6 @@
 use core::slice;
 
+use sha3::Sha3_512;
 use curve25519_dalek_ng::scalar::Scalar;
 
 #[no_mangle]
@@ -13,6 +14,14 @@ pub unsafe extern "C" fn scalar_new(bytes: *const u8) -> *const Scalar {
 #[no_mangle]
 pub unsafe extern "C" fn scalar_random() -> *const Scalar {
     let scalar = Scalar::random(&mut rand::thread_rng());
+    Box::into_raw(Box::new(scalar))
+}
+
+
+#[no_mangle]
+pub unsafe extern "C" fn scalar_hash_from_bytes(bytes: *const u8, len: i32) -> *const Scalar {
+    let bytes = unsafe { slice::from_raw_parts(bytes, len as usize) };
+    let scalar = Scalar::hash_from_bytes::<Sha3_512>(bytes);
     Box::into_raw(Box::new(scalar))
 }
 
@@ -36,6 +45,19 @@ pub unsafe extern "C" fn scalar_add(lhs: *const Scalar, rhs: *const Scalar) -> *
     let lhs = &*lhs;
     let rhs = &*rhs;
     Box::into_raw(Box::new(lhs + rhs))
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn scalar_sub(lhs: *const Scalar, rhs: *const Scalar) -> *const Scalar {
+    let lhs = &*lhs;
+    let rhs = &*rhs;
+    Box::into_raw(Box::new(lhs - rhs))
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn scalar_negate(this: *const Scalar) -> *const Scalar {
+    let this = &*this;
+    Box::into_raw(Box::new(-this))
 }
 
 #[no_mangle]

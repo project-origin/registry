@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Numerics;
 
-namespace ProjectOrigin.PedersenCommitment.Ristretto;
+namespace ProjectOrigin.PedersenCommitment;
 
 /**
  * @brief Scalar referencing a Rust object on the heap. Guaranteed to always be in the field.
@@ -25,11 +25,20 @@ public class Scalar : IDisposable
         [DllImport("rust_ffi", EntryPoint = "scalar_add")]
         internal static extern IntPtr Add(IntPtr lhs, IntPtr rhs);
 
+        [DllImport("rust_ffi", EntryPoint = "scalar_sub")]
+        internal static extern IntPtr Sub(IntPtr lhs, IntPtr rhs);
+
+        [DllImport("rust_ffi", EntryPoint = "scalar_negate")]
+        internal static extern IntPtr Negate(IntPtr self);
+
         [DllImport("rust_ffi", EntryPoint = "scalar_mul")]
         internal static extern IntPtr Mul(IntPtr lhs, byte[] rhs);
 
         [DllImport("rust_ffi", EntryPoint = "scalar_equals")]
         internal static extern bool Equals(IntPtr lhs, IntPtr rhs);
+
+        [DllImport("rust_ffi", EntryPoint = "scalar_hash_from_bytes")]
+        internal static extern IntPtr HashFromBytes(byte[] bytes, int len);
     }
 
     internal readonly IntPtr ptr;
@@ -37,6 +46,13 @@ public class Scalar : IDisposable
     internal Scalar(IntPtr ptr)
     {
         this.ptr = ptr;
+    }
+
+
+    public Scalar(ulong a)
+    {
+        var bytes = Util.FromBigInteger(new BigInteger(a));
+        this.ptr = Native.New(bytes);
     }
 
     public Scalar(BigInteger bigInteger)
@@ -47,9 +63,21 @@ public class Scalar : IDisposable
 
     public Scalar(byte[] bytes)
     {
+        if (bytes.Length != 32) {
+            throw new ArgumentException("Byte length has to 32");
+        }
         this.ptr = Native.New(bytes);
     }
 
+    public static Scalar Random()
+    {
+        return new Scalar(Native.Random());
+    }
+
+    public static Scalar HashFromBytes(byte[] bytes)
+    {
+        return new Scalar(Native.HashFromBytes(bytes, bytes.Length));
+    }
 
     public byte[] ToBytes()
     {
@@ -58,6 +86,10 @@ public class Scalar : IDisposable
         return bytes;
     }
 
+    public BigInteger ToBigInteger()
+    {
+        return new BigInteger(this.ToBytes(), true, false);
+    }
 
     public void Dispose()
     {
@@ -67,6 +99,18 @@ public class Scalar : IDisposable
     public static Scalar operator +(Scalar left, Scalar right)
     {
         var ptr = Native.Add(left.ptr, right.ptr);
+        return new Scalar(ptr);
+    }
+
+    public static Scalar operator -(Scalar left, Scalar right)
+    {
+        var ptr = Native.Sub(left.ptr, right.ptr);
+        return new Scalar(ptr);
+    }
+
+    public static Scalar operator -(Scalar self)
+    {
+        var ptr = Native.Negate(self.ptr);
         return new Scalar(ptr);
     }
 

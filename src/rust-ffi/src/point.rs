@@ -56,6 +56,26 @@ pub unsafe extern "C" fn ristretto_point_add(
     Box::into_raw(Box::new(lhs + rhs))
 }
 
+
+#[no_mangle]
+pub unsafe extern "C" fn ristretto_point_sub(
+    lhs: *const RistrettoPoint,
+    rhs: *const RistrettoPoint,
+) -> *const RistrettoPoint {
+    let lhs = &*lhs;
+    let rhs = &*rhs;
+    Box::into_raw(Box::new(lhs - rhs))
+}
+
+
+#[no_mangle]
+pub unsafe extern "C" fn ristretto_point_negate(
+    this: *const RistrettoPoint,
+) -> *const RistrettoPoint {
+    let this = &*this;
+    Box::into_raw(Box::new(-this))
+}
+
 #[no_mangle]
 pub unsafe extern "C" fn ristretto_point_mul_bytes(
     lhs: *const RistrettoPoint,

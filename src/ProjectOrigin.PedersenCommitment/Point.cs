@@ -22,6 +22,12 @@ internal class Native {
     [DllImport("rust_ffi", EntryPoint = "ristretto_point_add")]
     internal static extern IntPtr Add(IntPtr lhs, IntPtr rhs);
 
+    [DllImport("rust_ffi", EntryPoint = "ristretto_point_sub")]
+    internal static extern IntPtr Sub(IntPtr lhs, IntPtr rhs);
+
+    [DllImport("rust_ffi", EntryPoint = "ristretto_point_negate")]
+    internal static extern IntPtr Negate(IntPtr self);
+
     [DllImport("rust_ffi", EntryPoint = "ristretto_point_mul_bytes")]
     internal static extern IntPtr Mul(IntPtr lhs, byte[] rhs);
 
@@ -69,9 +75,21 @@ public class Point : IDisposable
         return new Point(ptr);
     }
 
+    public static Point operator -(Point left, Point right)
+    {
+        var ptr = Native.Sub(left.ptr, right.ptr);
+        return new Point(ptr);
+    }
+
+
+    public static Point operator -(Point self)
+    {
+        var ptr = Native.Negate(self.ptr);
+        return new Point(ptr);
+    }
+
     public static Point operator *(Point left, BigInteger right)
     {
-
         var ptr = Native.Mul(left.ptr, Util.FromBigInteger(right));
         return new Point(ptr);
 
