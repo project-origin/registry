@@ -43,6 +43,49 @@ As in the [slice command](slice.md#privacy-and-mathematics), all the quantities 
 
 The Zero Knowledge proof can prove the two pedersen-commitments in each slice are equal without revealing the actually numbers.
 
+## Multiple state changes on slices
+
+Because of the nature of the ClaimCommand involving multiple GCs that can exists on any registry,
+the ClaimCommand happens in multiple steps involving first creating AllocatedEvents for the slices,
+before "committing" the ClaimedEvents to the slices.
+When they ClaimedEvent are persistet, the claim has completed.
+A "roolback" of AllocatedEvents are still in the drawing board.
+
+
+```mermaid
+sequenceDiagram
+    actor user as Actor
+    participant prod as Production Slice
+    participant cons as Consumption Slice
+
+    user ->> prod: Initiate ClaimCommand
+
+    activate prod
+    prod --) cons: Verify Slice exists
+    prod --) prod: Verify Area and period are equal
+    prod ->> prod: Create AllocatedEvent
+    prod ->> cons: #
+    deactivate prod
+
+    activate cons
+    cons --) prod: Verify allocationt exists
+    cons ->> cons: Create AllocatedEvent
+    cons ->> prod: #
+    deactivate cons
+
+    activate prod
+    prod --) cons: Verify allocationt exists
+    prod ->> prod: Create ClaimedEvent
+    prod ->> cons: #
+    deactivate prod
+
+    activate cons
+    cons --) prod: Verify Claimed
+    cons ->> cons: Create ClaimedEvent
+    cons ->> user: ClaimCommand Success
+    deactivate cons
+```
+
 ## How to
 
 Look at the CommandBuilder for how to perform the [ClaimCommand](xref:ProjectOrigin.Electricity.Client.ElectricityCommandBuilder.ClaimCertificate(ProjectOrigin.Electricity.Client.Models.ShieldedValue,ProjectOrigin.Electricity.Client.Models.FederatedCertifcateId,ProjectOrigin.Electricity.Client.Models.ShieldedValue,Key,ProjectOrigin.Electricity.Client.Models.FederatedCertifcateId,ProjectOrigin.Electricity.Client.Models.ShieldedValue,Key))

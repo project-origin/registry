@@ -28,7 +28,7 @@ A GC consists of two parts:
 - A collection of [slices](#slices), when a GC is [issued](commands/issue.md),
   it is created with 1 initial slice.
 
-  A slice contains two values, the **quantity** of the slice, and the **owners public-key**.
+  An active slice contains two values, the **quantity** of the slice, and the **owners public-key**.
 
   All commands on an existing GC and the life-cycle happens through the slices.
 
@@ -58,6 +58,8 @@ It is up to the integrating system to implement an accounting system and manage 
 ### Slice life-cycle
 
 A slice has a specific life-cycle, when the slice is created, it becomes **active**.
+
+When a slice changes state, this state is stored on the slice as events.
 
 Note that most commands are final, in there is no way to reverse them once performed.
 
