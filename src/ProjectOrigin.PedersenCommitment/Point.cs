@@ -22,8 +22,11 @@ internal class Native {
     [DllImport("rust_ffi", EntryPoint = "ristretto_point_add")]
     internal static extern IntPtr Add(IntPtr lhs, IntPtr rhs);
 
-    [DllImport("rust_ffi", EntryPoint = "ristretto_point_mul_scalar")]
+    [DllImport("rust_ffi", EntryPoint = "ristretto_point_mul_bytes")]
     internal static extern IntPtr Mul(IntPtr lhs, byte[] rhs);
+
+    [DllImport("rust_ffi", EntryPoint = "ristretto_point_mul_scalar")]
+    internal static extern IntPtr Mul(IntPtr point, IntPtr scalar);
 
     [DllImport("rust_ffi", EntryPoint = "ristretto_point_equals")]
     internal static extern bool Equals(IntPtr lhs, IntPtr rhs);
@@ -76,10 +79,18 @@ public class Point : IDisposable
 
     public static Point operator *(BigInteger left, Point right)
     {
-
         var ptr = Native.Mul(right.ptr, Util.FromBigInteger(left));
         return new Point(ptr);
+    }
 
+    public static Point operator *(Point left, Scalar right)
+    {
+        return new Point(Native.Mul(left.ptr, right.ptr));
+    }
+
+    public static Point operator *(Scalar left, Point right)
+    {
+        return new Point(Native.Mul(right.ptr, left.ptr));
     }
 
     public override bool Equals(object? obj)

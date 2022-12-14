@@ -62,7 +62,7 @@ pub unsafe extern "C" fn ristretto_point_add(
 
 
 #[no_mangle]
-pub unsafe extern "C" fn ristretto_point_mul_scalar(
+pub unsafe extern "C" fn ristretto_point_mul_bytes(
     lhs: *const RistrettoPoint,
     rhs: *const u8,
 ) -> *const RistrettoPoint {
@@ -70,7 +70,17 @@ pub unsafe extern "C" fn ristretto_point_mul_scalar(
 
     let rhs = slice::from_raw_parts(rhs, 32);
     let rhs = Scalar::from_bytes_mod_order(rhs.try_into().unwrap());
-    println!("Scalar: {:?}", rhs);
+    Box::into_raw(Box::new(lhs * rhs))
+}
+
+
+#[no_mangle]
+pub unsafe extern "C" fn ristretto_point_mul_scalar(
+    lhs: *const RistrettoPoint,
+    rhs: *const Scalar,
+) -> *const RistrettoPoint {
+    let lhs = &*lhs;
+    let rhs = &*rhs;
     Box::into_raw(Box::new(lhs * rhs))
 }
 

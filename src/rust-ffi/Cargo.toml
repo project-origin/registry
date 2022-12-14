@@ -11,3 +11,4 @@ crate-type = ['cdylib']
 bulletproofs = "4.0.0"
 curve25519-dalek-ng = "4.1.1"
 merlin = "3.0.0"
+rand = "0.8.5"
