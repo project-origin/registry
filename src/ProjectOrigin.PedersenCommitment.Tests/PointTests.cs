@@ -56,10 +56,6 @@ public class PointTests
         var p5_ = p * new BigInteger(5);
 
         Assert.Equal(p5, p5_);
-
-        p5.Dispose();
-
-        p5.GutSpill();
     }
 
     [Fact]

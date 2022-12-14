@@ -20,7 +20,7 @@ public class Scalar : IDisposable
         internal static extern void ToBytes(IntPtr self, byte[] output);
 
         [DllImport("rust_ffi", EntryPoint = "scalar_free")]
-        internal static extern void Dispose(IntPtr self);
+        internal static extern void Free(IntPtr self);
 
         [DllImport("rust_ffi", EntryPoint = "scalar_add")]
         internal static extern IntPtr Add(IntPtr lhs, IntPtr rhs);
@@ -48,6 +48,10 @@ public class Scalar : IDisposable
         this.ptr = ptr;
     }
 
+    ~Scalar()
+    {
+        Native.Free(this.ptr);
+    }
 
     public Scalar(ulong a)
     {
@@ -93,7 +97,7 @@ public class Scalar : IDisposable
 
     public void Dispose()
     {
-        Native.Dispose(ptr);
+        Native.Free(ptr);
     }
 
     public static Scalar operator +(Scalar left, Scalar right)

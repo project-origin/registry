@@ -31,7 +31,7 @@ pub extern "C" fn ristretto_point_decompress(bytes: *const u8) -> *const Ristret
     let bytes = unsafe { slice::from_raw_parts(bytes, 32) };
     let compressed = CompressedRistretto::from_slice(bytes);
     let Some(point) = compressed.decompress() else {
-        return ptr::null(); // follow C-style error convetion
+        return ptr::null();
     };
     Box::into_raw(Box::new(point))
 }

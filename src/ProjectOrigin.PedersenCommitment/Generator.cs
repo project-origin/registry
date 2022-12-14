@@ -19,7 +19,8 @@ public record Generator : IDisposable
 
         [DllImport("rust_ffi", EntryPoint = "pedersen_gens_commit_bytes")]
         internal static extern IntPtr Commit(IntPtr self, byte[] m, byte[] r);
-        [DllImport("rust_ffi", EntryPoint = "pedersen_gens_dispose")]
+
+        [DllImport("rust_ffi", EntryPoint = "pedersen_gens_free")]
         internal static extern void Dispose(IntPtr self);
     }
 
@@ -33,6 +34,11 @@ public record Generator : IDisposable
     public Generator(Point g, Point h)
     {
         this.ptr = Native.New(g.ptr, h.ptr);
+    }
+
+    ~Generator()
+    {
+        Native.Dispose(ptr);
     }
 
     public void Dispose()

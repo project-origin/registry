@@ -17,7 +17,7 @@ internal class Native {
     internal static extern IntPtr Decompress(byte[] bytes);
 
     [DllImport("rust_ffi", EntryPoint = "ristretto_point_free")]
-    internal static extern void Dispose(IntPtr self);
+    internal static extern void Free(IntPtr self);
 
     [DllImport("rust_ffi", EntryPoint = "ristretto_point_add")]
     internal static extern IntPtr Add(IntPtr lhs, IntPtr rhs);
@@ -41,8 +41,7 @@ internal class Native {
     internal static extern void GutSpill(IntPtr self);
 }
 
-public class Point : IDisposable
-{
+public class Point {
 
     internal readonly IntPtr ptr;
 
@@ -51,15 +50,15 @@ public class Point : IDisposable
         this.ptr = ptr;
     }
 
+    ~Point()
+    {
+        Native.Free(ptr);
+    }
+
     public static Point FromUniformBytes(byte[] bytes)
     {
         // TODO: Ensure length of bytes is appropriate
         return new Point(Native.FromUniformBytes(bytes));
-    }
-
-    public void Dispose()
-    {
-        Native.Dispose(ptr);
     }
 
     public CompressedPoint Compress()

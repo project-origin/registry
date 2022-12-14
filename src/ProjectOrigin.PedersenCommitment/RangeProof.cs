@@ -1,16 +1,14 @@
 using System.Runtime.InteropServices;
-using System.Numerics;
 namespace ProjectOrigin.PedersenCommitment;
 
-public record RangeProof : IDisposable
-{
+public record RangeProof {
     internal class Native
     {
         [DllImport("rust_ffi", EntryPoint = "rangeproof_prove_single")]
-        internal static extern RangeProofWithCommit ProveSingle(IntPtr bp_gen, IntPtr pc_gen, ulong v, IntPtr blinding, uint n, byte[] label, int label_len);
+        internal static extern RangeProofWithCommit ProveSingle(BulletProofGen.Handle bp_gen, IntPtr pc_gen, ulong v, IntPtr blinding, uint n, byte[] label, int label_len);
 
         [DllImport("rust_ffi", EntryPoint = "rangeproof_prove_multiple")]
-        internal static extern RangeProofWithCommit ProveMultiple(IntPtr bp_gen, IntPtr pc_gen, ulong[] v, IntPtr blinding, uint n, byte[] label, int label_len, int amount);
+        internal static extern RangeProofWithCommit ProveMultiple(BulletProofGen.Handle bp_gen, IntPtr pc_gen, ulong[] v, IntPtr blinding, uint n, byte[] label, int label_len, int amount);
 
         [DllImport("rust_ffi", EntryPoint = "rangeproof_dispose")]
         internal static extern void Dispose(IntPtr self);
@@ -65,23 +63,42 @@ struct RangeProofWithCommit
     public IntPtr point;
 }
 
-public record BulletProofGen : IDisposable
+public record BulletProofGen
 {
-    internal readonly IntPtr ptr;
+    internal readonly Handle ptr;
 
     [DllImport("rust_ffi", EntryPoint = "bpgen_new")]
-    private static extern IntPtr New(uint gensCapacity, uint partyCapacity);
+    private static extern Handle New(uint gensCapacity, uint partyCapacity);
+
 
     public BulletProofGen(uint gensCapacity, uint partyCapacity)
     {
         this.ptr = New(gensCapacity, partyCapacity);
     }
 
-    [DllImport("rust_ffi", EntryPoint = "bpgen_dispose")]
-    private static extern void Dispose(IntPtr self);
-
-    public void Dispose()
+    internal class Handle : SafeHandle
     {
-        Dispose(ptr);
+        [DllImport("rust_ffi", EntryPoint = "bpgen_free")]
+        private static extern void Free(Handle self);
+
+        public Handle() : base(IntPtr.Zero, true)
+        {
+        }
+
+        public override bool IsInvalid
+        {
+            get { return this.handle == IntPtr.Zero; }
+        }
+
+        protected override bool ReleaseHandle()
+        {
+            if (!this.IsInvalid)
+            {
+                Free(this);
+            }
+            return true;
+        }
+
     }
 }
+

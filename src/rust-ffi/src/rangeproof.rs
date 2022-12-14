@@ -11,7 +11,7 @@ pub extern "C" fn bpgen_new(gens_capacity: u32, party_capacity: u32) -> *const B
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn bpgen_dispose(this: *mut BulletproofGens) {
+pub unsafe extern "C" fn bpgen_free(this: *mut BulletproofGens) {
     if this.is_null() {
         return;
     }
