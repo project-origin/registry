@@ -17,4 +17,10 @@ internet showing the growing scepticism with the current system.
 
 ## Documentaion
 
-To learn more [go to the complete documention.](https://project-origin.github.io/registry/)
+Below is a [system context diagram](https://c4model.com/#SystemContextDiagram) showing what systems the registry integrates with.
+
+![C4 system diagram](/doc/system_diagram.drawio.svg)
+
+More in depth information can be found in the [architecture description](doc/architecture.md).
+
+There is also more [conceptual, API and architecture documentation rendered as website](https://project-origin.github.io/registry/index.html).
