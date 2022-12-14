@@ -37,6 +37,7 @@
                 ]
             }
         ],
+        "overwrite": "api-overrides/*.md",
         "globalMetadata": {
             "_appTitle": "Project Origin",
             "_enableSearch": true

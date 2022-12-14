@@ -1,5 +1,6 @@
 # Issue Command
 
+> [!NOTE]
 > The issue command is only valid for **Issuing bodies** for a given area.
 
 It enables the issuing body to issue a new GC.
