@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build Documentation
-        uses: MartinSchmidt/docfx-action@v1.0.0
+        uses: MartinSchmidt/docfx-action@v2.59.4
         with:
           args: ./doc/docfx.json
 
