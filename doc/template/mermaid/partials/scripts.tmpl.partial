@@ -3,8 +3,8 @@
 <script src="https://unpkg.com/highlightjs-dotnetconfig@0.9.3/dist/dotnetconfig.min.js"></script>
 <script type="text/javascript" src="{{_rel}}styles/docfx.js"></script>
 <script type="text/javascript" src="{{_rel}}styles/main.js"></script>
-<script type="text/javascript" src="https://unpkg.com/mermaid@8.10.2/dist/mermaid.min.js"
-    integrity="sha384-nzpOk138h0/O14Ig1PAUlf1XSo5T+XvpBUVkpLaU40QBvMgrNkSKusdNAomDLEd2"
+<script src="https://unpkg.com/mermaid@9.2.2/dist/mermaid.min.js"
+    integrity="sha384-W/RuUCsZGwf4MwkS0K4JdFzoA0RgiA6foiYzRo68rW5DNPfq+5Dr0uGKY1zecHEA"
     crossorigin="anonymous"></script>
 <script>
     mermaid.initialize({
