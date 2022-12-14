@@ -101,13 +101,14 @@ public class CommitmentTests
     [Fact]
     public void TestMulScalar() {
         var seed = new byte[64];
+        seed[0] = 2;
         var p = Ristretto.Point.FromUniformBytes(seed);
 
         var p1 = p * new BigInteger(1);
         Assert.Equal(p, p1);
 
         var p2 = p * new BigInteger(2);
-        Assert.NotEqual(p, p2); // fails
+        Assert.NotEqual(p1, p2);
 
         var p3 = p * new BigInteger(3);
 
@@ -116,6 +117,5 @@ public class CommitmentTests
         var p5_ = p * new BigInteger(5);
 
         Assert.Equal(p5, p5_);
-
     }
 }

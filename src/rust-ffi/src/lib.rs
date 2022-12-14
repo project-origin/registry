@@ -54,6 +54,13 @@ pub unsafe extern "C" fn ristretto_point_from_uniform_bytes(bytes: *const u8) ->
     Box::into_raw(Box::new(RistrettoPoint::from_uniform_bytes(bytes)))
 }
 
+#[no_mangle]
+pub unsafe extern "C" fn ristretto_point_gut_spill(
+    this: *const RistrettoPoint,
+) {
+    let this = &*this;
+    println!("My Guts: {:?}", this.compress());
+}
 
 #[no_mangle]
 pub unsafe extern "C" fn ristretto_point_compress(
@@ -84,20 +91,20 @@ pub extern "C" fn ristretto_point_decompress(
 pub unsafe extern "C" fn ristretto_point_equals(
     lhs: *const RistrettoPoint,
     rhs: *const RistrettoPoint,
-) -> *const RistrettoPoint {
+) -> bool{
     let lhs = &*lhs;
     let rhs = &*rhs;
-    Box::into_raw(Box::new(lhs + rhs))
+    lhs == rhs
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn ristretto_point_add(
     lhs: *const RistrettoPoint,
     rhs: *const RistrettoPoint,
-) -> bool {
+) -> *const RistrettoPoint {
     let lhs = &*lhs;
     let rhs = &*rhs;
-    lhs == rhs
+    Box::into_raw(Box::new(lhs + rhs))
 }
 
 
@@ -110,6 +117,7 @@ pub unsafe extern "C" fn ristretto_point_mul_scalar(
 
     let rhs = slice::from_raw_parts(rhs, 32);
     let rhs = Scalar::from_bytes_mod_order(rhs.try_into().unwrap());
+    println!("Scalar: {:?}", rhs);
     Box::into_raw(Box::new(lhs * rhs))
 }
 

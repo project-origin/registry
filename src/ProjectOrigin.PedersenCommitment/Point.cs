@@ -27,6 +27,9 @@ internal class Native {
 
     [DllImport("rust_ffi", EntryPoint = "ristretto_point_equals")]
     internal static extern bool Equals(IntPtr lhs, IntPtr rhs);
+
+    [DllImport("rust_ffi", EntryPoint = "ristretto_point_gut_spill")]
+    internal static extern void GutSpill(IntPtr self);
 }
 
 public class Point : IDisposable
@@ -99,6 +102,12 @@ public class Point : IDisposable
     public static bool operator !=(Point left, Point right)
     {
         return !Native.Equals(left.ptr, right.ptr);
+    }
+
+
+    public void GutSpill()
+    {
+        Native.GutSpill(ptr);
     }
 
     public override int GetHashCode() => base.GetHashCode();
