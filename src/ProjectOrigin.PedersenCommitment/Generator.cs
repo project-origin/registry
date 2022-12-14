@@ -15,36 +15,43 @@ public record Generator : IDisposable
         internal static extern IntPtr New(IntPtr g, IntPtr h);
 
         [DllImport("rust_ffi", EntryPoint = "pedersen_gens_commit")]
-        internal static extern IntPtr Commit(IntPtr self, byte[] m, byte[] r);
+        internal static extern IntPtr Commit(IntPtr self, IntPtr m, IntPtr r);
 
+        [DllImport("rust_ffi", EntryPoint = "pedersen_gens_commit_bytes")]
+        internal static extern IntPtr Commit(IntPtr self, byte[] m, byte[] r);
         [DllImport("rust_ffi", EntryPoint = "pedersen_gens_dispose")]
         internal static extern void Dispose(IntPtr self);
     }
 
-    private IntPtr inner;
+    internal IntPtr ptr;
 
     public Generator()
     {
-        this.inner = Native.Default();
+        this.ptr = Native.Default();
     }
 
     public Generator(Point g, Point h)
     {
-        this.inner = Native.New(g.ptr, h.ptr);
+        this.ptr = Native.New(g.ptr, h.ptr);
     }
 
     public void Dispose()
     {
-        Native.Dispose(inner);
+        Native.Dispose(ptr);
     }
 
 
     public Point Commit(BigInteger m, BigInteger r)
     {
-        var ptr = Native.Commit(inner, Util.FromBigInteger(m), Util.FromBigInteger(r));
+        var ptr = Native.Commit(this.ptr, Util.FromBigInteger(m), Util.FromBigInteger(r));
         return new Point(ptr);
     }
 
+    public Point Commit(ulong m, ulong r)
+    {
+        var ptr = Native.Commit(this.ptr, new Scalar(m).ptr, new Scalar(r).ptr);
+        return new Point(ptr);
+    }
 
 }
 

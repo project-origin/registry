@@ -34,7 +34,6 @@ public class PointTests
         var c = g * new Scalar(5);
 
         Assert.Equal(c, b - a);
-
     }
 
     [Fact]
@@ -57,6 +56,10 @@ public class PointTests
         var p5_ = p * new BigInteger(5);
 
         Assert.Equal(p5, p5_);
+
+        p5.Dispose();
+
+        p5.GutSpill();
     }
 
     [Fact]

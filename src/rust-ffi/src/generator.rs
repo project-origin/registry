@@ -21,7 +21,7 @@ pub unsafe extern "C" fn pedersen_gens_new(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn pedersen_gens_commit(
+pub unsafe extern "C" fn pedersen_gens_commit_bytes(
     this: *mut PedersenGens,
     value: *const u8,
     blinding: *const u8,
@@ -35,6 +35,20 @@ pub unsafe extern "C" fn pedersen_gens_commit(
 
     Box::into_raw(Box::new(this.commit(value, blinding)))
 }
+
+
+#[no_mangle]
+pub unsafe extern "C" fn pedersen_gens_commit(
+    this: *mut PedersenGens,
+    value: *const Scalar,
+    blinding: *const Scalar,
+) -> *mut RistrettoPoint {
+    let this = &*this;
+    // TODO: Might need to clone as these values gets moved
+    // Probably fine since the Handle objects only exist in a short scope
+    Box::into_raw(Box::new(this.commit(*value, *blinding)))
+}
+
 
 #[no_mangle]
 pub extern "C" fn pedersen_gens_free(this: *mut PedersenGens) {

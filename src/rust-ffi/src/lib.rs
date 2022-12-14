@@ -3,3 +3,4 @@
 pub mod generator;
 pub mod point;
 pub mod scalar;
+pub mod rangeproof;
