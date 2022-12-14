@@ -2,6 +2,8 @@
 
 This getting started expects a running registry you can connect to.
 
+To call the registries, one should use the [client library available on nuget.org](https://www.nuget.org/packages/ProjectOrigin.Electricity.Client/).
+
 ## Connecting to a Registry
 
 All commands to a registry happens through a RegisterClient,
