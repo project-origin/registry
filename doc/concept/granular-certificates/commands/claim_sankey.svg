@@ -1,0 +1,89 @@
+<svg height="400" width="700" xmlns="http://www.w3.org/2000/svg">
+<title>Your Diagram Title</title>
+<!-- Generated with SankeyMATIC: 12/12/2022, 3:06:08 PM -->
+<rect height="400" width="700" fill="#ffffff"></rect>
+<g transform="translate(12,18)">
+<g id="sankey_flows">
+<path id="flow8" d="M9 282.16278C56.325 282.16278 119.425 294.43375 166.75 294.43375" fill="none" stroke-width="81.55455" stroke="#59a14f" opacity="0.65"><title>Production-Wind → Slice-D: 500</title></path>
+<path id="flow0" d="M9 61.47643C56.325 61.47643 119.425 51.25534 166.75 51.25534" fill="none" stroke-width="48.93273" stroke="#9c755f" opacity="0.65"><title>Production-Solar → Slice-A: 300</title></path>
+<path id="flow5" d="M9 225.0746C56.325 225.0746 119.425 195.35217 166.75 195.35217" fill="none" stroke-width="32.62182" stroke="#59a14f" opacity="0.65"><title>Production-Wind → Slice-C: 200</title></path>
+<path id="flow6" d="M175.75 195.35217C223.075 195.35217 286.175 229.95018 333.5 229.95018" fill="none" stroke-width="32.62182" stroke="#edc949" opacity="0.65"><title>Slice-C → Claim-Wind: 200</title></path>
+<path id="flow7" d="M342.5 229.95018C389.825 229.95018 452.925 191.19991 500.25 191.19991" fill="none" stroke-width="32.62182" stroke="#ff9da7" opacity="0.65"><title>Claim-Wind → ConSlice-B: 200</title></path>
+<path id="flow9" d="M509.25 191.19991C556.575 191.19991 619.675 176.5386 667 176.5386" fill="none" stroke-width="32.62182" stroke="#76b7b2" opacity="0.65"><title>ConSlice-B → Consumption: 200</title></path>
+<path id="flow1" d="M9 94.09824C56.325 94.09824 119.425 125.87056 166.75 125.87056" fill="none" stroke-width="16.31091" stroke="#9c755f" opacity="0.65"><title>Production-Solar → Slice-B: 100</title></path>
+<path id="flow2" d="M175.75 125.87056C223.075 125.87056 286.175 97.01784 333.5 97.01784" fill="none" stroke-width="16.31091" stroke="#4e79a7" opacity="0.65"><title>Slice-B → Claim-Solar: 100</title></path>
+<path id="flow3" d="M342.5 97.01784C389.825 97.01784 452.925 124.74015 500.25 124.74015" fill="none" stroke-width="16.31091" stroke="#e15759" opacity="0.65"><title>Claim-Solar → ConsSlice-A: 100</title></path>
+<path id="flow4" d="M509.25 124.74015C556.575 124.74015 619.675 152.07223 667 152.07223" fill="none" stroke-width="16.31091" stroke="#76b7b2" opacity="0.65"><title>ConsSlice-A → Consumption: 100</title></path>
+</g>
+<g id="sankey_nodes">
+<g class="node">
+<rect id="r0" class="for_r0" x="0" y="37.01006" height="65.24364" width="9" fill="#9c755f" fill-opacity="1"><title>Production-Solar:
+400</title></rect>
+</g>
+<g class="node">
+<rect id="r1" class="for_r1" x="166.75" y="26.78897" height="48.93273" width="9" fill="#bab0ab" fill-opacity="1"><title>Slice-A:
+300</title></rect>
+</g>
+<g class="node">
+<rect id="r2" class="for_r2" x="166.75" y="117.7151" height="16.31091" width="9" fill="#4e79a7" fill-opacity="1"><title>Slice-B:
+100</title></rect>
+</g>
+<g class="node">
+<rect id="r3" class="for_r3" x="333.5" y="116.86238" height="16.31091" width="9" fill="#f28e2c" fill-opacity="1" transform="translate(0,-28)"><title>Claim-Solar:
+100</title></rect>
+</g>
+<g class="node">
+<rect id="r4" class="for_r4" x="500.25" y="116.5847" height="16.31091" width="9" fill="#e15759" fill-opacity="1"><title>ConsSlice-A:
+100</title></rect>
+</g>
+<g class="node">
+<rect id="r5" class="for_r5" x="667" y="143.91678" height="48.93273" width="9" fill="#76b7b2" fill-opacity="1"><title>Consumption:
+300</title></rect>
+</g>
+<g class="node">
+<rect id="r6" class="for_r6" x="0" y="208.76369" height="114.17636" width="9" fill="#59a14f" fill-opacity="1"><title>Production-Wind:
+700</title></rect>
+</g>
+<g class="node">
+<rect id="r7" class="for_r7" x="166.75" y="179.04126" height="32.62182" width="9" fill="#edc949" fill-opacity="1"><title>Slice-C:
+200</title></rect>
+</g>
+<g class="node">
+<rect id="r8" class="for_r8" x="333.5" y="176.63927" height="32.62182" width="9" fill="#af7aa1" fill-opacity="1" transform="translate(0,37)"><title>Claim-Wind:
+200</title></rect>
+</g>
+<g class="node">
+<rect id="r9" class="for_r9" x="500.25" y="174.88901" height="32.62182" width="9" fill="#ff9da7" fill-opacity="1"><title>ConSlice-B:
+200</title></rect>
+</g>
+<g class="node">
+<rect id="r10" class="for_r10" x="166.75" y="253.65648" height="81.55455" width="9" fill="#9c755f" fill-opacity="1"><title>Slice-D:
+500</title></rect>
+</g>
+</g>
+<g id="sankey_labels" font-family="sans-serif" font-size="16px" font-weight="400" fill="#000000">
+<text text-anchor="middle" x="338" y="377" font-size="11px" font-weight="400" fill="rgb(127, 127, 127)">Made with SankeyMATIC</text>
+<rect id="label0_bg" class="for_r0" x="10.62656" y="58.13125" width="164.52219" height="22.81563" rx="4" fill="#fff" fill-opacity="0.55" stroke="none" stroke-width="0" stroke-opacity="0"></rect>
+<text id="label0" class="for_r0" text-anchor="start" x="15.30492" y="69.63188" dy="5.22453125">Production-Solar: 400</text>
+<rect id="label1_bg" class="for_r1" x="177.37656" y="39.75625" width="96.02219" height="22.81563" rx="4" fill="#fff" fill-opacity="0.55" stroke="none" stroke-width="0" stroke-opacity="0"></rect>
+<text id="label1" class="for_r1" text-anchor="start" x="182.05492" y="51.25534" dy="5.22453125">Slice-A: 300</text>
+<rect id="label2_bg" class="for_r2" x="177.37656" y="114.36562" width="96.02219" height="22.81563" rx="4" fill="#fff" fill-opacity="0.55" stroke="none" stroke-width="0" stroke-opacity="0"></rect>
+<text id="label2" class="for_r2" text-anchor="start" x="182.05492" y="125.87056" dy="5.22453125">Slice-B: 100</text>
+<rect id="label3_bg" class="for_r3" x="202.96062" y="113.52187" width="128.91281" height="22.81563" rx="4" fill="#fff" fill-opacity="0.55" stroke="none" stroke-width="0" stroke-opacity="0" transform="translate(0,-28)"></rect>
+<text id="label3" class="for_r3" text-anchor="end" x="327.19508" y="125.01784" dy="5.22453125" transform="translate(0,-28)">Claim-Solar: 100</text>
+<rect id="label4_bg" class="for_r4" x="365.24187" y="113.24062" width="133.38156" height="22.81563" rx="4" fill="#fff" fill-opacity="0.55" stroke="none" stroke-width="0" stroke-opacity="0"></rect>
+<text id="label4" class="for_r4" text-anchor="end" x="493.94508" y="124.74015" dy="5.22453125">ConsSlice-A: 100</text>
+<rect id="label5_bg" class="for_r5" x="525.7575" y="156.88125" width="139.61594" height="22.81563" rx="4" fill="#fff" fill-opacity="0.55" stroke="none" stroke-width="0" stroke-opacity="0"></rect>
+<text id="label5" class="for_r5" text-anchor="end" x="660.69508" y="168.38314" dy="5.22453125">Consumption: 300</text>
+<rect id="label6_bg" class="for_r6" x="10.62656" y="254.35" width="163.61594" height="22.81563" rx="4" fill="#fff" fill-opacity="0.55" stroke="none" stroke-width="0" stroke-opacity="0"></rect>
+<text id="label6" class="for_r6" text-anchor="start" x="15.30492" y="265.85187" dy="5.22453125">Production-Wind: 700</text>
+<rect id="label7_bg" class="for_r7" x="177.37656" y="183.85" width="96.91281" height="22.81563" rx="4" fill="#fff" fill-opacity="0.55" stroke="none" stroke-width="0" stroke-opacity="0"></rect>
+<text id="label7" class="for_r7" text-anchor="start" x="182.05492" y="195.35217" dy="5.22453125">Slice-C: 200</text>
+<rect id="label8_bg" class="for_r8" x="203.85125" y="181.44375" width="128.02219" height="22.81563" rx="4" fill="#fff" fill-opacity="0.55" stroke="none" stroke-width="0" stroke-opacity="0" transform="translate(0,37)"></rect>
+<text id="label8" class="for_r8" text-anchor="end" x="327.19508" y="192.95018" dy="5.22453125" transform="translate(0,37)">Claim-Wind: 200</text>
+<rect id="label9_bg" class="for_r9" x="373.24187" y="179.69375" width="125.38156" height="22.81563" rx="4" fill="#fff" fill-opacity="0.55" stroke="none" stroke-width="0" stroke-opacity="0"></rect>
+<text id="label9" class="for_r9" text-anchor="end" x="493.94508" y="191.19991" dy="5.22453125">ConSlice-B: 200</text>
+<rect id="label10_bg" class="for_r10" x="177.37656" y="282.92813" width="96.91281" height="22.81563" rx="4" fill="#fff" fill-opacity="0.55" stroke="none" stroke-width="0" stroke-opacity="0"></rect>
+<text id="label10" class="for_r10" text-anchor="start" x="182.05492" y="294.43375" dy="5.22453125">Slice-D: 500</text>
+</g>
+</g></svg>

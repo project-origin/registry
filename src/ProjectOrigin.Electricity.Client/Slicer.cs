@@ -4,7 +4,7 @@ using ProjectOrigin.Electricity.Client.Models;
 namespace ProjectOrigin.Electricity.Client;
 
 /// <summary>
-/// To help create <a href="xref:granular_certificate#slice">Granular Certificate slices</a> from the current slice.
+/// To help create <a href="xref:granular_certificate#slices">Granular Certificate slices</a> from the current slice.
 /// </summary>
 public class Slicer
 {
@@ -12,7 +12,7 @@ public class Slicer
     private List<Slice> _slices = new List<Slice>();
 
     /// <summary>
-    /// Creates a slicer based on an existing <a href="xref:granular_certificate#slice">Granular Certificate slice</a>.
+    /// Creates a slicer based on an existing <a href="xref:granular_certificate#slices">Granular Certificate slice</a>.
     /// </summary>
     /// <param name="source">a shieldedValue of the source slice on the certificate from which to create the new slices.</param>
     public Slicer(ShieldedValue source)

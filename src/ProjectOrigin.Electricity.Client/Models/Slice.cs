@@ -3,7 +3,7 @@ using NSec.Cryptography;
 namespace ProjectOrigin.Electricity.Client.Models;
 
 /// <summary>
-/// A <a href="xref:granular_certificate#slice">slice</a> represents an part of a
+/// A <a href="xref:granular_certificate#slices">slice</a> represents an part of a
 /// <a href="xref:granular_certificate">Granular Certificate</a>
 /// </summary>
 public class Slice

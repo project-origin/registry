@@ -12,7 +12,7 @@ public class SliceCollection
     public ShieldedValue Source { get; init; }
 
     /// <summary>
-    /// A collection of new <a href="xref:granular_certificate#slice">slices</a> to create
+    /// A collection of new <a href="xref:granular_certificate#slices">slices</a> to create
     /// from the source slice
     /// </summary>
     public IEnumerable<Slice> Slices { get; init; }
