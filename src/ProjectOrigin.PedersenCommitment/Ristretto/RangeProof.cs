@@ -1,5 +1,5 @@
 using System.Runtime.InteropServices;
-namespace ProjectOrigin.PedersenCommitment;
+namespace ProjectOrigin.PedersenCommitment.Ristretto;
 
 public record RangeProof {
     internal class Native

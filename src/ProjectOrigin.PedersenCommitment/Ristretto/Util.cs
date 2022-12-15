@@ -1,5 +1,5 @@
-namespace ProjectOrigin.PedersenCommitment;
 using System.Numerics;
+namespace ProjectOrigin.PedersenCommitment.Ristretto;
 
 internal class Util
 {

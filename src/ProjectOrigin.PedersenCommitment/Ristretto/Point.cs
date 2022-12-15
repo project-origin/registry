@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ProjectOrigin.PedersenCommitment.Ristretto;
 
-internal class Native {
+internal class NativePoint {
     [DllImport("rust_ffi", EntryPoint = "ristretto_point_from_uniform_bytes")]
     internal static extern IntPtr FromUniformBytes(byte[] bytes);
 
@@ -41,7 +41,8 @@ internal class Native {
     internal static extern void GutSpill(IntPtr self);
 }
 
-public sealed class Point {
+public sealed class Point
+{
 
     internal readonly IntPtr ptr;
 
@@ -52,62 +53,62 @@ public sealed class Point {
 
     ~Point()
     {
-        Native.Free(ptr);
+        NativePoint.Free(ptr);
     }
 
     public static Point FromUniformBytes(byte[] bytes)
     {
         // TODO: Ensure length of bytes is appropriate
-        return new Point(Native.FromUniformBytes(bytes));
+        return new Point(NativePoint.FromUniformBytes(bytes));
     }
 
     public CompressedPoint Compress()
     {
         var bytes = new byte[32]; // allocate bytes
-        Native.Compress(ptr, bytes);
+        NativePoint.Compress(ptr, bytes);
         return new CompressedPoint(bytes);
     }
 
     public static Point operator +(Point left, Point right)
     {
-        var ptr = Native.Add(left.ptr, right.ptr);
+        var ptr = NativePoint.Add(left.ptr, right.ptr);
         return new Point(ptr);
     }
 
     public static Point operator -(Point left, Point right)
     {
-        var ptr = Native.Sub(left.ptr, right.ptr);
+        var ptr = NativePoint.Sub(left.ptr, right.ptr);
         return new Point(ptr);
     }
 
 
     public static Point operator -(Point self)
     {
-        var ptr = Native.Negate(self.ptr);
+        var ptr = NativePoint.Negate(self.ptr);
         return new Point(ptr);
     }
 
     public static Point operator *(Point left, BigInteger right)
     {
-        var ptr = Native.Mul(left.ptr, Util.FromBigInteger(right));
+        var ptr = NativePoint.Mul(left.ptr, Util.FromBigInteger(right));
         return new Point(ptr);
 
     }
 
     public static Point operator *(BigInteger left, Point right)
     {
-        var ptr = Native.Mul(right.ptr, Util.FromBigInteger(left));
+        var ptr = NativePoint.Mul(right.ptr, Util.FromBigInteger(left));
         return new Point(ptr);
     }
 
     public static Point operator *(Point left, Scalar right)
     {
-        return new Point(Native.Mul(left.ptr, right.ptr));
+        return new Point(NativePoint.Mul(left.ptr, right.ptr));
     }
 
     public static Point operator *(Scalar left, Point right)
     {
-        return new Point(Native.Mul(right.ptr, left.ptr));
+        return new Point(NativePoint.Mul(right.ptr, left.ptr));
     }
 
     public override bool Equals(object? obj)
@@ -124,18 +125,18 @@ public sealed class Point {
         if (left.ptr == right.ptr) {
             return true;
         }
-        return Native.Equals(left.ptr, right.ptr);
+        return NativePoint.Equals(left.ptr, right.ptr);
     }
 
     public static bool operator !=(Point left, Point right)
     {
-        return !Native.Equals(left.ptr, right.ptr);
+        return !NativePoint.Equals(left.ptr, right.ptr);
     }
 
 
     public void GutSpill()
     {
-        Native.GutSpill(ptr);
+        NativePoint.GutSpill(ptr);
     }
 
     public override int GetHashCode() => base.GetHashCode();
@@ -156,7 +157,7 @@ public readonly struct CompressedPoint {
 
     public Point Decompress()
     {
-        var ptr = Native.Decompress(this.bytes);
+        var ptr = NativePoint.Decompress(this.bytes);
         if (ptr == IntPtr.Zero) { // null pointer == could not decompress
             throw new ArgumentException("Could not decompress RistrettoPoint");
         }

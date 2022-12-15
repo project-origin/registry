@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Numerics;
 
-namespace ProjectOrigin.PedersenCommitment;
+namespace ProjectOrigin.PedersenCommitment.Ristretto;
 
 /**
  * @brief Scalar referencing a Rust object on the heap. Guaranteed to always be in the field.
