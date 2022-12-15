@@ -10,11 +10,11 @@ public record RangeProof {
         [DllImport("rust_ffi", EntryPoint = "rangeproof_prove_multiple")]
         internal static extern RangeProofWithCommit ProveMultiple(BulletProofGen.Handle bp_gen, IntPtr pc_gen, ulong[] v, IntPtr blinding, uint n, byte[] label, int label_len, int amount);
 
-        [DllImport("rust_ffi", EntryPoint = "rangeproof_dispose")]
-        internal static extern void Dispose(IntPtr self);
+        [DllImport("rust_ffi", EntryPoint = "rangeproof_free")]
+        internal static extern void Free(IntPtr self);
 
-        [DllImport("rust_ffi", EntryPoint = "rangeproof_dispose")]
-        internal static extern void Verify(IntPtr self);
+        // [DllImport("rust_ffi", EntryPoint = "rangeproof_verify")]
+        // internal static extern void Verify(IntPtr self);
     }
 
     private readonly IntPtr ptr;
@@ -24,7 +24,12 @@ public record RangeProof {
         this.ptr = ptr;
     }
 
-    public RangeProof ProveSingle
+    ~RangeProof()
+    {
+        Native.Free(ptr);
+    }
+
+    public static RangeProof ProveSingle
         (
             BulletProofGen bp_gen,
             Generator pc_gen,
@@ -46,14 +51,6 @@ public record RangeProof {
         // return (new RangeProof(IntPtr.Zero), new Ristretto.Point(tuple.point));
         return new RangeProof(tuple.proof);
     }
-
-
-    public void Dispose()
-    {
-        Native.Dispose(ptr);
-    }
-
-
 }
 
 [StructLayout(LayoutKind.Sequential)]

@@ -26,7 +26,7 @@ pub struct RangeProofWithCommit {
 
 
 #[no_mangle]
-pub unsafe extern "C" fn rangeproof_dispose(this: *mut RangeProof) {
+pub unsafe extern "C" fn rangeproof_free(this: *mut RangeProof) {
     if this.is_null() {
         return;
     }

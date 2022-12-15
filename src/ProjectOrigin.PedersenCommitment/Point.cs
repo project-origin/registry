@@ -41,7 +41,7 @@ internal class Native {
     internal static extern void GutSpill(IntPtr self);
 }
 
-public class Point {
+public sealed class Point {
 
     internal readonly IntPtr ptr;
 

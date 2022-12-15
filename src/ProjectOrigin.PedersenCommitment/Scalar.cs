@@ -6,7 +6,7 @@ namespace ProjectOrigin.PedersenCommitment;
 /**
  * @brief Scalar referencing a Rust object on the heap. Guaranteed to always be in the field.
  */
-public class Scalar : IDisposable
+public sealed class Scalar : IDisposable
 {
     internal class Native
     {

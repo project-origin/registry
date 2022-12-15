@@ -4,7 +4,7 @@ namespace ProjectOrigin.PedersenCommitment;
 
 using ProjectOrigin.PedersenCommitment.Ristretto;
 
-public record Generator : IDisposable
+public sealed record Generator : IDisposable
 {
     internal class Native
     {
