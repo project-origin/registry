@@ -1,4 +1,8 @@
+# ignore dotnet code coverage files
 **/coverage.cobertura.xml
+
+# ignore docfx generated site
+doc/_site
 
 # Created by https://www.toptal.com/developers/gitignore/api/dotnetcore,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=dotnetcore,macos

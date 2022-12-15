@@ -8,7 +8,7 @@ namespace ProjectOrigin.Electricity.Production;
 public class ProductionCertificate : IModel
 {
     public FederatedStreamId Id { get => _issued.CertificateId.ToModel(); }
-    public TimePeriod Period { get => _issued.Period.ToModel(); }
+    public DateInterval Period { get => _issued.Period.ToModel(); }
     public string GridArea { get => _issued.GridArea; }
 
     internal CertificateSlice? GetCertificateSlice(Slice slice) => _availableSlices.SingleOrDefault(x => x.Commitment == slice.Source);

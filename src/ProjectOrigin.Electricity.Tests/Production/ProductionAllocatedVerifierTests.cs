@@ -55,7 +55,7 @@ public class ProductionAllocatedVerifierTests
     {
         var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
         var consIssued = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
-        var hourLater = new TimePeriod(consIssued.certificate.Period.DateTimeTo, consIssued.certificate.Period.DateTimeTo.AddHours(1));
+        var hourLater = new DateInterval(consIssued.certificate.Period.Start, consIssued.certificate.Period.End.AddHours(1));
         var (cert, sourceParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250, period: hourLater);
         var quantity = FakeRegister.Group.Commit(150);
 

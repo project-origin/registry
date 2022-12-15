@@ -1,0 +1,8 @@
+- name: Granular Certificate
+  items:
+  - name: Granular Certificate
+    href: granular-certificate.md
+- name: Commitments
+  items:
+  - name: Pedersen Commitment
+    href: pedersen-commitments.md

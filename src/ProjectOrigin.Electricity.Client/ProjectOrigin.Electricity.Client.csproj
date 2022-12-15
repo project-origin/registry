@@ -1,11 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="NSec.Cryptography" Version="22.4.0" />
     <ProjectReference Include="..\ProjectOrigin.PedersenCommitment\ProjectOrigin.PedersenCommitment.csproj" />
@@ -18,7 +12,7 @@
     <Protobuf Include="..\Protos\electricity.proto" />
     <Protobuf Include="..\Protos\electricity-primitives.proto" />
     <Protobuf Include="..\Protos\primitives.proto" />
-    <Protobuf Include="..\Protos\register.proto" GrpcServices="Client" />
+    <Protobuf Include="..\Protos\register.proto" GrpcServices="Client" Access="internal" />
   </ItemGroup>
 
 </Project>

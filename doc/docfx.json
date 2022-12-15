@@ -1,0 +1,49 @@
+{
+    "metadata": [
+        {
+            "src": [
+                {
+                    "files": [
+                        "**/ProjectOrigin.Electricity.Client.csproj"
+                    ],
+                    "src": "../src"
+                }
+            ],
+            "dest": "obj/api"
+        }
+    ],
+    "build": {
+        "content": [
+            {
+                "files": [
+                    "**/*.yml"
+                ],
+                "src": "obj/api",
+                "dest": "api"
+            },
+            {
+                "files": [
+                    "**/*.md",
+                    "toc.yml",
+                    "**/toc.yml"
+                ]
+            }
+        ],
+        "resource": [
+            {
+                "files": [
+                    "**/*.svg"
+                ]
+            }
+        ],
+        "globalMetadata": {
+            "_appTitle": "Project Origin",
+            "_enableSearch": true
+        },
+        "markdownEngineName": "markdig",
+        "dest": "_site",
+        "xrefService": [
+            "https://xref.docs.microsoft.com/query?uid={uid}"
+        ]
+    }
+}
