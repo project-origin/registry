@@ -2,3 +2,13 @@
   items:
   - name: Quickstart
     href: overview.md
+  - name: Alpha Deployment
+    href: alpha-deployment.md
+  - name: In registry containers
+    href: container.md
+- name: Containers
+  items:
+  - name: Step Processor
+    href: step_processor/README.md
+  - name: Verifiable Event Store
+    href: verifiable_event_store/README.md

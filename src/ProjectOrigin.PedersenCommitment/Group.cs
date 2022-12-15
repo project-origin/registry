@@ -21,11 +21,10 @@ public record Group
         }
     }
 
-    public BigInteger p { get; }
-    public BigInteger q { get; }
-    public BigInteger g { get; }
-    public BigInteger h { get; }
-
+    private BigInteger p { get; }
+    private BigInteger q { get; }
+    private BigInteger g { get; }
+    private BigInteger h { get; }
     private Random _random;
 
     public Group(BigInteger p, BigInteger q, BigInteger g, BigInteger h, Random? random = null)
@@ -51,15 +50,79 @@ public record Group
         _random = random ?? Random.Shared;
     }
 
-    public BigInteger RandomR()
-    {
-        return _random.NextBigInteger(1, q);
-    }
-
     public CommitmentParameters Commit(BigInteger m)
     {
         return new CommitmentParameters(m, RandomR(), this);
     }
+
+    public Commitment CreateCommitment(BigInteger c)
+    {
+        if (BigInteger.ModPow(c, q, p) != 1) throw new InvalidDataException("C^q should be equal to 1 mod p");
+
+        return new Commitment(c, this);
+    }
+
+    public CommitmentParameters CreateParameters(BigInteger message, BigInteger r)
+    {
+        return new CommitmentParameters(message, r, this);
+    }
+
+    public BigInteger RandomR()
+    {
+        return _random.NextBigInteger(1, q); //Probably redo TODO!!!
+    }
+
+    public Commitment CreateCommitment(BigInteger message, BigInteger rValue)
+    {
+        var c = BigInteger.ModPow(g, message, p) * BigInteger.ModPow(h, rValue, p) % p; //Probably redo TODO!!!
+
+        return CreateCommitment(c);
+    }
+
+    public Commitment CreateZeroCommitment(CommitmentParameters left, params CommitmentParameters[] right)
+    {
+        var mSum = left.Message - right.Select(x => x.Message).Aggregate((a, b) => a + b);
+        if (mSum != 0)
+        {
+            throw new NotSupportedException("Sum of messages are not zero.");
+        }
+        var rSum = (left.RValue - right.Select(x => x.RValue).Aggregate((a, b) => a + b)).MathMod(q);
+
+        return CreateCommitment(0, rSum);
+    }
+
+    public ReadOnlySpan<byte> CreateEqualityProof(CommitmentParameters sourceParams, params CommitmentParameters[] fs)
+    {
+        return ReadOnlySpan<byte>.Empty; //TODO
+    }
+
+    public bool VerifyEqualityProof(ReadOnlySpan<byte> bytes, Commitment commitment1, Commitment commitment2)
+    {
+        return bytes.Length == 0; //TODO
+    }
+
+    internal ReadOnlySpan<byte> CreateRangeProof(BigInteger message, BigInteger rValue)
+    {
+        return ReadOnlySpan<byte>.Empty; //TODO!!!
+    }
+
+    public bool VerifyRangeProof(ReadOnlySpan<byte> bytes, Commitment commitment)
+    {
+        return bytes.Length == 0; //TODO
+    }
+
+    internal Commitment Product(BigInteger cLeft, BigInteger cRight)
+    {
+        return CreateCommitment((cLeft * cRight) % p);
+    }
+
+    internal Commitment InverseProduct(BigInteger cLeft, BigInteger cRight)
+    {
+        var theInverse = BigInteger.ModPow(cRight, q - 1, p);
+        return CreateCommitment(cLeft * theInverse % p);
+    }
+
+    #region GenerateGroup
 
     public static Group Create(int numberOfBits = DefaultBitLength, Random? random = null)
     {
@@ -114,4 +177,6 @@ public record Group
 
         return gh;
     }
+
+    #endregion
 }

@@ -1,8 +1,6 @@
-using ProjectOrigin.Register.StepProcessor.Models;
-
 namespace ProjectOrigin.Register.StepProcessor.Interfaces;
 
 public interface ICommandStepProcessor
 {
-    Task<CommandStepResult> Process(CommandStep request);
+    Task<V1.CommandStepStatus> Process(V1.CommandStep request);
 }

@@ -1,0 +1,4 @@
+- name: Getting started and examples
+  href: ./examples/toc.yml
+- name: Reference
+  href: ../obj/api/toc.yml

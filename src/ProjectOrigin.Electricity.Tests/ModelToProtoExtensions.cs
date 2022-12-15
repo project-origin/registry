@@ -1,14 +1,23 @@
+using System.Security.Cryptography;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.PedersenCommitment;
-using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity.Tests;
 
 internal static class ModelToProtoExtensions
 {
+    internal static V1.SliceId ToSliceId(this CommitmentParameters @params)
+    {
+        return new V1.SliceId()
+        {
+            Hash = ByteString.CopyFrom(SHA256.HashData(@params.C.ToByteArray()))
+        };
+    }
+
+
     internal static Register.V1.Uuid ToProto(this Guid allocationId)
     {
         return new Register.V1.Uuid()
@@ -17,20 +26,20 @@ internal static class ModelToProtoExtensions
         };
     }
 
-    public static V1.Commitment ToProto(this Commitment obj)
+    public static V1.Commitment ToProtoCommitment(this CommitmentParameters obj)
     {
         return new V1.Commitment()
         {
-            C = ByteString.CopyFrom(obj.C.ToByteArray())
+            Content = ByteString.CopyFrom(obj.C.ToByteArray())
         };
     }
 
-    public static V1.CommitmentProof ToProto(this CommitmentParameters obj)
+    public static V1.CommitmentPublication ToProto(this CommitmentParameters obj)
     {
-        return new V1.CommitmentProof()
+        return new V1.CommitmentPublication()
         {
-            Message = (ulong)obj.m,
-            RValue = ByteString.CopyFrom(obj.r.ToByteArray())
+            Message = (ulong)obj.Message,
+            RValue = ByteString.CopyFrom(obj.RValue.ToByteArray())
         };
     }
 
@@ -49,18 +58,6 @@ internal static class ModelToProtoExtensions
         {
             Start = Timestamp.FromDateTimeOffset(model.Start),
             End = Timestamp.FromDateTimeOffset(model.End),
-        };
-    }
-
-    internal static Register.V1.FederatedStreamId ToProto(this FederatedStreamId id)
-    {
-        return new Register.V1.FederatedStreamId()
-        {
-            Registry = id.Registry,
-            StreamId = new Register.V1.Uuid()
-            {
-                Value = id.StreamId.ToString()
-            }
         };
     }
 }

@@ -8,19 +8,9 @@ This file contains the run though of the suggested architecture for the registry
 - **Events**: are state changes that has happened and are persisted when they have been included in a merkle tree.
 - **Event store**: a datastore that stores all the events for the registry.
 
-## Container diagram
+## Overview
 
-Below is a [Container diagram](https://c4model.com/#ContainerDiagram)
-showing a break down of the registry into high level containers as-is.
+Below is a [system context diagram](https://c4model.com/#SystemContextDiagram)
+showing the landscape of systems the registry interacts with.
 
-![C4 Container diagram](container.drawio.svg)
-
-For in depth description of the containers look in the following documents:
-
-- [Verifiable event store](verifiable_event_store/README.md)
-- [Step processor](step_processor/README.md)
-
-
-## Deployment diagram
-
-![C4 Deployment diagram for alpha test](deployment_multiple_alpha.drawio.svg)
+![C4 system diagram](system_diagram.drawio.svg)

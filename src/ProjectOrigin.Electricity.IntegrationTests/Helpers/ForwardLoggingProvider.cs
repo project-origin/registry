@@ -38,7 +38,7 @@ namespace ProjectOrigin.Electricity.IntegrationTests.Helpers
         {
         }
 
-        internal class ForwardingLogger : ILogger
+        internal class ForwardingLogger : ILogger, IDisposable
         {
             private readonly string _categoryName;
             private readonly LogMessage _logAction;
@@ -49,9 +49,14 @@ namespace ProjectOrigin.Electricity.IntegrationTests.Helpers
                 _logAction = logAction;
             }
 
-            public IDisposable BeginScope<TState>(TState state)
+            IDisposable ILogger.BeginScope<TState>(TState state)
             {
-                return null!;
+                return this;
+            }
+
+            public void Dispose()
+            {
+
             }
 
             public bool IsEnabled(LogLevel logLevel)

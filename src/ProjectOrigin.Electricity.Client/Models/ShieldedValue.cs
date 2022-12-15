@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Security.Cryptography;
 using Google.Protobuf;
 using ProjectOrigin.PedersenCommitment;
 
@@ -13,12 +14,12 @@ public class ShieldedValue
     /// <summary>
     /// Contains the message that the shielded value should protect.
     /// </summary>
-    public ulong Message { get => (ulong)_commitmentParameters.m; }
+    public ulong Message { get => (ulong)_commitmentParameters.Message; }
 
     /// <summary>
     /// The random value that protects the message.
     /// </summary>
-    public BigInteger R { get => _commitmentParameters.r; }
+    public BigInteger RValue { get => _commitmentParameters.RValue; }
 
     private CommitmentParameters _commitmentParameters;
 
@@ -30,7 +31,7 @@ public class ShieldedValue
     /// <param name="r">contains the random value that hides the message.</param>
     public ShieldedValue(ulong message, BigInteger r)
     {
-        _commitmentParameters = new CommitmentParameters(message, r, Group.Default);
+        _commitmentParameters = Group.Default.CreateParameters(message, r);
     }
 
     /// <summary>
@@ -43,20 +44,25 @@ public class ShieldedValue
         _commitmentParameters = Group.Default.Commit(message);
     }
 
+    internal V1.SliceId ToSliceId()
+    {
+        return new V1.SliceId()
+        {
+            Hash = ByteString.CopyFrom(SHA256.HashData(_commitmentParameters.C.ToByteArray()))
+        };
+    }
+
+    internal CommitmentParameters ToParams()
+    {
+        return Group.Default.CreateParameters(Message, RValue);
+    }
+
     internal V1.Commitment ToProtoCommitment()
     {
         return new V1.Commitment()
         {
-            C = ByteString.CopyFrom(_commitmentParameters.C.ToByteArray())
-        };
-    }
-
-    internal V1.CommitmentProof ToProtoCommitmentProof()
-    {
-        return new V1.CommitmentProof()
-        {
-            Message = (ulong)_commitmentParameters.m,
-            RValue = ByteString.CopyFrom(_commitmentParameters.r.ToByteArray())
+            Content = ByteString.CopyFrom(_commitmentParameters.C.ToByteArray()),
+            RangeProof = ByteString.CopyFrom(_commitmentParameters.RangeProof)
         };
     }
 }
