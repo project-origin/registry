@@ -89,3 +89,51 @@ pub unsafe extern "C" fn rangeproof_prove_multiple(
         point: points.as_ptr() as *mut _,
     }
 }
+
+
+#[no_mangle]
+pub unsafe extern "C" fn rangeproof_verify_single(
+    proof: *mut RangeProof,
+    bp_gens: *const BulletproofGens,
+    pc_gens: *const PedersenGens,
+    commit: *const CompressedRistretto,
+    n: u32,
+    label: *const u8,
+    label_len: i32,
+) -> bool {
+    let proof = &*proof;
+    let n = n as usize;
+    let bp_gens = &*bp_gens;
+    let pc_gens = &*pc_gens;
+    let commit = &*commit;
+    let label = slice::from_raw_parts(label, label_len as usize);
+    let mut transcript = Transcript::new(label);
+
+    let res = proof.verify_single(bp_gens, pc_gens, &mut transcript, commit, n);
+
+    res.is_ok()
+}
+
+
+#[no_mangle]
+pub unsafe extern "C" fn rangeproof_verify_multiple(
+    proof: *mut RangeProof,
+    bp_gens: *const BulletproofGens,
+    pc_gens: *const PedersenGens,
+    commits: *const CompressedRistretto,
+    n: u32,
+    label: *const u8,
+    label_len: i32,
+    amount: u32,
+) -> bool {
+    let proof = &*proof;
+    let n = n as usize;
+    let bp_gens = &*bp_gens;
+    let pc_gens = &*pc_gens;
+    let commits = slice::from_raw_parts(commits, amount as usize);
+    let label = slice::from_raw_parts(label, label_len as usize);
+    let mut transcript = Transcript::new(label);
+
+    let res = proof.verify_multiple(bp_gens, pc_gens, &mut transcript, commits, n);
+    res.is_ok()
+}

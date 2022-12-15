@@ -5,16 +5,20 @@ public record RangeProof {
     internal class Native
     {
         [DllImport("rust_ffi", EntryPoint = "rangeproof_prove_single")]
-        internal static extern RangeProofWithCommit ProveSingle(BulletProofGen.Handle bp_gen, IntPtr pc_gen, ulong v, IntPtr blinding, uint n, byte[] label, int label_len);
+        internal static extern RangeProofWithCommit ProveSingle(IntPtr bp_gen, IntPtr pc_gen, ulong v, IntPtr blinding, uint n, byte[] label, int label_len);
 
         [DllImport("rust_ffi", EntryPoint = "rangeproof_prove_multiple")]
-        internal static extern RangeProofWithCommit ProveMultiple(BulletProofGen.Handle bp_gen, IntPtr pc_gen, ulong[] v, IntPtr blinding, uint n, byte[] label, int label_len, int amount);
+        internal static extern RangeProofWithCommit ProveMultiple(IntPtr bp_gen, IntPtr pc_gen, ulong[] v, IntPtr blinding, uint n, byte[] label, int label_len, int amount);
+
+        [DllImport("rust_ffi", EntryPoint = "rangeproof_verify_single")]
+        internal static extern bool VerifySingle(IntPtr self, IntPtr bp_gen, IntPtr pc_gen, IntPtr commit, uint n, byte[] label, int label_len);
+
+        [DllImport("rust_ffi", EntryPoint = "rangeproof_verify_multiple")]
+        internal static extern bool VerifyMultiple(IntPtr self, IntPtr bp_gen, IntPtr pc_gen, IntPtr commits, uint n, byte[] label, int label_len);
 
         [DllImport("rust_ffi", EntryPoint = "rangeproof_free")]
         internal static extern void Free(IntPtr self);
 
-        // [DllImport("rust_ffi", EntryPoint = "rangeproof_verify")]
-        // internal static extern void Verify(IntPtr self);
     }
 
     private readonly IntPtr ptr;
@@ -29,7 +33,7 @@ public record RangeProof {
         Native.Free(ptr);
     }
 
-    public static RangeProof ProveSingle
+    public static (RangeProof, CompressedPoint) ProveSingle
         (
             BulletProofGen bp_gen,
             Generator pc_gen,
@@ -48,8 +52,32 @@ public record RangeProof {
                 label,
                 label.Length
                 );
-        // return (new RangeProof(IntPtr.Zero), new Ristretto.Point(tuple.point));
-        return new RangeProof(tuple.proof);
+
+        var bytes = new byte[32];
+        CompressedPoint.ToBytes(tuple.compressedPoint, bytes);
+        return (new RangeProof(tuple.proof), new CompressedPoint(bytes));
+    }
+
+    public bool VerifySingle
+        (
+            BulletProofGen bp_gen,
+            Generator pc_gen,
+            CompressedPoint commitment, // Should be a CompressedPoint
+            uint n,
+            byte[] label
+        )
+    {
+        var commit_ptr = CompressedPoint.FromBytes(commitment.bytes);
+        var res = Native.VerifySingle(
+                this.ptr,
+                bp_gen.ptr,
+                pc_gen.ptr,
+                commit_ptr,
+                n,
+                label,
+                label.Length
+                );
+        return res;
     }
 }
 
@@ -57,45 +85,28 @@ public record RangeProof {
 struct RangeProofWithCommit
 {
     public IntPtr proof;
-    public IntPtr point;
+    public IntPtr compressedPoint;
 }
 
 public record BulletProofGen
 {
-    internal readonly Handle ptr;
+    internal readonly IntPtr ptr;
 
     [DllImport("rust_ffi", EntryPoint = "bpgen_new")]
-    private static extern Handle New(uint gensCapacity, uint partyCapacity);
+    private static extern IntPtr New(uint gensCapacity, uint partyCapacity);
 
+    [DllImport("rust_ffi", EntryPoint = "bpgen_free")]
+    private static extern void Free(IntPtr self);
 
     public BulletProofGen(uint gensCapacity, uint partyCapacity)
     {
         this.ptr = New(gensCapacity, partyCapacity);
     }
 
-    internal class Handle : SafeHandle
+    ~BulletProofGen()
     {
-        [DllImport("rust_ffi", EntryPoint = "bpgen_free")]
-        private static extern void Free(Handle self);
-
-        public Handle() : base(IntPtr.Zero, true)
-        {
-        }
-
-        public override bool IsInvalid
-        {
-            get { return this.handle == IntPtr.Zero; }
-        }
-
-        protected override bool ReleaseHandle()
-        {
-            if (!this.IsInvalid)
-            {
-                Free(this);
-            }
-            return true;
-        }
-
+        Free(ptr);
     }
+
 }
 

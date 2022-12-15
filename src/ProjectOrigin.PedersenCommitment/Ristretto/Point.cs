@@ -144,7 +144,7 @@ public sealed class Point
 
 public readonly struct CompressedPoint {
 
-    readonly public byte[] bytes;
+    readonly internal byte[] bytes;
 
     public CompressedPoint(byte[] bytes)
     {
@@ -154,6 +154,12 @@ public readonly struct CompressedPoint {
         this.bytes = bytes;
     }
 
+
+    [DllImport("rust_ffi", EntryPoint = "compressed_ristretto_from_bytes")]
+    internal static extern IntPtr FromBytes(byte[] bytes);
+
+    [DllImport("rust_ffi", EntryPoint = "compressed_ristretto_to_bytes")]
+    internal static extern void ToBytes(IntPtr self, byte[] bytes);
 
     public Point Decompress()
     {
@@ -172,6 +178,8 @@ public readonly struct CompressedPoint {
         CompressedPoint other = (CompressedPoint) obj;
         return bytes.SequenceEqual(other.bytes);
     }
+
+
 
     public override int GetHashCode() => base.GetHashCode();
 

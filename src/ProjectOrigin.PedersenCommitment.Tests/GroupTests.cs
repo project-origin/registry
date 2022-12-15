@@ -1,5 +1,4 @@
 using System.Numerics;
-using ProjectOrigin.PedersenCommitment.Ristretto;
 
 namespace ProjectOrigin.PedersenCommitment.Tests;
 

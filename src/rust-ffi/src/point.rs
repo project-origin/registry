@@ -107,3 +107,19 @@ pub extern "C" fn ristretto_point_free(this: *mut RistrettoPoint) {
         drop(Box::from_raw(this));
     }
 }
+
+
+#[no_mangle]
+pub unsafe extern "C" fn compressed_ristretto_to_bytes(this: *mut CompressedRistretto, dst: *mut u8) {
+    let this = &*this;
+    let src = this.as_bytes();
+    let dst = slice::from_raw_parts_mut(dst, 32);
+    dst.clone_from_slice(src);
+}
+
+
+#[no_mangle]
+pub unsafe extern "C" fn compressed_ristretto_from_bytes(bytes: *mut u8) -> *mut CompressedRistretto {
+    let bytes = slice::from_raw_parts(bytes, 32);
+    Box::into_raw(Box::new(CompressedRistretto::from_slice(bytes)))
+}

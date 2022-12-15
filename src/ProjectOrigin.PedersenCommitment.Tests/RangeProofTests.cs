@@ -13,6 +13,8 @@ public class RangeProofTests {
         var blinding = Scalar.Random();
         var label = Encoding.ASCII.GetBytes("test example");
 
-        var proof = RangeProof.ProveSingle(bp_gens, pc_gens, 7, blinding, 32, label);
+        var (proof, commit) = RangeProof.ProveSingle(bp_gens, pc_gens, 7, blinding, 32, label);
+        var res = proof.VerifySingle(bp_gens, pc_gens, commit, 32, label);
+        Assert.True(res);
     }
 }
