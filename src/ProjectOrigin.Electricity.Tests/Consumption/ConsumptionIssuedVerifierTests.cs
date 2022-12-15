@@ -1,14 +1,11 @@
 using Microsoft.Extensions.Options;
 using NSec.Cryptography;
-using ProjectOrigin.Electricity.Consumption;
-using ProjectOrigin.Electricity.Consumption.Requests;
+using ProjectOrigin.Electricity.Consumption.Verifiers;
 using ProjectOrigin.Electricity.Models;
-using ProjectOrigin.Register.StepProcessor.Models;
-using ProjectOrigin.Register.StepProcessor.Services;
 
 namespace ProjectOrigin.Electricity.Tests;
 
-public class ConsumptionIssuedVerifierTests
+public class ConsumptionIssuedVerifierTests : AbstractVerifierTests
 {
     private IOptions<T> CreateOptionsMock<T>(T content) where T : class
     {
@@ -37,7 +34,9 @@ public class ConsumptionIssuedVerifierTests
 
         var request = FakeRegister.CreateConsumptionIssuedRequest(issuerKey);
 
-        await processor.Verify(request, null);
+        var result = await processor.Verify(request);
+
+        AssertValid(result);
     }
 
     [Fact]
@@ -45,12 +44,11 @@ public class ConsumptionIssuedVerifierTests
     {
         var (processor, issuerKey) = SetupIssuer();
 
-        var request = FakeRegister.CreateConsumptionIssuedRequest(issuerKey);
+        var request = FakeRegister.CreateConsumptionIssuedRequest(issuerKey, exists: true);
 
-        var result = await processor.Verify(request, new ConsumptionCertificate());
-        var invalid = result as VerificationResult.Invalid;
-        Assert.NotNull(invalid);
-        Assert.Equal($"Certificate with id ”{request.FederatedStreamId.StreamId}” already exists", invalid!.ErrorMessage);
+        var result = await processor.Verify(request);
+
+        AssertInvalid(result, $"Certificate with id ”{request.Event.CertificateId.StreamId}” already exists");
     }
 
     [Fact]
@@ -58,12 +56,11 @@ public class ConsumptionIssuedVerifierTests
     {
         var (processor, issuerKey) = SetupIssuer();
 
-        var request = FakeRegister.CreateConsumptionIssuedRequest(issuerKey, gsrnCommitmentOverride: FakeRegister.Group.Commit(57682));
+        var request = FakeRegister.CreateConsumptionIssuedRequest(issuerKey, gsrnCommitmentOverride: FakeRegister.InvalidCommitment());
 
-        var result = await processor.Verify(request, null);
-        var invalid = result as VerificationResult.Invalid;
-        Assert.NotNull(invalid);
-        Assert.Equal("Calculated GSRN commitment does not equal the parameters", invalid!.ErrorMessage);
+        var result = await processor.Verify(request);
+
+        AssertInvalid(result, "Invalid range proof forr GSRN commitment");
     }
 
     [Fact]
@@ -71,12 +68,11 @@ public class ConsumptionIssuedVerifierTests
     {
         var (processor, issuerKey) = SetupIssuer();
 
-        var request = FakeRegister.CreateConsumptionIssuedRequest(issuerKey, quantityCommitmentOverride: FakeRegister.Group.Commit(695956));
+        var request = FakeRegister.CreateConsumptionIssuedRequest(issuerKey, quantityCommitmentOverride: FakeRegister.InvalidCommitment());
 
-        var result = await processor.Verify(request, null);
-        var invalid = result as VerificationResult.Invalid;
-        Assert.NotNull(invalid);
-        Assert.Equal("Calculated Quantity commitment does not equal the parameters", invalid!.ErrorMessage);
+        var result = await processor.Verify(request);
+
+        AssertInvalid(result, "Invalid range proof forr Quantity commitment");
     }
 
     [Fact]
@@ -84,13 +80,16 @@ public class ConsumptionIssuedVerifierTests
     {
         var (processor, issuerKey) = SetupIssuer();
 
-        var randomOwnerKeyData = new Fixture().Create<byte[]>();
+        var randomOwnerKeyData = new V1.PublicKey
+        {
+            Content = Google.Protobuf.ByteString.CopyFrom(new Fixture().Create<byte[]>())
+        };
+
         var request = FakeRegister.CreateConsumptionIssuedRequest(issuerKey, ownerKeyOverride: randomOwnerKeyData);
 
-        var result = await processor.Verify(request, null);
-        var invalid = result as VerificationResult.Invalid;
-        Assert.NotNull(invalid);
-        Assert.Equal("Invalid owner key, not a valid Ed25519 publicKey", invalid!.ErrorMessage);
+        var result = await processor.Verify(request);
+
+        AssertInvalid(result, "Invalid owner key, not a valid Ed25519 publicKey");
     }
 
     [Fact]
@@ -102,10 +101,9 @@ public class ConsumptionIssuedVerifierTests
 
         var request = FakeRegister.CreateConsumptionIssuedRequest(someOtherKey);
 
-        var result = await processor.Verify(request, null);
-        var invalid = result as VerificationResult.Invalid;
-        Assert.NotNull(invalid);
-        Assert.Equal("Invalid issuer signature for GridArea ”DK1”", invalid!.ErrorMessage);
+        var result = await processor.Verify(request);
+
+        AssertInvalid(result, "Invalid issuer signature for GridArea ”DK1”");
     }
 
     [Fact]
@@ -117,9 +115,8 @@ public class ConsumptionIssuedVerifierTests
 
         var request = FakeRegister.CreateConsumptionIssuedRequest(someOtherKey, gridAreaOverride: "DK2");
 
-        var result = await processor.Verify(request, null);
-        var invalid = result as VerificationResult.Invalid;
-        Assert.NotNull(invalid);
-        Assert.Equal("No issuer found for GridArea ”DK2”", invalid!.ErrorMessage);
+        var result = await processor.Verify(request);
+
+        AssertInvalid(result, "No issuer found for GridArea ”DK2”");
     }
 }
