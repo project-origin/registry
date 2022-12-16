@@ -3,6 +3,6 @@
 - name: Architecture
   href: architecture/
 - name: Client API Documentation
-  href: obj/api/
+  href: client/
 - name: Contribute
-  href: contribute
+  href: contribute/

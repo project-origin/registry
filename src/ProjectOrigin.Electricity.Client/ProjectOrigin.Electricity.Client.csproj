@@ -9,9 +9,8 @@
     <PackageReference Include="Google.Protobuf" Version="3.21.9" />
     <PackageReference Include="Grpc.Tools" Version="2.50.0" />
     <PackageReference Include="Grpc.Net.Client" Version="2.50.0" />
-    <Protobuf Include="..\Protos\electricity.proto" />
-    <Protobuf Include="..\Protos\electricity-primitives.proto" />
-    <Protobuf Include="..\Protos\primitives.proto" />
+    <Protobuf Include="..\Protos\electricity.proto" Access="internal" />
+    <Protobuf Include="..\Protos\primitives.proto" Access="internal" />
     <Protobuf Include="..\Protos\register.proto" GrpcServices="Client" Access="internal" />
   </ItemGroup>
 

@@ -1,90 +1,82 @@
 syntax = "proto3";
 
+import "google/protobuf/timestamp.proto";
 import "primitives.proto";
-import "electricity-primitives.proto";
 
 package ProjectOrigin.Electricity.v1;
 
-message IssueConsumptionCommand {
-    message ConsumptionIssuedEvent {
-        ProjectOrigin.Register.v1.FederatedStreamId CertificateId = 1;
-        DateInterval Period = 2;
-        string GridArea = 3;
-        Commitment GsrnCommitment = 4;
-        Commitment QuantityCommitment = 5;
-        PublicKey OwnerPublicKey = 6;
-    }
-
-    message ConsumptionIssuedProof {
-        CommitmentProof GsrnProof = 1;
-        CommitmentProof QuantityProof = 2;
-    }
-
-    ConsumptionIssuedEvent Event = 1;
-    bytes Signature = 2;
-    ConsumptionIssuedProof Proof = 3;
+message ConsumptionIssuedEvent {
+    ProjectOrigin.Register.v1.FederatedStreamId CertificateId = 1;
+    DateInterval Period = 2;
+    string GridArea = 3;
+    Commitment GsrnCommitment = 4;
+    Commitment QuantityCommitment = 5;
+    PublicKey OwnerPublicKey = 6;
 }
 
-message IssueProductionCommand {
-    message ProductionIssuedEvent {
-        ProjectOrigin.Register.v1.FederatedStreamId CertificateId = 1;
-        DateInterval Period = 2;
-        string GridArea = 3;
-        string FuelCode = 4;
-        string TechCode = 5;
-        Commitment GsrnCommitment = 6;
-        Commitment QuantityCommitment = 7;
-        CommitmentProof QuantityProof = 8;
-        PublicKey OwnerPublicKey = 9;
-    }
-
-    message ProductionIssuedProof {
-        CommitmentProof GsrnProof = 1;
-        CommitmentProof QuantityProof = 2;
-    }
-
-    ProductionIssuedEvent Event = 1;
-    bytes Signature = 2;
-    ProductionIssuedProof Proof = 3;
+message ProductionIssuedEvent {
+    ProjectOrigin.Register.v1.FederatedStreamId CertificateId = 1;
+    DateInterval Period = 2;
+    string GridArea = 3;
+    string FuelCode = 4;
+    string TechCode = 5;
+    Commitment GsrnCommitment = 6;
+    Commitment QuantityCommitment = 7;
+    CommitmentPublication QuantityPublication = 8;
+    PublicKey OwnerPublicKey = 9;
 }
 
-message TransferProductionSliceCommand{
-    message ProductionSliceTransferredEvent{
-        ProjectOrigin.Register.v1.FederatedStreamId CertificateId = 1;
-        Slice Slice = 2;
-        bytes NewOwner = 3;
-    }
-
-    ProductionSliceTransferredEvent Event = 1;
-    bytes Signature = 2;
-    SliceProof Proof = 3;
+message TransferredEvent{
+    ProjectOrigin.Register.v1.FederatedStreamId CertificateId = 1;
+    SliceId SourceSlice = 2;
+    PublicKey NewOwner = 3;
 }
 
-message ClaimCommand {
-    message AllocatedEvent {
-        ProjectOrigin.Register.v1.Uuid AllocationId = 1;
-        ProjectOrigin.Register.v1.FederatedStreamId  ProductionCertificateId = 2;
-        ProjectOrigin.Register.v1.FederatedStreamId  ConsumptionCertificateId = 3;
-        Slice Slice = 4;
+message SlicedEvent{
+    message Slice {
+        Commitment Quantity = 1;
+        PublicKey NewOwner = 2;
     }
 
-    message ClaimedEvent {
-        ProjectOrigin.Register.v1.Uuid AllocationId = 1;
-        ProjectOrigin.Register.v1.FederatedStreamId  CertificateId = 2;
-    }
+    ProjectOrigin.Register.v1.FederatedStreamId CertificateId = 1;
+    SliceId SourceSlice = 2;
+    repeated Slice NewSlices = 3;
+    bytes SumProof = 4;
+}
 
-    AllocatedEvent ConsumptionAllocatedEvent = 1;
-    bytes ConsumptionAllocatedSignature = 2;
+message AllocatedEvent {
+    ProjectOrigin.Register.v1.Uuid AllocationId = 1;
+    ProjectOrigin.Register.v1.FederatedStreamId  ProductionCertificateId = 2;
+    ProjectOrigin.Register.v1.FederatedStreamId  ConsumptionCertificateId = 3;
+    SliceId ProductionSourceSlice = 4;
+    SliceId ConsumptionSourceSlice = 5;
+    bytes EqualityProof = 6;
+}
 
-    AllocatedEvent ProductionAllocatedEvent = 3;
-    bytes ProductionAllocatedSignature = 4;
+message ClaimedEvent {
+    ProjectOrigin.Register.v1.FederatedStreamId  CertificateId = 1;
+    ProjectOrigin.Register.v1.Uuid AllocationId = 2;
+}
 
-    ClaimedEvent ConsumptionClaimedEvent = 5;
-    bytes ConsumptionClaimedSignature = 6;
+message DateInterval {
+    google.protobuf.Timestamp Start = 1;
+    google.protobuf.Timestamp End = 2;
+}
 
-    ClaimedEvent ProductionClaimedEvent = 7;
-    bytes ProductionClaimedSignature = 8;
+message Commitment {
+    bytes Content = 1;
+    bytes RangeProof = 2;
+}
 
-    SliceProof ConsumptionAllocatedProof = 9;
-    SliceProof ProductionAllocatedProof = 10;
+message CommitmentPublication {
+    uint64 Message = 1;
+    bytes RValue = 2;
+}
+
+message PublicKey {
+    bytes Content = 1;
+}
+
+message SliceId {
+    bytes Hash = 1;
 }

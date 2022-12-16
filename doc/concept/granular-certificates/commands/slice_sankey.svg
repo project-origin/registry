@@ -1,0 +1,75 @@
+<svg height="400" width="600" xmlns="http://www.w3.org/2000/svg">
+<title>Your Diagram Title</title>
+<!-- Generated with SankeyMATIC: 12/12/2022, 1:26:49 PM -->
+<rect height="400" width="600" fill="#ffffff"></rect>
+<g transform="translate(12,18)">
+<g id="sankey_flows">
+<path id="flow0" d="M9 120.58723C63 120.58723 135 99.82893 189 99.82893" fill="none" stroke-width="126.64941" stroke="#4e79a7" opacity="0.65"><title>Slice-0 → Slice-A: 1,200</title></path>
+<path id="flow1" d="M198 73.44364C252 73.44364 324 57.03499 378 57.03499" fill="none" stroke-width="73.87882" stroke="#f28e2c" opacity="0.65"><title>Slice-A → Slice-E: 700</title></path>
+<path id="flow2" d="M198 136.76834C252 136.76834 324 162.35309 378 162.35309" fill="none" stroke-width="52.77059" stroke="#f28e2c" opacity="0.65"><title>Slice-A → Slice-F: 500</title></path>
+<path id="flow3" d="M387 151.79897C441 151.79897 513 134.71457 567 134.71457" fill="none" stroke-width="31.66235" stroke="#76b7b2" opacity="0.65"><title>Slice-F → Slice-G: 300</title></path>
+<path id="flow5" d="M9 197.10458C63 197.10458 135 218.33968 189 218.33968" fill="none" stroke-width="26.38529" stroke="#4e79a7" opacity="0.65"><title>Slice-0 → Slice-B: 250</title></path>
+<path id="flow4" d="M387 178.18427C441 178.18427 513 193.60193 567 193.60193" fill="none" stroke-width="21.10824" stroke="#76b7b2" opacity="0.65"><title>Slice-F → Slice-H: 200</title></path>
+<path id="flow6" d="M9 218.21281C63 218.21281 135 281.44132 189 281.44132" fill="none" stroke-width="15.83118" stroke="#4e79a7" opacity="0.65"><title>Slice-0 → Slice-C: 150</title></path>
+<path id="flow7" d="M9 231.40546C63 231.40546 135 336.62737 189 336.62737" fill="none" stroke-width="10.55412" stroke="#4e79a7" opacity="0.65"><title>Slice-0 → Slice-D: 100</title></path>
+</g>
+<g id="sankey_nodes">
+<g class="node">
+<rect id="r0" class="for_r0" x="0" y="57.26252" height="179.42" width="9" fill="#4e79a7" fill-opacity="1"><title>Slice-0:
+1,700</title></rect>
+</g>
+<g class="node">
+<rect id="r1" class="for_r1" x="189" y="36.50423" height="126.64941" width="9" fill="#f28e2c" fill-opacity="1"><title>Slice-A:
+1,200</title></rect>
+</g>
+<g class="node">
+<rect id="r2" class="for_r2" x="378" y="20.09557" height="73.87882" width="9" fill="#e15759" fill-opacity="1"><title>Slice-E:
+700</title></rect>
+</g>
+<g class="node">
+<rect id="r3" class="for_r3" x="378" y="135.9678" height="52.77059" width="9" fill="#76b7b2" fill-opacity="1"><title>Slice-F:
+500</title></rect>
+</g>
+<g class="node">
+<rect id="r4" class="for_r4" x="567" y="118.88339" height="31.66235" width="9" fill="#59a14f" fill-opacity="1"><title>Slice-G:
+300</title></rect>
+</g>
+<g class="node">
+<rect id="r5" class="for_r5" x="567" y="192.53915" height="21.10824" width="9" fill="#edc949" fill-opacity="1" transform="translate(0,-9.49133)"><title>Slice-H:
+200</title></rect>
+</g>
+<g class="node">
+<rect id="r6" class="for_r6" x="189" y="205.14704" height="26.38529" width="9" fill="#af7aa1" fill-opacity="1"><title>Slice-B:
+250</title></rect>
+</g>
+<g class="node">
+<rect id="r7" class="for_r7" x="189" y="273.52573" height="15.83118" width="9" fill="#ff9da7" fill-opacity="1"><title>Slice-C:
+150</title></rect>
+</g>
+<g class="node">
+<rect id="r8" class="for_r8" x="189" y="331.35031" height="10.55412" width="9" fill="#9c755f" fill-opacity="1"><title>Slice-D:
+100</title></rect>
+</g>
+</g>
+<g id="sankey_labels" font-family="sans-serif" font-size="16px" font-weight="400" fill="#000000">
+<text text-anchor="middle" x="288" y="377" font-size="11px" font-weight="400" fill="rgb(127, 127, 127)">Made with SankeyMATIC</text>
+<rect id="label0_bg" class="for_r0" x="10.62656" y="135.475" width="107.60031" height="22.81563" rx="4" fill="#fff" fill-opacity="0.55" stroke="none" stroke-width="0" stroke-opacity="0"></rect>
+<text id="label0" class="for_r0" text-anchor="start" x="15.30492" y="146.97252" dy="5.22453125">Slice-0: 1,700</text>
+<rect id="label1_bg" class="for_r1" x="199.62656" y="88.31875" width="109.36594" height="22.81563" rx="4" fill="#fff" fill-opacity="0.55" stroke="none" stroke-width="0" stroke-opacity="0"></rect>
+<text id="label1" class="for_r1" text-anchor="start" x="204.30492" y="99.82893" dy="5.22453125">Slice-A: 1,200</text>
+<rect id="label2_bg" class="for_r2" x="280.35125" y="45.5375" width="96.02219" height="22.81563" rx="4" fill="#fff" fill-opacity="0.55" stroke="none" stroke-width="0" stroke-opacity="0"></rect>
+<text id="label2" class="for_r2" text-anchor="end" x="371.69508" y="57.03499" dy="5.22453125">Slice-E: 700</text>
+<rect id="label3_bg" class="for_r3" x="281.24187" y="150.85" width="95.13156" height="22.81563" rx="4" fill="#fff" fill-opacity="0.55" stroke="none" stroke-width="0" stroke-opacity="0"></rect>
+<text id="label3" class="for_r3" text-anchor="end" x="371.69508" y="162.35309" dy="5.22453125">Slice-F: 500</text>
+<rect id="label4_bg" class="for_r4" x="467.57" y="123.20937" width="97.80344" height="22.81563" rx="4" fill="#fff" fill-opacity="0.55" stroke="none" stroke-width="0" stroke-opacity="0"></rect>
+<text id="label4" class="for_r4" text-anchor="end" x="560.69508" y="134.71457" dy="5.22453125">Slice-G: 300</text>
+<rect id="label5_bg" class="for_r5" x="468.46062" y="191.58437" width="96.91281" height="22.81563" rx="4" fill="#fff" fill-opacity="0.55" stroke="none" stroke-width="0" stroke-opacity="0" transform="translate(0,-9.49133)"></rect>
+<text id="label5" class="for_r5" text-anchor="end" x="560.69508" y="203.09326" dy="5.22453125" transform="translate(0,-9.49133)">Slice-H: 200</text>
+<rect id="label6_bg" class="for_r6" x="199.62656" y="206.83437" width="96.02219" height="22.81563" rx="4" fill="#fff" fill-opacity="0.55" stroke="none" stroke-width="0" stroke-opacity="0"></rect>
+<text id="label6" class="for_r6" text-anchor="start" x="204.30492" y="218.33968" dy="5.22453125">Slice-B: 250</text>
+<rect id="label7_bg" class="for_r7" x="199.62656" y="269.94375" width="96.91281" height="22.81563" rx="4" fill="#fff" fill-opacity="0.55" stroke="none" stroke-width="0" stroke-opacity="0"></rect>
+<text id="label7" class="for_r7" text-anchor="start" x="204.30492" y="281.44132" dy="5.22453125">Slice-C: 150</text>
+<rect id="label8_bg" class="for_r8" x="199.62656" y="325.13125" width="96.91281" height="22.81563" rx="4" fill="#fff" fill-opacity="0.55" stroke="none" stroke-width="0" stroke-opacity="0"></rect>
+<text id="label8" class="for_r8" text-anchor="start" x="204.30492" y="336.62737" dy="5.22453125">Slice-D: 100</text>
+</g>
+</g></svg>
