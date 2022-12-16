@@ -40,27 +40,27 @@ public sealed class Scalar : IDisposable
         internal static extern IntPtr HashFromBytes(byte[] bytes, int len);
     }
 
-    internal readonly IntPtr ptr;
+    internal readonly IntPtr _ptr;
 
     internal Scalar(IntPtr ptr)
     {
-        this.ptr = ptr;
+        _ptr = ptr;
     }
 
     ~Scalar()
     {
-        Native.Free(ptr);
+        Native.Free(_ptr);
     }
 
     public Scalar(ulong value)
     {
         var bytes = value.ToByteArray(32);
-        ptr = Native.New(bytes);
+        _ptr = Native.New(bytes);
     }
 
     public Scalar(ReadOnlySpan<byte> bytes)
     {
-        ptr = Native.New(bytes.ToArray());
+        _ptr = Native.New(bytes.ToArray());
     }
 
     public Scalar(byte[] bytes)
@@ -69,7 +69,7 @@ public sealed class Scalar : IDisposable
         {
             throw new ArgumentException("Byte length has to 32");
         }
-        ptr = Native.New(bytes);
+        _ptr = Native.New(bytes);
     }
 
     public static Scalar Random()
@@ -85,30 +85,30 @@ public sealed class Scalar : IDisposable
     public byte[] ToBytes()
     {
         var bytes = new byte[32];
-        Native.ToBytes(ptr, bytes);
+        Native.ToBytes(_ptr, bytes);
         return bytes;
     }
 
     public void Dispose()
     {
-        Native.Free(ptr);
+        Native.Free(_ptr);
     }
 
     public static Scalar operator +(Scalar left, Scalar right)
     {
-        var ptr = Native.Add(left.ptr, right.ptr);
+        var ptr = Native.Add(left._ptr, right._ptr);
         return new Scalar(ptr);
     }
 
     public static Scalar operator -(Scalar left, Scalar right)
     {
-        var ptr = Native.Sub(left.ptr, right.ptr);
+        var ptr = Native.Sub(left._ptr, right._ptr);
         return new Scalar(ptr);
     }
 
     public static Scalar operator -(Scalar self)
     {
-        var ptr = Native.Negate(self.ptr);
+        var ptr = Native.Negate(self._ptr);
         return new Scalar(ptr);
     }
 
@@ -126,16 +126,16 @@ public sealed class Scalar : IDisposable
 
     public static bool operator ==(Scalar left, Scalar right)
     {
-        if (left.ptr == right.ptr)
+        if (left._ptr == right._ptr)
         {
             return true;
         }
-        return Native.Equals(left.ptr, right.ptr);
+        return Native.Equals(left._ptr, right._ptr);
     }
 
     public static bool operator !=(Scalar left, Scalar right)
     {
-        return !Native.Equals(left.ptr, right.ptr);
+        return !Native.Equals(left._ptr, right._ptr);
     }
 
 

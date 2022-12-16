@@ -20,7 +20,7 @@ public record SecretCommitmentInfo
         get
         {
             var point = Generator.Default.Commit(Message, _blindingValue);
-            return new Commitment(point.Compress().bytes);
+            return new Commitment(point.Compress()._bytes);
         }
     }
 

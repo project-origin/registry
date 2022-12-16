@@ -1,6 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-
   <PropertyGroup>
       <RustRootDirectory>../rust-ffi/</RustRootDirectory>
   </PropertyGroup>

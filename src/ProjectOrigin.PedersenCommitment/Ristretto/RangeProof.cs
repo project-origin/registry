@@ -22,16 +22,16 @@ public record RangeProof
 
     }
 
-    private readonly IntPtr ptr;
+    private readonly IntPtr _ptr;
 
     private RangeProof(IntPtr ptr)
     {
-        this.ptr = ptr;
+        _ptr = ptr;
     }
 
     ~RangeProof()
     {
-        Native.Free(ptr);
+        Native.Free(_ptr);
     }
 
     public static (RangeProof proof, CompressedPoint commitment) ProveSingle
@@ -45,18 +45,18 @@ public record RangeProof
         )
     {
         var tuple = Native.ProveSingle(
-                bp_gen.ptr,
-                pc_gen.ptr,
+                bp_gen._ptr,
+                pc_gen._ptr,
                 v,
-                blinding.ptr,
+                blinding._ptr,
                 n,
                 label,
                 label.Length
                 );
 
         var bytes = new byte[32];
-        CompressedPoint.ToBytes(tuple.compressedPoint, bytes);
-        return (new RangeProof(tuple.proof), new CompressedPoint(bytes));
+        CompressedPoint.ToBytes(tuple.CompressedPoint, bytes);
+        return (new RangeProof(tuple.Proof), new CompressedPoint(bytes));
     }
 
     public bool VerifySingle
@@ -68,11 +68,11 @@ public record RangeProof
             byte[] label
         )
     {
-        var commit_ptr = CompressedPoint.FromBytes(commitment.bytes);
+        var commit_ptr = CompressedPoint.FromBytes(commitment._bytes);
         var res = Native.VerifySingle(
-                ptr,
-                bp_gen.ptr,
-                pc_gen.ptr,
+                _ptr,
+                bp_gen._ptr,
+                pc_gen._ptr,
                 commit_ptr,
                 n,
                 label,
@@ -85,8 +85,8 @@ public record RangeProof
 [StructLayout(LayoutKind.Sequential)]
 struct RangeProofWithCommit
 {
-    public IntPtr proof;
-    public IntPtr compressedPoint;
+    public IntPtr Proof;
+    public IntPtr CompressedPoint;
 }
 
 public record BulletProofGen
@@ -101,7 +101,7 @@ public record BulletProofGen
         get => LazyGenerator.Value;
     }
 
-    internal readonly IntPtr ptr;
+    internal readonly IntPtr _ptr;
 
     [DllImport("rust_ffi", EntryPoint = "bpgen_new")]
     private static extern IntPtr New(uint gensCapacity, uint partyCapacity);
@@ -111,12 +111,12 @@ public record BulletProofGen
 
     public BulletProofGen(uint gensCapacity, uint partyCapacity)
     {
-        ptr = New(gensCapacity, partyCapacity);
+        _ptr = New(gensCapacity, partyCapacity);
     }
 
     ~BulletProofGen()
     {
-        Free(ptr);
+        Free(_ptr);
     }
 
 }

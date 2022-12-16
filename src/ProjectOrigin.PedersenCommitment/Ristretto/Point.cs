@@ -44,16 +44,16 @@ internal class NativePoint
 public sealed class Point
 {
 
-    internal readonly IntPtr ptr;
+    internal readonly IntPtr _ptr;
 
     internal Point(IntPtr ptr)
     {
-        this.ptr = ptr;
+        _ptr = ptr;
     }
 
     ~Point()
     {
-        NativePoint.Free(ptr);
+        NativePoint.Free(_ptr);
     }
 
     public static Point FromUniformBytes(byte[] bytes)
@@ -65,37 +65,37 @@ public sealed class Point
     public CompressedPoint Compress()
     {
         var bytes = new byte[32]; // allocate bytes
-        NativePoint.Compress(ptr, bytes);
+        NativePoint.Compress(_ptr, bytes);
         return new CompressedPoint(bytes);
     }
 
     public static Point operator +(Point left, Point right)
     {
-        var ptr = NativePoint.Add(left.ptr, right.ptr);
+        var ptr = NativePoint.Add(left._ptr, right._ptr);
         return new Point(ptr);
     }
 
     public static Point operator -(Point left, Point right)
     {
-        var ptr = NativePoint.Sub(left.ptr, right.ptr);
+        var ptr = NativePoint.Sub(left._ptr, right._ptr);
         return new Point(ptr);
     }
 
 
     public static Point operator -(Point self)
     {
-        var ptr = NativePoint.Negate(self.ptr);
+        var ptr = NativePoint.Negate(self._ptr);
         return new Point(ptr);
     }
 
     public static Point operator *(Point left, Scalar right)
     {
-        return new Point(NativePoint.Mul(left.ptr, right.ptr));
+        return new Point(NativePoint.Mul(left._ptr, right._ptr));
     }
 
     public static Point operator *(Scalar left, Point right)
     {
-        return new Point(NativePoint.Mul(right.ptr, left.ptr));
+        return new Point(NativePoint.Mul(right._ptr, left._ptr));
     }
 
     public override bool Equals(object? obj)
@@ -112,22 +112,22 @@ public sealed class Point
 
     public static bool operator ==(Point left, Point right)
     {
-        if (left.ptr == right.ptr)
+        if (left._ptr == right._ptr)
         {
             return true;
         }
-        return NativePoint.Equals(left.ptr, right.ptr);
+        return NativePoint.Equals(left._ptr, right._ptr);
     }
 
     public static bool operator !=(Point left, Point right)
     {
-        return !NativePoint.Equals(left.ptr, right.ptr);
+        return !NativePoint.Equals(left._ptr, right._ptr);
     }
 
 
     public void GutSpill()
     {
-        NativePoint.GutSpill(ptr);
+        NativePoint.GutSpill(_ptr);
     }
 
     public override int GetHashCode() => base.GetHashCode();
@@ -136,7 +136,7 @@ public sealed class Point
 public readonly struct CompressedPoint
 {
 
-    internal readonly byte[] bytes;
+    internal readonly byte[] _bytes;
 
     public CompressedPoint(byte[] bytes)
     {
@@ -144,7 +144,7 @@ public readonly struct CompressedPoint
         {
             throw new ArgumentException("Byte array must be 32 long");
         }
-        this.bytes = bytes;
+        _bytes = bytes;
     }
 
 
@@ -156,7 +156,7 @@ public readonly struct CompressedPoint
 
     public Point Decompress()
     {
-        var ptr = NativePoint.Decompress(bytes);
+        var ptr = NativePoint.Decompress(_bytes);
         if (ptr == IntPtr.Zero)
         { // null pointer == could not decompress
             throw new ArgumentException("Could not decompress RistrettoPoint");
@@ -171,7 +171,7 @@ public readonly struct CompressedPoint
             return false;
         }
         var other = (CompressedPoint)obj;
-        return bytes.SequenceEqual(other.bytes);
+        return _bytes.SequenceEqual(other._bytes);
     }
 
 

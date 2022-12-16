@@ -42,37 +42,37 @@ public sealed record Generator : IDisposable
         internal static extern void Dispose(IntPtr self);
     }
 
-    internal IntPtr ptr;
+    internal IntPtr _ptr;
 
     public Generator()
     {
-        ptr = Native.Default();
+        _ptr = Native.Default();
     }
 
     public Generator(Point g, Point h)
     {
-        ptr = Native.New(g.ptr, h.ptr);
+        _ptr = Native.New(g._ptr, h._ptr);
     }
 
     ~Generator()
     {
-        Native.Dispose(ptr);
+        Native.Dispose(_ptr);
     }
 
     public void Dispose()
     {
-        Native.Dispose(ptr);
+        Native.Dispose(_ptr);
     }
 
     public Point Commit(ulong m, ulong r)
     {
-        var ptr = Native.Commit(this.ptr, new Scalar(m).ptr, new Scalar(r).ptr);
+        var ptr = Native.Commit(_ptr, new Scalar(m)._ptr, new Scalar(r)._ptr);
         return new Point(ptr);
     }
 
     public Point Commit(ulong m, Scalar r)
     {
-        var ptr = Native.Commit(this.ptr, new Scalar(m).ptr, r.ptr);
+        var ptr = Native.Commit(_ptr, new Scalar(m)._ptr, r._ptr);
         return new Point(ptr);
     }
 }

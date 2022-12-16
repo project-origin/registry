@@ -11,7 +11,7 @@ public record Commitment
 {
     private CompressedPoint _compressionPoint;
 
-    public ReadOnlySpan<byte> C { get => _compressionPoint.bytes; }
+    public ReadOnlySpan<byte> C { get => _compressionPoint._bytes; }
 
     internal Ristretto.Point Point { get => _compressionPoint.Decompress(); }
 
@@ -38,12 +38,12 @@ public record Commitment
     public static Commitment operator +(Commitment left, Commitment right)
     {
         var newPoint = left.Point + right.Point;
-        return new Commitment(newPoint.Compress().bytes);
+        return new Commitment(newPoint.Compress()._bytes);
     }
 
     public static Commitment operator -(Commitment left, Commitment right)
     {
         var newPoint = left.Point - right.Point;
-        return new Commitment(newPoint.Compress().bytes);
+        return new Commitment(newPoint.Compress()._bytes);
     }
 }
