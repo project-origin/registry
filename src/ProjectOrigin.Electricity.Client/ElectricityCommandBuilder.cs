@@ -112,7 +112,7 @@ public class ElectricityCommandBuilder
     }
 
     /// <summary>
-    /// This is used to transfer a <a href="xref:granular_certificate#slice">Granular Certificate slice</a> from the current owner to a new owner.
+    /// This is used to transfer a <a href="xref:granular_certificate#slices">Granular Certificate slice</a> from the current owner to a new owner.
     /// </summary>
     /// <param name="id">the federated certicate id for the certificate.</param>
     /// <param name="source">a shieldedValue of the source slice on the certificate from which to create the new slices.</param>
@@ -138,7 +138,7 @@ public class ElectricityCommandBuilder
     }
 
     /// <summary>
-    /// This is used to transfer a <a href="xref:granular_certificate#slice">Granular Certificate slice</a> from the current owner to a new owner.
+    /// This is used to create new <a href="xref:granular_certificate#slices">slices</a> from an existing <a href="xref:granular_certificate#slices">slice</a>.
     /// </summary>
     /// <param name="id">The federated certicate id for the certificate.</param>
     /// <param name="sliceCollection">The collection of new slices created with the help of the Slicer.</param>

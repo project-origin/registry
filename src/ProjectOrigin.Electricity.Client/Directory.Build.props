@@ -3,5 +3,6 @@
   <PropertyGroup>
     <TargetFramework /> <!-- it is required to seet the TargetFramework to nothing to allow to set TargetFrameworks -->
     <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 </Project>
