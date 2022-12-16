@@ -6,6 +6,10 @@ public static class IEnumerableMerkleExtension
 {
     public static byte[] CalculateMerkleRoot<T>(this IEnumerable<T> events, Func<T, byte[]> selector)
     {
+        if (!events.Any())
+        {
+            throw new ArgumentException("Can not CalculateMerkleRoot on an empty collection.", nameof(events));
+        }
         if (!IsPowerOfTwo(events.Count()))
         {
             throw new NotSupportedException("CalculateMerkleRoot currently only supported on exponents of 2");

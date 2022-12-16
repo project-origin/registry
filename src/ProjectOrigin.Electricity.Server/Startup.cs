@@ -14,9 +14,9 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         VerifierConfiguration.ConfigureServices(services);
-
-        var memorystoreRegA = new MemoryEventStore();
-        var memorystoreRegB = new MemoryEventStore();
+        var batchSizeOptions = new BatcherOptions() { BatchSizeExponent = 0 };
+        var memorystoreRegA = new MemoryEventStore(batchSizeOptions);
+        var memorystoreRegB = new MemoryEventStore(batchSizeOptions);
 
         services.AddGrpc();
         services.AddTransient<IBlockchainConnector, ConcordiumConnector>();
