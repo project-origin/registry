@@ -1,7 +1,8 @@
 using System.Runtime.InteropServices;
 namespace ProjectOrigin.PedersenCommitment.Ristretto;
 
-public record RangeProof {
+public record RangeProof
+{
     internal class Native
     {
         [DllImport("rust_ffi", EntryPoint = "rangeproof_prove_single")]
@@ -33,7 +34,7 @@ public record RangeProof {
         Native.Free(ptr);
     }
 
-    public static (RangeProof, CompressedPoint) ProveSingle
+    public static (RangeProof proof, CompressedPoint commitment) ProveSingle
         (
             BulletProofGen bp_gen,
             Generator pc_gen,
@@ -69,7 +70,7 @@ public record RangeProof {
     {
         var commit_ptr = CompressedPoint.FromBytes(commitment.bytes);
         var res = Native.VerifySingle(
-                this.ptr,
+                ptr,
                 bp_gen.ptr,
                 pc_gen.ptr,
                 commit_ptr,
@@ -90,6 +91,16 @@ struct RangeProofWithCommit
 
 public record BulletProofGen
 {
+    public static Lazy<BulletProofGen> LazyGenerator = new Lazy<BulletProofGen>(() =>
+    {
+        return new BulletProofGen(32, 1);
+    }, true);
+
+    public static BulletProofGen Default
+    {
+        get => LazyGenerator.Value;
+    }
+
     internal readonly IntPtr ptr;
 
     [DllImport("rust_ffi", EntryPoint = "bpgen_new")]
@@ -100,7 +111,7 @@ public record BulletProofGen
 
     public BulletProofGen(uint gensCapacity, uint partyCapacity)
     {
-        this.ptr = New(gensCapacity, partyCapacity);
+        ptr = New(gensCapacity, partyCapacity);
     }
 
     ~BulletProofGen()

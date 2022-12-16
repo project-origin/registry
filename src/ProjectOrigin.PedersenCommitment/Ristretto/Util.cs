@@ -1,18 +1,19 @@
-using System.Numerics;
 namespace ProjectOrigin.PedersenCommitment.Ristretto;
 
-internal class Util
+internal static class Extensions
 {
-    internal static byte[] FromBigInteger(BigInteger b)
+    internal static byte[] ToByteArray(this ulong value, uint arrayLength)
     {
-        var count = b.GetByteCount(true);
-        if (count > 32) {
-            throw new ArgumentException("BigInteger too large, above 32 bytes");
+        var inputBytes = BitConverter.GetBytes(value);
+        var length = inputBytes.Length;
+
+        if (arrayLength < length)
+        {
+            throw new ArgumentException("WantedLength is smaller that source.");
         }
 
-        var bytes = b.ToByteArray(true, false);
-        var outs = new byte[32];
-        Array.Copy(bytes, outs, count);
-        return outs;
+        var outputArray = new byte[arrayLength];
+        Array.Copy(inputBytes, outputArray, inputBytes.Length);
+        return outputArray;
     }
 }

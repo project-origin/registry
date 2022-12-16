@@ -1,5 +1,3 @@
-using System.Numerics;
-
 using ProjectOrigin.PedersenCommitment.Ristretto;
 
 namespace ProjectOrigin.PedersenCommitment.Tests;
@@ -7,7 +5,8 @@ namespace ProjectOrigin.PedersenCommitment.Tests;
 public class PointTests
 {
     [Fact]
-    public void Elligator() {
+    public void Elligator()
+    {
         var seed = new byte[64];
         seed[0] = 2;
         var p = Ristretto.Point.FromUniformBytes(seed);
@@ -39,36 +38,16 @@ public class PointTests
     }
 
     [Fact]
-    public void MulBigInteger()
+    public void MulScalar()
     {
         var seed = new byte[64];
         seed[0] = 2;
         var p = Ristretto.Point.FromUniformBytes(seed);
-
-        var p1 = p * new BigInteger(1);
-        Assert.Equal(p, p1);
-
-        var p2 = p * new BigInteger(2);
-        Assert.NotEqual(p1, p2);
-
-        var p3 = p * new BigInteger(3);
-
-        var p5 = p2 + p3;
-
-        var p5_ = p * new BigInteger(5);
-
-        Assert.Equal(p5, p5_);
-    }
-
-    [Fact]
-    public void MulScalar() {
-        var seed = new byte[64];
-        seed[0] = 2;
-        var p = Ristretto.Point.FromUniformBytes(seed);
+        var p7 = Ristretto.Point.FromUniformBytes(seed);
 
         var p1 = p * new Scalar(1);
-        Assert.Equal(p, p1);
 
+        Assert.Equal(p, p1);
         var p2 = p * new Scalar(2);
         Assert.NotEqual(p1, p2);
 

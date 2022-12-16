@@ -1,11 +1,29 @@
 using System.Runtime.InteropServices;
-using System.Numerics;
-namespace ProjectOrigin.PedersenCommitment;
-
+using System.Security.Cryptography;
+using System.Text;
 using ProjectOrigin.PedersenCommitment.Ristretto;
 
+namespace ProjectOrigin.PedersenCommitment;
 public sealed record Generator : IDisposable
 {
+    public static Lazy<Generator> LazyGenerator = new Lazy<Generator>(() =>
+    {
+        // We use pi with 42 digits as the seed, because, well 42 is the answer to everything.
+        var piBytes = Encoding.ASCII.GetBytes("3.141592653589793238462643383279502884197169");
+        var sha1 = SHA512.HashData(piBytes);
+        var sha2 = SHA512.HashData(sha1);
+
+        var g1 = Point.FromUniformBytes(sha1);
+        var g2 = Point.FromUniformBytes(sha2);
+
+        return new Generator(g1, g2);
+    }, true);
+
+    public static Generator Default
+    {
+        get => LazyGenerator.Value;
+    }
+
     internal class Native
     {
         [DllImport("rust_ffi", EntryPoint = "pedersen_gens_default")]
@@ -28,12 +46,12 @@ public sealed record Generator : IDisposable
 
     public Generator()
     {
-        this.ptr = Native.Default();
+        ptr = Native.Default();
     }
 
     public Generator(Point g, Point h)
     {
-        this.ptr = Native.New(g.ptr, h.ptr);
+        ptr = Native.New(g.ptr, h.ptr);
     }
 
     ~Generator()
@@ -46,19 +64,15 @@ public sealed record Generator : IDisposable
         Native.Dispose(ptr);
     }
 
-
-    public Point Commit(BigInteger m, BigInteger r)
-    {
-        var ptr = Native.Commit(this.ptr, Util.FromBigInteger(m), Util.FromBigInteger(r));
-        return new Point(ptr);
-    }
-
     public Point Commit(ulong m, ulong r)
     {
         var ptr = Native.Commit(this.ptr, new Scalar(m).ptr, new Scalar(r).ptr);
         return new Point(ptr);
     }
 
+    public Point Commit(ulong m, Scalar r)
+    {
+        var ptr = Native.Commit(this.ptr, new Scalar(m).ptr, r.ptr);
+        return new Point(ptr);
+    }
 }
-
-

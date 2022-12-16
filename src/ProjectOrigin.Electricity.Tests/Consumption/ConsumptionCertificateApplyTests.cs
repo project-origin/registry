@@ -1,4 +1,4 @@
-using System.Numerics;
+using System.Security.Cryptography;
 using Google.Protobuf;
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Consumption;
@@ -26,14 +26,14 @@ public class ConsumptionCertificateApplyTests
         };
     }
 
-    private (ConsumptionCertificate, CommitmentParameters) Create()
+    private (ConsumptionCertificate, SecretCommitmentInfo) Create()
     {
         var area = _fix.Create<string>();
         var period = new DateInterval(
             new DateTimeOffset(2022, 09, 25, 12, 0, 0, TimeSpan.Zero),
             new DateTimeOffset(2022, 09, 25, 13, 0, 0, TimeSpan.Zero));
-        var gsrn = Group.Default.Commit(_fix.Create<BigInteger>());
-        var quantity = Group.Default.Commit(_fix.Create<BigInteger>());
+        var gsrnHash = SHA256.HashData(BitConverter.GetBytes(new Fixture().Create<ulong>()));
+        var quantity = new SecretCommitmentInfo(_fix.Create<uint>());
         var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
 
 
@@ -42,7 +42,7 @@ public class ConsumptionCertificateApplyTests
             CertificateId = CreateId(),
             Period = period.ToProto(),
             GridArea = area,
-            GsrnCommitment = gsrn.ToProtoCommitment(),
+            GsrnHash = ByteString.CopyFrom(gsrnHash),
             QuantityCommitment = quantity.ToProtoCommitment(),
             OwnerPublicKey = ownerKey.PublicKey.ToProto(),
         };
@@ -62,8 +62,8 @@ public class ConsumptionCertificateApplyTests
         var period = new DateInterval(
             new DateTimeOffset(2022, 09, 25, 12, 0, 0, TimeSpan.Zero),
             new DateTimeOffset(2022, 09, 25, 13, 0, 0, TimeSpan.Zero));
-        var gsrn = Group.Default.Commit(_fix.Create<BigInteger>());
-        var quantity = Group.Default.Commit(_fix.Create<BigInteger>());
+        var gsrnHash = SHA256.HashData(BitConverter.GetBytes(new Fixture().Create<ulong>()));
+        var quantity = new SecretCommitmentInfo(_fix.Create<uint>());
         var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
 
 
@@ -79,7 +79,7 @@ public class ConsumptionCertificateApplyTests
             },
             Period = period.ToProto(),
             GridArea = area,
-            GsrnCommitment = gsrn.ToProtoCommitment(),
+            GsrnHash = ByteString.CopyFrom(gsrnHash),
             QuantityCommitment = quantity.ToProtoCommitment(),
             OwnerPublicKey = ownerKey.PublicKey.ToProto(),
         };
@@ -105,7 +105,7 @@ public class ConsumptionCertificateApplyTests
             SourceSlice = slice0.ToSliceId(),
         };
 
-        var slice1 = Group.Default.Commit(_fix.Create<BigInteger>());
+        var slice1 = new SecretCommitmentInfo(_fix.Create<uint>());
         var owner1 = Key.Create(SignatureAlgorithm.Ed25519);
         @event.NewSlices.Add(new V1.SlicedEvent.Types.Slice
         {
@@ -113,7 +113,7 @@ public class ConsumptionCertificateApplyTests
             NewOwner = owner1.PublicKey.ToProto()
         });
 
-        var slice2 = Group.Default.Commit(_fix.Create<BigInteger>());
+        var slice2 = new SecretCommitmentInfo(_fix.Create<uint>());
         var owner2 = Key.Create(SignatureAlgorithm.Ed25519);
         @event.NewSlices.Add(new V1.SlicedEvent.Types.Slice
         {
@@ -134,7 +134,7 @@ public class ConsumptionCertificateApplyTests
         var allocationId = Guid.NewGuid().ToProto();
         var productionId = CreateId();
         var (cert, consQuantity) = Create();
-        var prodQuantity = Group.Default.Commit(_fix.Create<BigInteger>());
+        var prodQuantity = new SecretCommitmentInfo(_fix.Create<uint>());
 
         var @event = new V1.AllocatedEvent()
         {
@@ -143,7 +143,7 @@ public class ConsumptionCertificateApplyTests
             ConsumptionCertificateId = cert.Id,
             ProductionSourceSlice = prodQuantity.ToSliceId(),
             ConsumptionSourceSlice = consQuantity.ToSliceId(),
-            EqualityProof = ByteString.CopyFrom(Group.Default.CreateEqualityProof(consQuantity, prodQuantity))
+            EqualityProof = ByteString.CopyFrom(SecretCommitmentInfo.CreateEqualityProof(consQuantity, prodQuantity))
         };
 
         cert.Apply(@event);
@@ -160,7 +160,7 @@ public class ConsumptionCertificateApplyTests
         var allocationId = Guid.NewGuid().ToProto();
         var productionId = CreateId();
         var (cert, consQuantity) = Create();
-        var prodQuantity = Group.Default.Commit(_fix.Create<BigInteger>());
+        var prodQuantity = new SecretCommitmentInfo(_fix.Create<uint>());
 
         var allocationEvent = new V1.AllocatedEvent()
         {
@@ -169,7 +169,7 @@ public class ConsumptionCertificateApplyTests
             ConsumptionCertificateId = cert.Id,
             ProductionSourceSlice = prodQuantity.ToSliceId(),
             ConsumptionSourceSlice = consQuantity.ToSliceId(),
-            EqualityProof = ByteString.CopyFrom(Group.Default.CreateEqualityProof(consQuantity, prodQuantity))
+            EqualityProof = ByteString.CopyFrom(SecretCommitmentInfo.CreateEqualityProof(consQuantity, prodQuantity))
         };
         cert.Apply(allocationEvent);
 

@@ -21,13 +21,18 @@ internal class ProductionSlicedVerifier : IEventVerifier<ProductionCertificate, 
             return new VerificationResult.Invalid($"Invalid signature for slice");
 
         foreach (var slice in request.Event.NewSlices)
+        {
             if (!PublicKey.TryImport(SignatureAlgorithm.Ed25519, slice.NewOwner.Content.ToByteArray(), KeyBlobFormat.RawPublicKey, out _))
                 return new VerificationResult.Invalid("Invalid NewOwner key, not a valid Ed25519 publicKey");
 
-        if (!Group.Default.VerifyEqualityProof(
+            if (!slice.Quantity.VerifyCommitment(request.Event.CertificateId.StreamId.Value))
+                return new VerificationResult.Invalid("Invalid range proof for Quantity commitment");
+        }
+
+        if (!Commitment.VerifyEqualityProof(
                 request.Event.SumProof.ToByteArray(),
                 certificateSlice.Commitment,
-                request.Event.NewSlices.Select(slice => slice.Quantity.ToModel()).Aggregate((b, c) => b * c)))
+                request.Event.NewSlices.Select(slice => slice.Quantity.ToModel()).Aggregate((b, c) => b + c)))
             return new VerificationResult.Invalid($"Invalid sum proof");
 
         return new VerificationResult.Valid();

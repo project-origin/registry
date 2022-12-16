@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using System.Numerics;
 
 namespace ProjectOrigin.PedersenCommitment.Ristretto;
 
@@ -50,27 +49,27 @@ public sealed class Scalar : IDisposable
 
     ~Scalar()
     {
-        Native.Free(this.ptr);
+        Native.Free(ptr);
     }
 
-    public Scalar(ulong a)
+    public Scalar(ulong value)
     {
-        var bytes = Util.FromBigInteger(new BigInteger(a));
-        this.ptr = Native.New(bytes);
+        var bytes = value.ToByteArray(32);
+        ptr = Native.New(bytes);
     }
 
-    public Scalar(BigInteger bigInteger)
+    public Scalar(ReadOnlySpan<byte> bytes)
     {
-        var bytes = Util.FromBigInteger(bigInteger);
-        this.ptr = Native.New(bytes);
+        ptr = Native.New(bytes.ToArray());
     }
 
     public Scalar(byte[] bytes)
     {
-        if (bytes.Length != 32) {
+        if (bytes.Length != 32)
+        {
             throw new ArgumentException("Byte length has to 32");
         }
-        this.ptr = Native.New(bytes);
+        ptr = Native.New(bytes);
     }
 
     public static Scalar Random()
@@ -88,11 +87,6 @@ public sealed class Scalar : IDisposable
         var bytes = new byte[32];
         Native.ToBytes(ptr, bytes);
         return bytes;
-    }
-
-    public BigInteger ToBigInteger()
-    {
-        return new BigInteger(this.ToBytes(), true, false);
     }
 
     public void Dispose()
@@ -118,32 +112,22 @@ public sealed class Scalar : IDisposable
         return new Scalar(ptr);
     }
 
-    public static Scalar operator *(Scalar left, BigInteger right)
-    {
-        var ptr = Native.Mul(left.ptr, Util.FromBigInteger(right));
-        return new Scalar(ptr);
-
-    }
-
-    public static Scalar operator *(BigInteger left, Scalar right)
-    {
-        var ptr = Native.Mul(right.ptr, Util.FromBigInteger(left));
-        return new Scalar(ptr);
-
-    }
-
     public override bool Equals(object? obj)
     {
-        if (obj is Scalar) {
-            return this == (Scalar) obj;
-        } else {
+        if (obj is Scalar)
+        {
+            return this == (Scalar)obj;
+        }
+        else
+        {
             return false;
         }
     }
 
     public static bool operator ==(Scalar left, Scalar right)
     {
-        if (left.ptr == right.ptr) {
+        if (left.ptr == right.ptr)
+        {
             return true;
         }
         return Native.Equals(left.ptr, right.ptr);

@@ -1,9 +1,9 @@
-namespace ProjectOrigin.PedersenCommitment.Tests;
-
-using ProjectOrigin.PedersenCommitment.Ristretto;
 using System.Text;
+using ProjectOrigin.PedersenCommitment.Ristretto;
 
-public class RangeProofTests {
+namespace ProjectOrigin.PedersenCommitment.Tests;
+public class RangeProofTests
+{
 
     [Fact]
     public void SingleProof()

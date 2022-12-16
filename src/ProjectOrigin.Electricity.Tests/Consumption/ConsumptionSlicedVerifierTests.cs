@@ -15,8 +15,6 @@ public class ConsumptionSlicedVerifierTests : AbstractVerifierTests
         return optionsMock.Object;
     }
 
-    private Group Group { get => FakeRegister.Group; }
-
     private ConsumptionSlicedVerifier Verifier { get => new ConsumptionSlicedVerifier(); }
 
     [Fact]
@@ -51,7 +49,7 @@ public class ConsumptionSlicedVerifierTests : AbstractVerifierTests
         var newOwnerKey = Key.Create(SignatureAlgorithm.Ed25519);
         var (cert, sourceParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
 
-        var fakeSliceParams = FakeRegister.Group.Commit(250);
+        var fakeSliceParams = new SecretCommitmentInfo(250);
         var request = FakeRegister.CreateSlices(cert, fakeSliceParams, 150, ownerKey);
 
         var result = await Verifier.Verify(request);

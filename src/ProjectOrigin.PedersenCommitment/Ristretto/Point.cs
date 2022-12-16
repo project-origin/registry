@@ -1,10 +1,10 @@
-using System.Runtime.InteropServices;
-using System.Numerics;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 
 namespace ProjectOrigin.PedersenCommitment.Ristretto;
 
-internal class NativePoint {
+internal class NativePoint
+{
     [DllImport("rust_ffi", EntryPoint = "ristretto_point_from_uniform_bytes")]
     internal static extern IntPtr FromUniformBytes(byte[] bytes);
 
@@ -88,19 +88,6 @@ public sealed class Point
         return new Point(ptr);
     }
 
-    public static Point operator *(Point left, BigInteger right)
-    {
-        var ptr = NativePoint.Mul(left.ptr, Util.FromBigInteger(right));
-        return new Point(ptr);
-
-    }
-
-    public static Point operator *(BigInteger left, Point right)
-    {
-        var ptr = NativePoint.Mul(right.ptr, Util.FromBigInteger(left));
-        return new Point(ptr);
-    }
-
     public static Point operator *(Point left, Scalar right)
     {
         return new Point(NativePoint.Mul(left.ptr, right.ptr));
@@ -113,16 +100,20 @@ public sealed class Point
 
     public override bool Equals(object? obj)
     {
-        if (obj is Point) {
-            return this == (Point) obj;
-        } else {
+        if (obj is Point)
+        {
+            return this == (Point)obj;
+        }
+        else
+        {
             return false;
         }
     }
 
     public static bool operator ==(Point left, Point right)
     {
-        if (left.ptr == right.ptr) {
+        if (left.ptr == right.ptr)
+        {
             return true;
         }
         return NativePoint.Equals(left.ptr, right.ptr);
@@ -142,13 +133,15 @@ public sealed class Point
     public override int GetHashCode() => base.GetHashCode();
 }
 
-public readonly struct CompressedPoint {
+public readonly struct CompressedPoint
+{
 
-    readonly internal byte[] bytes;
+    internal readonly byte[] bytes;
 
     public CompressedPoint(byte[] bytes)
     {
-        if (bytes.Length != 32) {
+        if (bytes.Length != 32)
+        {
             throw new ArgumentException("Byte array must be 32 long");
         }
         this.bytes = bytes;
@@ -163,8 +156,9 @@ public readonly struct CompressedPoint {
 
     public Point Decompress()
     {
-        var ptr = NativePoint.Decompress(this.bytes);
-        if (ptr == IntPtr.Zero) { // null pointer == could not decompress
+        var ptr = NativePoint.Decompress(bytes);
+        if (ptr == IntPtr.Zero)
+        { // null pointer == could not decompress
             throw new ArgumentException("Could not decompress RistrettoPoint");
         }
         return new Point(ptr);
@@ -172,10 +166,11 @@ public readonly struct CompressedPoint {
 
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        if (obj is not CompressedPoint) {
+        if (obj is not CompressedPoint)
+        {
             return false;
         }
-        CompressedPoint other = (CompressedPoint) obj;
+        var other = (CompressedPoint)obj;
         return bytes.SequenceEqual(other.bytes);
     }
 

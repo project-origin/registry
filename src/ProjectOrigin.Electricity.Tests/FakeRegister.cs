@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using Google.Protobuf;
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Consumption;
@@ -11,14 +12,13 @@ namespace ProjectOrigin.Electricity.Tests;
 
 internal static class FakeRegister
 {
-    internal static Group Group { get => Group.Default; }
     const string Registry = "OurReg";
 
     private static V1.DateInterval _defaultPeriod = new DateInterval(
             new DateTimeOffset(2022, 09, 25, 12, 0, 0, TimeSpan.Zero),
             new DateTimeOffset(2022, 09, 25, 13, 0, 0, TimeSpan.Zero)).ToProto();
 
-    internal static Guid Allocated(this ProductionCertificate prodCert, ConsumptionCertificate consCert, CommitmentParameters produtionParameters, CommitmentParameters sourceParameters, Key signer, Guid? allocationIdOverride = null)
+    internal static Guid Allocated(this ProductionCertificate prodCert, ConsumptionCertificate consCert, SecretCommitmentInfo produtionParameters, SecretCommitmentInfo sourceParameters, Key signer, Guid? allocationIdOverride = null)
     {
         var allocationId = allocationIdOverride ?? Guid.NewGuid();
 
@@ -28,7 +28,7 @@ internal static class FakeRegister
         return allocationId;
     }
 
-    internal static Guid Allocated(this ConsumptionCertificate consSert, Guid allocationId, ProductionCertificate prodCert, CommitmentParameters produtionParameters, CommitmentParameters sourceParameters, Key signer)
+    internal static Guid Allocated(this ConsumptionCertificate consSert, Guid allocationId, ProductionCertificate prodCert, SecretCommitmentInfo produtionParameters, SecretCommitmentInfo sourceParameters, Key signer)
     {
         var request = CreateConsumptionAllocationRequest(allocationId, prodCert, consSert, produtionParameters, sourceParameters, signer);
         consSert.Apply(request.Event);
@@ -36,12 +36,13 @@ internal static class FakeRegister
         return allocationId;
     }
 
-    internal static V1.Commitment InvalidCommitment(ulong quantity = 150)
+    internal static V1.Commitment InvalidCommitment(uint quantity = 150, string label = "hello")
     {
+        var privateCommitment = new SecretCommitmentInfo(quantity);
         return new V1.Commitment
         {
-            Content = ByteString.CopyFrom(FakeRegister.Group.Commit(quantity).C.ToByteArray()),
-            RangeProof = ByteString.CopyFrom(new Fixture().Create<byte[]>())
+            Content = ByteString.CopyFrom(privateCommitment.Commitment.C),
+            RangeProof = ByteString.CopyFrom(new Fixture().CreateMany<byte>().ToArray())
         };
     }
 
@@ -58,7 +59,7 @@ internal static class FakeRegister
 
     internal static VerificationRequest<V1.TransferredEvent> CreateTransfer(
         ProductionCertificate certificate,
-        CommitmentParameters sourceSliceParameters,
+        SecretCommitmentInfo sourceSliceParameters,
         V1.PublicKey newOwner,
         Key signerKey,
         bool exists = true
@@ -82,8 +83,8 @@ internal static class FakeRegister
 
     internal static VerificationRequest<V1.SlicedEvent> CreateSlices(
         ProductionCertificate certificate,
-        CommitmentParameters sourceParams,
-        int quantity,
+        SecretCommitmentInfo sourceParams,
+        uint quantity,
         Key ownerKey,
         V1.PublicKey? newOwnerOverride = null,
         ByteString? sumOverride = null,
@@ -102,8 +103,8 @@ internal static class FakeRegister
 
     internal static VerificationRequest<V1.SlicedEvent> CreateSlices(
     ConsumptionCertificate certificate,
-    CommitmentParameters sourceParams,
-    int quantity,
+    SecretCommitmentInfo sourceParams,
+    uint quantity,
     Key ownerKey,
     V1.PublicKey? newOwnerOverride = null,
     ByteString? sumOverride = null,
@@ -121,10 +122,10 @@ internal static class FakeRegister
     }
 
 
-    private static V1.SlicedEvent CreateSliceEvent(FederatedStreamId id, CommitmentParameters sourceParams, int quantity, Key ownerKey, V1.PublicKey? newOwnerOverride, ByteString? sumOverride)
+    private static V1.SlicedEvent CreateSliceEvent(FederatedStreamId id, SecretCommitmentInfo sourceParams, uint quantity, Key ownerKey, V1.PublicKey? newOwnerOverride, ByteString? sumOverride)
     {
-        var slice = Group.Commit(quantity);
-        var remainder = Group.Commit(sourceParams.Message - quantity);
+        var slice = new SecretCommitmentInfo(quantity);
+        var remainder = new SecretCommitmentInfo(sourceParams.Message - quantity);
 
         var newOwner = newOwnerOverride ?? Key.Create(SignatureAlgorithm.Ed25519).PublicKey.ToProto();
 
@@ -132,7 +133,7 @@ internal static class FakeRegister
         {
             CertificateId = id,
             SourceSlice = sourceParams.ToSliceId(),
-            SumProof = sumOverride ?? ByteString.CopyFrom(Group.CreateEqualityProof(sourceParams, slice, remainder))
+            SumProof = sumOverride ?? ByteString.CopyFrom(SecretCommitmentInfo.CreateEqualityProof(sourceParams, slice + remainder))
         };
 
         @event.NewSlices.Add(new V1.SlicedEvent.Types.Slice
@@ -205,8 +206,8 @@ internal static class FakeRegister
     Guid allocationId,
     ProductionCertificate production,
     ConsumptionCertificate consumption,
-    CommitmentParameters productionSlice,
-    CommitmentParameters consumptionSlice,
+    SecretCommitmentInfo productionSlice,
+    SecretCommitmentInfo consumptionSlice,
     Key signerKey,
     bool exists = true,
     bool otherExists = true,
@@ -229,8 +230,8 @@ internal static class FakeRegister
     internal static VerificationRequest<V1.AllocatedEvent> CreateProductionAllocationRequest(
     ProductionCertificate production,
     ConsumptionCertificate consumption,
-    CommitmentParameters productionSlice,
-    CommitmentParameters consumptionSlice,
+    SecretCommitmentInfo productionSlice,
+    SecretCommitmentInfo consumptionSlice,
     Key signerKey,
     bool exists = true,
     bool otherExists = true,
@@ -256,8 +257,8 @@ internal static class FakeRegister
         Guid allocationId,
         Register.V1.FederatedStreamId productionId,
         Register.V1.FederatedStreamId consumptionId,
-        CommitmentParameters productionSlice,
-        CommitmentParameters consumptionSlice,
+        SecretCommitmentInfo productionSlice,
+        SecretCommitmentInfo consumptionSlice,
         byte[]? overwrideEqualityProof
         )
     {
@@ -268,22 +269,22 @@ internal static class FakeRegister
             ConsumptionCertificateId = consumptionId,
             ProductionSourceSlice = productionSlice.ToSliceId(),
             ConsumptionSourceSlice = consumptionSlice.ToSliceId(),
-            EqualityProof = ByteString.CopyFrom(overwrideEqualityProof ?? Group.CreateEqualityProof(consumptionSlice, productionSlice))
+            EqualityProof = ByteString.CopyFrom(overwrideEqualityProof ?? SecretCommitmentInfo.CreateEqualityProof(consumptionSlice, productionSlice))
         };
     }
 
-    internal static (ConsumptionCertificate certificate, CommitmentParameters parameters) ConsumptionIssued(PublicKey ownerKey, long quantity, string area = "DK1", DateInterval? periodOverride = null)
+    internal static (ConsumptionCertificate certificate, SecretCommitmentInfo parameters) ConsumptionIssued(PublicKey ownerKey, uint quantity, string area = "DK1", DateInterval? periodOverride = null)
     {
         var id = CreateFederatedId();
-        var quantityCommitmentParameters = Group.Commit(quantity);
-        var gsrnCommitmentParameters = Group.Commit(new Fixture().Create<long>());
+        var quantityCommitmentParameters = new SecretCommitmentInfo(quantity);
+        var gsrnHash = SHA256.HashData(BitConverter.GetBytes(new Fixture().Create<ulong>()));
 
         var @event = new V1.ConsumptionIssuedEvent()
         {
             CertificateId = id,
             Period = (periodOverride?.ToProto() ?? _defaultPeriod),
             GridArea = area,
-            GsrnCommitment = gsrnCommitmentParameters.ToProtoCommitment(),
+            GsrnHash = ByteString.CopyFrom(gsrnHash),
             QuantityCommitment = quantityCommitmentParameters.ToProtoCommitment(),
             OwnerPublicKey = (ownerKey).ToProto(),
         };
@@ -293,11 +294,11 @@ internal static class FakeRegister
         return (cert, quantityCommitmentParameters);
     }
 
-    internal static (ProductionCertificate certificate, CommitmentParameters parameters) ProductionIssued(PublicKey ownerKey, long quantity, string area = "DK1", DateInterval? periodOverride = null)
+    internal static (ProductionCertificate certificate, SecretCommitmentInfo parameters) ProductionIssued(PublicKey ownerKey, uint quantity, string area = "DK1", DateInterval? periodOverride = null)
     {
         var id = CreateFederatedId();
-        var gsrnCommitmentParameters = Group.Commit(new Fixture().Create<long>());
-        var quantityCommitmentParameters = Group.Commit(quantity);
+        var gsrnHash = SHA256.HashData(BitConverter.GetBytes(new Fixture().Create<ulong>()));
+        var quantityCommitmentParameters = new SecretCommitmentInfo(quantity);
 
         var @event = new V1.ProductionIssuedEvent()
         {
@@ -306,7 +307,7 @@ internal static class FakeRegister
             GridArea = area,
             FuelCode = "F01050100",
             TechCode = "T020002",
-            GsrnCommitment = gsrnCommitmentParameters.ToProtoCommitment(),
+            GsrnHash = ByteString.CopyFrom(gsrnHash),
             QuantityCommitment = quantityCommitmentParameters.ToProtoCommitment(),
             OwnerPublicKey = ownerKey.ToProto(),
         };
@@ -319,7 +320,6 @@ internal static class FakeRegister
     internal static VerificationRequest<V1.ConsumptionIssuedEvent> CreateConsumptionIssuedRequest(
         Key signerKey,
         V1.PublicKey? ownerKeyOverride = null,
-        V1.Commitment? gsrnCommitmentOverride = null,
         V1.Commitment? quantityCommitmentOverride = null,
         string? gridAreaOverride = null,
         bool exists = false
@@ -327,15 +327,15 @@ internal static class FakeRegister
     {
         var id = CreateFederatedId();
         var owner = ownerKeyOverride ?? Key.Create(SignatureAlgorithm.Ed25519).PublicKey.ToProto();
-        var gsrnCommitment = Group.Commit(5700000000000001).ToProtoCommitment();
-        var quantityCommmitment = Group.Commit(150).ToProtoCommitment();
+        var gsrnHash = SHA256.HashData(BitConverter.GetBytes(5700000000000001));
+        var quantityCommmitment = new SecretCommitmentInfo(150).ToProtoCommitment();
 
         var @event = new V1.ConsumptionIssuedEvent()
         {
             CertificateId = id,
             Period = _defaultPeriod,
             GridArea = gridAreaOverride ?? "DK1",
-            GsrnCommitment = gsrnCommitmentOverride ?? gsrnCommitment,
+            GsrnHash = ByteString.CopyFrom(gsrnHash),
             QuantityCommitment = quantityCommitmentOverride ?? quantityCommmitment,
             OwnerPublicKey = owner,
         };
@@ -360,19 +360,18 @@ internal static class FakeRegister
 
     internal static VerificationRequest<V1.ProductionIssuedEvent> CreateProductionIssuedRequest(
         Key signerKey,
-        V1.Commitment? gsrnCommitmentOverride = null,
         V1.Commitment? quantityCommitmentOverride = null,
         V1.PublicKey? ownerKeyOverride = null,
         bool publicQuantity = false,
-        CommitmentParameters? publicQuantityCommitmentOverride = null,
+        SecretCommitmentInfo? publicQuantityCommitmentOverride = null,
         string? gridAreaOverride = null,
         bool exists = false
         )
     {
         var id = CreateFederatedId();
         var owner = ownerKeyOverride ?? Key.Create(SignatureAlgorithm.Ed25519).PublicKey.ToProto();
-        var gsrnCommitment = Group.Commit(5700000000000001).ToProtoCommitment();
-        var quantityCommmitmentParams = Group.Commit(150);
+        var gsrnHash = SHA256.HashData(BitConverter.GetBytes(5700000000000001));
+        var quantityCommmitmentParams = new SecretCommitmentInfo(150);
         var quantityCommmitment = quantityCommmitmentParams.ToProtoCommitment();
 
         var @event = new V1.ProductionIssuedEvent()
@@ -382,7 +381,7 @@ internal static class FakeRegister
             GridArea = gridAreaOverride ?? "DK1",
             FuelCode = "F01050100",
             TechCode = "T020002",
-            GsrnCommitment = gsrnCommitmentOverride ?? gsrnCommitment,
+            GsrnHash = ByteString.CopyFrom(gsrnHash),
             QuantityCommitment = quantityCommitmentOverride ?? quantityCommmitment,
             OwnerPublicKey = owner,
             QuantityPublication = publicQuantity ? (publicQuantityCommitmentOverride ?? quantityCommmitmentParams).ToProto() : null
