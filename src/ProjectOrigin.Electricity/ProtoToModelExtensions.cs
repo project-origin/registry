@@ -1,51 +1,39 @@
 using System.Numerics;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.PedersenCommitment;
-using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Electricity;
 
-public static class ProtoToModelExtensions
+internal static class ProtoToModelExtensions
 {
-    public static SliceProof ToModel(this V1.SliceProof proto)
+    internal static bool VerifyCommitment(this V1.Commitment protoCommitment)
     {
-        return new SliceProof(
-            proto.Source.ToModel(),
-            proto.Quantity.ToModel(),
-            proto.Remainder.ToModel());
+        var commitment = Group.Default.CreateCommitment(new BigInteger(protoCommitment.Content.ToByteArray()));
+        return Group.Default.VerifyRangeProof(protoCommitment.RangeProof.Span, commitment);
     }
 
-    public static Slice ToModel(this V1.Slice proto)
+    internal static bool VerifyPublication(this V1.Commitment commitment, V1.CommitmentPublication publication)
     {
-        return new Slice(
-            proto.Source.ToModel(),
-            proto.Quantity.ToModel(),
-            proto.Remainder.ToModel(),
-            new BigInteger(proto.ZeroR.ToByteArray()));
+        var cp = Group.Default.CreateParameters(publication.Message, new BigInteger(publication.RValue.ToByteArray()));
+        return commitment.Content.Span.SequenceEqual(cp.C.ToByteArray());
     }
 
-    public static Commitment ToModel(this V1.Commitment proto)
+    internal static Commitment ToModel(this V1.Commitment proto)
     {
-        return new Commitment(new BigInteger(proto.C.ToByteArray()), Group.Default);
+        return Group.Default.CreateCommitment(new BigInteger(proto.Content.ToByteArray()));
     }
 
-    public static CommitmentParameters ToModel(this V1.CommitmentProof proto)
+    internal static CommitmentParameters ToModel(this V1.CommitmentPublication proto)
     {
-        return new CommitmentParameters(proto.Message, new BigInteger(proto.RValue.ToByteArray()), Group.Default);
+        return Group.Default.CreateParameters(proto.Message, new BigInteger(proto.RValue.ToByteArray()));
     }
 
-    public static Guid ToModel(this Register.V1.Uuid allocationId) => Guid.Parse(allocationId.Value);
+    internal static Guid ToModel(this Register.V1.Uuid allocationId) => Guid.Parse(allocationId.Value);
 
-    public static DateInterval ToModel(this V1.DateInterval proto)
+    internal static DateInterval ToModel(this V1.DateInterval proto)
     {
         return new DateInterval(
             proto.Start.ToDateTimeOffset(),
             proto.End.ToDateTimeOffset());
     }
-
-    public static FederatedStreamId ToModel(this Register.V1.FederatedStreamId proto)
-    {
-        return new FederatedStreamId(proto.Registry, Guid.Parse(proto.StreamId.Value));
-    }
-
 }

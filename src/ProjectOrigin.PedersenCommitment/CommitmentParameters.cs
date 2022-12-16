@@ -1,40 +1,25 @@
 using System.Numerics;
-using System.Runtime.Serialization;
 
 namespace ProjectOrigin.PedersenCommitment;
 
 public record CommitmentParameters
 {
-    public BigInteger m { get; }
+    public BigInteger Message { get; }
 
-    public BigInteger r { get; }
+    public BigInteger RValue { get; }
 
-    [IgnoreDataMember]
-    public Group Group { get; }
+    public Commitment Commitment { get => _group.CreateCommitment(Message, RValue); }
 
-    [IgnoreDataMember]
-    public Commitment Commitment { get => Commitment.Create(Group, m, r); }
-
-    [IgnoreDataMember]
     public BigInteger C { get => Commitment.C; }
 
-    public CommitmentParameters(BigInteger m, BigInteger r, Group group)
-    {
-        this.m = m;
-        this.r = r;
-        Group = group;
-    }
+    public ReadOnlySpan<byte> RangeProof { get => _group.CreateRangeProof(Message, RValue); }
 
-    public bool Verify(BigInteger c)
-    {
-        var cActual = new Commitment(c, Group);
-        return Verify(cActual);
-    }
+    private Group _group;
 
-    public bool Verify(Commitment cActual)
+    internal CommitmentParameters(BigInteger m, BigInteger r, Group group)
     {
-        var cExpected = Commitment.Create(Group, m, r);
-
-        return cActual == cExpected;
+        Message = m;
+        RValue = r;
+        _group = group;
     }
 }

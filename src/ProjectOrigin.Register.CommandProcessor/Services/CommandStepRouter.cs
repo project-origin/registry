@@ -1,5 +1,4 @@
 using ProjectOrigin.Register.StepProcessor.Interfaces;
-using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Register.CommandProcessor.Services;
 
@@ -12,12 +11,18 @@ public class CommandStepRouter : ICommandStepProcessor
         _routes = routes;
     }
 
-    public Task<CommandStepResult> Process(CommandStep request)
+    public Task<V1.CommandStepStatus> Process(V1.CommandStep request)
     {
-        var targetRegistry = request.FederatedStreamId.Registry;
+        var targetRegistry = request.RoutingId.Registry;
 
         if (!_routes.TryGetValue(targetRegistry, out var processor))
-            return Task.FromResult(new CommandStepResult(request.CommandStepId, CommandStepState.Failed, $"Registry ”{targetRegistry}” unknown"));
+        {
+            return Task.FromResult(new V1.CommandStepStatus()
+            {
+                State = V1.CommandState.Failed,
+                Error = $"Unable to route CommandStep to ”{targetRegistry}”, unknown registry."
+            });
+        }
 
         return processor.Process(request);
     }

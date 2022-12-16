@@ -1,6 +1,6 @@
 namespace System.Numerics;
 
-public static class BigIntegerExtensions
+internal static class BigIntegerExtensions
 {
     const int DefaultWitnesses = 10;
 

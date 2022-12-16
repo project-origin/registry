@@ -11,16 +11,16 @@ public class ProtoSerializer : IProtoSerializer
 
     public ProtoSerializer(Assembly assembly)
     {
-        _typeDictionary = assembly.GetExportedTypes()
+        _typeDictionary = assembly.GetTypes()
             .Where(type =>
                 type.IsClass
                 && typeof(IMessage).IsAssignableFrom(type))
             .Select(type =>
             {
                 var descriptor = (MessageDescriptor)type.GetProperty(nameof(IMessage.Descriptor), BindingFlags.Public | BindingFlags.Static)!.GetValue(null)!;
-                return (type, descriptor);
+                return descriptor;
             })
-            .ToDictionary(x => x.type.FullName!, x => x.descriptor);
+            .ToDictionary(descriptor => descriptor.FullName, descriptor => descriptor);
     }
 
     public IMessage Deserialize(string type, ByteString content)

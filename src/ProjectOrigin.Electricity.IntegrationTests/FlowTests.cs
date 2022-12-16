@@ -2,16 +2,18 @@ using AutoFixture;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NSec.Cryptography;
+using ProjectOrigin.Electricity.Client;
 using ProjectOrigin.Electricity.Client.Models;
 using ProjectOrigin.Electricity.IntegrationTests.Helpers;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Server;
+using ProjectOrigin.PedersenCommitment;
 using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector;
 using Xunit.Abstractions;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
-public class FlowTests : ElectricityClientTestBase
+public class FlowTests : RegisterClientTestBase
 {
     private static Key _dk1_issuer_key = Key.Create(SignatureAlgorithm.Ed25519);
     private static Key _dk2_issuer_key = Key.Create(SignatureAlgorithm.Ed25519);
@@ -47,39 +49,75 @@ public class FlowTests : ElectricityClientTestBase
     [Fact]
     public async Task IssueConsumptionCertificate_Success()
     {
-        var gsrn = Client.Group.Commit(150);
-        var quantity = Client.Group.Commit(250);
+        var commandBuilder = new ElectricityCommandBuilder();
+        var gsrn = Group.Default.Commit(150);
+        var quantity = Group.Default.Commit(250);
         var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
 
-        var id = await Client.IssueConsumptionCertificate(
-            new FederatedCertifcateId(
-                Registries.RegistryA,
-                Guid.NewGuid()
-            ),
-            new Client.Models.DateInterval(
-                new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
-                new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
-            ),
-            Area_DK1,
-            new Client.Models.ShieldedValue(150, gsrn.r),
-            new Client.Models.ShieldedValue(250, quantity.r),
-            ownerKey.PublicKey,
-            _dk1_issuer_key
-            );
+        var id = await commandBuilder
+            .IssueConsumptionCertificate(
+                new FederatedCertifcateId(
+                    Registries.RegistryA,
+                    Guid.NewGuid()
+                ),
+                new Client.Models.DateInterval(
+                    new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
+                    new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
+                ),
+                Area_DK1,
+                new Client.Models.ShieldedValue(150, gsrn.RValue),
+                new Client.Models.ShieldedValue(250, quantity.RValue),
+                ownerKey.PublicKey,
+                _dk1_issuer_key
+                )
+            .Execute(Client);
 
         var res = await GetResult();
 
-        AssertValidResponse(id, res);
+        AssertValid(id, res);
+    }
+
+    [Fact]
+    public async Task IssueConsumptionCertificate_Invalid()
+    {
+        var commandBuilder = new ElectricityCommandBuilder();
+        var gsrn = Group.Default.Commit(150);
+        var quantity = Group.Default.Commit(250);
+        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
+
+        var id = await commandBuilder
+            .IssueConsumptionCertificate(
+                new FederatedCertifcateId(
+                    Registries.RegistryA,
+                    Guid.NewGuid()
+                ),
+                new Client.Models.DateInterval(
+                    new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
+                    new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
+                ),
+                Area_DK1,
+                new Client.Models.ShieldedValue(150, gsrn.RValue),
+                new Client.Models.ShieldedValue(250, quantity.RValue),
+                ownerKey.PublicKey,
+                ownerKey
+                )
+            .Execute(Client);
+
+        var res = await GetResult();
+
+        AssertInvalid(id, res, "Invalid issuer signature for GridArea ”Area_DK1”");
     }
 
     [Fact]
     public async Task IssueProductionCertificate_Success()
     {
-        var gsrn = Client.Group.Commit(150);
-        var quantity = Client.Group.Commit(250);
+        var commandBuilder = new ElectricityCommandBuilder();
+        var gsrn = Group.Default.Commit(150);
+        var quantity = Group.Default.Commit(250);
         var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
 
-        var id = await Client.IssueProductionCertificate(
+        var id = await commandBuilder
+            .IssueProductionCertificate(
             new FederatedCertifcateId(
                 Registries.RegistryB,
                 Guid.NewGuid()
@@ -91,41 +129,51 @@ public class FlowTests : ElectricityClientTestBase
             Area_DK2,
             "F01050100",
             "T020002",
-            new Client.Models.ShieldedValue(150, gsrn.r),
-            new Client.Models.ShieldedValue(250, quantity.r),
+            new Client.Models.ShieldedValue(150, gsrn.RValue),
+            new Client.Models.ShieldedValue(250, quantity.RValue),
             ownerKey.PublicKey,
             _dk2_issuer_key
-            );
+            )
+            .Execute(Client);
 
         var res = await GetResult();
 
-        AssertValidResponse(id, res);
+        AssertValid(id, res);
     }
 
-
     [Fact]
-    public async Task TransferCertificate_Success()
+    public async Task SliceCertificate_Success()
     {
-        var gsrn = Client.Group.Commit(570000000001213);
-
-        var quantity = Client.Group.Commit(250);
-        var transfer1 = Client.Group.Commit(150);
-        var remainder1 = Client.Group.Commit(100);
-
-        var transfer2 = Client.Group.Commit(100);
-        var remainder2 = Client.Group.Commit(50);
+        var commandBuilder = new ElectricityCommandBuilder();
+        var gsrn = Group.Default.Commit(570000000001213);
 
         var ownerKey1 = Key.Create(SignatureAlgorithm.Ed25519);
         var ownerKey2 = Key.Create(SignatureAlgorithm.Ed25519);
         var ownerKey3 = Key.Create(SignatureAlgorithm.Ed25519);
+
+        var slice_0 = new ShieldedValue(250);
+        var slice_1 = new ShieldedValue(150);
+        var slice_1_1 = new ShieldedValue(100);
+        var slice_1_2 = new ShieldedValue(50);
+
+        var slicer = new Slicer(slice_0);
+        slicer.CreateSlice(slice_1, ownerKey2.PublicKey);
+        var collection1 = slicer.Collect();
+        Assert.NotNull(collection1.Remainder);
+
+        var slicer2 = new Slicer(slice_1);
+        slicer2.CreateSlice(slice_1_1, ownerKey3.PublicKey);
+        slicer2.CreateSlice(slice_1_2, ownerKey1.PublicKey);
+        var collection2 = slicer2.Collect();
+        Assert.Null(collection2.Remainder);
 
         var certId = new FederatedCertifcateId(
             Registries.RegistryB,
             Guid.NewGuid()
         );
 
-        {
-            var id = await Client.IssueProductionCertificate(
+        var id = await commandBuilder
+            .IssueProductionCertificate(
                 certId,
                 new Client.Models.DateInterval(
                     new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
@@ -135,129 +183,121 @@ public class FlowTests : ElectricityClientTestBase
                 "F01050100",
                 "T020002",
                 gsrn.ToShieldedValue(),
-                quantity.ToShieldedValue(),
+                slice_0,
                 ownerKey1.PublicKey,
                 _dk2_issuer_key
-                );
-            var res = await GetResult();
-            AssertValidResponse(id, res);
-        }
-
-        {
-            var id = await Client.TransferCertificate(
+                )
+            .SliceCertificate(
                 certId,
-                quantity.ToShieldedValue(),
-                transfer1.ToShieldedValue(),
-                remainder1.ToShieldedValue(),
-                ownerKey1,
-                ownerKey2.PublicKey
-                );
-            var res = await GetResult();
-            AssertValidResponse(id, res);
-        }
-
-        {
-            var id = await Client.TransferCertificate(
+                collection1,
+                ownerKey1
+                )
+            .SliceCertificate(
                 certId,
-                transfer1.ToShieldedValue(),
-                transfer2.ToShieldedValue(),
-                remainder2.ToShieldedValue(),
-                ownerKey2,
-                ownerKey3.PublicKey
-                );
-            var res = await GetResult();
-            AssertValidResponse(id, res);
-        }
+                collection2,
+                ownerKey2
+                )
+            .Execute(Client);
+
+        var res = await GetResult();
+        AssertValid(id, res);
     }
-
 
     [Fact]
     public async Task ClaimCertificate_Success()
     {
-        var gsrn = Client.Group.Commit(570000000001213);
-
+        var commandBuilder = new ElectricityCommandBuilder();
+        var gsrn = Group.Default.Commit(570000000001213);
+        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
 
         var consCertId = new FederatedCertifcateId(
             Registries.RegistryB,
             Guid.NewGuid()
         );
-        var consQuantity = Client.Group.Commit(150);
+        var consQuantity = new ShieldedValue(150);
 
         var prodCertId = new FederatedCertifcateId(
             Registries.RegistryB,
             Guid.NewGuid()
         );
-        var prodQuantity = Client.Group.Commit(250);
+        var prodQuantity = new ShieldedValue(250);
+        var prod_slice = new ShieldedValue(150);
 
-        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
+        var claimQuantity = new ShieldedValue(150);
 
-        var id_1 = await Client.IssueConsumptionCertificate(
-            consCertId,
-            new Client.Models.DateInterval(
-                new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
-                new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
-            ),
-            Area_DK1,
-            gsrn.ToShieldedValue(),
-            consQuantity.ToShieldedValue(),
-            ownerKey.PublicKey,
-            _dk1_issuer_key
-            );
+        var slicer = new Slicer(prodQuantity);
+        slicer.CreateSlice(prod_slice, ownerKey.PublicKey);
+        var collection1 = slicer.Collect();
+        Assert.NotNull(collection1.Remainder);
 
-        var res_1 = await GetResult();
-        AssertValidResponse(id_1, res_1);
+        var id = await commandBuilder
+            .IssueProductionCertificate(
+                prodCertId,
+                new Client.Models.DateInterval(
+                    new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
+                    new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
+                ),
+                Area_DK1,
+                "F01050100",
+                "T020002",
+                gsrn.ToShieldedValue(),
+                prodQuantity,
+                ownerKey.PublicKey,
+                _dk1_issuer_key
+            )
+            .IssueConsumptionCertificate(
+                consCertId,
+                new Client.Models.DateInterval(
+                    new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
+                    new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
+                ),
+                Area_DK1,
+                gsrn.ToShieldedValue(),
+                consQuantity,
+                ownerKey.PublicKey,
+                _dk1_issuer_key
+                )
+            .SliceCertificate(
+                prodCertId,
+                collection1,
+                ownerKey
+                )
+            .ClaimCertificate(
+                claimQuantity,
+                consCertId,
+                consQuantity,
+                ownerKey,
+                prodCertId,
+                prod_slice,
+                ownerKey
+            )
+            .Execute(Client);
 
-        var id_2 = await Client.IssueProductionCertificate(
-            prodCertId,
-            new Client.Models.DateInterval(
-                new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
-                new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
-            ),
-            Area_DK1,
-            "F01050100",
-            "T020002",
-            gsrn.ToShieldedValue(),
-            prodQuantity.ToShieldedValue(),
-            ownerKey.PublicKey,
-            _dk1_issuer_key
-            );
-
-        var res_2 = await GetResult();
-        AssertValidResponse(id_2, res_2);
-
-        var claimQuantity = Client.Group.Commit(150);
-        var consRemainder = Client.Group.Commit(0);
-        var prodRemainder = Client.Group.Commit(100);
-
-        var id_3 = await Client.ClaimCertificate(
-            claimQuantity.ToShieldedValue(),
-            consCertId,
-            consQuantity.ToShieldedValue(),
-            consRemainder.ToShieldedValue(),
-            ownerKey,
-            prodCertId,
-            prodQuantity.ToShieldedValue(),
-            prodRemainder.ToShieldedValue(),
-            ownerKey
-            );
-
-        var res_3 = await GetResult();
-        AssertValidResponse(id_3, res_3);
+        AssertValid(id, await GetResult());
     }
 
-    void AssertValidResponse(CommandId id, CommandStatusEvent? res)
+    private static void AssertValid(CommandId id, CommandStatusEvent? res)
     {
         Assert.NotNull(res);
         Assert.Equal(id.Hash, res!.Id.Hash);
         if (!string.IsNullOrEmpty(res.Error)) throw new Xunit.Sdk.XunitException(res.Error);
         Assert.Equal(CommandState.Succeeded, res.State);
     }
+
+    private static void AssertInvalid(CommandId id, CommandStatusEvent? res, string expectedError)
+    {
+        Assert.NotNull(res);
+        Assert.Equal(id.Hash, res!.Id.Hash);
+        if (string.IsNullOrEmpty(res.Error)) throw new Xunit.Sdk.XunitException($"Error field is empty, expected ”{expectedError}”");
+        Assert.Equal(expectedError, res.Error);
+        Assert.Equal(CommandState.Failed, res.State);
+    }
 }
 
 public static class Extensions
 {
-    public static Client.Models.ShieldedValue ToShieldedValue(this PedersenCommitment.CommitmentParameters cm)
+    public static ShieldedValue ToShieldedValue(this CommitmentParameters cm)
     {
-        return new Client.Models.ShieldedValue((ulong)cm.m, cm.r);
+        return new ShieldedValue((ulong)cm.Message, cm.RValue);
     }
 }

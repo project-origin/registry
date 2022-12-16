@@ -2,7 +2,7 @@ using ProjectOrigin.Register.StepProcessor.Models;
 
 namespace ProjectOrigin.Register.StepProcessor.Interfaces;
 
-public interface ICommandStepDispatcher
+public interface ICommandStepVerifiere
 {
-    Task<(VerificationResult Result, int NextEventIndex)> Verify(CommandStep request);
+    Task<VerificationResult> Verify(V1.CommandStep request, IDictionary<V1.FederatedStreamId, IEnumerable<V1.SignedEvent>> streams);
 }
