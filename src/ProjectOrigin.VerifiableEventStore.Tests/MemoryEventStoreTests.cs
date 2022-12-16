@@ -23,8 +23,8 @@ public class MemoryEventStoreTests
         await memoryEventStore.Store(@event1);
         await memoryEventStore.Store(@event2);
 
-        var batchId = await memoryEventStore.GetBatchesForFinalization(10);
-        var batch = await memoryEventStore.GetEventsForBatch(batchId.First());
+        var batchIds = await memoryEventStore.GetBatchesForFinalization(10);
+        var batch = await memoryEventStore.GetEventsForBatch(batchIds.First());
 
         Assert.NotEmpty(batch);
     }
