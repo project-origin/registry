@@ -3,7 +3,7 @@ namespace ProjectOrigin.PedersenCommitment.Ristretto;
 
 public record RangeProof
 {
-    internal class Native
+    private class Native
     {
         [DllImport("rust_ffi", EntryPoint = "rangeproof_prove_single")]
         internal static extern RangeProofWithCommit ProveSingle(IntPtr bp_gen, IntPtr pc_gen, ulong v, IntPtr blinding, uint n, byte[] label, int label_len);
@@ -19,7 +19,6 @@ public record RangeProof
 
         [DllImport("rust_ffi", EntryPoint = "rangeproof_free")]
         internal static extern void Free(IntPtr self);
-
     }
 
     private readonly IntPtr _ptr;
@@ -118,6 +117,4 @@ public record BulletProofGen
     {
         Free(_ptr);
     }
-
 }
-

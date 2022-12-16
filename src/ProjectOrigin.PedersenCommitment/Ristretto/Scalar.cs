@@ -7,7 +7,7 @@ namespace ProjectOrigin.PedersenCommitment.Ristretto;
  */
 public sealed class Scalar : IDisposable
 {
-    internal class Native
+    private class Native
     {
         [DllImport("rust_ffi", EntryPoint = "scalar_new")]
         internal static extern IntPtr New(byte[] bytes);

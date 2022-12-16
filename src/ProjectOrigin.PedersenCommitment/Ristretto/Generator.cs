@@ -6,6 +6,24 @@ using ProjectOrigin.PedersenCommitment.Ristretto;
 namespace ProjectOrigin.PedersenCommitment;
 public sealed record Generator : IDisposable
 {
+    private class Native
+    {
+        [DllImport("rust_ffi", EntryPoint = "pedersen_gens_default")]
+        internal static extern IntPtr Default();
+
+        [DllImport("rust_ffi", EntryPoint = "pedersen_gens_new")]
+        internal static extern IntPtr New(IntPtr g, IntPtr h);
+
+        [DllImport("rust_ffi", EntryPoint = "pedersen_gens_commit")]
+        internal static extern IntPtr Commit(IntPtr self, IntPtr m, IntPtr r);
+
+        [DllImport("rust_ffi", EntryPoint = "pedersen_gens_commit_bytes")]
+        internal static extern IntPtr Commit(IntPtr self, byte[] m, byte[] r);
+
+        [DllImport("rust_ffi", EntryPoint = "pedersen_gens_free")]
+        internal static extern void Dispose(IntPtr self);
+    }
+
     public static Lazy<Generator> LazyGenerator = new Lazy<Generator>(() =>
     {
         // We use pi with 42 digits as the seed, because, well 42 is the answer to everything.
@@ -24,30 +42,7 @@ public sealed record Generator : IDisposable
         get => LazyGenerator.Value;
     }
 
-    internal class Native
-    {
-        [DllImport("rust_ffi", EntryPoint = "pedersen_gens_default")]
-        internal static extern IntPtr Default();
-
-        [DllImport("rust_ffi", EntryPoint = "pedersen_gens_new")]
-        internal static extern IntPtr New(IntPtr g, IntPtr h);
-
-        [DllImport("rust_ffi", EntryPoint = "pedersen_gens_commit")]
-        internal static extern IntPtr Commit(IntPtr self, IntPtr m, IntPtr r);
-
-        [DllImport("rust_ffi", EntryPoint = "pedersen_gens_commit_bytes")]
-        internal static extern IntPtr Commit(IntPtr self, byte[] m, byte[] r);
-
-        [DllImport("rust_ffi", EntryPoint = "pedersen_gens_free")]
-        internal static extern void Dispose(IntPtr self);
-    }
-
     internal IntPtr _ptr;
-
-    public Generator()
-    {
-        _ptr = Native.Default();
-    }
 
     public Generator(Point g, Point h)
     {
