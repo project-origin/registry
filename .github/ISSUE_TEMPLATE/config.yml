@@ -1,0 +1,10 @@
+contact_links:
+    - name: 📃 Documentation Issue
+      url: https://github.com/orgs/project-origin/discussions/categories/documentation-issues
+      about: This issue tracker is not for documentation issues. Please file any documentation issues here.
+    - name: 🤔 Questions and Help
+      url: https://github.com/project-origin/registry/discussions
+      about: This issue tracker is not for support questions. Please refer to the community's Q&A and discussion forums.
+    - name: 💻 Developer Slack
+      url: https://projectorigintalk.slack.com/ssb/redirect
+      about: Go to the developer Slack here, for ongoing developer-specific discussions, questions, updates and announcements.
