@@ -1,7 +1,7 @@
 use core::slice;
 
-use sha3::Sha3_512;
 use curve25519_dalek_ng::scalar::Scalar;
+use sha3::Sha3_512;
 
 #[no_mangle]
 pub unsafe extern "C" fn scalar_new(bytes: *const u8) -> *const Scalar {
@@ -16,7 +16,6 @@ pub unsafe extern "C" fn scalar_random() -> *const Scalar {
     let scalar = Scalar::random(&mut rand::thread_rng());
     Box::into_raw(Box::new(scalar))
 }
-
 
 #[no_mangle]
 pub unsafe extern "C" fn scalar_hash_from_bytes(bytes: *const u8, len: i32) -> *const Scalar {

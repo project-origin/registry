@@ -36,7 +36,6 @@ pub unsafe extern "C" fn pedersen_gens_commit_bytes(
     Box::into_raw(Box::new(this.commit(value, blinding)))
 }
 
-
 #[no_mangle]
 pub unsafe extern "C" fn pedersen_gens_commit(
     this: *mut PedersenGens,
@@ -48,7 +47,6 @@ pub unsafe extern "C" fn pedersen_gens_commit(
     // Probably fine since the Handle objects only exist in a short scope
     Box::into_raw(Box::new(this.commit(*value, *blinding)))
 }
-
 
 #[no_mangle]
 pub extern "C" fn pedersen_gens_free(this: *mut PedersenGens) {

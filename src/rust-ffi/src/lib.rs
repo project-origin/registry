@@ -6,8 +6,8 @@ use core::slice;
 use util::RawVec;
 pub mod generator;
 pub mod point;
-pub mod scalar;
 pub mod rangeproof;
+pub mod scalar;
 mod util;
 
 #[no_mangle]

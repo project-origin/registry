@@ -90,15 +90,16 @@ public record RangeProof
     {
         var raw = Native.ToBytes(_ptr);
         var bytes = new byte[raw.size];
-        Marshal.Copy(raw.data, bytes, 0, (int) raw.size);
+        Marshal.Copy(raw.data, bytes, 0, (int)raw.size);
         Extensions.FreeBytes(raw);
         return bytes;
     }
 
     public static RangeProof FromBytes(byte[] bytes)
     {
-        var ptr = Native.FromBytes(bytes, (uint) bytes.Length);
-        if (ptr == IntPtr.Zero) {
+        var ptr = Native.FromBytes(bytes, (uint)bytes.Length);
+        if (ptr == IntPtr.Zero)
+        {
             throw new FormatException("Could not deserialize RangeProof");
         }
         return new RangeProof(ptr);

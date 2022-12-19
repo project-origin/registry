@@ -1,10 +1,10 @@
 use core::slice;
 
-use bulletproofs::{RangeProof, BulletproofGens, PedersenGens};
-use curve25519_dalek_ng::{scalar::Scalar, ristretto::CompressedRistretto};
+use bulletproofs::{BulletproofGens, PedersenGens, RangeProof};
+use curve25519_dalek_ng::{ristretto::CompressedRistretto, scalar::Scalar};
 use merlin::Transcript;
 
-use crate::{util::RawVec, deref};
+use crate::{deref, util::RawVec};
 
 #[no_mangle]
 pub extern "C" fn bpgen_new(gens_capacity: u32, party_capacity: u32) -> *const BulletproofGens {
@@ -25,7 +25,6 @@ pub struct RangeProofWithCommit {
     pub proof: *mut RangeProof,
     pub point: *mut CompressedRistretto,
 }
-
 
 #[no_mangle]
 pub unsafe extern "C" fn rangeproof_free(this: *mut RangeProof) {
@@ -48,7 +47,7 @@ pub extern "C" fn rangeproof_prove_single(
     let n = n as usize;
     let bp_gens = deref!(bp_gens);
     let pc_gens = deref!(pc_gens);
-    let label = unsafe {slice::from_raw_parts(label, label_len as usize)};
+    let label = unsafe { slice::from_raw_parts(label, label_len as usize) };
 
     let v_blinding = deref!(v_blinding);
 
@@ -76,10 +75,10 @@ pub extern "C" fn rangeproof_prove_multiple(
     let n = n as usize;
     let bp_gens = deref!(bp_gens);
     let pc_gens = deref!(pc_gens);
-    let label = unsafe {slice::from_raw_parts(label, label_len as usize)};
+    let label = unsafe { slice::from_raw_parts(label, label_len as usize) };
 
-    let v_blinding = unsafe {slice::from_raw_parts(v_blinding, amount as usize)};
-    let v = unsafe {slice::from_raw_parts(v, amount as usize)};
+    let v_blinding = unsafe { slice::from_raw_parts(v_blinding, amount as usize) };
+    let v = unsafe { slice::from_raw_parts(v, amount as usize) };
 
     let mut transcript = Transcript::new(label);
     let proof = RangeProof::prove_multiple(bp_gens, pc_gens, &mut transcript, v, v_blinding, n);
@@ -91,7 +90,6 @@ pub extern "C" fn rangeproof_prove_multiple(
         point: points.as_ptr() as *mut _,
     }
 }
-
 
 #[no_mangle]
 pub extern "C" fn rangeproof_verify_single(
@@ -108,13 +106,12 @@ pub extern "C" fn rangeproof_verify_single(
     let bp_gens = deref!(bp_gens);
     let pc_gens = deref!(pc_gens);
     let commit = deref!(commit);
-    let label = unsafe{slice::from_raw_parts(label, label_len as usize)};
+    let label = unsafe { slice::from_raw_parts(label, label_len as usize) };
     let mut transcript = Transcript::new(label);
 
     let res = proof.verify_single(bp_gens, pc_gens, &mut transcript, commit, n);
     res.is_ok()
 }
-
 
 #[no_mangle]
 pub extern "C" fn rangeproof_verify_multiple(
@@ -131,14 +128,13 @@ pub extern "C" fn rangeproof_verify_multiple(
     let n = n as usize;
     let bp_gens = deref!(bp_gens);
     let pc_gens = deref!(pc_gens);
-    let commits = unsafe{slice::from_raw_parts(commits, amount as usize)};
-    let label = unsafe{slice::from_raw_parts(label, label_len as usize)};
+    let commits = unsafe { slice::from_raw_parts(commits, amount as usize) };
+    let label = unsafe { slice::from_raw_parts(label, label_len as usize) };
     let mut transcript = Transcript::new(label);
 
     let res = proof.verify_multiple(bp_gens, pc_gens, &mut transcript, commits, n);
     res.is_ok()
 }
-
 
 #[no_mangle]
 pub unsafe extern "C" fn rangeproof_to_bytes(proof: *mut RangeProof) -> RawVec<u8> {
@@ -146,13 +142,11 @@ pub unsafe extern "C" fn rangeproof_to_bytes(proof: *mut RangeProof) -> RawVec<u
     let raw = RawVec {
         data: proof.as_mut_ptr(),
         size: proof.len(),
-        cap: proof.capacity()
+        cap: proof.capacity(),
     };
     std::mem::forget(proof);
     raw
 }
-
-
 
 #[no_mangle]
 pub unsafe extern "C" fn rangeproof_from_bytes(bytes: *mut u8, len: u32) -> *const RangeProof {
