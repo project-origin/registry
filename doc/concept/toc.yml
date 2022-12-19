@@ -6,3 +6,7 @@
   items:
   - name: Pedersen Commitment
     href: pedersen-commitments.md
+- name: Unique proofs using tries/merkleproofs
+  items:
+  - name: Merkle Proof
+    href: unique-proofs-using-tries-merkleproofs.md
