@@ -19,6 +19,12 @@ public record RangeProof
 
         [DllImport("rust_ffi", EntryPoint = "rangeproof_free")]
         internal static extern void Free(IntPtr self);
+
+        [DllImport("rust_ffi", EntryPoint = "rangeproof_to_bytes")]
+        internal static extern Extensions.RawVec ToBytes(IntPtr self);
+
+        [DllImport("rust_ffi", EntryPoint = "rangeproof_from_bytes")]
+        internal static extern IntPtr FromBytes(byte[] bytes, uint len);
     }
 
     private readonly IntPtr _ptr;
@@ -78,6 +84,24 @@ public record RangeProof
                 label.Length
                 );
         return res;
+    }
+
+    public byte[] ToBytes()
+    {
+        var raw = Native.ToBytes(_ptr);
+        var bytes = new byte[raw.size];
+        Marshal.Copy(raw.data, bytes, 0, (int) raw.size);
+        Extensions.FreeBytes(raw);
+        return bytes;
+    }
+
+    public static RangeProof FromBytes(byte[] bytes)
+    {
+        var ptr = Native.FromBytes(bytes, (uint) bytes.Length);
+        if (ptr == IntPtr.Zero) {
+            throw new FormatException("Could not deserialize RangeProof");
+        }
+        return new RangeProof(ptr);
     }
 }
 

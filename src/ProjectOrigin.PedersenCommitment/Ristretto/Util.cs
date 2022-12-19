@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 namespace ProjectOrigin.PedersenCommitment.Ristretto;
 
 internal static class Extensions
@@ -15,5 +16,19 @@ internal static class Extensions
         var outputArray = new byte[arrayLength];
         Array.Copy(inputBytes, outputArray, inputBytes.Length);
         return outputArray;
+    }
+
+    [DllImport("rust_ffi", EntryPoint = "fill_bytes")]
+    internal static extern void FillBytes(RawVec raw, byte[] dst);
+
+    [DllImport("rust_ffi", EntryPoint = "free_vec")]
+    internal static extern void FreeBytes(RawVec raw);
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct RawVec
+    {
+        internal IntPtr data;
+        internal nuint size;
+        internal nuint cap;
     }
 }
