@@ -82,7 +82,9 @@ Patricia Merkle trees can be validated by calling a function with a path and tri
 
 It has to be noted to prove that the certificates has not been changed or tampered with they must be included in the merkle tree upon issuance.
 
-There is a different approach to compress the proofs called verkle trees, that uses vector commitments as described by [Kurszmaul, 2018](https://math.mit.edu/research/highschool/primes/materials/2018/Kuszmaul.pdf) and appropriated by the [ethereum foundation](https://blog.ethereum.org/2021/12/02/verkle-tree-structure/) to achieve smaller proofs for the validators in their network. Verkle trees are more efficient in terms of space and computation but are not as flexible as the merkle trees or Patricia Merkle trees - and are not quantum safe as the hashing implementations. Hence the use of Patricia Merkle trees is the preferred implementation option.
+There is a different approach to compress the proofs called verkle trees, that uses vector commitments as described by [Kurszmaul, 2018](https://math.mit.edu/research/highschool/primes/materials/2018/Kuszmaul.pdf) and appropriated by the [ethereum foundation](https://blog.ethereum.org/2021/12/02/verkle-tree-structure/) to achieve smaller proofs for the validators in their network. Verkle trees are more efficient in terms of space and computation but are not as flexible as the merkle trees or Patricia Merkle trees - and are not quantum safe as the hashing implementations. 
+
+Hence the use of Patricia Merkle trees is the preferred implementation option.
 
 ## Known Instances 
 - [Patricia Merkle Trees](https://ethereum.org/en/developers/docs/data-structures-and-encoding/patricia-merkle-trie/)
