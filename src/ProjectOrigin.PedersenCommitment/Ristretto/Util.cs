@@ -27,8 +27,8 @@ internal static class Extensions
     [StructLayout(LayoutKind.Sequential)]
     internal struct RawVec
     {
-        internal IntPtr data;
         internal nuint size;
         internal nuint cap;
+        internal IntPtr data;
     }
 }
