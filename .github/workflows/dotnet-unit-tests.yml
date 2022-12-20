@@ -5,7 +5,8 @@ on:
     branches:
       - main
   push:
-    - "*"
+    branches:
+      - "*"
 
 env:
   compose_folder: src/ProjectOrigin.VerifiableEventStore.Tests
