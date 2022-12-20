@@ -8,7 +8,8 @@ Through a session of workshops we have found a theoretical approach to an implem
 
 ## Problem
 
-The problem being that digital copies cannot be distinguished from their original counterparts. Using a cryptographic method we should be able to proof uniqueness of a claim to mitigate double spending, issuance and claims. The solution will be  generic and subsequently applied to the Energy Track and Trace problem space.
+The problem is that digital copies cannot be distinguished from their original counterparts. 
+Using a cryptographic method, however, we should be able to prove uniqueness of a claim, thus mitigating double spending, -issuance and -claims. The solution will be  generic and subsequently applied to the Energy Track and Trace problem space.
 
 ## Story
 
