@@ -1,8 +1,11 @@
 using System.Runtime.InteropServices;
+
 namespace ProjectOrigin.PedersenCommitment.Ristretto;
 
 public record RangeProof
 {
+    private const int MaxRangeProofSize = 1024;
+
     private class Native
     {
         [DllImport("rust_ffi", EntryPoint = "rangeproof_prove_single")]
@@ -21,11 +24,16 @@ public record RangeProof
         internal static extern void Free(IntPtr self);
 
         [DllImport("rust_ffi", EntryPoint = "rangeproof_to_bytes")]
-        internal static extern int ToBytes(IntPtr self, byte[] bytes);
+        internal static extern uint ToBytes(IntPtr self, byte[] bytes, uint len);
 
         [DllImport("rust_ffi", EntryPoint = "rangeproof_from_bytes")]
         internal static extern IntPtr FromBytes(byte[] bytes, uint len);
+
+        [DllImport("rust_ffi", EntryPoint = "compressed_ristretto_from_bytes")]
+        internal static extern IntPtr CompressedPointFromBytes(byte[] bytes);
     }
+
+
 
     private readonly IntPtr _ptr;
 
@@ -59,7 +67,7 @@ public record RangeProof
                 label.Length
                 );
 
-        var bytes = new byte[32];
+        var bytes = new byte[CompressedPoint.ByteSize];
         CompressedPoint.ToBytes(tuple.CompressedPoint, bytes);
         return (new RangeProof(tuple.Proof), new CompressedPoint(bytes));
     }
@@ -88,9 +96,9 @@ public record RangeProof
 
     public ReadOnlySpan<byte> ToBytes()
     {
-        var bytes = new byte[1024];
-        var bytesCopied = Native.ToBytes(_ptr, bytes);
-        return new ReadOnlySpan<byte>(bytes).Slice(0, bytesCopied);
+        var bytes = new byte[MaxRangeProofSize];
+        var bytesCopied = Native.ToBytes(_ptr, bytes, (uint)bytes.Length);
+        return new ReadOnlySpan<byte>(bytes).Slice(0, (int)bytesCopied);
     }
 
     public static RangeProof FromBytes(ReadOnlySpan<byte> bytes)

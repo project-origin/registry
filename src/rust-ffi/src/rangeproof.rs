@@ -137,11 +137,12 @@ pub extern "C" fn rangeproof_verify_multiple(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn rangeproof_to_bytes(proof: *mut RangeProof, dst: *mut u8) -> usize {
+pub unsafe extern "C" fn rangeproof_to_bytes(proof: *mut RangeProof, dst: *mut u8, len: u32) -> u32 {
     let proof = (*proof).to_bytes();
-    let dst = slice::from_raw_parts_mut(dst, proof.len());
-    dst.copy_from_slice(&proof);
-    (proof.len() as i32).try_into().unwrap()
+    let data_length = proof.len();
+    let dst = slice::from_raw_parts_mut(dst, len as usize);
+    dst[0..data_length].copy_from_slice(&proof);
+    (data_length as u32).try_into().unwrap()
 }
 
 #[no_mangle]
