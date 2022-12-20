@@ -25,8 +25,6 @@ jobs:
       - name: Build code
         run: make build
 
-      - name: Run Electricity tests
-        run: dotnet test src/ProjectOrigin.Electricity.Tests/
 
       - name: Run PedersenCommitment tests
         run: dotnet test src/ProjectOrigin.PedersenCommitment.Tests/
@@ -36,6 +34,9 @@ jobs:
 
       - name: Run VerifiableEventStore tests
         run: dotnet test src/ProjectOrigin.VerifiableEventStore.Tests/
+
+      - name: Run Electricity tests
+        run: dotnet test src/ProjectOrigin.Electricity.Tests/
 
       - name: Run Electricity IntegrationTests
         run: dotnet test src/ProjectOrigin.Electricity.IntegrationTests/
