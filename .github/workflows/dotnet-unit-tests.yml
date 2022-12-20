@@ -22,12 +22,6 @@ jobs:
         with:
           dotnet-version: "7.0"
 
-      - name: hello
-        run: rustc -V
-
-      - name: hello
-        run: cargo version
-
       - name: Build code
         run: make build
 

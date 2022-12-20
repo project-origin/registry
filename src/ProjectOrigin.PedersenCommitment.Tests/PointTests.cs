@@ -7,25 +7,10 @@ namespace ProjectOrigin.PedersenCommitment.Tests;
 public class PointTests
 {
     [Fact]
-    public void Test()
-    {
-        var piBytes = Encoding.ASCII.GetBytes("3.141592653589793238462643383279502884197169");
-        var sha1 = SHA512.HashData(piBytes);
-
-        var point = Point.FromUniformBytes(sha1);
-
-        Assert.NotNull(point);
-    }
-
-
-    [Fact]
     public void Elligator()
     {
-
-        var piBytes = Encoding.ASCII.GetBytes("hello world");
-        var seed = SHA512.HashData(piBytes);
-
-
+        var seed = new byte[64];
+        seed[0] = 2;
         var p = Ristretto.Point.FromUniformBytes(seed);
 
         Assert.NotNull(p);
