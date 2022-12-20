@@ -24,7 +24,7 @@ To solve the apparent privacy issues[^1] that public verifiability would create,
 the data is encrypted using [Pedersen Commitments](concept/pedersen-commitments.md),
 which cannot be decrypted, but only proven.
 
-[^1]: Exposing users' measurement data publicly might result in undesirable and potentially damaging insights into companies and citizens usage.
+[^1]: Exposing users' measurement data publicly might result in undesirable and potentially damaging insights into companies' and citizens' usage.
 
 
 To solve the scalability issues arising from the huge amounts of measurement data[^2], the implementation uses a **federated setup**
