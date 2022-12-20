@@ -34,8 +34,8 @@ jobs:
       - name: Run PedersenCommitment tests
         run: dotnet test src/ProjectOrigin.PedersenCommitment.Tests/
 
-      - name: Run Electricity tests
-        run: dotnet test src/ProjectOrigin.Electricity.Tests/
+      # - name: Run Electricity tests
+      #   run: dotnet test src/ProjectOrigin.Electricity.Tests/
 
-      - name: Run Electricity IntegrationTests
-        run: dotnet test src/ProjectOrigin.Electricity.IntegrationTests/
+      # - name: Run Electricity IntegrationTests
+      #   run: dotnet test src/ProjectOrigin.Electricity.IntegrationTests/
