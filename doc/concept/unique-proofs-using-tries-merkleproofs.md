@@ -78,7 +78,7 @@ graph TD
 
 ```
 ## Rationale 
-Patricia Merkle trees can be validated by calling a function with a path and trie. The root hash can show inclusion by applying the path to verify whether or not there is a value on the path. This means a unique subproof can be provided to the user as a means of delivery of the claims, such a mechanism can be proof of delivery - that initiates the agreed payment for the transaction of the claims on the digital assets - in the case of ETT claims on production and consumption certificates.
+Patricia Merkle trees can be validated by calling a function with a path and trie. The root hash can show inclusion by applying the path to verify whether or not there is a value on the path. This means that a unique subproof can be provided to the user as a means of delivery of the claims, as such a mechanism can be proof of delivery - that initiates the agreed payment for the transaction of the claims on the digital assets - in the case of ETT claims on production and consumption certificates.
 
 It has to be noted to prove that the certificates has not been changed or tampered with they must be included in the merkle tree upon issuance.
 
