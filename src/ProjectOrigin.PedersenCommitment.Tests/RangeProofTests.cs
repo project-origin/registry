@@ -16,7 +16,7 @@ public class RangeProofTests
         var res = proof.VerifySingle(bp_gens, pc_gens, commit, 32, label);
         Assert.True(res);
 
-        // var bytes = proof.ToBytes();
+        var bytes = proof.ToBytes();
         // var new_proof = RangeProof.FromBytes(bytes);
         // res = new_proof.VerifySingle(bp_gens, pc_gens, commit, 32, label);
         // Assert.True(res);
