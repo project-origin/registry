@@ -1,6 +1,6 @@
 # Unique proofs using tries / merkle proofs
 
-A unique digital proof is prerequisite for claims and immutability of certificates
+A unique digital proof is prerequisite for claims and immutability of certificates.
 
 ## Patlet
 
