@@ -93,9 +93,9 @@ public record RangeProof
         return new ReadOnlySpan<byte>(bytes).Slice(0, bytesCopied);
     }
 
-    public static RangeProof FromBytes(byte[] bytes)
+    public static RangeProof FromBytes(ReadOnlySpan<byte> bytes)
     {
-        var ptr = Native.FromBytes(bytes, (uint)bytes.Length);
+        var ptr = Native.FromBytes(bytes.ToArray(), (uint)bytes.Length);
         if (ptr == IntPtr.Zero)
         {
             throw new FormatException("Could not deserialize RangeProof");
