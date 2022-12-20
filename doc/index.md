@@ -18,7 +18,7 @@ The project aims to enable extended use of the implementation, to other energy f
 ## How it Works
 
 To make the data **publicly verifiable**, it is required for data
-to be placed somewhere that everyone can read the data.
+to be placed somewhere that everyone can read and validate the data using unique proofs i.e. [merkleproofs](concept/unique-proofs-using-tries-merkleproofs.md).
 
 To solve the apparent privacy issues[^1] that public verifiability would create,
 the data is encrypted using [Pedersen Commitments](concept/pedersen-commitments.md),
