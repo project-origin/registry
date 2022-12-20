@@ -4,7 +4,7 @@
 
 Project-Origin is an OpenSource project to create a **[Federated](https://arxiv.org/pdf/1202.4503.pdf) Registry**
 that handles **Granular Certificates** (GCs). 
-The GCs purpose is to prove the origin and potential conversions of Energy, thus supporting the green transition and power-to-X (PtX).
+The GCs purpose is to prove the origin and potential conversions of energy, thus supporting the green transition and power-to-X (PtX).
 
 ## Why Project-Origin?
 
