@@ -5,12 +5,21 @@ namespace ProjectOrigin.PedersenCommitment.Tests;
 public class PointTests
 {
     [Fact]
-    public void Elligator()
+    public void Test()
     {
-        var seed = new byte[64];
-        seed[0] = 2;
-        var p = Ristretto.Point.FromUniformBytes(seed);
+        var a = Scalar.Random();
+
+        Assert.NotNull(a);
     }
+
+
+    // [Fact]
+    // public void Elligator()
+    // {
+    //     var seed = new byte[64];
+    //     seed[0] = 2;
+    //     var p = Ristretto.Point.FromUniformBytes(seed);
+    // }
 
     // [Fact]
     // public void CompressDecompress()
