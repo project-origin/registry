@@ -16,17 +16,17 @@ public class PointTests
         Assert.NotNull(p);
     }
 
-    // [Fact]
-    // public void CompressDecompress()
-    // {
-    //     var seed = new byte[64];
-    //     seed[0] = 2;
-    //     var point = Ristretto.Point.FromUniformBytes(seed);
-    //     var a = point.Compress();
-    //     var b = a.Decompress();
-    //     var c = b.Compress();
-    //     Assert.Equal(a, c);
-    // }
+    [Fact]
+    public void CompressDecompress()
+    {
+        var seed = new byte[64];
+        seed[0] = 2;
+        var point = Ristretto.Point.FromUniformBytes(seed);
+        var a = point.Compress();
+        var b = a.Decompress();
+        var c = b.Compress();
+        Assert.Equal(a, c);
+    }
 
     // [Fact]
     // public void Sub()
