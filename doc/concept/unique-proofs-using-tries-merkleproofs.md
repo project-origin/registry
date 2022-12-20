@@ -4,7 +4,7 @@ A unique digital proof is prerequisite for claims and immutability of certificat
 
 ## Patlet
 
-Through a session of workshops we have a theoritical approach to an implementation that gives us the ability to have unique claims using proofs / subproofs for a batch of data transactions per registry.
+Through a session of workshops we have found a theoretical approach to an implementation giving us the ability to obtain unique claims using proofs / subproofs for a batch of data transactions per registry.
 
 ## Problem
 
