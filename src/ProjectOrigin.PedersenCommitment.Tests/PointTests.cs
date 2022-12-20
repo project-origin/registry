@@ -21,8 +21,11 @@ public class PointTests
     [Fact]
     public void Elligator()
     {
-        var seed = new byte[64];
-        seed[0] = 2;
+
+        var piBytes = Encoding.ASCII.GetBytes("hello world");
+        var seed = SHA512.HashData(piBytes);
+
+
         var p = Ristretto.Point.FromUniformBytes(seed);
 
         Assert.NotNull(p);
