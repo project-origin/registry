@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using ProjectOrigin.PedersenCommitment.Ristretto;
 
 namespace ProjectOrigin.PedersenCommitment.Tests;
@@ -7,9 +9,12 @@ public class PointTests
     [Fact]
     public void Test()
     {
-        var a = Scalar.Random();
+        var piBytes = Encoding.ASCII.GetBytes("3.141592653589793238462643383279502884197169");
+        var sha1 = SHA512.HashData(piBytes);
 
-        Assert.NotNull(a);
+        var point = Point.FromUniformBytes(sha1);
+
+        Assert.NotNull(point);
     }
 
 
