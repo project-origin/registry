@@ -35,15 +35,15 @@ public class ProductionCertificateApplyTests
         var gsrnHash = SHA256.HashData(BitConverter.GetBytes(new Fixture().Create<ulong>()));
         var quantity = new SecretCommitmentInfo(_fix.Create<uint>());
         var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
-
+        var certId = CreateId();
 
         var @event = new V1.ProductionIssuedEvent()
         {
-            CertificateId = CreateId(),
+            CertificateId = certId,
             Period = period.ToProto(),
             GridArea = area,
             GsrnHash = ByteString.CopyFrom(gsrnHash),
-            QuantityCommitment = quantity.ToProtoCommitment(),
+            QuantityCommitment = quantity.ToProtoCommitment(certId.StreamId.Value),
             OwnerPublicKey = ownerKey.PublicKey.ToProto(),
         };
 
@@ -80,7 +80,7 @@ public class ProductionCertificateApplyTests
             Period = period.ToProto(),
             GridArea = area,
             GsrnHash = ByteString.CopyFrom(gsrnHash),
-            QuantityCommitment = quantity.ToProtoCommitment(),
+            QuantityCommitment = quantity.ToProtoCommitment(streamId.ToString()),
             OwnerPublicKey = ownerKey.PublicKey.ToProto(),
         };
 
@@ -109,7 +109,7 @@ public class ProductionCertificateApplyTests
         var owner1 = Key.Create(SignatureAlgorithm.Ed25519);
         @event.NewSlices.Add(new V1.SlicedEvent.Types.Slice
         {
-            Quantity = slice1.ToProtoCommitment(),
+            Quantity = slice1.ToProtoCommitment(cert.Id.StreamId.Value),
             NewOwner = owner1.PublicKey.ToProto()
         });
 
@@ -117,7 +117,7 @@ public class ProductionCertificateApplyTests
         var owner2 = Key.Create(SignatureAlgorithm.Ed25519);
         @event.NewSlices.Add(new V1.SlicedEvent.Types.Slice
         {
-            Quantity = slice2.ToProtoCommitment(),
+            Quantity = slice2.ToProtoCommitment(cert.Id.StreamId.Value),
             NewOwner = owner2.PublicKey.ToProto()
         });
 

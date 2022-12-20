@@ -20,14 +20,11 @@ public record Commitment
         _compressionPoint = new Ristretto.CompressedPoint(bytes.ToArray());
     }
 
-    public bool VerifyRangeProof(ReadOnlySpan<byte> rangeProof, string label)
+    public bool VerifyRangeProof(ReadOnlySpan<byte> rangeProofSpan, string label)
     {
-        var labelBytes = Encoding.ASCII.GetBytes(label);
-
-        //Ristretto.RangeProof rangeProof;
-        //return rangeProof.VerifySingle(BulletProofGen.Default, Generator.Default, compressedPoint, 32, label);
-
-        return rangeProof.IsEmpty; // TODO Proofs
+        var labelBytes = Encoding.UTF8.GetBytes(label);
+        var rangeProof = Ristretto.RangeProof.FromBytes(rangeProofSpan.ToArray());
+        return rangeProof.VerifySingle(BulletProofGen.Default, Generator.Default, _compressionPoint, 32, labelBytes);
     }
 
     public static bool VerifyEqualityProof(ReadOnlySpan<byte> equalityProof, Commitment commitment1, Commitment commitment2)

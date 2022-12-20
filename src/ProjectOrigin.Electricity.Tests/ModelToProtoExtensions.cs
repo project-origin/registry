@@ -26,11 +26,12 @@ internal static class ModelToProtoExtensions
         };
     }
 
-    public static V1.Commitment ToProtoCommitment(this SecretCommitmentInfo obj)
+    public static V1.Commitment ToProtoCommitment(this SecretCommitmentInfo obj, string certId)
     {
         return new V1.Commitment()
         {
-            Content = ByteString.CopyFrom(obj.Commitment.C)
+            Content = ByteString.CopyFrom(obj.Commitment.C),
+            RangeProof = ByteString.CopyFrom(obj.CreateRangeProof(certId))
         };
     }
 

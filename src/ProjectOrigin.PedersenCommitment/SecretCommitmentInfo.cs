@@ -34,11 +34,9 @@ public record SecretCommitmentInfo
 
     public ReadOnlySpan<byte> CreateRangeProof(string label)
     {
-        var labelBytes = Encoding.ASCII.GetBytes(label);
+        var labelBytes = Encoding.UTF8.GetBytes(label);
         var (rangeProof, compressedPoint) = Ristretto.RangeProof.ProveSingle(Ristretto.BulletProofGen.Default, Generator.Default, Message, _blindingValue, 32, labelBytes);
-
-        //return rangeProof.bytes;
-        return ReadOnlySpan<byte>.Empty; // TODO Proofs
+        return rangeProof.ToBytes();
     }
 
     public static ReadOnlySpan<byte> CreateEqualityProof(SecretCommitmentInfo left, SecretCommitmentInfo right)

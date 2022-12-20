@@ -39,10 +39,11 @@ internal static class FakeRegister
     internal static V1.Commitment InvalidCommitment(uint quantity = 150, string label = "hello")
     {
         var privateCommitment = new SecretCommitmentInfo(quantity);
+        var anotherCommitmentForInvalidRangeProof = new SecretCommitmentInfo(quantity);
         return new V1.Commitment
         {
             Content = ByteString.CopyFrom(privateCommitment.Commitment.C),
-            RangeProof = ByteString.CopyFrom(new Fixture().CreateMany<byte>().ToArray())
+            RangeProof = ByteString.CopyFrom(anotherCommitmentForInvalidRangeProof.CreateRangeProof(label))
         };
     }
 
@@ -138,12 +139,12 @@ internal static class FakeRegister
 
         @event.NewSlices.Add(new V1.SlicedEvent.Types.Slice
         {
-            Quantity = slice.ToProtoCommitment(),
+            Quantity = slice.ToProtoCommitment(id.StreamId.Value),
             NewOwner = newOwner
         });
         @event.NewSlices.Add(new V1.SlicedEvent.Types.Slice
         {
-            Quantity = remainder.ToProtoCommitment(),
+            Quantity = remainder.ToProtoCommitment(id.StreamId.Value),
             NewOwner = ownerKey.PublicKey.ToProto()
         });
         return @event;
@@ -285,7 +286,7 @@ internal static class FakeRegister
             Period = (periodOverride?.ToProto() ?? _defaultPeriod),
             GridArea = area,
             GsrnHash = ByteString.CopyFrom(gsrnHash),
-            QuantityCommitment = quantityCommitmentParameters.ToProtoCommitment(),
+            QuantityCommitment = quantityCommitmentParameters.ToProtoCommitment(id.StreamId.Value),
             OwnerPublicKey = (ownerKey).ToProto(),
         };
 
@@ -308,7 +309,7 @@ internal static class FakeRegister
             FuelCode = "F01050100",
             TechCode = "T020002",
             GsrnHash = ByteString.CopyFrom(gsrnHash),
-            QuantityCommitment = quantityCommitmentParameters.ToProtoCommitment(),
+            QuantityCommitment = quantityCommitmentParameters.ToProtoCommitment(id.StreamId.Value),
             OwnerPublicKey = ownerKey.ToProto(),
         };
 
@@ -328,7 +329,7 @@ internal static class FakeRegister
         var id = CreateFederatedId();
         var owner = ownerKeyOverride ?? Key.Create(SignatureAlgorithm.Ed25519).PublicKey.ToProto();
         var gsrnHash = SHA256.HashData(BitConverter.GetBytes(5700000000000001));
-        var quantityCommmitment = new SecretCommitmentInfo(150).ToProtoCommitment();
+        var quantityCommmitment = new SecretCommitmentInfo(150).ToProtoCommitment(id.StreamId.Value);
 
         var @event = new V1.ConsumptionIssuedEvent()
         {
@@ -372,7 +373,7 @@ internal static class FakeRegister
         var owner = ownerKeyOverride ?? Key.Create(SignatureAlgorithm.Ed25519).PublicKey.ToProto();
         var gsrnHash = SHA256.HashData(BitConverter.GetBytes(5700000000000001));
         var quantityCommmitmentParams = new SecretCommitmentInfo(150);
-        var quantityCommmitment = quantityCommmitmentParams.ToProtoCommitment();
+        var quantityCommmitment = quantityCommmitmentParams.ToProtoCommitment(id.StreamId.Value);
 
         var @event = new V1.ProductionIssuedEvent()
         {
