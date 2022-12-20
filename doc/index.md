@@ -1,53 +1,50 @@
-# ProjectOrigin
+# Project-Origin
 
-## What Is ProjectOrigin?
+## What is Project-Origin?
 
-ProjectOrigin is a OpenSource project to create a **Federated Registry**
-to handle [**Granular Certificates**](concept/granular-certificates/readme.md)
-to prove the origin and conversions of Energy in the Green transition.
+Project-Origin is a Open Source project to create a **[Federated](https://arxiv.org/pdf/1202.4503.pdf) Registry**
+to handle [**Granular Certificates**](concept/granular-certificates/readme.md)  (GCs). 
+The GCs purpose is to prove the origin and potential conversions of energy, thus supporting the green transition and Power-to-X (PtX).
 
-## Why ProjectOrigin?
+## Why Project-Origin?
 
-ProjectOrigin was created because there is a need to provide a
-**public verifiable** way to prove the origin of the electricity one uses on
-with a high granularity.
+If one searches for greenwashing, there is no shortages of articles on the internet showing a growing scepticism with [the current system](https://en.energinet.dk/Energy-data/Guarantees-of-origin-el-gas-hydrogen/) for proving the origin of electricity.
 
-If one searches for greenwashing there is no shortages of articles on the
-internet showing the growing scepticism with the current system.
+Project-Origin was created because there is a need to provide a trustworthy,
+**publicly verifiable** way to prove the origin of the electricity one uses on
+with a high granularity. 
+The project aims to enable extended use of the implementation, to other energy forms than electricity alone. 
 
-## How it works
+## How it Works
 
 To make the data **publicly verifiable**, it is required for data
-to a place were everyone can read the data.
+to be placed somewhere that everyone can read the data.
 
-To solve the apparent privacy issues[^1] this would create,
-the data is encrypted with the help of [Pedersen Commitments](concept/pedersen-commitments.md),
+To solve the apparent privacy issues[^1] that public verifiability would create,
+the data is encrypted using [Pedersen Commitments](concept/pedersen-commitments.md),
 which cannot be decrypted, but only proven.
 
-[^1]: Exposings users measurement data publically could give insights into companies and citizens
-usage, which is very undesireable and potentially damaging.
+[^1]: Exposing users' measurement data publicly might result in undesirable and potentially damaging insights into companies and citizens usage.
 
 
-To solve the scalability issues[^2] we chose to go with a **federated setup**
-instead of a fully distributed setup directly on distributed ledger.
+To solve the scalability issues arising from the huge amounts of measurement data[^2], the implementation uses a **federated setup**
+instead of a fully distributed setup directly on a distributed ledger.
 
 This is implemented as a layer-2 blockchain, where batches of data for
-each registry is hashed in a merkle-tree, and each root is written to a ledger.
+each registry is hashed in a merkle-tree, and each root is then written to a ledger.
 
 This ensures immutability, while providing high throughput.
 
 [^2]: In Denmark alone we have 3.500.000 electricity meters,
 and with hourly measurements this would create
-30.660.000.000 (30 billion) measurements yearly.
+30.660.000.000 (30 billion) measurements on a yearly basis.
 
-More in depth information can be found in the [architecture description](architecture/overview.md).
+More in-depth information can be found in the [architecture description](architecture/overview.md).
 
-## Work in progress
+## Work in Progress
 
 The documentation and everything else is a work in progress,
-so mind that everything might not be well documented,
-but please [create an issue](https://github.com/project-origin/registry/issues/new/choose)
-with what aspects we should document further.
+so mind that everything might not be well documented yet. You can help us by explaining any documentation issues you encounter in the [discussion forum](https://github.com/orgs/project-origin/discussions/categories/documentation-issues).
 
 ## Development Status
 
