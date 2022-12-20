@@ -15,6 +15,22 @@ public class PointTests
     }
 
     [Fact]
+    public void CreateUsingGenrator()
+    {
+        var pc_gens = Generator.Default;
+        var blinding = Scalar.Random();
+
+        var point = pc_gens.Commit(12, blinding);
+        Assert.NotNull(point);
+
+        var compressed = point.Compress();
+        Assert.NotNull(compressed);
+
+        var decompressed = compressed.Decompress();
+        Assert.Equal(point, decompressed);
+    }
+
+    [Fact]
     public void CompressDecompress()
     {
         var seed = new byte[64];
