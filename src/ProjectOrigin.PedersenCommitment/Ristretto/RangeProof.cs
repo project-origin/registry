@@ -21,7 +21,7 @@ public record RangeProof
         internal static extern void Free(IntPtr self);
 
         [DllImport("rust_ffi", EntryPoint = "rangeproof_to_bytes")]
-        internal static extern Extensions.RawVec ToBytes(IntPtr self);
+        internal static extern int ToBytes(IntPtr self, byte[] bytes);
 
         [DllImport("rust_ffi", EntryPoint = "rangeproof_from_bytes")]
         internal static extern IntPtr FromBytes(byte[] bytes, uint len);
@@ -86,24 +86,11 @@ public record RangeProof
         return res;
     }
 
-    [StructLayout(LayoutKind.Sequential)]
-    public struct MyArrayStruct
+    public ReadOnlySpan<byte> ToBytes()
     {
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 608)]
-        public byte[] vals;
-    }
-
-
-    public byte[] ToBytes()
-    {
-        var raw = Native.ToBytes(_ptr);
-        var size = Convert.ToInt32(raw.size);
-        var bytes = new byte[size];
-        Console.WriteLine($"SIZE ”{raw.size}” ss ”{size}” IntPtr ”{raw.ptr}”");
-        var b = Marshal.PtrToStructure<MyArrayStruct>(raw.ptr);
-
-        Extensions.FreeBytes(raw);
-        return b.vals;
+        var bytes = new byte[1024];
+        var bytesCopied = Native.ToBytes(_ptr, bytes);
+        return new ReadOnlySpan<byte>(bytes).Slice(0, bytesCopied);
     }
 
     public static RangeProof FromBytes(byte[] bytes)

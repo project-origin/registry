@@ -4,7 +4,7 @@ use bulletproofs::{BulletproofGens, PedersenGens, RangeProof};
 use curve25519_dalek_ng::{ristretto::CompressedRistretto, scalar::Scalar};
 use merlin::Transcript;
 
-use crate::{deref, util::RawVec};
+use crate::deref;
 
 #[no_mangle]
 pub extern "C" fn bpgen_new(gens_capacity: u32, party_capacity: u32) -> *const BulletproofGens {
@@ -137,15 +137,11 @@ pub extern "C" fn rangeproof_verify_multiple(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn rangeproof_to_bytes(proof: *mut RangeProof) -> RawVec {
-    let mut proof = (*proof).to_bytes();
-    let raw = RawVec {
-        size: proof.len(),
-        cap: proof.capacity(),
-        ptr: proof.as_mut_ptr(),
-    };
-    std::mem::forget(proof);
-    raw
+pub unsafe extern "C" fn rangeproof_to_bytes(proof: *mut RangeProof, dst: *mut u8) -> usize {
+    let proof = (*proof).to_bytes();
+    let dst = slice::from_raw_parts_mut(dst, proof.len());
+    dst.copy_from_slice(&proof);
+    (proof.len() as i32).try_into().unwrap()
 }
 
 #[no_mangle]

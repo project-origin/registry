@@ -18,17 +18,4 @@ internal static class Extensions
         return outputArray;
     }
 
-    [DllImport("rust_ffi", EntryPoint = "fill_bytes")]
-    internal static extern void FillBytes(RawVec raw, byte[] dst);
-
-    [DllImport("rust_ffi", EntryPoint = "free_vec")]
-    internal static extern void FreeBytes(RawVec raw);
-
-    [StructLayout(LayoutKind.Sequential)]
-    internal ref struct RawVec
-    {
-        internal nuint size;
-        internal nuint cap;
-        internal IntPtr ptr;
-    }
 }
