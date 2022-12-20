@@ -28,18 +28,18 @@ public class PointTests
         Assert.Equal(a, c);
     }
 
-    // [Fact]
-    // public void Sub()
-    // {
-    //     var seed = new byte[64];
-    //     seed[0] = 2;
-    //     var g = Ristretto.Point.FromUniformBytes(seed);
-    //     var a = g * new Scalar(2);
-    //     var b = g * new Scalar(7);
-    //     var c = g * new Scalar(5);
+    [Fact]
+    public void Sub()
+    {
+        var seed = new byte[64];
+        seed[0] = 2;
+        var g = Ristretto.Point.FromUniformBytes(seed);
+        var a = g * new Scalar(2);
+        var b = g * new Scalar(7);
+        var c = g * new Scalar(5);
 
-    //     Assert.Equal(c, b - a);
-    // }
+        Assert.Equal(c, b - a);
+    }
 
     // [Fact]
     // public void MulScalar()
