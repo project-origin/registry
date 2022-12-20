@@ -18,13 +18,15 @@ public class PointTests
     }
 
 
-    // [Fact]
-    // public void Elligator()
-    // {
-    //     var seed = new byte[64];
-    //     seed[0] = 2;
-    //     var p = Ristretto.Point.FromUniformBytes(seed);
-    // }
+    [Fact]
+    public void Elligator()
+    {
+        var seed = new byte[64];
+        seed[0] = 2;
+        var p = Ristretto.Point.FromUniformBytes(seed);
+
+        Assert.NotNull(p);
+    }
 
     // [Fact]
     // public void CompressDecompress()
