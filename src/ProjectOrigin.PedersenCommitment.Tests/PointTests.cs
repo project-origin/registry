@@ -1,5 +1,3 @@
-using System.Security.Cryptography;
-using System.Text;
 using ProjectOrigin.PedersenCommitment.Ristretto;
 
 namespace ProjectOrigin.PedersenCommitment.Tests;
