@@ -4,7 +4,7 @@ using System.Text;
 using ProjectOrigin.PedersenCommitment.Ristretto;
 
 namespace ProjectOrigin.PedersenCommitment;
-public sealed record Generator : IDisposable
+public sealed record Generator
 {
     private class Native
     {
@@ -21,7 +21,13 @@ public sealed record Generator : IDisposable
         internal static extern IntPtr Commit(IntPtr self, byte[] m, byte[] r);
 
         [DllImport("rust_ffi", EntryPoint = "pedersen_gens_free")]
-        internal static extern void Dispose(IntPtr self);
+        internal static extern void Free(IntPtr self);
+
+        [DllImport("rust_ffi", EntryPoint = "pedersen_gens_B")]
+        internal static extern IntPtr G(IntPtr self);
+
+        [DllImport("rust_ffi", EntryPoint = "pedersen_gens_B_blinding")]
+        internal static extern IntPtr H(IntPtr self);
     }
 
     public static Lazy<Generator> LazyGenerator = new Lazy<Generator>(() =>
@@ -51,12 +57,17 @@ public sealed record Generator : IDisposable
 
     ~Generator()
     {
-        Native.Dispose(_ptr);
+        Native.Free(_ptr);
     }
 
-    public void Dispose()
+    public Point G()
     {
-        Native.Dispose(_ptr);
+        return new Point(Native.G(this._ptr));
+    }
+
+    public Point H()
+    {
+        return new Point(Native.H(this._ptr));
     }
 
     public Point Commit(ulong m, ulong r)

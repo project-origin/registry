@@ -2,6 +2,8 @@ use bulletproofs::PedersenGens;
 use curve25519_dalek_ng::{ristretto::RistrettoPoint, scalar::Scalar};
 use std::slice;
 
+use crate::deref;
+
 #[no_mangle]
 pub extern "C" fn pedersen_gens_default() -> *mut PedersenGens {
     Box::into_raw(Box::default())
@@ -37,14 +39,24 @@ pub unsafe extern "C" fn pedersen_gens_commit_bytes(
 }
 
 #[no_mangle]
+pub extern "C" fn pedersen_gens_B(this: *const PedersenGens) -> *const RistrettoPoint {
+    let this = &deref!(this);
+    Box::into_raw(Box::new(this.B))
+}
+
+#[no_mangle]
+pub extern "C" fn pedersen_gens_B_blinding(this: *const PedersenGens) -> *const RistrettoPoint {
+    let this = &deref!(this);
+    Box::into_raw(Box::new(this.B_blinding))
+}
+
+#[no_mangle]
 pub unsafe extern "C" fn pedersen_gens_commit(
     this: *mut PedersenGens,
     value: *const Scalar,
     blinding: *const Scalar,
 ) -> *mut RistrettoPoint {
-    let this = &*this;
-    // TODO: Might need to clone as these values gets moved
-    // Probably fine since the Handle objects only exist in a short scope
+    let this = deref!(this);
     Box::into_raw(Box::new(this.commit(*value, *blinding)))
 }
 

@@ -5,8 +5,7 @@ namespace ProjectOrigin.PedersenCommitment.Ristretto;
 /**
  * @brief Scalar referencing a Rust object on the heap. Guaranteed to always be in the field.
  */
-public sealed class Scalar : IDisposable
-{
+public sealed class Scalar {
     private class Native
     {
         [DllImport("rust_ffi", EntryPoint = "scalar_new")]
@@ -14,6 +13,9 @@ public sealed class Scalar : IDisposable
 
         [DllImport("rust_ffi", EntryPoint = "scalar_random")]
         internal static extern IntPtr Random();
+
+        [DllImport("rust_ffi", EntryPoint = "scalar_spill_guts")]
+        internal static extern void SpillGuts(IntPtr self);
 
         [DllImport("rust_ffi", EntryPoint = "scalar_to_bytes")]
         internal static extern void ToBytes(IntPtr self, byte[] output);
@@ -31,7 +33,7 @@ public sealed class Scalar : IDisposable
         internal static extern IntPtr Negate(IntPtr self);
 
         [DllImport("rust_ffi", EntryPoint = "scalar_mul")]
-        internal static extern IntPtr Mul(IntPtr lhs, byte[] rhs);
+        internal static extern IntPtr Mul(IntPtr lhs, IntPtr rhs);
 
         [DllImport("rust_ffi", EntryPoint = "scalar_equals")]
         internal static extern bool Equals(IntPtr lhs, IntPtr rhs);
@@ -82,16 +84,16 @@ public sealed class Scalar : IDisposable
         return new Scalar(Native.HashFromBytes(bytes, bytes.Length));
     }
 
+    public void SpillGuts()
+    {
+        Native.SpillGuts(_ptr);
+    }
+
     public byte[] ToBytes()
     {
         var bytes = new byte[32];
         Native.ToBytes(_ptr, bytes);
         return bytes;
-    }
-
-    public void Dispose()
-    {
-        Native.Free(_ptr);
     }
 
     public static Scalar operator +(Scalar left, Scalar right)
@@ -109,6 +111,12 @@ public sealed class Scalar : IDisposable
     public static Scalar operator -(Scalar self)
     {
         var ptr = Native.Negate(self._ptr);
+        return new Scalar(ptr);
+    }
+
+    public static Scalar operator *(Scalar left, Scalar right)
+    {
+        var ptr = Native.Mul(left._ptr, right._ptr);
         return new Scalar(ptr);
     }
 
