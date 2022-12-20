@@ -47,7 +47,7 @@ This means that Merkle trees and their derivations has the utlity that they can 
 
 The registry will thus consist of two loosely coupled mechanisms, a conventional database and a trie for validation of the transacations on the database. A batch of transactions can thus be appended the trie - for the proof of concept trie will consist of 2^20 entries approximately a million entries, will be available per batch for a registry before it will be published. There could be a timer that closes the batch if the transaction volume makes finalization an issue, the trie size could also be a variable determined by the number of users on the registry. 
 
-After a batch is processed by the registry - be it by time or by reaching the limit of the tree storage space the hash of the root of the trie can then be published and used for validating subproofs. The end-user can hence lookup the root in a log, at a blockchain etc and validate their energy consumption using the trie root as input to a subproof validation mechanism.
+After a batch is processed by the registry - be it by time or by reaching the limit of the tree storage space the hash of the root of the trie can then be published and used for validating subproofs. The end-user can hence look up the root in a log, at a blockchain, etc. and validate their energy consumption using the trie root as input to a subproof validation mechanism.
 
 A proof has 3 ways of being validating using this structure:
 - Get(path, tree_id ) - the user provides, the path and recovers the root from the tree_id and has a subproof of inclusion in that specific trie, that is validated as true or false
