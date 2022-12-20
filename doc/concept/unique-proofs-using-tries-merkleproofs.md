@@ -17,7 +17,8 @@ In order to facilitate making claims of energy a digital asset with unique claim
 
 We have conducted research in tries / merkle tree structures in order to be able to locally batch a set of transactions involving issuance of production and consumption certificates and the subsequent claims on these certficates. 
 
-In order to facilitate loose coupling between the processes of validation each registry will have to process a trie per batch of transactions and publish them to prove that the underlying data has noot been changed. The trie has a root hash that will change by any change in the underlying dataset - not only is the trie a verification of the dataset, it can also contain subproofs that consumers can present validating their claims without disclosing information about the consumption, value, origin etc, but as a purely verifiable cryptographic proof to third-parties.
+To facilitate loose coupling between the processes of validation, each registry will have to process a trie per batch of transactions and then publish them, to prove that the underlying data has not been changed. 
+The trie has a root hash that will change by any change in the underlying dataset, and hence the trie is not only a verification of the dataset, it can also contain subproofs that consumers can present validating their claims without disclosing information about the consumption, value, origin etc, but as a purely verifiable cryptographic proof to third-parties.
 
 ## Context
 
