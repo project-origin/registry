@@ -22,5 +22,17 @@ jobs:
       - name: Build code
         run: make build
 
-      - name: Run tests
-        run: make test
+      - name: Run Electricity IntegrationTests
+        run: dotnet test src/ProjectOrigin.Electricity.IntegrationTests/
+
+      - name: Run Electricity tests
+        run: dotnet test src/ProjectOrigin.Electricity.Tests/
+
+      - name: Run PedersenCommitment tests
+        run: dotnet test src/ProjectOrigin.PedersenCommitment.Tests/
+
+      - name: Run StepProcessor tests
+        run: dotnet test src/ProjectOrigin.Register.StepProcessor.Tests/
+
+      - name: Run VerifiableEventStore tests
+        run: dotnet test src/ProjectOrigin.VerifiableEventStore.Tests/
