@@ -25,10 +25,10 @@ internal static class Extensions
     internal static extern void FreeBytes(RawVec raw);
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct RawVec
+    internal ref struct RawVec
     {
         internal nuint size;
         internal nuint cap;
-        internal IntPtr data;
+        internal IntPtr ptr;
     }
 }

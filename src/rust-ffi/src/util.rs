@@ -1,9 +1,9 @@
 #[repr(C)]
 #[derive(Debug)]
-pub struct RawVec<T> {
+pub struct RawVec {
     pub size: usize,
     pub cap: usize,
-    pub data: *mut T,
+    pub ptr: *mut u8,
 }
 
 #[macro_export]

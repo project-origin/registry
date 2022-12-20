@@ -1,25 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-      <RustRootDirectory>../rust-ffi/</RustRootDirectory>
+    <RustRootDirectory>../rust-ffi/</RustRootDirectory>
   </PropertyGroup>
 
-  <Target Name="CargoBuildDebug" BeforeTargets="PreBuildEvent"  Condition=" '$(Configuration)' == 'Debug' ">
-      <Exec Command="cargo build" WorkingDirectory="$(RustRootDirectory)"/>
-      <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
-          <Content
-              CopyToOutputDirectory="PreserveNewest"
-              Include="$(RustRootDirectory)/target/**/debug/*rust_ffi.*" />
-      </ItemGroup>
+  <Target Name="CargoBuildDebug" BeforeTargets="PreBuildEvent" Condition=" '$(Configuration)' == 'Debug' ">
+    <Exec Command="cargo build" WorkingDirectory="$(RustRootDirectory)"/>
+    <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <Content CopyToOutputDirectory="PreserveNewest" Include="$(RustRootDirectory)/target/**/debug/*rust_ffi.*" />
+    </ItemGroup>
   </Target>
 
   <Target Name="CargoBuildRelease" BeforeTargets="PreBuildEvent" Condition=" '$(Configuration)' == 'Release' ">
-      <Exec Command="cargo build --release" WorkingDirectory="$(RustRootDirectory)"/>
-      <ItemGroup Condition=" '$(Configuration)' == 'Release' ">
-          <Content
-              CopyToOutputDirectory="PreserveNewest"
-              Include="$(RustRootDirectory)/target/**/release/*rust_ffi.*" />
-      </ItemGroup>
+    <Exec Command="cargo build --release" WorkingDirectory="$(RustRootDirectory)"/>
+    <ItemGroup Condition=" '$(Configuration)' == 'Release' ">
+      <Content CopyToOutputDirectory="PreserveNewest" Include="$(RustRootDirectory)/target/**/release/*rust_ffi.*" />
+    </ItemGroup>
   </Target>
 
 </Project>
