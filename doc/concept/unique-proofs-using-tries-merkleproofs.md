@@ -13,7 +13,7 @@ Using a cryptographic method, however, we should be able to prove uniqueness of 
 
 ## Story
 
-In order to facilitate making claims of energy a digital asset with unique claims at scale we are faced with a set of challenges that must be addressed in order to achieve a production ready, scalable solution.
+In order to facilitate making claims of energy a digital asset with unique claims at scale, we are faced with a set of challenges that must be addressed in order to achieve a production-ready, scalable solution.
 
 We have conducted research in tries / merkle tree structures in order to be able to locally batch a set of transactions involving issuance of production and consumption certificates and the subsequent claims on these certficates. 
 
