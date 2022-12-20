@@ -140,9 +140,9 @@ pub extern "C" fn rangeproof_verify_multiple(
 pub unsafe extern "C" fn rangeproof_to_bytes(proof: *mut RangeProof) -> RawVec<u8> {
     let mut proof = (*proof).to_bytes();
     let raw = RawVec {
-        data: proof.as_mut_ptr(),
         size: proof.len(),
         cap: proof.capacity(),
+        data: proof.as_mut_ptr(),
     };
     std::mem::forget(proof);
     raw
