@@ -34,11 +34,11 @@ jobs:
       - name: Run VerifiableEventStore tests
         run: dotnet test src/ProjectOrigin.VerifiableEventStore.Tests/
 
-      - name: Run PedersenCommitment tests
-        run: dotnet test src/ProjectOrigin.PedersenCommitment.Tests/
-
       - name: Run StepProcessor tests
         run: dotnet test src/ProjectOrigin.Register.StepProcessor.Tests/
+
+      - name: Run PedersenCommitment tests
+        run: dotnet test src/ProjectOrigin.PedersenCommitment.Tests/
 
       - name: Run Electricity tests
         run: dotnet test src/ProjectOrigin.Electricity.Tests/
