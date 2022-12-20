@@ -37,7 +37,7 @@ graph LR
     A[fa:fa-file-code A production certificate ] -->|claim x Whrs| C(Go shopping)
     B[fa:fa-file-code B consumption certificate] --> C[Registry Processes transaction]
     C -->|update local| D[fa:fa-database Database]
-    C -->|add subproof to | E[fa:fa-sitemap Merkle tree ]
+    C -->|add data to | E[fa:fa-sitemap Merkle tree ]
 ```
 
 ## Solutions
