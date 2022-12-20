@@ -50,7 +50,7 @@ The registry will thus consist of two loosely coupled mechanisms, a conventional
 After a batch is processed by the registry - be it by time or by reaching the limit of the tree storage space the hash of the root of the trie can then be published and used for validating subproofs. The end-user can hence look up the root in a log, at a blockchain, etc. and validate their energy consumption using the trie root as input to a subproof validation mechanism.
 
 A proof has 3 ways of being validating using this structure:
-- Get(path, tree_id ) - the user provides, the path and recovers the root from the tree_id and has a subproof of inclusion in that specific trie, that is validated as true or false
+- Get(path, tree_id ) - the user provides the path and recovers the root from the tree_id and has a subproof of inclusion in that specific trie, that is validated as true or false
 - Merkleproof([1,2,...20]) - A Registry [serverside] function that returns the merkleproof to the user that can verify themselves that the hashes on the path is included in the root.
 - Verify(merkleproof, path) - a client function [clientside] recursive function that locally can compute and verify the soundness of the proof using the merkleproof from the registry by looping through the path and validating the subproof or by looping through all hashes and producing the root hash that can be validated against the published trie-root.
 ## Resulting Context
