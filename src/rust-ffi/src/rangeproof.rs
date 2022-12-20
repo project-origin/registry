@@ -144,7 +144,7 @@ pub unsafe extern "C" fn rangeproof_to_bytes(proof: *mut RangeProof) -> RawVec<u
         cap: proof.capacity(),
         data: proof.as_mut_ptr(),
     };
-    std::mem::forget(proof);
+    //std::mem::forget(proof);
     raw
 }
 
