@@ -22,7 +22,7 @@ internal static class Extensions
     internal static extern void FillBytes(RawVec raw, byte[] dst);
 
     [DllImport("rust_ffi", EntryPoint = "free_vec")]
-    internal static extern void FreeVec(IntPtr ptr, nuint size, nuint cap);
+    internal static extern void FreeVec(RawVec raw);
 
     [StructLayout(LayoutKind.Sequential)]
     internal struct RawVec
