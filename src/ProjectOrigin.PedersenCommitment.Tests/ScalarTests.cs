@@ -5,7 +5,6 @@ namespace ProjectOrigin.PedersenCommitment.Tests;
 
 public class ScalarTest
 {
-
     [Fact]
     public void HashFromBytes()
     {

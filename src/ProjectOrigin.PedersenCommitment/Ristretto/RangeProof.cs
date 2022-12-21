@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+
 namespace ProjectOrigin.PedersenCommitment.Ristretto;
 
 public record RangeProof
@@ -59,7 +60,7 @@ public record RangeProof
                 label.Length
                 );
 
-        var bytes = new byte[32];
+        var bytes = new byte[CompressedPoint.ByteSize];
         CompressedPoint.ToBytes(tuple.CompressedPoint, bytes);
         return (new RangeProof(tuple.Proof), new CompressedPoint(bytes));
     }

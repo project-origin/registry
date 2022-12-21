@@ -57,13 +57,16 @@ public sealed class Point
 
     public static Point FromUniformBytes(byte[] bytes)
     {
-        // TODO: Ensure length of bytes is appropriate
+        if (bytes.Length != 64)
+        {
+            throw new ArgumentException("Byte array must be 64 byte long");
+        }
         return new Point(Native.FromUniformBytes(bytes));
     }
 
     public CompressedPoint Compress()
     {
-        var bytes = new byte[32]; // allocate bytes
+        var bytes = new byte[CompressedPoint.ByteSize]; // allocate bytes
         Native.Compress(_ptr, bytes);
         return new CompressedPoint(bytes);
     }
@@ -79,7 +82,6 @@ public sealed class Point
         var ptr = Native.Sub(left._ptr, right._ptr);
         return new Point(ptr);
     }
-
 
     public static Point operator -(Point self)
     {
@@ -143,17 +145,18 @@ public sealed class Point
 public readonly struct CompressedPoint
 {
 
+    public const int ByteSize = 32;
+
     internal readonly byte[] _bytes;
 
     public CompressedPoint(byte[] bytes)
     {
-        if (bytes.Length != 32)
+        if (bytes.Length != ByteSize)
         {
             throw new ArgumentException("Byte array must be 32 long");
         }
         _bytes = bytes;
     }
-
 
     [DllImport("rust_ffi", EntryPoint = "compressed_ristretto_from_bytes")]
     internal static extern IntPtr FromBytes(byte[] bytes);
@@ -176,8 +179,5 @@ public readonly struct CompressedPoint
         return _bytes.SequenceEqual(other._bytes);
     }
 
-
-
     public override int GetHashCode() => base.GetHashCode();
-
 }

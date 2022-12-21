@@ -10,6 +10,24 @@ public class PointTests
         var seed = new byte[64];
         seed[0] = 2;
         var p = Ristretto.Point.FromUniformBytes(seed);
+
+        Assert.NotNull(p);
+    }
+
+    [Fact]
+    public void CreateUsingGenrator()
+    {
+        var pc_gens = Generator.Default;
+        var blinding = Scalar.Random();
+
+        var point = pc_gens.Commit(12, blinding);
+        Assert.NotNull(point);
+
+        var compressed = point.Compress();
+        Assert.NotNull(compressed);
+
+        var decompressed = compressed.Decompress();
+        Assert.Equal(point, decompressed);
     }
 
     [Fact]

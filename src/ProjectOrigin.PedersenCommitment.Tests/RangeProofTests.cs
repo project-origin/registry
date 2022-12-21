@@ -20,5 +20,7 @@ public class RangeProofTests
         var new_proof = RangeProof.FromBytes(bytes);
         res = new_proof.VerifySingle(bp_gens, pc_gens, commit, 32, label);
         Assert.True(res);
+
+        Assert.NotNull(pc_gens);
     }
 }
