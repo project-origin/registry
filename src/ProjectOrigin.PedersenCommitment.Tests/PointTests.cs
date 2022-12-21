@@ -24,7 +24,6 @@ public class PointTests
         Assert.NotNull(point);
 
         var compressed = point.Compress();
-        Assert.NotNull(compressed);
 
         var decompressed = compressed.Decompress();
         Assert.Equal(point, decompressed);
