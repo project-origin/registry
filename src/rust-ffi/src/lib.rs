@@ -19,9 +19,7 @@ pub unsafe extern "C" fn fill_bytes(raw: *const RawVec<u8>, dst: *mut u8) {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn free_vec(raw: *const RawVec<u8>) {
-    let raw = deref!(raw);
-    // dbg!(&raw);
-    let vec = Vec::from_raw_parts(raw.data, raw.size, raw.cap);
+pub unsafe extern "C" fn free_vec(ptr: *mut u8, size: usize, cap: usize) {
+    let vec = Vec::from_raw_parts(ptr, size, cap);
     drop(vec);
 }

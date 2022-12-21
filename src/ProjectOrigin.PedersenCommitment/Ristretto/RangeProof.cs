@@ -90,8 +90,8 @@ public record RangeProof
     {
         var raw = Native.ToBytes(_ptr);
         var bytes = new byte[raw.size];
-        Marshal.Copy(raw.data, bytes, 0, (int)raw.size);
-        Extensions.FreeBytes(raw);
+        Marshal.Copy(raw.data, bytes, 0, (int) raw.size);
+        Extensions.FreeVec(raw.data, raw.size, raw.cap);
         return bytes;
     }
 

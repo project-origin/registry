@@ -10,7 +10,7 @@ internal static class Extensions
 
         if (arrayLength < length)
         {
-            throw new ArgumentException("WantedLength is smaller that source.");
+            throw new ArgumentException("Wanted Length is smaller that source.");
         }
 
         var outputArray = new byte[arrayLength];
@@ -22,7 +22,7 @@ internal static class Extensions
     internal static extern void FillBytes(RawVec raw, byte[] dst);
 
     [DllImport("rust_ffi", EntryPoint = "free_vec")]
-    internal static extern void FreeBytes(RawVec raw);
+    internal static extern void FreeVec(IntPtr ptr, nuint size, nuint cap);
 
     [StructLayout(LayoutKind.Sequential)]
     internal struct RawVec

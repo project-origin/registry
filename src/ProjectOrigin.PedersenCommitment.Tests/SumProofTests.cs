@@ -13,8 +13,6 @@ public class SumProofTests
         var r = Scalar.Random();
         var c0 = pc_gens.Commit(0, r);
         var c1 = pc_gens.H() * r;
-        c0.GutSpill();
-        c1.GutSpill();
         Assert.Equal(c0, c1);
     }
 
