@@ -5,7 +5,8 @@ namespace ProjectOrigin.PedersenCommitment.Ristretto;
 /**
  * @brief Scalar referencing a Rust object on the heap. Guaranteed to always be in the field.
  */
-public sealed class Scalar {
+public sealed class Scalar
+{
     private class Native
     {
         [DllImport("rust_ffi", EntryPoint = "scalar_new")]
