@@ -1,14 +1,15 @@
 using ProjectOrigin.PedersenCommitment.Ristretto;
+using System.Text;
 
 namespace ProjectOrigin.PedersenCommitment.Tests;
 
 public class SumProofTests
 {
 
-
     [Fact]
     public void SanityCheck()
     {
+        // check that a zero commit is the same as doing it manually
         var pc_gens = Generator.Default;
         var r = Scalar.Random();
         var c0 = pc_gens.Commit(0, r);
@@ -20,18 +21,22 @@ public class SumProofTests
     public void Zero()
     {
         var pc_gens = Generator.Default;
+        var label = Encoding.UTF8.GetBytes("test");
         var r = Scalar.Random();
         var c = pc_gens.Commit(0, r);
 
-        var proof = ZeroProof.Prove(pc_gens, r);
 
-        Assert.True(proof.Verify(pc_gens, c));
+
+        var proof = ZeroProof.Prove(pc_gens, r, label);
+
+        Assert.True(proof.Verify(pc_gens, c, label));
     }
 
     [Fact]
     public void Equal()
     {
         var pc_gens = Generator.Default;
+        var label = Encoding.UTF8.GetBytes("test");
         var r0 = Scalar.Random();
         var r1 = Scalar.Random();
         var c0 = pc_gens.Commit(42, r0);
@@ -40,14 +45,15 @@ public class SumProofTests
         var c = c0 - c1;
         var r = r0 - r1;
 
-        var proof = ZeroProof.Prove(pc_gens, r);
-        Assert.True(proof.Verify(pc_gens, c));
+        var proof = ZeroProof.Prove(pc_gens, r, label);
+        Assert.True(proof.Verify(pc_gens, c, label));
     }
 
     [Fact]
     public void Sum()
     {
         var pc_gens = Generator.Default;
+        var label = Encoding.UTF8.GetBytes("test");
         var r0 = Scalar.Random();
         var r1 = Scalar.Random();
         var r2 = Scalar.Random();
@@ -60,19 +66,46 @@ public class SumProofTests
         var c = c0 - (c1 + c2 + c3);
         var r = r0 - (r1 + r2 + r3);
 
-        var proof = ZeroProof.Prove(pc_gens, r);
-        Assert.True(proof.Verify(pc_gens, c));
+        var proof = ZeroProof.Prove(pc_gens, r, label);
+        Assert.True(proof.Verify(pc_gens, c, label));
     }
 
 
     [Fact]
-    public void Wrong()
+    public void NonZeroFails()
     {
+        var label = Encoding.UTF8.GetBytes("test");
         var pc_gens = Generator.Default;
         var r = Scalar.Random();
-        var c = pc_gens.Commit(42, r); // None Zero
-        var proof = ZeroProof.Prove(pc_gens, r);
-        Assert.False(proof.Verify(pc_gens, c));
+        var c = pc_gens.Commit(42, r); // None Zero, since everything else should fail
+        var proof = ZeroProof.Prove(pc_gens, r, label);
+        Assert.False(proof.Verify(pc_gens, c, label));
+    }
+
+    [Fact]
+    public void WrongLabelFails()
+    {
+        var label0 = Encoding.UTF8.GetBytes("proof");
+        var label1 = Encoding.UTF8.GetBytes("verify");
+        var pc_gens = Generator.Default;
+        var r = Scalar.Random();
+        var c = pc_gens.Commit(0, r);
+        var proof = ZeroProof.Prove(pc_gens, r, label0);
+        Assert.False(proof.Verify(pc_gens, c, label1));
+    }
+
+    [Fact]
+    public void Serde()
+    {
+        var label = Encoding.UTF8.GetBytes("test");
+        var pc_gens = Generator.Default;
+        var r = Scalar.Random();
+        var c = pc_gens.Commit(0, r);
+        var proof = ZeroProof.Prove(pc_gens, r, label);
+
+        var bytes = proof.Serialize();
+        var new_proof = ZeroProof.Deserialize(bytes);
+        Assert.True(new_proof.Verify(pc_gens, c, label));
     }
 
 }
