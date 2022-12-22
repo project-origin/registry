@@ -33,7 +33,7 @@ public class ZeroProof
         var n = compressed._bytes.Length;
         var m = label.Length;
 
-        var digest = new byte[n+m];
+        var digest = new byte[n + m];
         System.Array.Copy(compressed._bytes, 0, digest, 0, n);
         System.Array.Copy(label, 0, digest, n, m);
         return Scalar.HashFromBytes(digest);
