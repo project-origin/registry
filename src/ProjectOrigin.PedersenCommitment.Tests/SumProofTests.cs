@@ -49,6 +49,22 @@ public class SumProofTests
         Assert.True(proof.Verify(pc_gens, c, label));
     }
 
+    // Test the derivative proofs
+    [Fact]
+    public void Equal2()
+    {
+        var pc_gens = Generator.Default;
+        var label = Encoding.UTF8.GetBytes("test");
+        var r0 = Scalar.Random();
+        var r1 = Scalar.Random();
+        var c0 = pc_gens.Commit(42, r0);
+        var c1 = pc_gens.Commit(42, r1);
+
+        var proof = EqualProof.Prove(pc_gens, r0, r1, label);
+
+        Assert.True(proof.Verify(pc_gens, c0, c1, label));
+    }
+
     [Fact]
     public void Sum()
     {
@@ -68,6 +84,25 @@ public class SumProofTests
 
         var proof = ZeroProof.Prove(pc_gens, r, label);
         Assert.True(proof.Verify(pc_gens, c, label));
+    }
+
+    // Test the derivative proofs
+    [Fact]
+    public void Sum2()
+    {
+        var pc_gens = Generator.Default;
+        var label = Encoding.UTF8.GetBytes("test");
+        var r0 = Scalar.Random();
+        var r1 = Scalar.Random();
+        var r2 = Scalar.Random();
+        var r3 = Scalar.Random();
+        var c0 = pc_gens.Commit(10, r0);
+        var c1 = pc_gens.Commit(3, r1);
+        var c2 = pc_gens.Commit(5, r2);
+        var c3 = pc_gens.Commit(2, r3);
+
+        var proof = SumProof.Prove(pc_gens, label, r0, r1, r2, r3);
+        Assert.True(proof.Verify(pc_gens, label, c0, c1, c2, c3));
     }
 
 

@@ -89,3 +89,43 @@ public class EqualProof
         return new EqualProof(ZeroProof.Deserialize(bytes));
     }
 }
+
+public class SumProof
+{
+    private EqualProof proof;
+
+    private SumProof(EqualProof proof)
+    {
+        this.proof = proof;
+    }
+
+    public static SumProof Prove(Generator gen, byte[] label, Scalar rsum, params Scalar[] rs)
+    {
+        var rsum2 = rs[0];
+        foreach (Scalar r in rs[1..])
+        { // TODO: Probably use a Native function for speedup
+            rsum2 += r;
+        }
+        return new SumProof(EqualProof.Prove(gen, rsum, rsum2, label));
+    }
+
+    public bool Verify(Generator gen, byte[] label, Point csum, params Point[] cs)
+    {
+        var csum2 = cs[0];
+        foreach (Point r in cs[1..])
+        { // TODO: Probably use a Native function for speedup
+            csum2 += r;
+        }
+        return proof.Verify(gen, csum, csum2, label);
+    }
+
+    public byte[] Serialize()
+    {
+        return proof.Serialize();
+    }
+
+    public static SumProof Deserialize(byte[] bytes)
+    {
+        return new SumProof(EqualProof.Deserialize(bytes));
+    }
+}
