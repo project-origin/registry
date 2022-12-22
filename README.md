@@ -24,3 +24,4 @@ Below is a [system context diagram](https://c4model.com/#SystemContextDiagram) s
 More in depth information can be found in the [architecture description](doc/architecture.md).
 
 There is also more [conceptual, API and architecture documentation rendered as website](https://project-origin.github.io/registry/index.html).
+To learn more [go to the complete documention.](https://project-origin.github.io/registry/)
