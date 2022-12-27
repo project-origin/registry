@@ -1,6 +1,6 @@
 # Example flow
 
-Below is an example wher two GCs are issued
+Below is an example where two GCs are issued
 
 - Consumption of 150Wh
 - Production of 250Wh
