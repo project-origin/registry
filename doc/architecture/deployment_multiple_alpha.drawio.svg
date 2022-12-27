@@ -71,7 +71,7 @@
                                 <br/>
                                 <div>
                                     <font style="font-size: 11px">
-                                        Stores events as public data, and arranges them in a series of merkel trees, each root publishes to the blockchain after a set time or number of events.
+                                        Stores events as public data, and arranges them in a series of merkle trees. Each root publishes to the blockchain after a set time or number of events.
                                     </font>
                                 </div>
                             </div>
@@ -101,7 +101,7 @@
                                 <br/>
                                 <div>
                                     <font style="font-size: 11px">
-                                        Verifies an event in a command step is valid before it is written to the verifiable eventstore.
+                                        Verifies that an event in a command step is valid before it is written to the verifiable event store.
                                     </font>
                                 </div>
                             </div>
@@ -131,7 +131,7 @@
                                 <br/>
                                 <div>
                                     <font style="font-size: 11px">
-                                        Processes a command, and executes lines sequencially on multiple registries.
+                                        Processes a command, and executes lines sequentially on multiple registries.
                                     </font>
                                 </div>
                             </div>
@@ -332,7 +332,7 @@
                                     This diagram shows how we plan to test using two registries running in one container, by running two line processors with two in-memory verifiable event-stores.
                                     <br/>
                                     <br/>
-                                    This is to test the orchistrator pattern, and will be split into multiple containers.
+                                    This is to test the orchestrator pattern, and will be split into multiple containers.
                                 </div>
                             </div>
                         </div>
@@ -361,7 +361,7 @@
                                 <br/>
                                 <div>
                                     <font style="font-size: 11px">
-                                        Stores events as public data, and arranges them in a series of merkel trees, each root publishes to the blockchain after a set time or number of events.
+                                        Stores events as public data, and arranges them in a series of merkle trees, each root publishes to the blockchain after a set time or number of events.
                                     </font>
                                 </div>
                             </div>
@@ -391,7 +391,7 @@
                                 <br/>
                                 <div>
                                     <font style="font-size: 11px">
-                                        Verifies an event in a command step is valid before it is written to the verifiable eventstore.
+                                        Verifies that an event in a command step is valid before it is written to the verifiable event store.
                                     </font>
                                 </div>
                             </div>
