@@ -80,7 +80,7 @@
                                 <div>
                                     <font style="font-size: 11px">
                                         <font color="#E6E6E6">
-                                            Validates events that they are valid Ensures that events are valid and allowed based on the logic and rules.
+                                            Validates events. Ensures that events are valid and allowed based on the logic and rules.
                                         </font>
                                     </font>
                                 </div>
@@ -147,7 +147,7 @@
                                 <br/>
                                 <div>
                                     <font style="font-size: 11px">
-                                        Holds events until batch is publishes, defines order of events, and creates merkle-root.
+                                        Holds events until batch is published, defines order of events and creates merkle-root.
                                     </font>
                                 </div>
                             </div>
@@ -230,7 +230,7 @@
                                 <div style="text-align: left ; font-size: 11px">
                                     <div style="text-align: center ; font-size: 11px">
                                         <b style="font-size: 11px">
-                                            Publish merkle Root returns
+                                            Publish merkle-tree root. Returns
                                             <br/>
                                             blockchain-transaction-ref
                                         </b>
