@@ -43,7 +43,7 @@ body:
     attributes:
       label: "Related Material"
       description: Provide links to any related documents or resources, such as RFCs, discussions or code.
-       placeholder: "Add any related links here"
+      placeholder: "Add any related links here"
     validations:
       required: false
   - type: dropdown
