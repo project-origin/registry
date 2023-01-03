@@ -2,9 +2,9 @@ using System.Runtime.InteropServices;
 
 namespace ProjectOrigin.PedersenCommitment.Ristretto;
 
-/**
- * @brief Scalar referencing a Rust object on the heap. Guaranteed to always be in the field.
- */
+/// <summary>
+/// Scalar referencing a Rust object, guaranteed to always be in the field.
+/// </summary>
 public sealed class Scalar
 {
     private class Native
@@ -55,17 +55,35 @@ public sealed class Scalar
         Native.Free(_ptr);
     }
 
+    /// <summary>
+    /// Construct a new Scalar from a unsigned long
+    /// </summary>
+    /// <param name="value">value to map into the field</param>
+    /// <returns>Scalar representing the value</returns>
     public Scalar(ulong value)
     {
         var bytes = value.ToByteArray(32);
         _ptr = Native.New(bytes);
     }
 
+    /// <summary>
+    /// Construct a new Scalar from a byte span of size 32
+    /// </summary>
+    /// <param name="bytes">value to map into the field</param>
+    /// <returns>Scalar representing the value</returns>
     public Scalar(ReadOnlySpan<byte> bytes)
     {
+        if (bytes.Length != 32) {
+            throw new ArgumentException("Length has to be 32");
+        }
         _ptr = Native.New(bytes.ToArray());
     }
 
+    /// <summary>
+    /// Construct a new Scalar from a byte array of size 32
+    /// </summary>
+    /// <param name="bytes">value to map into the field</param>
+    /// <returns>Scalar representing the value</returns>
     public Scalar(byte[] bytes)
     {
         if (bytes.Length != 32)

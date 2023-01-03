@@ -55,6 +55,11 @@ public sealed class Point
         Native.Free(_ptr);
     }
 
+    /// <summary>
+    /// Map a point securely from 64 uniformly random bytes to the curve, using elligator 2.
+    /// </summary>
+    /// <param name="bytes">uniformly random byte array of size 64</param>
+    /// <returns>a 'random' point corresponding to the array</returns>
     public static Point FromUniformBytes(byte[] bytes)
     {
         if (bytes.Length != 64)
@@ -64,6 +69,10 @@ public sealed class Point
         return new Point(Native.FromUniformBytes(bytes));
     }
 
+    /// <summary>
+    /// Compress a point to a size 32 byte array
+    /// </summary>
+    /// <returns>A compressed point consisting of 32 bytes</returns>
     public CompressedPoint Compress()
     {
         var bytes = new byte[CompressedPoint.ByteSize]; // allocate bytes
@@ -131,6 +140,7 @@ public sealed class Point
     }
 
     public override int GetHashCode() => base.GetHashCode();
+
     internal static Point Decompress(byte[] bytes)
     {
         var ptr = Native.Decompress(bytes);
@@ -164,6 +174,11 @@ public readonly struct CompressedPoint
     [DllImport("rust_ffi", EntryPoint = "compressed_ristretto_to_bytes")]
     internal static extern void ToBytes(IntPtr self, byte[] bytes);
 
+    /// <summary>
+    /// Decompress a point enabling arithmetic
+    /// </summary>
+    /// <exception cref="ArgumentException">If the decompression failed</exception>
+    /// <returns>A Ristretto Point</returns>
     public Point Decompress()
     {
         return Point.Decompress(_bytes);

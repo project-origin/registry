@@ -4,6 +4,7 @@ using System.Text;
 using ProjectOrigin.PedersenCommitment.Ristretto;
 
 namespace ProjectOrigin.PedersenCommitment;
+
 public sealed record Generator
 {
     private class Native
@@ -50,6 +51,12 @@ public sealed record Generator
 
     internal IntPtr _ptr;
 
+    /// <summary>
+    /// Construct a new generator
+    /// </summary>
+    /// <param name="g">Generator for mapping the messages to the curve</param>
+    /// <param name="h">Generator for mapping the blinding to the curve</param>
+    /// <returns>A new generator from the points</returns>
     public Generator(Point g, Point h)
     {
         _ptr = Native.New(g._ptr, h._ptr);
@@ -60,22 +67,42 @@ public sealed record Generator
         Native.Free(_ptr);
     }
 
+    /// <summary>
+    /// The 'G' generator of the group mapping the messages
+    /// </summary>
+    /// <returns>The 'G' generator as a Ristretto Point</returns>
     public Point G()
     {
         return new Point(Native.G(this._ptr));
     }
 
+    /// <summary>
+    /// The 'H' generator of the group mapping the messages
+    /// </summary>
+    /// <returns>The 'H' generator as a Ristretto Point</returns>
     public Point H()
     {
         return new Point(Native.H(this._ptr));
     }
 
+    /// <summary>
+    /// Constructs a new Pedersen Commitment
+    /// </summary>
+    /// <param name="m">The message</param>
+    /// <param name="r">The blinding/randomness</param>
+    /// <returns>A new Ristretto Point representing the commitment</returns>
     public Point Commit(ulong m, ulong r)
     {
         var ptr = Native.Commit(_ptr, new Scalar(m)._ptr, new Scalar(r)._ptr);
         return new Point(ptr);
     }
 
+    /// <summary>
+    /// Constructs a new Pedersen Commitment
+    /// </summary>
+    /// <param name="m">The message</param>
+    /// <param name="r">The blinding/randomness</param>
+    /// <returns>A new Ristretto Point representing the commitment</returns>
     public Point Commit(ulong m, Scalar r)
     {
         var ptr = Native.Commit(_ptr, new Scalar(m)._ptr, r._ptr);
