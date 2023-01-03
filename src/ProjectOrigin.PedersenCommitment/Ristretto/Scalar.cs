@@ -73,7 +73,8 @@ public sealed class Scalar
     /// <returns>Scalar representing the value</returns>
     public Scalar(ReadOnlySpan<byte> bytes)
     {
-        if (bytes.Length != 32) {
+        if (bytes.Length != 32)
+        {
             throw new ArgumentException("Length has to be 32");
         }
         _ptr = Native.New(bytes.ToArray());
