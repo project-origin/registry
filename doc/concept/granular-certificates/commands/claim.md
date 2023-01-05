@@ -68,13 +68,13 @@ sequenceDiagram
     deactivate prod
 
     activate cons
-    cons --) prod: Verify allocationt exists
+    cons --) prod: Verify allocation exists
     cons ->> cons: Create AllocatedEvent
     cons ->> prod: #
     deactivate cons
 
     activate prod
-    prod --) cons: Verify allocationt exists
+    prod --) cons: Verify allocation exists
     prod ->> prod: Create ClaimedEvent
     prod ->> cons: #
     deactivate prod
