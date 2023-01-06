@@ -1,8 +1,8 @@
 # Claim command
 
-The claim command is where production and consumption certificates "cancel" each other out.
+The claim command is where a production and consumption certificate "cancel" each other out.
 
-To use the claim command one has to specify two slices, **one production** and **one consumption**, and they have to be of qual quantity [because of proofs](#privacy-and-zero-knowledge-proofs).
+To use the claim command one has to specify two slices, **one production** and **one consumption**, and they have to be of equal quantity [because of proofs](#privacy-and-zero-knowledge-proofs).
 
 This might require one to perform some slice commands to make them fit together.
 
@@ -39,17 +39,17 @@ ConSlice-B [200] Consumption
 
 ## Privacy and Zero Knowledge proofs
 
-As in the [slice command](slice.md#privacy-and-mathematics), all the quantities are hidden with the help of [Pedersen Commitments](../../pedersen-commitments.md) and Zero Knowledge proofs.
+As in the [slice command](slice.md#privacy-and-mathematics), all quantities are hidden using [Pedersen Commitments](../../pedersen-commitments.md) and Zero Knowledge proofs.
 
-The Zero Knowledge proof can prove the two pedersen-commitments in each slice are equal without revealing the actually numbers.
+The Zero Knowledge proof can prove that the two pedersen-commitments in each slice are equal without revealing the actual numbers.
 
 ## Multiple state changes on slices
 
 Because of the nature of the ClaimCommand involving multiple GCs that can exists on any registry,
 the ClaimCommand happens in multiple steps involving first creating AllocatedEvents for the slices,
 before "committing" the ClaimedEvents to the slices.
-When they ClaimedEvent are persistet, the claim has completed.
-A "roolback" of AllocatedEvents are still in the drawing board.
+When the ClaimedEvent is persisted, the claim has completed.
+A "rollback" of AllocatedEvents are still on the drawing board.
 
 
 ```mermaid
@@ -68,13 +68,13 @@ sequenceDiagram
     deactivate prod
 
     activate cons
-    cons --) prod: Verify allocationt exists
+    cons --) prod: Verify allocation exists
     cons ->> cons: Create AllocatedEvent
     cons ->> prod: #
     deactivate cons
 
     activate prod
-    prod --) cons: Verify allocationt exists
+    prod --) cons: Verify allocation exists
     prod ->> prod: Create ClaimedEvent
     prod ->> cons: #
     deactivate prod

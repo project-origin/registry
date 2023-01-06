@@ -6,7 +6,7 @@ Below is the current roadmap for the project.
 
 The alpha version will enable the first running Alpha registry.
 It will be all in one container,
-proving the federated priciple with in process calls.
+proving the federated principle with in process calls.
 
 Progress can be tracked [on GitHub](https://github.com/project-origin/registry/milestone/1)
 
@@ -19,7 +19,7 @@ Progress can be tracked [on GitHub](https://github.com/project-origin/registry/m
 
 ## Beta
 
-A continuation of the requirements from the Alpha release.
+The beta version will contain a continuation of the requirements from the Alpha release.
 
 Progress can be tracked [on GitHub](https://github.com/project-origin/registry/milestone/2)
 

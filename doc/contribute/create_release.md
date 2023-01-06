@@ -17,4 +17,4 @@ git push --tags
 
 ## Beware
 
-Once pushed the workflow will automatically trigger, and nuget packages cannot be deleted was released.
+Once pushed the workflow will automatically trigger, and nuget packages cannot be deleted when released.

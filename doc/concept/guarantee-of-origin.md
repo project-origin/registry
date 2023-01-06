@@ -9,8 +9,8 @@ guaranteed to be produced in a specific manner.
 
 A GO has a fixed size of **1 MWh** of electricity and are usually issued on a monthly basis.
 
-The GO are valid for **cancelation** for a **year** after they have been issued.
+The GOs are valid for **cancellation** for a **year** after they have been issued.
 
 The GOs are defined in article 15 of the European Directive 2009/28/EC.
 
-More info can be read on [Wikipedia](https://en.wikipedia.org/wiki/Guarantee_of_origin) or elseware on the internet.
+More info can be read at, e.g., [Wikipedia](https://en.wikipedia.org/wiki/Guarantee_of_origin).

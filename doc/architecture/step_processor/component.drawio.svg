@@ -46,7 +46,7 @@
                                 <div>
                                     <font style="font-size: 11px">
                                         <font color="#E6E6E6">
-                                            Stores events as public data, and arranges them in a series of merkel trees, each root publishes to the blockchain after a set time or number of events.
+                                            Stores events as public data, and arranges them in a series of merkle trees, each root publishes to the blockchain after a set time or number of events.
                                         </font>
                                     </font>
                                 </div>
@@ -77,7 +77,7 @@
                                 <br/>
                                 <div>
                                     <font style="font-size: 11px">
-                                        Take a CommandStep, verifies it, and publishes the event to the EventStream.
+                                        Takes a CommandStep, verifies it, and publishes the event to the EventStream.
                                     </font>
                                 </div>
                             </div>
@@ -165,7 +165,7 @@
                                 <div>
                                     <font style="font-size: 11px">
                                         <font color="#E6E6E6">
-                                            Takes commands, and ensures steps are executed sequencially and on the target registry.
+                                            Takes commands, and ensures that steps are executed sequentially and on the target registry.
                                         </font>
                                     </font>
                                 </div>
@@ -328,7 +328,7 @@
                                 <div style="text-align: left">
                                     <div style="text-align: center">
                                         <b>
-                                            Publishes to, and read events from
+                                            Publishes to, and reads events from
                                         </b>
                                     </div>
                                     <div style="text-align: center">

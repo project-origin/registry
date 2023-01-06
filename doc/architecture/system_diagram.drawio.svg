@@ -93,7 +93,7 @@
                                 <div>
                                     <font style="font-size: 11px">
                                         <font color="#cccccc">
-                                            Conventional blockchain that will store a series of hashes for each merkel tree, ensuring that data within the tree cannot be changed without it being visible.
+                                            Conventional blockchain that will store a series of hashes for each merkle tree, ensuring that data within the tree cannot be changed without it being visible.
                                         </font>
                                     </font>
                                 </div>
@@ -125,7 +125,7 @@
                                 <div>
                                     <font style="font-size: 11px">
                                         <font color="#cccccc">
-                                            Other registries that supports the same protocol, enabled cross registry claims.
+                                            Other registries that support the same protocol, enables cross registry claims.
                                         </font>
                                     </font>
                                 </div>

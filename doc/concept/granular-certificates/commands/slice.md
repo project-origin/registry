@@ -5,17 +5,17 @@ The slice command enables the current owner to create new slices from an existin
 
 The new slices may[^may] be assigned to a new owner as part of the slice command.
 
-[^may]: It is the current owners chose if they want to transfer it within the command or not.
+[^may]: It is the current owner's choice if they want to transfer it within the command or not.
 
-The **sum** of the new slices are **always equal** to quantity of the old slice.
-When the new slices are created, they become active, and the old slice is removed.
+The **sum** of the new slices are **always equal** to the quantity of the old slice.
+When the new slices are created, they become active, and the old slice becomes inactive and is removed.
 
-*NOTE: how the **total** of the new slices are always the same as the source, so the total of non-removed slices on a certificate always stays the same.*
+*NOTE: how the **total** of the new slices are always the same as the source slice. Hence, the total quantity of the non-removed slices on a certificate always stays the same.*
 
 ## Example
 
 Below is a Sankey representation of slice that is sliced multiple times:
-1. It is initially issued with a single slice (0), which a quantity of 1700Wh
+1. Initially, a single slice (0) is issued with a quantity of 1700Wh.
 2. Slice-0 is sliced into 4 slices:
    - Slice-A 1200Wh
    - Slice-B 250Wh
@@ -45,24 +45,25 @@ Slice-0 [100] Slice-D
 
 ## Privacy and mathematics
 
-The examples above is a simplification.
+The example above is a simplification.
 
-The quantity on each slice is encrypted with the help of a [Pedersen commitments](../../pedersen-commitments.md).
-This enables one to prove the amounts stored without any changes of the data leaking.
+The quantity of each slice is encrypted using [Pedersen commitments](../../pedersen-commitments.md).
+The Pedersen commitment enables one to prove the quantity stored without causing any changes to the data, and with no data leaking.
 
-A Pedersen commitment is also homomorphic, in that we can do operations on the "encrypted data",
-this enables one to mathematically prove the total of the new slices are equal to the old slice,
-with the help of a Zero-knowledge equality proof, without publically revealing the quantities.
+A Pedersen commitment is also homomorphic, meaning that one can do operations on the "encrypted data", 
+e.g., mathematically prove that the total of the new slices are equal to the old slice (using a Zero-knowledge equality proof), 
+without publically revealing the quantities.
 
-The owner of a slice only knowns the quantity of their own slice.
+The owner of a slice only knows the quantity of their own slice.
 
-> In the example above if I got Slice-A transferred into my account,
-> I know I have 1200wh within the GC, but I do not know the total of the GC, only that I have a proveable part of the GC which no-other can claim the ownership of.
+> In the example above:
+> If I got Slice-A transferred into my account,
+> I know I have 1200wh within the GC, but I do not know the total of the GC, only that I have a proveable part of the GC which no-one else can claim the ownership of.
 >
-> Similar, if I create slice-F and transfer it to another part,
-> I do not know what size the new slices they might create (G and H) only they are proveable sum to the 500wh I transferred.
+> Similarly, if I create slice-F and transfer it to another part,
+> I do not know the size of the new slices they might create (G and H) only that they are provably the sum of the 500Wh I transferred.
 
 ## How to
 
-Look at the [Slicer](xref:ProjectOrigin.Electricity.Client.Slicer) for how to create a SliceCollection,
-and the CommandBuilder to how to execute the [SliceCommand](xref:ProjectOrigin.Electricity.Client.ElectricityCommandBuilder.SliceCertificate(ProjectOrigin.Electricity.Client.Models.FederatedCertifcateId,ProjectOrigin.Electricity.Client.Models.SliceCollection,Key))
+Look at the [Slicer](xref:ProjectOrigin.Electricity.Client.Slicer) for information on how to create a SliceCollection,
+and the CommandBuilder on how to execute the [SliceCommand](xref:ProjectOrigin.Electricity.Client.ElectricityCommandBuilder.SliceCertificate(ProjectOrigin.Electricity.Client.Models.FederatedCertifcateId,ProjectOrigin.Electricity.Client.Models.SliceCollection,Key))
