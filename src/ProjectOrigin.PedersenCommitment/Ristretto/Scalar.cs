@@ -99,6 +99,11 @@ public sealed class Scalar
         return new Scalar(Native.Random());
     }
 
+    /// <summary>
+    /// Construct a new scalar by hashing with sha3-512 an arbitrary length byte array
+    /// </summary>
+    /// <param name="bytes">byte array to be hashed</param>
+    /// <returns>a new scalar from the hashed bytes</returns>
     public static Scalar HashFromBytes(byte[] bytes)
     {
         return new Scalar(Native.HashFromBytes(bytes, bytes.Length));
@@ -109,6 +114,10 @@ public sealed class Scalar
         Native.SpillGuts(_ptr);
     }
 
+    /// <summary>
+    /// Construct a 32-byte array from the Scalar
+    /// </summary>
+    /// <returns>a 32-byte array</returns>
     public byte[] ToBytes()
     {
         var bytes = new byte[32];
