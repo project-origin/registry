@@ -18,15 +18,15 @@ body:
     attributes:
       label: "Implementation PR"
       description: Pull request used
-      placeholder: "#Pull Request ID"
+      placeholder: "#Pull Request ID or _To be updated_ if no PR yet"
     validations:
       required: false
   - type: textarea
     id: reference_issues
     attributes:
-      label: "Reference Issues"
-      description: Common issues
-      placeholder: "#Issues IDs"
+      label: "Reference Issues and PRs"
+      description: Add any related issues or PRs here.
+      placeholder: "#Issue/PR IDs"
     validations:
       required: false
   - type: textarea
