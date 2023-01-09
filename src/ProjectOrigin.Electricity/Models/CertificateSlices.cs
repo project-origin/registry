@@ -15,7 +15,7 @@ internal record CertificateSlice(Commitment Commitment, PublicKey Owner)
         {
             return new V1.SliceId
             {
-                Hash = ByteString.CopyFrom(SHA256.HashData(Commitment.C.ToByteArray()))
+                Hash = ByteString.CopyFrom(SHA256.HashData(Commitment.C))
             };
         }
     }

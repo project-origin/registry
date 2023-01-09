@@ -22,6 +22,5 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ProjectOrigin.Register.StepProcessor\ProjectOrigin.Register.StepProcessor.csproj" />
-    <ProjectReference Include="..\ProjectOrigin.PedersenCommitment\ProjectOrigin.PedersenCommitment.csproj" />
   </ItemGroup>
 </Project>

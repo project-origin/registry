@@ -21,11 +21,8 @@ internal class ProductionIssuedVerifier : IEventVerifier<V1.ProductionIssuedEven
         if (request.TryGetModel<ProductionCertificate>(request.Event.CertificateId, out _))
             return new VerificationResult.Invalid($"Certificate with id ”{request.Event.CertificateId.StreamId}” already exists");
 
-        if (!request.Event.GsrnCommitment.VerifyCommitment())
-            return new VerificationResult.Invalid("Invalid range proof forr GSRN commitment");
-
-        if (!request.Event.QuantityCommitment.VerifyCommitment())
-            return new VerificationResult.Invalid("Invalid range proof forr Quantity commitment");
+        if (!request.Event.QuantityCommitment.VerifyCommitment(request.Event.CertificateId.StreamId.Value))
+            return new VerificationResult.Invalid("Invalid range proof for Quantity commitment");
 
         if (request.Event.QuantityPublication is not null
             && !request.Event.QuantityCommitment.VerifyPublication(request.Event.QuantityPublication))

@@ -2,6 +2,7 @@ using Microsoft.Extensions.Options;
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Production.Verifiers;
+using ProjectOrigin.PedersenCommitment;
 
 namespace ProjectOrigin.Electricity.Tests;
 
@@ -63,18 +64,6 @@ public class ProductionIssuedVerifierTests : AbstractVerifierTests
     }
 
     [Fact]
-    public async Task ProductionIssuedVerifier_GsrnCommitmentInvalid_Fail()
-    {
-        var (processor, issuerKey) = SetupIssuer();
-
-        var request = FakeRegister.CreateProductionIssuedRequest(issuerKey, gsrnCommitmentOverride: FakeRegister.InvalidCommitment());
-
-        var result = await processor.Verify(request);
-
-        AssertInvalid(result, "Invalid range proof forr GSRN commitment");
-    }
-
-    [Fact]
     public async Task ProductionIssuedVerifier_QuantityCommitmentInvalid_Fail()
     {
         var (processor, issuerKey) = SetupIssuer();
@@ -83,7 +72,7 @@ public class ProductionIssuedVerifierTests : AbstractVerifierTests
 
         var result = await processor.Verify(request);
 
-        AssertInvalid(result, "Invalid range proof forr Quantity commitment");
+        AssertInvalid(result, "Invalid range proof for Quantity commitment");
     }
 
     [Fact]
@@ -91,7 +80,7 @@ public class ProductionIssuedVerifierTests : AbstractVerifierTests
     {
         var (processor, issuerKey) = SetupIssuer();
 
-        var request = FakeRegister.CreateProductionIssuedRequest(issuerKey, publicQuantityCommitmentOverride: FakeRegister.Group.Commit(695956), publicQuantity: true);
+        var request = FakeRegister.CreateProductionIssuedRequest(issuerKey, publicQuantityCommitmentOverride: new SecretCommitmentInfo(695956), publicQuantity: true);
 
         var result = await processor.Verify(request);
 

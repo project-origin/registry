@@ -9,7 +9,7 @@ message ConsumptionIssuedEvent {
     ProjectOrigin.Register.v1.FederatedStreamId CertificateId = 1;
     DateInterval Period = 2;
     string GridArea = 3;
-    Commitment GsrnCommitment = 4;
+    bytes GsrnHash = 4;
     Commitment QuantityCommitment = 5;
     PublicKey OwnerPublicKey = 6;
 }
@@ -20,7 +20,7 @@ message ProductionIssuedEvent {
     string GridArea = 3;
     string FuelCode = 4;
     string TechCode = 5;
-    Commitment GsrnCommitment = 6;
+    bytes GsrnHash = 6;
     Commitment QuantityCommitment = 7;
     CommitmentPublication QuantityPublication = 8;
     PublicKey OwnerPublicKey = 9;
@@ -69,7 +69,7 @@ message Commitment {
 }
 
 message CommitmentPublication {
-    uint64 Message = 1;
+    uint32 Message = 1;
     bytes RValue = 2;
 }
 

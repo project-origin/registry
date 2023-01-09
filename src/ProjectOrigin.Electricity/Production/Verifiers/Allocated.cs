@@ -1,7 +1,6 @@
 using Google.Protobuf;
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Consumption;
-using ProjectOrigin.Electricity.V1;
 using ProjectOrigin.PedersenCommitment;
 using ProjectOrigin.Register.StepProcessor.Interfaces;
 using ProjectOrigin.Register.StepProcessor.Models;
@@ -10,7 +9,7 @@ namespace ProjectOrigin.Electricity.Production.Verifiers;
 
 internal class ProductionAllocatedVerifier : IEventVerifier<ProductionCertificate, V1.AllocatedEvent>
 {
-    public Task<VerificationResult> Verify(Register.StepProcessor.Interfaces.VerificationRequest<AllocatedEvent> request)
+    public Task<VerificationResult> Verify(Register.StepProcessor.Interfaces.VerificationRequest<V1.AllocatedEvent> request)
     {
         if (!request.TryGetModel<ProductionCertificate>(request.Event.ProductionCertificateId, out var productionCertificate))
             return new VerificationResult.Invalid("Certificate does not exist");
@@ -35,7 +34,7 @@ internal class ProductionAllocatedVerifier : IEventVerifier<ProductionCertificat
         if (consumptionSlice is null)
             return new VerificationResult.Invalid("Consumption slice does not exist");
 
-        if (!Group.Default.VerifyEqualityProof(request.Event.EqualityProof.ToByteArray(), productionSlice.Commitment, consumptionSlice.Commitment))
+        if (!Commitment.VerifyEqualityProof(request.Event.EqualityProof.ToByteArray(), productionSlice.Commitment, consumptionSlice.Commitment))
             return new VerificationResult.Invalid("Invalid Equality proof");
 
         return new VerificationResult.Valid();

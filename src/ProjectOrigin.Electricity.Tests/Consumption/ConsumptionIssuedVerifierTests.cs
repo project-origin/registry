@@ -52,18 +52,6 @@ public class ConsumptionIssuedVerifierTests : AbstractVerifierTests
     }
 
     [Fact]
-    public async Task ConsumptionIssuedVerifier_GsrnCommitmentInvalid_Fail()
-    {
-        var (processor, issuerKey) = SetupIssuer();
-
-        var request = FakeRegister.CreateConsumptionIssuedRequest(issuerKey, gsrnCommitmentOverride: FakeRegister.InvalidCommitment());
-
-        var result = await processor.Verify(request);
-
-        AssertInvalid(result, "Invalid range proof forr GSRN commitment");
-    }
-
-    [Fact]
     public async Task ConsumptionIssuedVerifier_QuantityCommitmentInvalid_Fail()
     {
         var (processor, issuerKey) = SetupIssuer();
@@ -72,7 +60,7 @@ public class ConsumptionIssuedVerifierTests : AbstractVerifierTests
 
         var result = await processor.Verify(request);
 
-        AssertInvalid(result, "Invalid range proof forr Quantity commitment");
+        AssertInvalid(result, "Invalid range proof for Quantity commitment");
     }
 
     [Fact]

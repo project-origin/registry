@@ -2,7 +2,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ProjectOrigin.VerifiableEventStore\ProjectOrigin.VerifiableEventStore.csproj" />
-    <ProjectReference Include="..\ProjectOrigin.PedersenCommitment\ProjectOrigin.PedersenCommitment.csproj" />
     <PackageReference Include="protobuf-net" Version="3.1.25" />
   </ItemGroup>
 

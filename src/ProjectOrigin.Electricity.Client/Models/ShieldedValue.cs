@@ -1,4 +1,3 @@
-using System.Numerics;
 using System.Security.Cryptography;
 using Google.Protobuf;
 using ProjectOrigin.PedersenCommitment;
@@ -14,14 +13,14 @@ public class ShieldedValue
     /// <summary>
     /// Contains the message that the shielded value should protect.
     /// </summary>
-    public ulong Message { get => (ulong)_commitmentParameters.Message; }
+    public uint Message { get => (uint)_commitmentParameters.Message; }
 
     /// <summary>
     /// The random value that protects the message.
     /// </summary>
-    public BigInteger RValue { get => _commitmentParameters.RValue; }
+    public ReadOnlySpan<byte> RValue { get => _commitmentParameters.BlindingValue; }
 
-    private CommitmentParameters _commitmentParameters;
+    private SecretCommitmentInfo _commitmentParameters;
 
     /// <summary>
     /// Creates a ShieldedValue based on a message and r value.
@@ -29,9 +28,9 @@ public class ShieldedValue
     /// </summary>
     /// <param name="message">contains the message that one wants to hide.</param>
     /// <param name="r">contains the random value that hides the message.</param>
-    public ShieldedValue(ulong message, BigInteger r)
+    public ShieldedValue(uint message, ReadOnlySpan<byte> r)
     {
-        _commitmentParameters = Group.Default.CreateParameters(message, r);
+        _commitmentParameters = new SecretCommitmentInfo(message, r);
     }
 
     /// <summary>
@@ -39,30 +38,30 @@ public class ShieldedValue
     /// automatically creates a random value to hide the message.
     /// </summary>
     /// <param name="message">contains the message that one wants to hide.</param>
-    public ShieldedValue(ulong message)
+    public ShieldedValue(uint message)
     {
-        _commitmentParameters = Group.Default.Commit(message);
+        _commitmentParameters = new SecretCommitmentInfo(message);
     }
 
     internal V1.SliceId ToSliceId()
     {
         return new V1.SliceId()
         {
-            Hash = ByteString.CopyFrom(SHA256.HashData(_commitmentParameters.C.ToByteArray()))
+            Hash = ByteString.CopyFrom(SHA256.HashData(_commitmentParameters.Commitment.C))
         };
     }
 
-    internal CommitmentParameters ToParams()
+    internal SecretCommitmentInfo ToParams()
     {
-        return Group.Default.CreateParameters(Message, RValue);
+        return new SecretCommitmentInfo(Message, RValue);
     }
 
-    internal V1.Commitment ToProtoCommitment()
+    internal V1.Commitment ToProtoCommitment(string label)
     {
         return new V1.Commitment()
         {
-            Content = ByteString.CopyFrom(_commitmentParameters.C.ToByteArray()),
-            RangeProof = ByteString.CopyFrom(_commitmentParameters.RangeProof)
+            Content = ByteString.CopyFrom(_commitmentParameters.Commitment.C),
+            RangeProof = ByteString.CopyFrom(_commitmentParameters.CreateRangeProof(label))
         };
     }
 }

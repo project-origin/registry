@@ -50,8 +50,8 @@ public class FlowTests : RegisterClientTestBase
     public async Task IssueConsumptionCertificate_Success()
     {
         var commandBuilder = new ElectricityCommandBuilder();
-        var gsrn = Group.Default.Commit(150);
-        var quantity = Group.Default.Commit(250);
+        var gsrn = new Fixture().Create<ulong>();
+        var quantity = new ShieldedValue(250);
         var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
 
         var id = await commandBuilder
@@ -65,8 +65,8 @@ public class FlowTests : RegisterClientTestBase
                     new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
                 ),
                 Area_DK1,
-                new Client.Models.ShieldedValue(150, gsrn.RValue),
-                new Client.Models.ShieldedValue(250, quantity.RValue),
+                gsrn,
+                quantity,
                 ownerKey.PublicKey,
                 _dk1_issuer_key
                 )
@@ -81,8 +81,8 @@ public class FlowTests : RegisterClientTestBase
     public async Task IssueConsumptionCertificate_Invalid()
     {
         var commandBuilder = new ElectricityCommandBuilder();
-        var gsrn = Group.Default.Commit(150);
-        var quantity = Group.Default.Commit(250);
+        var gsrn = new Fixture().Create<ulong>();
+        var quantity = new ShieldedValue(250);
         var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
 
         var id = await commandBuilder
@@ -96,8 +96,8 @@ public class FlowTests : RegisterClientTestBase
                     new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
                 ),
                 Area_DK1,
-                new Client.Models.ShieldedValue(150, gsrn.RValue),
-                new Client.Models.ShieldedValue(250, quantity.RValue),
+                gsrn,
+                quantity,
                 ownerKey.PublicKey,
                 ownerKey
                 )
@@ -112,8 +112,8 @@ public class FlowTests : RegisterClientTestBase
     public async Task IssueProductionCertificate_Success()
     {
         var commandBuilder = new ElectricityCommandBuilder();
-        var gsrn = Group.Default.Commit(150);
-        var quantity = Group.Default.Commit(250);
+        var gsrn = new Fixture().Create<ulong>();
+        var quantity = new ShieldedValue(250);
         var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
 
         var id = await commandBuilder
@@ -129,8 +129,8 @@ public class FlowTests : RegisterClientTestBase
             Area_DK2,
             "F01050100",
             "T020002",
-            new Client.Models.ShieldedValue(150, gsrn.RValue),
-            new Client.Models.ShieldedValue(250, quantity.RValue),
+            gsrn,
+            quantity,
             ownerKey.PublicKey,
             _dk2_issuer_key
             )
@@ -145,7 +145,7 @@ public class FlowTests : RegisterClientTestBase
     public async Task SliceCertificate_Success()
     {
         var commandBuilder = new ElectricityCommandBuilder();
-        var gsrn = Group.Default.Commit(570000000001213);
+        var gsrn = new Fixture().Create<ulong>();
 
         var ownerKey1 = Key.Create(SignatureAlgorithm.Ed25519);
         var ownerKey2 = Key.Create(SignatureAlgorithm.Ed25519);
@@ -182,7 +182,7 @@ public class FlowTests : RegisterClientTestBase
                 Area_DK2,
                 "F01050100",
                 "T020002",
-                gsrn.ToShieldedValue(),
+                gsrn,
                 slice_0,
                 ownerKey1.PublicKey,
                 _dk2_issuer_key
@@ -207,7 +207,7 @@ public class FlowTests : RegisterClientTestBase
     public async Task ClaimCertificate_Success()
     {
         var commandBuilder = new ElectricityCommandBuilder();
-        var gsrn = Group.Default.Commit(570000000001213);
+        var gsrn = new Fixture().Create<ulong>();
         var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
 
         var consCertId = new FederatedCertifcateId(
@@ -240,7 +240,7 @@ public class FlowTests : RegisterClientTestBase
                 Area_DK1,
                 "F01050100",
                 "T020002",
-                gsrn.ToShieldedValue(),
+                gsrn,
                 prodQuantity,
                 ownerKey.PublicKey,
                 _dk1_issuer_key
@@ -252,7 +252,7 @@ public class FlowTests : RegisterClientTestBase
                     new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
                 ),
                 Area_DK1,
-                gsrn.ToShieldedValue(),
+                gsrn,
                 consQuantity,
                 ownerKey.PublicKey,
                 _dk1_issuer_key
@@ -296,8 +296,8 @@ public class FlowTests : RegisterClientTestBase
 
 public static class Extensions
 {
-    public static ShieldedValue ToShieldedValue(this CommitmentParameters cm)
+    public static ShieldedValue ToShieldedValue(this SecretCommitmentInfo cm)
     {
-        return new ShieldedValue((ulong)cm.Message, cm.RValue);
+        return new ShieldedValue(cm.Message, cm.BlindingValue);
     }
 }

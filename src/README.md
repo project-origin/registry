@@ -65,3 +65,9 @@ Contains unit-tests for the ProjectOrigin.VerifiableEventStore library.
 ## Protos
 
 Contains the .proto files defining the different messages and services in the registry.
+
+## rust-ffi
+
+Contains the Rust library used for eliptic curves, bulletproofs and commitments.
+To built this you will require the rust toolchain along with Cargo.
+

@@ -1,6 +1,6 @@
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Production.Verifiers;
-using ProjectOrigin.Register.StepProcessor.Models;
+using ProjectOrigin.PedersenCommitment;
 
 namespace ProjectOrigin.Electricity.Tests;
 
@@ -61,7 +61,7 @@ public class ProductionTransferredVerifierTests : AbstractVerifierTests
         var newOwnerKey = Key.Create(SignatureAlgorithm.Ed25519);
         var (cert, sourceParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
 
-        var fakeSliceParams = FakeRegister.Group.Commit(250);
+        var fakeSliceParams = new SecretCommitmentInfo(250);
         var request = FakeRegister.CreateTransfer(cert, fakeSliceParams, newOwnerKey.PublicKey.ToProto(), ownerKey);
 
         var result = await Verifier.Verify(request);
