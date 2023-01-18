@@ -149,11 +149,19 @@ public class ElectricityCommandBuilder
         Key currentOwnerSigner
     )
     {
+        var allSliceParams = sliceCollection.Slices.Select(x => x.Quantity.ToParams());
+        if (sliceCollection.Remainder is not null)
+        {
+            allSliceParams = allSliceParams.Append(sliceCollection.Remainder.ToParams());
+        }
+        var sumOfSlices = allSliceParams.Aggregate((left, right) => left + right);
+
         var federatedId = id.ToProto();
         var @event = new V1.SlicedEvent()
         {
             CertificateId = federatedId,
             SourceSlice = sliceCollection.Source.ToSliceId(),
+            SumProof = ByteString.CopyFrom(SecretCommitmentInfo.CreateEqualityProof(sliceCollection.Source.ToParams(), sumOfSlices, federatedId.StreamId.Value))
         };
 
         foreach (var slice in sliceCollection.Slices)

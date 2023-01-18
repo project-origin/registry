@@ -34,7 +34,11 @@ internal class ProductionAllocatedVerifier : IEventVerifier<ProductionCertificat
         if (consumptionSlice is null)
             return new VerificationResult.Invalid("Consumption slice does not exist");
 
-        if (!Commitment.VerifyEqualityProof(request.Event.EqualityProof.ToByteArray(), productionSlice.Commitment, consumptionSlice.Commitment, request.Event.AllocationId.Value))
+        if (!Commitment.VerifyEqualityProof(
+            request.Event.EqualityProof.ToByteArray(),
+            productionSlice.Commitment,
+            consumptionSlice.Commitment,
+            request.Event.AllocationId.Value))
             return new VerificationResult.Invalid("Invalid Equality proof");
 
         return new VerificationResult.Valid();

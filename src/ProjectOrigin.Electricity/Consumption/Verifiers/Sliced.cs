@@ -33,7 +33,8 @@ internal class ConsumptionSlicedVerifier : IEventVerifier<ConsumptionCertificate
         if (!Commitment.VerifyEqualityProof(
             request.Event.SumProof.ToByteArray(),
             certificateSlice.Commitment,
-            request.Event.NewSlices.Select(slice => slice.Quantity.ToModel()).Aggregate((b, c) => b + c), request.Event.CertificateId.StreamId.Value))
+            request.Event.NewSlices.Select(slice => slice.Quantity.ToModel()).Aggregate((left, right) => left + right),
+            request.Event.CertificateId.StreamId.Value))
             return new VerificationResult.Invalid($"Invalid sum proof");
 
         return new VerificationResult.Valid();

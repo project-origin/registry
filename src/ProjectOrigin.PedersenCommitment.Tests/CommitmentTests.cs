@@ -34,4 +34,20 @@ public class CommitmentTests
 
         AssertExt.SequenceEqual(cTo0.Commitment.C, (cp1.Commitment - (cp2.Commitment + cp3.Commitment)).C);
     }
+
+    [Fact]
+    public void Commitment_EqualityProof_Success()
+    {
+        var m2 = new Fixture().Create<uint>();
+        var m3 = new Fixture().Create<uint>();
+
+        var cp1 = new SecretCommitmentInfo(m2 + m3);
+        var cp2 = new SecretCommitmentInfo(m2);
+        var cp3 = new SecretCommitmentInfo(m3);
+
+        var b = SecretCommitmentInfo.CreateEqualityProof(cp1, cp2 + cp3, "test");
+        var result = Commitment.VerifyEqualityProof(b, cp1.Commitment, cp2.Commitment + cp3.Commitment, "test");
+
+        Assert.True(result);
+    }
 }
