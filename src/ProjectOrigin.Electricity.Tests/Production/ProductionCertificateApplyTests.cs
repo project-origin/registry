@@ -168,7 +168,7 @@ public class ProductionCertificateApplyTests
             ConsumptionCertificateId = consumptionId,
             ProductionSourceSlice = prodQuantity.ToSliceId(),
             ConsumptionSourceSlice = consQuantity.ToSliceId(),
-            EqualityProof = ByteString.CopyFrom(SecretCommitmentInfo.CreateEqualityProof(consQuantity, prodQuantity))
+            EqualityProof = ByteString.CopyFrom(SecretCommitmentInfo.CreateEqualityProof(consQuantity, prodQuantity, allocationId.Value))
         };
 
         cert.Apply(@event);
@@ -194,7 +194,7 @@ public class ProductionCertificateApplyTests
             ConsumptionCertificateId = consumptionId,
             ProductionSourceSlice = prodQuantity.ToSliceId(),
             ConsumptionSourceSlice = consQuantity.ToSliceId(),
-            EqualityProof = ByteString.CopyFrom(SecretCommitmentInfo.CreateEqualityProof(consQuantity, prodQuantity))
+            EqualityProof = ByteString.CopyFrom(SecretCommitmentInfo.CreateEqualityProof(consQuantity, prodQuantity, allocationId.Value))
         };
         cert.Apply(allocationEvent);
 

@@ -39,9 +39,11 @@ public record SecretCommitmentInfo
         return rangeProof.ToBytes();
     }
 
-    public static ReadOnlySpan<byte> CreateEqualityProof(SecretCommitmentInfo left, SecretCommitmentInfo right)
+    public static ReadOnlySpan<byte> CreateEqualityProof(SecretCommitmentInfo left, SecretCommitmentInfo right, string label)
     {
-        return ReadOnlySpan<byte>.Empty; // TODO Proofs
+        var labelBytes = Encoding.UTF8.GetBytes(label);
+        var equalityProof = Ristretto.EqualProof.Prove(Generator.Default, left._blindingValue, right._blindingValue, labelBytes);
+        return equalityProof.Serialize();
     }
 
     public static SecretCommitmentInfo operator +(SecretCommitmentInfo left, SecretCommitmentInfo right)

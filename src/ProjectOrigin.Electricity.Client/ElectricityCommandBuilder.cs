@@ -212,7 +212,7 @@ public class ElectricityCommandBuilder
             ConsumptionCertificateId = consCertId,
             ProductionSourceSlice = productionSource.ToSliceId(),
             ConsumptionSourceSlice = consumptionSource.ToSliceId(),
-            EqualityProof = ByteString.CopyFrom(SecretCommitmentInfo.CreateEqualityProof(productionSource.ToParams(), consumptionSource.ToParams()))
+            EqualityProof = ByteString.CopyFrom(SecretCommitmentInfo.CreateEqualityProof(productionSource.ToParams(), consumptionSource.ToParams(), allocationId.Value))
         };
 
         var productionClaimedEvent = new V1.ClaimedEvent

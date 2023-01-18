@@ -27,9 +27,11 @@ public record Commitment
         return rangeProof.VerifySingle(BulletProofGen.Default, Generator.Default, _compressionPoint, 32, labelBytes);
     }
 
-    public static bool VerifyEqualityProof(ReadOnlySpan<byte> equalityProof, Commitment commitment1, Commitment commitment2)
+    public static bool VerifyEqualityProof(ReadOnlySpan<byte> equalityProof, Commitment commitment1, Commitment commitment2, string label)
     {
-        return equalityProof.IsEmpty; // TODO Proofs
+        var labelBytes = Encoding.UTF8.GetBytes(label);
+        var proof = Ristretto.EqualProof.Deserialize(equalityProof.ToArray());
+        return proof.Verify(Generator.Default, commitment1._compressionPoint.Decompress(), commitment2._compressionPoint.Decompress(), labelBytes);
     }
 
     public static Commitment operator +(Commitment left, Commitment right)

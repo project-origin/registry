@@ -134,7 +134,7 @@ internal static class FakeRegister
         {
             CertificateId = id,
             SourceSlice = sourceParams.ToSliceId(),
-            SumProof = sumOverride ?? ByteString.CopyFrom(SecretCommitmentInfo.CreateEqualityProof(sourceParams, slice + remainder))
+            SumProof = sumOverride ?? ByteString.CopyFrom(SecretCommitmentInfo.CreateEqualityProof(sourceParams, slice + remainder, id.StreamId.Value))
         };
 
         @event.NewSlices.Add(new V1.SlicedEvent.Types.Slice
@@ -270,7 +270,7 @@ internal static class FakeRegister
             ConsumptionCertificateId = consumptionId,
             ProductionSourceSlice = productionSlice.ToSliceId(),
             ConsumptionSourceSlice = consumptionSlice.ToSliceId(),
-            EqualityProof = ByteString.CopyFrom(overwrideEqualityProof ?? SecretCommitmentInfo.CreateEqualityProof(consumptionSlice, productionSlice))
+            EqualityProof = ByteString.CopyFrom(overwrideEqualityProof ?? SecretCommitmentInfo.CreateEqualityProof(productionSlice, consumptionSlice, allocationId.ToString()))
         };
     }
 

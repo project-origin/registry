@@ -96,7 +96,7 @@ public class ConsumptionSlicedVerifierTests : AbstractVerifierTests
         var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
         var (cert, sourceParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
 
-        var sumOverride = ByteString.CopyFrom(new Fixture().Create<byte[]>());
+        var sumOverride = ByteString.CopyFrom(new Fixture().CreateMany<byte>(64).ToArray());
 
         var request = FakeRegister.CreateSlices(cert, sourceParams, 150, ownerKey, sumOverride: sumOverride);
 
