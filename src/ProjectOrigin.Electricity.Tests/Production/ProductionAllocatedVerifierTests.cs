@@ -121,7 +121,7 @@ public class ProductionAllocatedVerifierTests : AbstractVerifierTests
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
 
-        var request = FakeRegister.CreateProductionAllocationRequest(prodCert, consCert, prodParams, consParams, ownerKey, overwrideEqualityProof: new Fixture().Create<byte[]>());
+        var request = FakeRegister.CreateProductionAllocationRequest(prodCert, consCert, prodParams, consParams, ownerKey, overwrideEqualityProof: new Fixture().CreateMany<byte>(64).ToArray());
         var result = await Verifier.Verify(request);
 
         AssertInvalid(result, "Invalid Equality proof");

@@ -22,11 +22,8 @@ internal class ConsumptionIssuedVerifier : IEventVerifier<V1.ConsumptionIssuedEv
         if (request.TryGetModel<ConsumptionCertificate>(request.Event.CertificateId, out _))
             return new VerificationResult.Invalid($"Certificate with id ”{request.Event.CertificateId.StreamId}” already exists");
 
-        if (!request.Event.GsrnCommitment.VerifyCommitment())
-            return new VerificationResult.Invalid("Invalid range proof forr GSRN commitment");
-
-        if (!request.Event.QuantityCommitment.VerifyCommitment())
-            return new VerificationResult.Invalid("Invalid range proof forr Quantity commitment");
+        if (!request.Event.QuantityCommitment.VerifyCommitment(request.Event.CertificateId.StreamId.Value))
+            return new VerificationResult.Invalid("Invalid range proof for Quantity commitment");
 
         if (!PublicKey.TryImport(SignatureAlgorithm.Ed25519, request.Event.OwnerPublicKey.Content.ToByteArray(), KeyBlobFormat.RawPublicKey, out _))
             return new VerificationResult.Invalid("Invalid owner key, not a valid Ed25519 publicKey");

@@ -1,28 +1,48 @@
-using System.Numerics;
+using System.Text;
+using ProjectOrigin.PedersenCommitment.Ristretto;
 
 namespace ProjectOrigin.PedersenCommitment;
 
+/// <summary>
+/// This class holds the <b>public</b> part of a commitment,
+/// this can be shared without leaking any information.
+/// </summary>
 public record Commitment
 {
-    public BigInteger C { get; }
+    private CompressedPoint _compressionPoint;
 
-    private Group _group;
+    public ReadOnlySpan<byte> C { get => _compressionPoint._bytes; }
 
-    internal Commitment(BigInteger c, Group group)
+    internal Ristretto.Point Point { get => _compressionPoint.Decompress(); }
+
+    public Commitment(ReadOnlySpan<byte> bytes)
     {
-        C = c;
-        _group = group;
+        _compressionPoint = new Ristretto.CompressedPoint(bytes.ToArray());
     }
 
-    public static Commitment operator *(Commitment left, Commitment right)
+    public bool VerifyRangeProof(ReadOnlySpan<byte> rangeProofSpan, string label)
     {
-        if (left._group != right._group) throw new InvalidOperationException("Operator * between two commitments in different groups are not allowed");
-        return left._group.Product(left.C, right.C);
+        var labelBytes = Encoding.UTF8.GetBytes(label);
+        var rangeProof = Ristretto.RangeProof.FromBytes(rangeProofSpan.ToArray());
+        return rangeProof.VerifySingle(BulletProofGen.Default, Generator.Default, _compressionPoint, 32, labelBytes);
     }
 
-    public static Commitment operator /(Commitment left, Commitment right)
+    public static bool VerifyEqualityProof(ReadOnlySpan<byte> equalityProof, Commitment commitment1, Commitment commitment2, string label)
     {
-        if (left._group != right._group) throw new InvalidOperationException("Operator / between two commitments in different groups are not allowed");
-        return left._group.InverseProduct(left.C, right.C);
+        var labelBytes = Encoding.UTF8.GetBytes(label);
+        var proof = Ristretto.EqualProof.Deserialize(equalityProof.ToArray());
+        return proof.Verify(Generator.Default, commitment1._compressionPoint.Decompress(), commitment2._compressionPoint.Decompress(), labelBytes);
+    }
+
+    public static Commitment operator +(Commitment left, Commitment right)
+    {
+        var newPoint = left.Point + right.Point;
+        return new Commitment(newPoint.Compress()._bytes);
+    }
+
+    public static Commitment operator -(Commitment left, Commitment right)
+    {
+        var newPoint = left.Point - right.Point;
+        return new Commitment(newPoint.Compress()._bytes);
     }
 }
