@@ -15,12 +15,12 @@ When the new slices are created, they become active, and the old slice is remove
 ## Example
 
 Below is a Sankey representation of slice that is sliced multiple times:
-1. It is initially issued with a single slice (0), which a quantity of 1800Wh
+1. It is initially issued with a single slice (0), which a quantity of 1700Wh
 2. Slice-0 is sliced into 4 slices:
    - Slice-A 1200Wh
-   - Slice-D 250Wh
-   - Slice-E 150Wh
-   - Slice-F 100Wh
+   - Slice-B 250Wh
+   - Slice-C 150Wh
+   - Slice-D 100Wh
 3. Slice-A is sliced into 2 slices:
    - Slice-E 700Wh
    - Slice-F 500Wh
