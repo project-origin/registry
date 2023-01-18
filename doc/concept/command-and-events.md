@@ -5,11 +5,11 @@ Everything on the registries happen through [commands](./granular-certificates/c
 `Commands` are a request to the network to perform a given action.
 They must be signed by the right entity[^auth].
 
-[^auth]: The entity might either be an issueing body, or the owner of a GC.
+[^auth]: The entity might either be an issuing body, or the owner of a GC.
 
 `Events` are state changes within the network,
 it is the result of a command.
-If an [issue certifcate](./granular-certificates/commands/issue.md) has been performed,
+If an [issue certificate](./granular-certificates/commands/issue.md) has been performed,
 then a resulting CertificateIssued event has happened.
 
 ## Verifiable events

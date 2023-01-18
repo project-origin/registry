@@ -1,10 +1,10 @@
 # Architecture
 
-This file contains the run though of the suggested architecture for the registry.
+This file contains a run-through of the suggested architecture for the registry.
 
 ## Glossary
 
-- **Commands**: are a request to the registry to perform a state change, it is signed by the owner of the item to perform changes upon.
+- **Commands**: are requests to the registry to perform a state change. A command is signed by the owner of the item to perform the change.
 - **Events**: are state changes that has happened and are persisted when they have been included in a merkle tree.
 - **Event store**: a datastore that stores all the events for the registry.
 
