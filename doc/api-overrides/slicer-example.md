@@ -7,8 +7,8 @@ uid: ProjectOrigin.Electricity.Client.Slicer
 Below is an example of how to use the slicer.
 
 ```csharp
-// In this example we create the ShieldedValue here,
-// but it save from when it was issued.
+// A source ShieldedValue is created here, for the example, but
+// the implementation saves the value from when it was issued. 
 PublicKey currentOwner, secondOwner, thirdOwner;
 ShieldedValue sourceSlice = new ShieldedValue(500);
 

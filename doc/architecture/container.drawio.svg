@@ -20,7 +20,7 @@
                                 <div>
                                     <font style="font-size: 11px">
                                         <font color="#cccccc">
-                                            Conventional blockchain that will store a series of hashes for each merkel tree, ensuring that data within the tree cannot be changed without it being visible.
+                                            Conventional blockchain that will store a series of hashes for each merkle tree, ensuring that data within the tree cannot be changed without it being visible.
                                         </font>
                                     </font>
                                 </div>
@@ -168,7 +168,7 @@
                                 <br/>
                                 <div>
                                     <font style="font-size: 11px">
-                                        Stores events as public data, and arranges them in a series of merkel trees, each root publishes to the blockchain after a set time or number of events.
+                                        Stores events as public data, and arranges them in a series of merkle trees. Each root publishes to the blockchain after a set time or number of events.
                                     </font>
                                 </div>
                             </div>
@@ -191,7 +191,7 @@
                                 <div style="text-align: left">
                                     <div style="text-align: center">
                                         <b>
-                                            Publishes merkel roots for each batch of events to the blockchain
+                                            Publishes merkle roots for each batch of events to the blockchain
                                         </b>
                                     </div>
                                 </div>
@@ -200,7 +200,7 @@
                     </div>
                 </foreignObject>
                 <text x="510" y="1218" fill="#404040" font-family="Helvetica" font-size="10px" text-anchor="middle">
-                    Publishes merkel roots for each batch of events...
+                    Publishes merkle roots for each batch of events...
                 </text>
             </switch>
         </g>
@@ -222,7 +222,7 @@
                                 <br/>
                                 <div>
                                     <font style="font-size: 11px">
-                                        Implements a ICommandStepVerifier and
+                                        Implements an ICommandStepVerifier and
                                         <b>
                                             Event-Verifiers
                                         </b>
@@ -255,7 +255,7 @@
                                 <br/>
                                 <div>
                                     <font style="font-size: 11px">
-                                        Verifies an event in a command step is valid before it is written to the verifiable eventstore.
+                                        Verifies that an event in a command step is valid before it is written to the verifiable event store.
                                     </font>
                                 </div>
                             </div>
@@ -285,7 +285,7 @@
                                 <br/>
                                 <div>
                                     <font style="font-size: 11px">
-                                        Processes a command, and executes lines sequencially on multiple registries.
+                                        Processes a command, and executes lines sequentially on multiple registries.
                                     </font>
                                 </div>
                             </div>
@@ -367,7 +367,7 @@
                                 <div style="text-align: left">
                                     <div style="text-align: center">
                                         <b>
-                                            Verifies event via the ICommandStepVerifier
+                                            Verifies an event via the ICommandStepVerifier
                                         </b>
                                     </div>
                                     <div style="text-align: center">
@@ -379,7 +379,7 @@
                     </div>
                 </foreignObject>
                 <text x="265" y="893" fill="#404040" font-family="Helvetica" font-size="10px" text-anchor="middle">
-                    Verifies event via the ICommandStepVerifier...
+                    Verifies an event via the ICommandStepVerifier...
                 </text>
             </switch>
         </g>
@@ -780,7 +780,7 @@
                                     </b>
                                 </font>
                                 <div style="text-align: left">
-                                    Client sends a command to a CommandProcessor, which orchestrates it into a series of commandSteps, which each is validated by the StepProcesor and StepVerifier, before being persisted to the EventStore.
+                                    Client sends a command to a CommandProcessor, which orchestrates it into a series of commandSteps, where each is validated by the StepProcesor and StepVerifier, before being persisted to the EventStore.
                                 </div>
                             </div>
                         </div>
