@@ -45,6 +45,8 @@ public sealed class Point
 
     internal readonly IntPtr _ptr;
 
+    public readonly static int LENGTH = 32;
+
     internal Point(IntPtr ptr)
     {
         _ptr = ptr;

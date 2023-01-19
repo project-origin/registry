@@ -26,7 +26,8 @@ public class ZeroProof
     public static ZeroProof Prove(Generator gen, Scalar r, byte[] label)
     {
         var a = Scalar.Random();
-        var c = Oracle(gen.H() * a, label);
+        var A = gen.H() * a;
+        var c = Oracle(label, A, gen.G(), gen.H());
         var z = a - c * r;
         return new ZeroProof(c, z);
     }
@@ -41,19 +42,23 @@ public class ZeroProof
     public bool Verify(Generator gen, Point c0, byte[] label)
     {
         var A = (gen.H() * this.z) + (c0 * this.c);
-        var c = Oracle(A, label);
+        var c = Oracle(label, A, gen.G(), gen.H());
         return this.c == c;
     }
 
-    private static Scalar Oracle(Point A, byte[] label)
+    private static Scalar Oracle(byte[] label, params Point[] inputs)
     {
-        var compressed = A.Compress();
-        var n = compressed._bytes.Length;
-        var m = label.Length;
+        var m = (inputs.Length * Point.LENGTH) + label.Length;
 
-        var digest = new byte[n + m];
-        System.Array.Copy(compressed._bytes, 0, digest, 0, n);
-        System.Array.Copy(label, 0, digest, n, m);
+        var digest = new byte[m];
+        var begin = 0;
+        foreach (var point in inputs)
+        {
+            var item = point.Compress()._bytes;
+            System.Array.Copy(item, 0, digest, begin, item.Length);
+            begin += item.Length;
+        }
+        System.Array.Copy(label, 0, digest, begin, label.Length);
         return Scalar.HashFromBytes(digest);
     }
 
