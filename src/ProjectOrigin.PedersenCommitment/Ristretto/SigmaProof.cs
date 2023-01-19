@@ -27,7 +27,7 @@ public class ZeroProof
     {
         var a = Scalar.Random();
         var A = gen.H() * a;
-        var c = Oracle(label, A, gen.G(), gen.H());
+        var c = Oracle(label, A, gen.H() * r, gen.G(), gen.H());
         var z = a - c * r;
         return new ZeroProof(c, z);
     }
@@ -42,14 +42,13 @@ public class ZeroProof
     public bool Verify(Generator gen, Point c0, byte[] label)
     {
         var A = (gen.H() * this.z) + (c0 * this.c);
-        var c = Oracle(label, A, gen.G(), gen.H());
+        var c = Oracle(label, A, c0, gen.G(), gen.H());
         return this.c == c;
     }
 
     private static Scalar Oracle(byte[] label, params Point[] inputs)
     {
         var m = (inputs.Length * Point.LENGTH) + label.Length;
-
         var digest = new byte[m];
         var begin = 0;
         foreach (var point in inputs)
