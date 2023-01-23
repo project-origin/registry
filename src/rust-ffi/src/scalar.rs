@@ -75,6 +75,12 @@ pub unsafe extern "C" fn scalar_mul(lhs: *const Scalar, rhs: *const Scalar) -> *
 }
 
 #[no_mangle]
+pub extern "C" fn scalar_sum(args: *const *const Scalar, len: i32) -> *const Scalar {
+    let args = unsafe { std::slice::from_raw_parts(args, len as usize) };
+    Box::into_raw(Box::new(args.iter().map(|&ptr| unsafe { *ptr }).sum()))
+}
+
+#[no_mangle]
 pub unsafe extern "C" fn scalar_free(this: *mut Scalar) {
     if this.is_null() {
         return;

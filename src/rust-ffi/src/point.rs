@@ -97,6 +97,15 @@ pub extern "C" fn ristretto_point_mul_scalar(
 }
 
 #[no_mangle]
+pub extern "C" fn ristretto_point_sum(
+    args: *const *const RistrettoPoint,
+    len: i32,
+) -> *const RistrettoPoint {
+    let args = unsafe { std::slice::from_raw_parts(args, len as usize) };
+    Box::into_raw(Box::new(args.iter().map(|&ptr| unsafe { *ptr }).sum()))
+}
+
+#[no_mangle]
 pub extern "C" fn ristretto_point_free(this: *mut RistrettoPoint) {
     if this.is_null() {
         return;

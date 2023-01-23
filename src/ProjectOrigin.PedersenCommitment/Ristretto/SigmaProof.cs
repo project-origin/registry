@@ -163,11 +163,10 @@ public class SumProof
     /// <returns>a new proof</returns>
     public static SumProof Prove(Generator gen, byte[] label, Scalar rsum, Point csum, params (Scalar, Point)[] vec)
     {
-        var rsum2 = vec[0].Item1;
-        foreach ((Scalar, Point) item in vec[1..])
-        { // TODO: Probably use a Native function for speedup
-            rsum2 += item.Item1;
-        }
+        var rs = new Scalar[vec.Length];
+        for (int i = 0; i < vec.Length; i++)
+            rs[i] = vec[i].Item1;
+        var rsum2 = Scalar.Sum(rs);
 
 
         var oracle = (Point A) =>
@@ -194,11 +193,7 @@ public class SumProof
     /// <returns>true of the commitments are made to the commitment sum</returns>
     public bool Verify(Generator gen, byte[] label, Point csum, params Point[] cs)
     {
-        var csum2 = cs[0];
-        foreach (Point r in cs[1..])
-        { // TODO: Probably use a Native function for speedup
-            csum2 += r;
-        }
+        var csum2 = Point.Sum(cs);
 
         var oracle = (Point A) =>
         {

@@ -36,6 +36,9 @@ public sealed class Point
         [DllImport("rust_ffi", EntryPoint = "ristretto_point_mul_scalar")]
         internal static extern IntPtr Mul(IntPtr point, IntPtr scalar);
 
+        [DllImport("rust_ffi", EntryPoint = "ristretto_point_sum")]
+        internal static extern IntPtr Sum(IntPtr[] args, int len);
+
         [DllImport("rust_ffi", EntryPoint = "ristretto_point_equals")]
         internal static extern bool Equals(IntPtr lhs, IntPtr rhs);
 
@@ -134,6 +137,16 @@ public sealed class Point
     public static bool operator !=(Point left, Point right)
     {
         return !Native.Equals(left._ptr, right._ptr);
+    }
+
+    public static Point Sum(params Point[] args)
+    {
+        var ptrs = new IntPtr[args.Length];
+        for (int i = 0; i < args.Length; i++)
+            ptrs[i] = args[i]._ptr;
+
+        var resPtr = Native.Sum(ptrs, ptrs.Length);
+        return new Point(resPtr);
     }
 
     public void GutSpill()
