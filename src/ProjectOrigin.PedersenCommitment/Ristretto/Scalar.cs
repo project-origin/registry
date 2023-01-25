@@ -182,7 +182,6 @@ public sealed class Scalar
 
     public static Scalar Sum(params Scalar[] args)
     {
-        args[0].SpillGuts();
         var ptrs = new IntPtr[args.Length];
         for (int i = 0; i < args.Length; i++)
             ptrs[i] = args[i]._ptr;
