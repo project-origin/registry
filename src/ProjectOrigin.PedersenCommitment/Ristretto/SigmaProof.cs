@@ -26,15 +26,17 @@ public class ZeroProof
     public static ZeroProof Prove(Generator gen, Scalar r, byte[] label)
     {
         var c0 = gen.H() * r;
-        var oracle = (Point A) => Oracle(label, A, c0, gen.G(), gen.H());
+        var oracle = new Oracle(label);
+        oracle.Add(c0, gen.G(), gen.H());
         return ZeroProof.Prove(gen, r, oracle);
     }
 
-    internal static ZeroProof Prove(Generator gen, Scalar r, Func<Point, Scalar> oracle)
+    internal static ZeroProof Prove(Generator gen, Scalar r, Oracle oracle)
     {
         var a = Scalar.Random();
         var A = gen.H() * a;
-        var c = oracle(A);
+        oracle.Add(A);
+        var c = oracle.Hash();
         var z = a - c * r;
         return new ZeroProof(c, z);
     }
@@ -48,29 +50,17 @@ public class ZeroProof
     /// <returns>true if the commitment is made to zero and the proof holds</returns>
     public bool Verify(Generator gen, Point c0, byte[] label)
     {
-        return this.Verify(gen, c0, (A) => Oracle(label, A, c0, gen.G(), gen.H()));
+        var oracle = new Oracle(label);
+        oracle.Add(c0, gen.G(), gen.H());
+        return this.Verify(gen, c0, oracle);
     }
 
-    internal bool Verify(Generator gen, Point c0, Func<Point, Scalar> oracle)
+    internal bool Verify(Generator gen, Point c0, Oracle oracle)
     {
         var A = (gen.H() * this.z) + (c0 * this.c);
-        var c = oracle(A);
+        oracle.Add(A);
+        var c = oracle.Hash();
         return this.c == c;
-    }
-
-    internal static Scalar Oracle(byte[] label, params Point[] inputs)
-    {
-        var m = (inputs.Length * Point.LENGTH) + label.Length;
-        var digest = new byte[m];
-        var begin = 0;
-        foreach (var point in inputs)
-        {
-            var item = point.Compress()._bytes;
-            System.Array.Copy(item, 0, digest, begin, item.Length);
-            begin += item.Length;
-        }
-        System.Array.Copy(label, 0, digest, begin, label.Length);
-        return Scalar.HashFromBytes(digest);
     }
 
     public byte[] Serialize()
@@ -113,7 +103,8 @@ public class EqualProof
     /// <returns>a new proof</returns>
     public static EqualProof Prove(Generator gen, Scalar r0, Scalar r1, Point c0, Point c1, byte[] label)
     {
-        var oracle = (Point A) => ZeroProof.Oracle(label, A, c0, c1, gen.G(), gen.H());
+        var oracle = new Oracle(label);
+        oracle.Add(c0, c1, gen.G(), gen.H());
         return new EqualProof(ZeroProof.Prove(gen, r0 - r1, oracle));
     }
 
@@ -128,7 +119,8 @@ public class EqualProof
     /// <returns>true if the commitments are to the same value and the proof holds</returns>
     public bool Verify(Generator gen, Point c0, Point c1, byte[] label)
     {
-        var oracle = (Point A) => ZeroProof.Oracle(label, A, c0, c1, gen.G(), gen.H());
+        var oracle = new Oracle(label);
+        oracle.Add(c0, c1, gen.G(), gen.H());
         return proof.Verify(gen, c0 - c1, oracle);
     }
 
@@ -168,18 +160,12 @@ public class SumProof
             rs[i] = vec[i].Item1;
         var rsum2 = Scalar.Sum(rs);
 
-
-        var oracle = (Point A) =>
+        var oracle = new Oracle(label);
+        oracle.Add(csum, gen.G(), gen.H());
+        foreach (var (_, p) in vec)
         {
-            var n = vec.Length;
-            var args = new Point[n + 3];
-            for (int i = 0; i < n; i++)
-                args[i] = vec[i].Item2;
-            args[n] = gen.G();
-            args[n + 1] = gen.H();
-            args[n + 2] = A;
-            return ZeroProof.Oracle(label, args);
-        };
+            oracle.Add(p);
+        }
         return new SumProof(ZeroProof.Prove(gen, rsum - rsum2, oracle));
     }
 
@@ -195,16 +181,9 @@ public class SumProof
     {
         var csum2 = Point.Sum(cs);
 
-        var oracle = (Point A) =>
-        {
-            var n = cs.Length;
-            var args = new Point[n + 3];
-            System.Array.Copy(cs, 0, args, 0, n);
-            args[n] = gen.G();
-            args[n + 1] = gen.H();
-            args[n + 2] = A;
-            return ZeroProof.Oracle(label, args);
-        };
+        var oracle = new Oracle(label);
+        oracle.Add(csum, gen.G(), gen.H());
+        oracle.Add(cs);
         return proof.Verify(gen, csum - csum2, oracle);
     }
 
