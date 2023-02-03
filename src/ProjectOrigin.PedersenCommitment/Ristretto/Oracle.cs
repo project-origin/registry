@@ -1,4 +1,5 @@
 namespace ProjectOrigin.PedersenCommitment.Ristretto;
+using System.Text;
 
 class Oracle
 {
@@ -8,6 +9,12 @@ class Oracle
     public Oracle(byte[] label)
     {
         messages.Add(label);
+    }
+
+    public void Domain(String domain)
+    {
+        var bytes = Encoding.UTF8.GetBytes("test");
+        messages.Add(bytes);
     }
 
 
@@ -20,7 +27,7 @@ class Oracle
         }
     }
 
-    public Scalar Hash()
+    public Scalar Challenge()
     {
         var m = 0;
         foreach (var msg in messages)
