@@ -1,42 +1,51 @@
 namespace ProjectOrigin.PedersenCommitment.Ristretto;
 using System.Text;
+using System.Runtime.InteropServices;
 
-class Oracle
+public class Oracle
 {
 
-    private List<byte[]> messages = new List<byte[]>();
+    private class NativeTranscript
+    {
+
+        [DllImport("rust_ffi", EntryPoint = "transcript_new")]
+        internal static extern IntPtr New(byte[] label, int len);
+
+        [DllImport("rust_ffi", EntryPoint = "transcript_append_point")]
+        internal static extern void AppendPoint(IntPtr self, byte[] label, int len, IntPtr point);
+
+        [DllImport("rust_ffi", EntryPoint = "transcript_challenge_scalar")]
+        internal static extern IntPtr ChallengeScalar(IntPtr self, byte[] label, int len);
+    }
+
+    private readonly IntPtr _ptr;
 
     public Oracle(byte[] label)
     {
-        messages.Add(label);
+        _ptr = NativeTranscript.New(label, label.Length);
+
+    }
+
+    public Oracle(String label)
+    {
+        var bytes = Encoding.UTF8.GetBytes(label);
+        _ptr = NativeTranscript.New(bytes, bytes.Length);
     }
 
     public void Add(String label, params Point[] points)
     {
         var bytes = Encoding.UTF8.GetBytes(label);
-        messages.Add(bytes);
         foreach (Point p in points)
         {
-            messages.Add(p.Compress()._bytes);
+            NativeTranscript.AppendPoint(this._ptr, bytes, bytes.Length, p._ptr);
         }
+
     }
 
-    public Scalar Challenge()
+    public Scalar Challenge(String label)
     {
-        var m = 0;
-        foreach (var msg in messages)
-        {
-            m += msg.Length;
-        }
-
-        var digest = new byte[m];
-        var begin = 0;
-        foreach (var msg in messages)
-        {
-
-            System.Array.Copy(msg, 0, digest, begin, msg.Length);
-            begin += msg.Length;
-        }
-        return Scalar.HashFromBytes(digest);
+        var bytes = Encoding.UTF8.GetBytes(label);
+        var scalar_ptr = NativeTranscript.ChallengeScalar(this._ptr, bytes, bytes.Length);
+        return new Scalar(scalar_ptr);
     }
 }

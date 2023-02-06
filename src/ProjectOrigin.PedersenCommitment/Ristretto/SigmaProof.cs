@@ -38,7 +38,7 @@ public class ZeroProof
         oracle.Add("domain_zeroproof");
         oracle.Add("message_A", A);
         oracle.Add("generator_GH", gen.G(), gen.H());
-        var c = oracle.Challenge();
+        var c = oracle.Challenge("challenge_c");
         var z = a - c * r;
         return new ZeroProof(c, z);
     }
@@ -63,7 +63,7 @@ public class ZeroProof
         oracle.Add("domain_zeroproof");
         oracle.Add("message_A", A);
         oracle.Add("generator_GH", gen.G(), gen.H());
-        var c = oracle.Challenge();
+        var c = oracle.Challenge("challenge_c");
         return this.c == c;
     }
 
