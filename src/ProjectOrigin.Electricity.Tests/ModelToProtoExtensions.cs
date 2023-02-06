@@ -9,11 +9,11 @@ namespace ProjectOrigin.Electricity.Tests;
 
 internal static class ModelToProtoExtensions
 {
-    internal static V1.SliceId ToSliceId(this CommitmentParameters @params)
+    internal static V1.SliceId ToSliceId(this SecretCommitmentInfo @params)
     {
         return new V1.SliceId()
         {
-            Hash = ByteString.CopyFrom(SHA256.HashData(@params.C.ToByteArray()))
+            Hash = ByteString.CopyFrom(SHA256.HashData(@params.Commitment.C))
         };
     }
 
@@ -26,20 +26,21 @@ internal static class ModelToProtoExtensions
         };
     }
 
-    public static V1.Commitment ToProtoCommitment(this CommitmentParameters obj)
+    public static V1.Commitment ToProtoCommitment(this SecretCommitmentInfo obj, string certId)
     {
         return new V1.Commitment()
         {
-            Content = ByteString.CopyFrom(obj.C.ToByteArray())
+            Content = ByteString.CopyFrom(obj.Commitment.C),
+            RangeProof = ByteString.CopyFrom(obj.CreateRangeProof(certId))
         };
     }
 
-    public static V1.CommitmentPublication ToProto(this CommitmentParameters obj)
+    public static V1.CommitmentPublication ToProto(this SecretCommitmentInfo obj)
     {
         return new V1.CommitmentPublication()
         {
-            Message = (ulong)obj.Message,
-            RValue = ByteString.CopyFrom(obj.RValue.ToByteArray())
+            Message = (uint)obj.Message,
+            RValue = ByteString.CopyFrom(obj.BlindingValue)
         };
     }
 

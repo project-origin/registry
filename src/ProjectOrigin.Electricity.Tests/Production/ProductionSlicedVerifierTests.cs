@@ -15,8 +15,6 @@ public class ProductionSlicedVerifierTests : AbstractVerifierTests
         return optionsMock.Object;
     }
 
-    private Group Group { get => FakeRegister.Group; }
-
     private ProductionSlicedVerifier Verifier { get => new ProductionSlicedVerifier(); }
 
     [Fact]
@@ -51,7 +49,7 @@ public class ProductionSlicedVerifierTests : AbstractVerifierTests
         var newOwnerKey = Key.Create(SignatureAlgorithm.Ed25519);
         var (cert, sourceParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
 
-        var fakeSliceParams = FakeRegister.Group.Commit(250);
+        var fakeSliceParams = new SecretCommitmentInfo(250);
         var request = FakeRegister.CreateSlices(cert, fakeSliceParams, 150, ownerKey);
 
         var result = await Verifier.Verify(request);
@@ -98,7 +96,7 @@ public class ProductionSlicedVerifierTests : AbstractVerifierTests
         var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
         var (cert, sourceParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
 
-        var sumOverride = ByteString.CopyFrom(new Fixture().Create<byte[]>());
+        var sumOverride = ByteString.CopyFrom(new Fixture().CreateMany<byte>(64).ToArray());
 
         var request = FakeRegister.CreateSlices(cert, sourceParams, 150, ownerKey, sumOverride: sumOverride);
 

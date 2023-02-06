@@ -12,20 +12,20 @@ The **Federated Certificate ID** (FID) is a combination of two parts:
 [^1]: [Granular Certificate](readme.md)
 
 This combined key is ALWAYS the full identifier for a GC,
-event though the StreamID is unique,
+even though the StreamID is unique,
 the FID should always be used.
 
-## Register ID
+## Registry ID
 
-The RegisterID is an identifier for the specific [registry](../registry.md)
+The RegistryID is an identifier for the specific [registry](../registry.md)
 holding the GC.
 
-A GC whole lifecycle always exists on a single register,
-this removes the need for the federated network to reach concensus,
-since the holding register has the mandate to invoke changes on the GC.
+A GC's whole lifecycle always exists on a single registry,
+removing the need for the federated network to reach consensus,
+since the holding registry has the full mandate to invoke changes on the GC.
 
-The RegisterID is used to route commands to the correct register,
-as to releave the need for a lookup table to identify what register a
+The RegistryID is used to route commands to the correct registry,
+as to remove the need for a lookup table to identify which registry a
 GC lives on.
 
 ## Stream ID

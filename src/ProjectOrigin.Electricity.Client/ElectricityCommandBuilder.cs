@@ -40,7 +40,7 @@ public class ElectricityCommandBuilder
         FederatedCertifcateId id,
         DateInterval inteval,
         string gridArea,
-        ShieldedValue gsrn,
+        ulong gsrn,
         ShieldedValue quantity,
         PublicKey owner,
         Key issuingBodySigner
@@ -52,8 +52,8 @@ public class ElectricityCommandBuilder
             CertificateId = federatedId,
             Period = inteval.ToProto(),
             GridArea = gridArea,
-            GsrnCommitment = gsrn.ToProtoCommitment(),
-            QuantityCommitment = quantity.ToProtoCommitment(),
+            GsrnHash = ByteString.CopyFrom(SHA256.HashData(BitConverter.GetBytes(gsrn))),
+            QuantityCommitment = quantity.ToProtoCommitment(id.CertificateId.ToString()),
             OwnerPublicKey = new V1.PublicKey()
             {
                 Content = ByteString.CopyFrom(owner.Export(KeyBlobFormat.RawPublicKey))
@@ -83,7 +83,7 @@ public class ElectricityCommandBuilder
         string gridArea,
         string fuelCode,
         string techCode,
-        ShieldedValue gsrn,
+        ulong gsrn,
         ShieldedValue quantity,
         PublicKey owner,
         Key issuingBodySigner
@@ -97,8 +97,8 @@ public class ElectricityCommandBuilder
             GridArea = gridArea,
             FuelCode = fuelCode,
             TechCode = techCode,
-            GsrnCommitment = gsrn.ToProtoCommitment(),
-            QuantityCommitment = quantity.ToProtoCommitment(),
+            GsrnHash = ByteString.CopyFrom(SHA256.HashData(BitConverter.GetBytes(gsrn))),
+            QuantityCommitment = quantity.ToProtoCommitment(id.CertificateId.ToString()),
             // QuantityPublication = new V1.CommitmentPublication()
             // {
             //     Message = quantity.Message,
@@ -149,18 +149,26 @@ public class ElectricityCommandBuilder
         Key currentOwnerSigner
     )
     {
+        var allSliceParams = sliceCollection.Slices.Select(x => x.Quantity.ToParams());
+        if (sliceCollection.Remainder is not null)
+        {
+            allSliceParams = allSliceParams.Append(sliceCollection.Remainder.ToParams());
+        }
+        var sumOfSlices = allSliceParams.Aggregate((left, right) => left + right);
+
         var federatedId = id.ToProto();
         var @event = new V1.SlicedEvent()
         {
             CertificateId = federatedId,
             SourceSlice = sliceCollection.Source.ToSliceId(),
+            SumProof = ByteString.CopyFrom(SecretCommitmentInfo.CreateEqualityProof(sliceCollection.Source.ToParams(), sumOfSlices, federatedId.StreamId.Value))
         };
 
         foreach (var slice in sliceCollection.Slices)
         {
             @event.NewSlices.Add(new V1.SlicedEvent.Types.Slice
             {
-                Quantity = slice.Quantity.ToProtoCommitment(),
+                Quantity = slice.Quantity.ToProtoCommitment(id.CertificateId.ToString()),
                 NewOwner = slice.Owner.ToProto(),
             });
         }
@@ -169,7 +177,7 @@ public class ElectricityCommandBuilder
         {
             @event.NewSlices.Add(new V1.SlicedEvent.Types.Slice
             {
-                Quantity = sliceCollection.Remainder.ToProtoCommitment(),
+                Quantity = sliceCollection.Remainder.ToProtoCommitment(id.CertificateId.ToString()),
                 NewOwner = currentOwnerSigner.PublicKey.ToProto(),
             });
         }
@@ -212,7 +220,7 @@ public class ElectricityCommandBuilder
             ConsumptionCertificateId = consCertId,
             ProductionSourceSlice = productionSource.ToSliceId(),
             ConsumptionSourceSlice = consumptionSource.ToSliceId(),
-            EqualityProof = ByteString.CopyFrom(Group.Default.CreateEqualityProof(productionSource.ToParams(), consumptionSource.ToParams()))
+            EqualityProof = ByteString.CopyFrom(SecretCommitmentInfo.CreateEqualityProof(productionSource.ToParams(), consumptionSource.ToParams(), allocationId.Value))
         };
 
         var productionClaimedEvent = new V1.ClaimedEvent

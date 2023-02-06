@@ -5,9 +5,9 @@ Below is an example wher two GCs are issued, sliced and claimed.
 - Consumption of 150Wh
 - Production of 250Wh
 
-The production is then sliced to a 150Wh slice and a remainder (100Wh).
+The production is then sliced to a 150Wh slice and a remainder slice (100Wh).
 
-A claim is then created between the two slices, and last the commands are executed.
+A claim is then created between the two slices, and the commands are executed.
 
 The commands could all have been executed independently, this is just an example.
 
