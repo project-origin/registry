@@ -27,7 +27,7 @@ public class ZeroProof
     {
         var c0 = gen.H() * r;
         var oracle = new Oracle(label);
-        oracle.Add(c0);
+        oracle.Add("message_c0", c0);
         return ZeroProof.Prove(gen, r, oracle);
     }
 
@@ -35,8 +35,9 @@ public class ZeroProof
     {
         var a = Scalar.Random();
         var A = gen.H() * a;
-        oracle.Domain("ZeroProof");
-        oracle.Add(A, gen.G(), gen.H());
+        oracle.Add("domain_zeroproof");
+        oracle.Add("message_A", A);
+        oracle.Add("generator_GH", gen.G(), gen.H());
         var c = oracle.Challenge();
         var z = a - c * r;
         return new ZeroProof(c, z);
@@ -52,15 +53,16 @@ public class ZeroProof
     public bool Verify(Generator gen, Point c0, byte[] label)
     {
         var oracle = new Oracle(label);
-        oracle.Add(c0);
+        oracle.Add("message_c0", c0);
         return this.Verify(gen, c0, oracle);
     }
 
     internal bool Verify(Generator gen, Point c0, Oracle oracle)
     {
         var A = (gen.H() * this.z) + (c0 * this.c);
-        oracle.Domain("ZeroProof");
-        oracle.Add(A, gen.G(), gen.H());
+        oracle.Add("domain_zeroproof");
+        oracle.Add("message_A", A);
+        oracle.Add("generator_GH", gen.G(), gen.H());
         var c = oracle.Challenge();
         return this.c == c;
     }
@@ -106,8 +108,8 @@ public class EqualProof
     public static EqualProof Prove(Generator gen, Scalar r0, Scalar r1, Point c0, Point c1, byte[] label)
     {
         var oracle = new Oracle(label);
-        oracle.Domain("EqualProof");
-        oracle.Add(c0, c1);
+        oracle.Add("domain_equalproof");
+        oracle.Add("message_pair", c0, c1);
         return new EqualProof(ZeroProof.Prove(gen, r0 - r1, oracle));
     }
 
@@ -123,8 +125,8 @@ public class EqualProof
     public bool Verify(Generator gen, Point c0, Point c1, byte[] label)
     {
         var oracle = new Oracle(label);
-        oracle.Domain("EqualProof");
-        oracle.Add(c0, c1);
+        oracle.Add("domain_equalproof");
+        oracle.Add("message_pair", c0, c1);
         return proof.Verify(gen, c0 - c1, oracle);
     }
 
@@ -159,18 +161,14 @@ public class SumProof
     /// <returns>a new proof</returns>
     public static SumProof Prove(Generator gen, byte[] label, Scalar rsum, Point csum, params (Scalar, Point)[] vec)
     {
-        var rs = new Scalar[vec.Length];
-        for (int i = 0; i < vec.Length; i++)
-            rs[i] = vec[i].Item1;
+        var rs = vec.Select(pair => pair.Item1).ToArray();
+        var cs = vec.Select(pair => pair.Item2).ToArray();
         var rsum2 = Scalar.Sum(rs);
 
         var oracle = new Oracle(label);
-        oracle.Domain("SumProof");
-        oracle.Add(csum);
-        foreach (var (_, p) in vec)
-        {
-            oracle.Add(p);
-        }
+        oracle.Add("domain_sumproof");
+        oracle.Add("message_commitsum", csum);
+        oracle.Add("message_commitparts", cs);
         return new SumProof(ZeroProof.Prove(gen, rsum - rsum2, oracle));
     }
 
@@ -187,9 +185,9 @@ public class SumProof
         var csum2 = Point.Sum(cs);
 
         var oracle = new Oracle(label);
-        oracle.Domain("SumProof");
-        oracle.Add(csum);
-        oracle.Add(cs);
+        oracle.Add("domain_sumproof");
+        oracle.Add("message_commitsum", csum);
+        oracle.Add("message_commitparts", cs);
         return proof.Verify(gen, csum - csum2, oracle);
     }
 

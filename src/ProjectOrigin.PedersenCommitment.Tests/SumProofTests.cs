@@ -130,7 +130,7 @@ public class SumProofTests
     }
 
     [Fact]
-    public void Serde()
+    public void SerialzeDeserialize()
     {
         var label = Encoding.UTF8.GetBytes("test");
         var pc_gens = Generator.Default;

@@ -11,16 +11,10 @@ class Oracle
         messages.Add(label);
     }
 
-    public void Domain(String domain)
+    public void Add(String label, params Point[] points)
     {
-        var bytes = Encoding.UTF8.GetBytes("test");
+        var bytes = Encoding.UTF8.GetBytes(label);
         messages.Add(bytes);
-    }
-
-
-    public void Add(params Point[] points)
-    {
-
         foreach (Point p in points)
         {
             messages.Add(p.Compress()._bytes);
