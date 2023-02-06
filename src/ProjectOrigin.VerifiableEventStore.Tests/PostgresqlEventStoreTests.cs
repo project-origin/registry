@@ -119,7 +119,7 @@ namespace ProjectOrigin.VerifiableEventStore.Tests
             var fixture = new Fixture();
             var @event = new VerifiableEvent(new EventId(Guid.NewGuid(), 99), fixture.Create<byte[]>());
             async Task act() => await _eventStore.Store(@event);
-            await Assert.ThrowsAnyAsync<Exception>(act);
+            await Assert.ThrowsAnyAsync<OutOfOrderException>(act);
         }
     }
 }
