@@ -6,7 +6,9 @@
 - @wisbech onboarding of the two PhD's to the project. @wisbech is primus motor on this, hence tagged here. 
 - Merging open PRs. At the time of writing, this includes: [#47](https://github.com/project-origin/registry/pull/47), [#53](https://github.com/project-origin/registry/pull/53), [#80](https://github.com/project-origin/registry/pull/80), and [#81](https://github.com/project-origin/registry/pull/81)
 - @wisbech and @tpryds agree to write a paper on the implemented functionality 
-- @lauranolling create project view for draft issues and go through open issues. Go through labels and remove `1`, `2`, `3`, `4`, `5`
+- @lauranolling create project view for draft issues and go through open issues. 
+- ~@lauranolling Go through labels and remove `1`, `2`, `3`, `4`, `5`~
+    - Done
 	
 ### Next steps 
 - Performance/benchmarking tests on implementations
