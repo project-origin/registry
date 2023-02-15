@@ -60,7 +60,7 @@ public class SumProofTests
         var c0 = pc_gens.Commit(42, r0);
         var c1 = pc_gens.Commit(42, r1);
 
-        var proof = EqualProof.Prove(pc_gens, r0, r1, label);
+        var proof = EqualProof.Prove(pc_gens, r0, r1, c0, c1, label);
 
         Assert.True(proof.Verify(pc_gens, c0, c1, label));
     }
@@ -101,7 +101,7 @@ public class SumProofTests
         var c2 = pc_gens.Commit(5, r2);
         var c3 = pc_gens.Commit(2, r3);
 
-        var proof = SumProof.Prove(pc_gens, label, r0, r1, r2, r3);
+        var proof = SumProof.Prove(pc_gens, label, r0, c0, (r1, c1), (r2, c2), (r3, c3));
         Assert.True(proof.Verify(pc_gens, label, c0, c1, c2, c3));
     }
 
@@ -130,7 +130,7 @@ public class SumProofTests
     }
 
     [Fact]
-    public void Serde()
+    public void SerialzeDeserialize()
     {
         var label = Encoding.UTF8.GetBytes("test");
         var pc_gens = Generator.Default;

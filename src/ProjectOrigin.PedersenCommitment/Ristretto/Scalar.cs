@@ -36,6 +36,9 @@ public sealed class Scalar
         [DllImport("rust_ffi", EntryPoint = "scalar_mul")]
         internal static extern IntPtr Mul(IntPtr lhs, IntPtr rhs);
 
+        [DllImport("rust_ffi", EntryPoint = "scalar_sum")]
+        internal static extern IntPtr Sum(IntPtr[] args, int len);
+
         [DllImport("rust_ffi", EntryPoint = "scalar_equals")]
         internal static extern bool Equals(IntPtr lhs, IntPtr rhs);
 
@@ -175,6 +178,15 @@ public sealed class Scalar
         return !Native.Equals(left._ptr, right._ptr);
     }
 
-
     public override int GetHashCode() => base.GetHashCode();
+
+    public static Scalar Sum(params Scalar[] args)
+    {
+        var ptrs = new IntPtr[args.Length];
+        for (int i = 0; i < args.Length; i++)
+            ptrs[i] = args[i]._ptr;
+
+        var resPtr = Native.Sum(ptrs, ptrs.Length);
+        return new Scalar(resPtr);
+    }
 }

@@ -42,7 +42,7 @@ public record SecretCommitmentInfo
     public static ReadOnlySpan<byte> CreateEqualityProof(SecretCommitmentInfo left, SecretCommitmentInfo right, string label)
     {
         var labelBytes = Encoding.UTF8.GetBytes(label);
-        var equalityProof = Ristretto.EqualProof.Prove(Generator.Default, left._blindingValue, right._blindingValue, labelBytes);
+        var equalityProof = Ristretto.EqualProof.Prove(Generator.Default, left._blindingValue, right._blindingValue, left.Commitment.Point, right.Commitment.Point, labelBytes);
         return equalityProof.Serialize();
     }
 
