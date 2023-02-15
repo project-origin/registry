@@ -1,7 +1,7 @@
 # Overview of Project-Origin
 
 ## Certification of Energy
-_Why bother at all_? one might ask, and argue that the energy supplied in the socket is electrons and its origin whatever is available at the given time, it is all in the residual mix, if I want solar or wind specifically I can simply shift my consumption to hours where there is a high degree of such sources in the residual mix ? A feasible strategy - yes, practical definately not.
+_Why bother at all_? one might ask, and argue that the energy supplied in the socket is electrons and its origin whatever is available at the given time, it is all in the residual mix. _If I want solar or wind specifically I can simply shift my consumption to hours, where there is a high degree of such sources in the residual mix_.  A feasible strategy? Yes. Practical? definitely not.
 
 Leveraging that electricity meters can provide extensive amounts of data - down to an interval of mere minutes - we can separate and document the total amount of electricity provided to the grid at a given time in terms of amounts and their origin at high temporal granularity, on a basis aligned with the spot market. 
 
@@ -17,7 +17,7 @@ The implementation is provided as available open-source software, to allow anyon
 ![](/resources/graphics/ETTvalue.drawio.png)
 
 ## How it has been done so far ?
-As the shares of renewables in the energy mix of some countries are rising towards 30%, the need for a system to certify the energy supplied in a trustworthy and transparent way becomes increasingly important. 
+As the share of renewables in the energy mix of some countries are rising [towards 60%](https://energinet.dk/media/2l5jt3lp/%C3%A5ret-der-gik-2022-i-el-og-gas.pdf), the need for a system to certify the energy supplied in a trustworthy and transparent way becomes increasingly important. 
 Currently, certification is done using [Guarantees of Origin](https://en.energinet.dk/Energy-data/Guarantees-of-origin-el-gas-hydrogen/) (GOs), issued on a monthly basis to an electronic register, and can be traded and/or cancelled up to 12 months after being issued. 
 This system has been in place for a long time and is generally well understood. 
 However, the GO certification scheme has received lots of criticism, especially evolving around the scheme [lacking credibility](https://ieeexplore.ieee.org/abstract/document/5311433), [lacking national implementations of disclosure regulation](https://www.oeko.de/fileadmin/oekodoc/Reliable-Disclosure-in-Europe-Status-Improvements-and-Perspectives.pdf), and having [little to no effect in terms of accelerating investments](https://akjournals.com/view/journals/204/41/4/article-p487.xml?body=contentsummary-24716) in renewable energy production.  
@@ -25,6 +25,7 @@ The drawbacks of the GO certification system will be elaborated below.
 
 ### Guarantees of Origin
 Guarantees of Origin (GOs) are issued monthly as 1 MWh fixed-volume certificates, which can be traded up to one year after being issued. 
+The GO certification system is regulated by the [Renewable Energy Directive](https://energy.ec.europa.eu/topics/renewable-energy/renewable-energy-directive-targets-and-rules/renewable-energy-directive_en) (RED-II).
 The rules specifying the format of GOs are provided in the [EN 16325](https://standards.globalspec.com/std/9969735/EN%2016325) standard developed by the European Committee for Standardisation (CEN) and the European Committee for Electrotechnical Standardisation (CENELEC). 
 The GO certification system is regulated by the [Renewable Energy Directive](https://energy.ec.europa.eu/topics/renewable-energy/renewable-energy-directive-targets-and-rules/renewable-energy-directive_en) (RED-II). 
 
@@ -32,17 +33,17 @@ the [Association of Issuing Bodies](https://www.aib-net.org/) (AIB) is the centr
 
 The procedure for trading GOs is as follows:
 
-1. A producer of energy requests a certificate for each MWh of energy produced, and a third party issuer, compliant with the central authority (AIB), issues the GO(s) to the producer
+1. A producer of energy requests a certificate for each MWh of energy produced, and the national issuing body for GO's, compliant with the central authority (AIB), issues the GO(s) to the producer
 2. The GO(s) is/are sold to a supplier
 3. The supplier sells the GO(s) to a consumer
-4. The consumer can then "use" the GO, by claiming, or [cancelling](https://en.energinet.dk/Energy-data/Guarantees-of-origin-el-gas-hydrogen/#accordion-cancellation), effectively attributing consumption of the renewable energy amount specified by the GO to the consumer.
+4. The consumer can then "use" the GO, by [cancelling](https://en.energinet.dk/Energy-data/Guarantees-of-origin-el-gas-hydrogen/#accordion-cancellation), effectively attributing consumption of the renewable energy amount specified by the GO to the consumer.
 
 To summarize, the existing GO system is based on the following principles:
 - Yearly certification
 - Volume based accounting
-- Exchange of certificates between parties through a centralised system AIB-hub
+- Exchange of certificates between parties through a centralised system 
 - The certificate is a tradeable asset
-- No direct physical link between the certificate and the energy supplied is required
+- There is no requirement for a direct physical link between the certificate and the energy supplied
 #### Challenges  
 At times, certain grid areas experience a supply by renewables that is [bigger than the grid capacity](https://www.caiso.com/documents/curtailmentfastfacts.pdf), which brings a number of [challenges to the existing, physical grid](https://www.rff.org/publications/explainers/renewables-101-integrating-renewables/): 
 - It becomes [difficult to stabilize the grid frequency](https://www.engineering.com/story/grid-frequency-stability-and-renewable-power) in the electricity grid.
