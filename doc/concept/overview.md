@@ -3,7 +3,7 @@
 ## Certification of Energy
 _Why bother at all_? one might ask, and argue that the energy supplied in the socket is electrons and its origin whatever is available at the given time, it is all in the residual mix, if I want solar or wind specifically I can simply shift my consumption to hours where there is a high degree of such sources in the residual mix ? A feasible strategy - yes, practical definately not.
 
-However, leveraging that electricity meters can provide extensive amounts of data - down to an interval of mere minutes - we can separate and document the total amount of electricity provided to the grid at a given time in terms of amounts and their origin at high temporal granularity, on a basis aligned with the spot market. 
+Leveraging that electricity meters can provide extensive amounts of data - down to an interval of mere minutes - we can separate and document the total amount of electricity provided to the grid at a given time in terms of amounts and their origin at high temporal granularity, on a basis aligned with the spot market. 
 
 Such documentation enables us to design and create a certification system, making it possible for consumers to prove the source of their consumed electricity at specific time intervals. 
 This certification system is extremely powerful as it provides trustworthy proofs, and given the [high demand for green energy](https://www2.deloitte.com/content/dam/Deloitte/us/Documents/energy-resources/us-eri-renewable-energy-outlook-2023.pdf) creates incentives to prioritize supply from renewable sources, while effectively preventing greenwashing. 
