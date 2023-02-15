@@ -8,7 +8,7 @@ Leveraging that electricity meters can provide extensive amounts of data - down 
 Such documentation enables us to design and create a certification system, making it possible for consumers to prove the source of their consumed electricity at specific time intervals. 
 This certification system is extremely powerful as it provides trustworthy proofs, and given the [high demand for green energy](https://www2.deloitte.com/content/dam/Deloitte/us/Documents/energy-resources/us-eri-renewable-energy-outlook-2023.pdf) creates incentives to prioritize supply from renewable sources, while effectively preventing greenwashing. 
 
-The scope of a trustworthy certification system like described above, can be useful in markets for various types of  energy. Additionally, a shared technical solution for certification across energy types creates the basis for coupling across sectors by supporting hybrid and Power-to-X technologies.
+The scope of a trustworthy certification system as described above, can be useful in markets for various types of  energy. Additionally, a shared technical solution for certification across energy types creates the basis for coupling across sectors by supporting hybrid and Power-to-X technologies.
 
 This is the basis of Project-Origin - creating a trustworthy, secure certification system that can be shared across energy types, by implementing the fundamental technical core functionality. 
 The implementation is provided as available open-source software, to allow anyone to use it, and build any necessary functionality on top to create a certification system able to trace their specific resource(s) in transactions.   
