@@ -27,7 +27,6 @@ The drawbacks of the GO certification system will be elaborated below.
 Guarantees of Origin (GOs) are issued monthly as 1 MWh fixed-volume certificates, which can be traded up to one year after being issued. 
 The GO certification system is regulated by the [Renewable Energy Directive](https://energy.ec.europa.eu/topics/renewable-energy/renewable-energy-directive-targets-and-rules/renewable-energy-directive_en) (RED-II).
 The rules specifying the format of GOs are provided in the [EN 16325](https://standards.globalspec.com/std/9969735/EN%2016325) standard developed by the European Committee for Standardisation (CEN) and the European Committee for Electrotechnical Standardisation (CENELEC). 
-The GO certification system is regulated by the [Renewable Energy Directive](https://energy.ec.europa.eu/topics/renewable-energy/renewable-energy-directive-targets-and-rules/renewable-energy-directive_en) (RED-II). 
 
 the [Association of Issuing Bodies](https://www.aib-net.org/) (AIB) is the central authority for the GO system in Europe, operating a central hub for trading the certificates following the EN 16325 standard. 
 
