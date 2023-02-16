@@ -15,8 +15,7 @@ The scope of a trustworthy certification system as described above, can be usefu
 This is the basis of Project-Origin - creating a trustworthy, secure certification system that can be shared across energy types, by implementing the fundamental technical core functionality. 
 The implementation is provided as available open-source software, to allow anyone to use it, and build any necessary functionality on top to create a certification system able to trace their specific resource(s) in transactions.   
 
-
-![](/resources/graphics/ETTvalue.drawio.png)
+![](GCvalue.drawio.svg)
 
 
 ## How it has been done so far ?
