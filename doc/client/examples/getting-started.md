@@ -1,13 +1,13 @@
 # Getting Started
 
-This getting started expects a running registry you can connect to.
+**Note**: This guide assumes that you have access to a running registry you can connect to.
 
 To call the registries, one should use the [client library available on nuget.org](https://www.nuget.org/packages/ProjectOrigin.Electricity.Client/).
 
 ## Connecting to a Registry
 
 All commands to a registry happens through a RegisterClient,
-this can be instanciated with the help of the address of where
+this can be instantiated using the address where
 the registry is located.
 
 ```csharp
@@ -18,8 +18,8 @@ var client = new RegisterClient("http://my-registry")
 
 To issue a certificate, one has to use the ElectricityCommandBuilder.
 
-When executed, it only returns a reference to the command,
-to get the result one has to listen to [async responses](#events)
+When executed, it only returns a reference to the command. 
+To get the result one has to listen to [async responses](#events)
 
 ```csharp
 RegisterClient client;
@@ -53,8 +53,8 @@ var commandId = await commandBuilder.Execute(client);
 
 ## Events
 
-Reponses are send async back to clients,
-they can be listened to by attaching to the client.Events handle.
+Reponses are sent asynchronously back to clients. 
+They can be listened to by attaching to the client.Events handle.
 
 ```csharp
 var client = new RegisterClient("http://my-registry")
