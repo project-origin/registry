@@ -50,7 +50,7 @@ To summarize, the existing GO system is based on the following principles:
 Despite the good concepts behind the GO certification system, it suffers from a number of serious drawbacks. One of these is the very low certificate prices, making it [difficult to generate enough economic incentives](https://www.sciencedirect.com/science/article/abs/pii/S0301421504002423) for improvements and investments in renewable energy production facilities. Another drawback is the property of not to link any physical properties to the certification system, which causes [neglection of transportation costs and over-exploitation of interconnector capacities](https://www.sciencedirect.com/science/article/abs/pii/S0301421516302889). Finally, there have been cases of countries with no physical interconnections [trading GOs](https://akjournals.com/view/journals/204/41/4/article-p487.xml?body=contentsummary-24716). These drawbacks ultimately hinder a trustworthy, transparent documentation of energy consumption and unfortunately don't create the positive impact on further renewable energy investments, as intended.  
 
 
-## Challenges in the current and future energy grid
+## Challenges in the energy grid
 At times, certain grid areas experience a supply by renewables that is [bigger than the grid capacity](https://www.caiso.com/documents/curtailmentfastfacts.pdf), which brings a number of [challenges to the existing, physical grid](https://www.rff.org/publications/explainers/renewables-101-integrating-renewables/): 
 
 - It becomes [difficult to stabilize the grid frequency](https://www.engineering.com/story/grid-frequency-stability-and-renewable-power) in the electricity grid.
