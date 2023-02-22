@@ -2,7 +2,7 @@ contact_links:
     - name: 🤔 Questions and Help
       url: https://github.com/project-origin/registry/discussions/categories/q-a
       about: This issue tracker is not for support questions. Please refer to the community's Q&A and discussion forums.
-      - name: 🤝 Code of Conduct
+    - name: 🤝 Code of Conduct
       url: https://github.com/project-origin/.github/blob/main/CODE_OF_CONDUCT.md
       about: Please consult our Code of Conduct before participating in the Project-Origin community.
     - name: 💻 Developer Slack
