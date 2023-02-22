@@ -1,6 +1,6 @@
 name: "☑️ Tracking of Tasks/Task List"
 description: Create a task list that tracks to-do's on the same topic. Helps split larger tasks into smaller to-do's. 
-title: "☑️ [Task List] - <title>"
+title: "☑️ [TASK LIST] - <title>"
 labels: [
   "tracking"
 ]
