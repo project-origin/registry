@@ -1,0 +1,47 @@
+name: "✏️ Task"
+description: Create a ticket for a new task
+title: ✏️ [TASK] - <title>"
+labels: [
+  "planning"
+]
+body:
+  - type: input
+    id: start_date
+    attributes:
+      label: "Start Date"
+      description: Start of development
+      value: "day/month/year"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: "Description"
+      description: Briefly describe the task you are working on
+      placeholder: "Describe the task in a few lines..."
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: "Motivation"
+      description: Motivation
+      placeholder: "Describe why the task needs to be done"
+    validations:
+      required: true
+  - type: textarea
+    id: definition_of_done
+    attributes:
+      label: "Definition of Done"
+      description: Describe what needs to happen before the task can be considered done.
+      placeholder: Add all criteria here, that needs to be fulfilled for the task to be considered done. 
+    validations:
+      required: true
+  - type: textarea
+    id: additional_info
+    attributes:
+      label: "Additional Information"
+      description: Is there any additional, relevant information? 
+      placeholder: Add any relevant information here. 
+    validations:
+      required: false

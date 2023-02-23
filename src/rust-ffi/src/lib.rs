@@ -9,6 +9,7 @@ pub mod point;
 pub mod rangeproof;
 pub mod scalar;
 mod util;
+pub mod transscript;
 
 #[no_mangle]
 pub unsafe extern "C" fn fill_bytes(raw: *const RawVec<u8>, dst: *mut u8) {
