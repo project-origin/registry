@@ -13,7 +13,7 @@ namespace ProjectOrigin.Electricity.Server;
 
 public class Startup
 {
-    public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+    public void ConfigureServices(IServiceCollection services)
     {
         VerifierConfiguration.ConfigureServices(services);
 
