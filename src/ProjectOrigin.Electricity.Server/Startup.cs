@@ -23,8 +23,8 @@ public class Startup
         var memorystoreRegB = new MemoryEventStore(batchSizeOptions);
 
         // Persistent setup
-        services.AddBatchProcessor();
-        services.AddPostgresEventStore(configuration);
+        // services.AddBatchProcessor();
+        // services.AddPostgresEventStore(configuration);
 
         services.AddGrpc();
         services.AddTransient<IBlockchainConnector, ConcordiumConnector>();
