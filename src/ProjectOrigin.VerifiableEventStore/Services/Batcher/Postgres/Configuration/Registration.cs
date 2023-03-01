@@ -4,7 +4,7 @@ namespace ProjectOrigin.VerifiableEventStore.Services.Batcher.Postgres.Configura
 
 public static class Registration
 {
-    public static IServiceCollection AddBatchProcessor(IServiceCollection services)
+    public static IServiceCollection AddBatchProcessor(this IServiceCollection services)
     {
         services.AddHostedService<BatchProcessorBackgroundService>();
         return services;

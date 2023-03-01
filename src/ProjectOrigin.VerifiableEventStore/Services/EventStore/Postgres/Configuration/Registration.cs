@@ -6,7 +6,7 @@ namespace ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres.Config
 
 public static class Registration
 {
-    public static IServiceCollection AddPostgresEventStore(IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddPostgresEventStore(this IServiceCollection services, IConfiguration configuration)
     {
         var options = new PostgresqlEventStoreOptions
         {
