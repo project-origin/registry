@@ -58,7 +58,7 @@ At times, certain grid areas experience a supply by renewables that is [bigger t
 - [Less centralized load balancing](https://research.rug.nl/en/publications/local-balancing-of-the-electricity-grid-in-a-renewable-municipali) might be necessary 
 - Makes it hard to validate the actual energy supplied to power-to-x applications and the origin of the losses in the process
 
-
+Considering the drawbacks of the GO certification system and the challenges of the energy grid, it is essential to develop an improved certification system that mitigates these drawbacks and is more connected to the physical grids mode of operation.
 ## Strategies for updating the certification system
 Several strategies could be applied to the infrastructure to tackle the challenges of the existing system. 
 
