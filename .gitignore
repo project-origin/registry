@@ -49,8 +49,20 @@ Temporary Items
 # iCloud generated files
 *.icloud
 
-
 # TestResults (dotnet)
 **/TestResults/
+
+### VisualStudioCode ###
+.vscode/*      # Maybe .vscode/**/* instead - see comments
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+### VisualStudioCode Patch ###
+# Ignore all local history of files
+**/.history
+
+# End of https://www.gitignore.io/api/visualstudiocode
 
 # End of https://www.toptal.com/developers/gitignore/api/dotnetcore,macos
