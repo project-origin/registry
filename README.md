@@ -31,7 +31,7 @@ The registry is not a PKI or a **Federated Network** infrastructure such as the 
 - [Alchemy Supernode](https://www.alchemy.com/supernode)
 - [Confidential Consortium Framework](https://ccf.microsoft.com/)
 
-The registry is not exposing external PKI's to the network but merely acts as a validation mechanism that handles **Granular Certificates** (GCs). 
+The registry is not exposing external PKI's to the network but merely acts as a validation mechanism that handles **Granular Certificates** (GCs). Preferably with an external eventstore to store the events that are used in state transitions, otherwise a local SQL database can be used with some modifications so that internal consistency is assured. 
 
 ## Why Project-Origin?
 
