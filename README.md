@@ -52,5 +52,5 @@ The project aims to enable extended use of the implementation, to other energy f
 ## Need any help? 
 In the registry repository, the Trusted Committer is currently @wisbech. The Trusted Committer provides timely support and mentorship for contributors, and helps contributors to shape their pull request to be ready to be submitted/accepted. If you want to contribute to this repository, the Trusted Committer has the mandate to specify any requirements that the contribution must fulfill on behalf of the partnership, to ensure product quality. 
 
-## Documentaion
+## Documentation
 To learn more about the implementation [go to the complete documention.](https://project-origin.github.io/registry/)
