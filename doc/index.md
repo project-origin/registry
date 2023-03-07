@@ -49,7 +49,7 @@ This ensures immutability, while providing high throughput.
 
 2. In Denmark alone we have 3.500.000 electricity meters,
 and with hourly measurements this would create
-30.660.000.000 (30 billion) measurements on a yearly basis.
+30.660.000.000 (30 billion) measurements on a yearly basis. Or in simpler terms, each meter would create 8760 issued certificates per year.
 
 More in-depth information can be found in the [architecture description](architecture/overview.md).
 
