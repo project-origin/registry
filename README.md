@@ -1,5 +1,8 @@
 # Project-Origin
 
+## Navigation
+- [Documentation](https://project-origin.github.io/registry/)
+- [Code](https://github.com/project-origin/registry/tree/main/src)
 ## How to run and test the registry
 The registry is currently available as .devcontainer in the repository. This means that you can run the registry in a docker container with all the dependencies installed.
 
@@ -19,6 +22,7 @@ The registry is currently available as .devcontainer in the repository. This mea
 The GCs purpose is to prove the origin and potential conversions of energy, thus supporting the green transition and power-to-X (PtX).
 
 If one searches for greenwashing, there is no shortages of articles on the internet showing a growing scepticism with [the current system](https://en.energinet.dk/Energy-data/Guarantees-of-origin-el-gas-hydrogen/) for proving the origin of electricity. 
+
 
 ## What Is Project-Origin?
 
