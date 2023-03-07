@@ -1,5 +1,19 @@
 # Project-Origin
 
+## How to run and test the registry
+The registry is currently available as .devcontainer in the repository. This means that you can run the registry in a docker container with all the dependencies installed.
+
+### Prerequisites
+- [Docker](https://docs.docker.com/get-docker/)
+- [VSCode](https://code.visualstudio.com/download)
+
+### Steps
+1. Clone the repository
+2. Open the repository in VSCode
+3. Install the [Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension
+4. Open the Command Palette (Ctrl+Shift+P) and select the Remote-Containers: Reopen in Container command.
+5. Check the ports terminal to see which ports are available
+
 ## What Is Project-Origin?
 
 Project-Origin is an Open Source project that is focused on creating verifiable and unique objects for the [Energy Track and Trace](https://energytrackandtrace.com/), Granular Certification Scheme. There are two main features of Project-Origin:
