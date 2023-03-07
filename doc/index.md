@@ -1,8 +1,4 @@
 # Project-Origin
-
-## Navigation
-- [Documentation](https://project-origin.github.io/registry/)
-- [Code](https://github.com/project-origin/registry/tree/main/src)
 ## How to run and test the registry
 The registry is currently available as .devcontainer in the repository. This means that you can run the registry in a docker container with all the dependencies installed.
 
