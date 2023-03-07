@@ -14,6 +14,12 @@ The registry is currently available as .devcontainer in the repository. This mea
 4. Open the Command Palette (Ctrl+Shift+P) and select the Remote-Containers: Reopen in Container command.
 5. Check the ports terminal to see which ports are available
 
+## Why Project-Origin?
+
+The GCs purpose is to prove the origin and potential conversions of energy, thus supporting the green transition and power-to-X (PtX).
+
+If one searches for greenwashing, there is no shortages of articles on the internet showing a growing scepticism with [the current system](https://en.energinet.dk/Energy-data/Guarantees-of-origin-el-gas-hydrogen/) for proving the origin of electricity. 
+
 ## What Is Project-Origin?
 
 Project-Origin is an Open Source project that is focused on creating verifiable and unique objects for the [Energy Track and Trace](https://energytrackandtrace.com/), Granular Certification Scheme. There are two main features of Project-Origin:
@@ -33,11 +39,6 @@ The registry is not a PKI or a **Federated Network** infrastructure such as the 
 
 The registry is not exposing external PKI's to the network but merely acts as a validation mechanism that handles **Granular Certificates** (GCs). Preferably with an external eventstore to store the events that are used in state transitions, otherwise a local SQL database can be used with some modifications so that internal consistency is assured. 
 
-## Why Project-Origin?
-
-The GCs purpose is to prove the origin and potential conversions of energy, thus supporting the green transition and power-to-X (PtX).
-
-If one searches for greenwashing, there is no shortages of articles on the internet showing a growing scepticism with [the current system](https://en.energinet.dk/Energy-data/Guarantees-of-origin-el-gas-hydrogen/) for proving the origin of electricity.
 
 Project-Origin was created because there is a need to provide a trustworthy,
 **publicly verifiable** way to prove the origin of the electricity one uses on
