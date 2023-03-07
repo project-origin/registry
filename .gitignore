@@ -54,3 +54,4 @@ Temporary Items
 **/TestResults/
 
 # End of https://www.toptal.com/developers/gitignore/api/dotnetcore,macos
+/src/.vs

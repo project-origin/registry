@@ -4,8 +4,10 @@ using ProjectOrigin.Register.StepProcessor.Interfaces;
 using ProjectOrigin.Register.StepProcessor.Models;
 using ProjectOrigin.Register.StepProcessor.Services;
 using ProjectOrigin.VerifiableEventStore.Services.Batcher;
+using ProjectOrigin.VerifiableEventStore.Services.Batcher.Postgres.Configuration;
 using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector;
 using ProjectOrigin.VerifiableEventStore.Services.EventStore;
+using ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres.Configuration;
 
 namespace ProjectOrigin.Electricity.Server;
 
@@ -15,8 +17,14 @@ public class Startup
     {
         VerifierConfiguration.ConfigureServices(services);
 
-        var memorystoreRegA = new MemoryEventStore();
-        var memorystoreRegB = new MemoryEventStore();
+        // In-memory setup
+        var batchSizeOptions = new BatcherOptions() { BatchSizeExponent = 0 };
+        var memorystoreRegA = new MemoryEventStore(batchSizeOptions);
+        var memorystoreRegB = new MemoryEventStore(batchSizeOptions);
+
+        // Persistent setup
+        // services.AddBatchProcessor();
+        // services.AddPostgresEventStore(configuration);
 
         services.AddGrpc();
         services.AddTransient<IBlockchainConnector, ConcordiumConnector>();
