@@ -11,7 +11,7 @@ The registry is currently available as .devcontainer in the repository. This mea
 - [VSCode](https://code.visualstudio.com/download)
 
 ### Steps
-1. Clone the repository
+1. Clone the [repository](https://github.com/project-origin/registry/tree/main)
 2. Open the repository in VSCode
 3. Install the [Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension
 4. Open the Command Palette (Ctrl+Shift+P) and select the Remote-Containers: Reopen in Container command.
