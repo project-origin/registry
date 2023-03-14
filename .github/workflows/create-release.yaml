@@ -25,10 +25,6 @@ jobs:
         with:
           dotnet-version: "7.0"
 
-      - name: Install windows cross-compile
-        run: |
-          rustup target add x86_64-w64-mingw32-gcc
-
       - name: Build
         shell: bash
         run: dotnet build --configuration Release ${{ env.project }}
