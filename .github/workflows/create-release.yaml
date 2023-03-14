@@ -27,7 +27,7 @@ jobs:
 
       - name: Build
         shell: bash
-        run: dotnet build ${{ env.project }}
+        run: dotnet build --configuration Release ${{ env.project }}
 
       - name: Pack
         shell: bash

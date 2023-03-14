@@ -18,4 +18,10 @@
     <Protobuf Include="..\Protos\register.proto" GrpcServices="Client" Access="internal" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <Content Include="bin\$(Configuration)\*\rust_ffi.*" PackagePath="lib\" />
+    <Content Include="bin\$(Configuration)\*\librust_ffi.*" PackagePath="lib\" />
+  </ItemGroup>
+
 </Project>
