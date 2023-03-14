@@ -6,6 +6,8 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY . .
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+RUN cd rust-ffi && cargo build && cd -
 RUN dotnet restore
 RUN dotnet build ProjectOrigin.Electricity.Server --no-restore -c Release -o /app/build
 
