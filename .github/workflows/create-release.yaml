@@ -27,8 +27,7 @@ jobs:
 
       - name: Install windows cross-compile
         run: |
-          sudo apt-get update
-          sudo apt-get install gcc-mingw-w64
+          rustup target add x86_64-w64-mingw32-gcc
 
       - name: Build
         shell: bash
