@@ -89,7 +89,7 @@ jobs:
           context: ./src
           file: ./src/ProjectOrigin.Electricity.Server/Dockerfile
           push: true
-          tags: po-electricity-server:${{ needs.define-version.outputs.version }}
+          tags: ghcr.io/project-origin/electricity-server:${{ needs.define-version.outputs.version }}
 
   create-release:
     name: Create GitHub Release
