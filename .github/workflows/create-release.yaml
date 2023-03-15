@@ -10,7 +10,7 @@ jobs:
 
   publish-client-nuget:
     name: Publish Client Nuget Package
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       project: src/ProjectOrigin.Electricity.Client
 
