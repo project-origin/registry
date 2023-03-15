@@ -5,11 +5,12 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
+RUN apt-get update && apt install build-essential -y
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="$PATH:/root/.cargo/bin"
 COPY . .
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-RUN cd rust-ffi && cargo build && cd -
 RUN dotnet restore
-RUN dotnet build ProjectOrigin.Electricity.Server --no-restore -c Release -o /app/build
+RUN dotnet build ProjectOrigin.Electricity.Server -c Release --no-restore -o /app/build
 
 FROM build AS publish
 RUN dotnet publish ProjectOrigin.Electricity.Server -c Release -o /app/publish
