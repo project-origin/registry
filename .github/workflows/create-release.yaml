@@ -25,9 +25,15 @@ jobs:
         with:
           dotnet-version: "7.0"
 
+      - name: Install windows cross-compile
+        run: |
+          sudo apt-get update
+          sudo apt-get install gcc-mingw-w64 -y
+          rustup target add x86_64-pc-windows-gnu
+
       - name: Build
         shell: bash
-        run: dotnet build ${{ env.project }}
+        run: dotnet build --configuration Release ${{ env.project }}
 
       - name: Pack
         shell: bash

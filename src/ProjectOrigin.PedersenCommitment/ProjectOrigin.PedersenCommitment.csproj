@@ -13,6 +13,7 @@
 
   <Target Name="CargoBuildRelease" BeforeTargets="PreBuildEvent" Condition=" '$(Configuration)' == 'Release' ">
     <Exec Command="cargo build --release" WorkingDirectory="$(RustRootDirectory)"/>
+    <Exec Command="cargo build --release --target x86_64-pc-windows-gnu" WorkingDirectory="$(RustRootDirectory)"/>
     <ItemGroup Condition=" '$(Configuration)' == 'Release' ">
       <Content CopyToOutputDirectory="PreserveNewest" Include="$(RustRootDirectory)/target/**/release/*rust_ffi.*" />
     </ItemGroup>
