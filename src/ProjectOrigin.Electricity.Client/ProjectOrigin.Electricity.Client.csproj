@@ -18,10 +18,9 @@
     <Protobuf Include="..\Protos\register.proto" GrpcServices="Client" Access="internal" />
   </ItemGroup>
 
-
-  <ItemGroup>
-    <Content Include="bin\$(Configuration)\*\rust_ffi.*" PackagePath="lib\" />
-    <Content Include="bin\$(Configuration)\*\librust_ffi.*" PackagePath="lib\" />
+  <ItemGroup Condition=" '$(Configuration)' == 'Release' ">
+    <None Include="../rust-ffi/target/x86_64-unknown-linux-gnu/release/librust_ffi.so" Pack="true" PackagePath="runtimes/linux-x64/native" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../rust-ffi/target/x86_64-pc-windows-gnu/release/rust_ffi.dll" Pack="true" PackagePath="runtimes/win-x64/native" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
