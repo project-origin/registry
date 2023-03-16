@@ -13,7 +13,7 @@ namespace ProjectOrigin.Electricity.Server;
 
 public class Startup
 {
-    public void ConfigureServices(IServiceCollection services, ConfigurationManager configuration)
+    public void ConfigureServices(IServiceCollection services)
     {
         VerifierConfiguration.ConfigureServices(services);
 
@@ -25,10 +25,6 @@ public class Startup
         // Persistent setup
         // services.AddBatchProcessor();
         // services.AddPostgresEventStore(configuration);
-
-        services.AddOptions<ConcordiumOptions>()
-            .Bind(configuration.GetSection("Concordium"))
-            .ValidateDataAnnotations();
 
         services.AddGrpc();
         services.AddTransient<IBlockchainConnector, ConcordiumConnector>();
