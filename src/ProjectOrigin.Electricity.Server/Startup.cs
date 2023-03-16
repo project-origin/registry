@@ -4,10 +4,8 @@ using ProjectOrigin.Register.StepProcessor.Interfaces;
 using ProjectOrigin.Register.StepProcessor.Models;
 using ProjectOrigin.Register.StepProcessor.Services;
 using ProjectOrigin.VerifiableEventStore.Services.Batcher;
-using ProjectOrigin.VerifiableEventStore.Services.Batcher.Postgres.Configuration;
 using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector;
 using ProjectOrigin.VerifiableEventStore.Services.EventStore;
-using ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres.Configuration;
 
 namespace ProjectOrigin.Electricity.Server;
 
@@ -34,6 +32,7 @@ public class Startup
                 { Registries.RegistryA, memorystoreRegA},
                 { Registries.RegistryB, memorystoreRegB}
             };
+
 
             var batcherRegA = new MemoryBatcher(serviceProvider.GetService<IBlockchainConnector>()!, memorystoreRegA, Options.Create(new BatcherOptions { BatchSizeExponent = 0 }));
             var batcherRegB = new MemoryBatcher(serviceProvider.GetService<IBlockchainConnector>()!, memorystoreRegB, Options.Create(new BatcherOptions { BatchSizeExponent = 0 }));
