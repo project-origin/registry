@@ -23,8 +23,11 @@ public class CommandService : V1.CommandService.CommandServiceBase
             State = V1.CommandState.Succeeded,
         };
 
+
         try
         {
+            _logger.LogInformation($"Started command ”{protoCommand.Id}”");
+
             foreach (var step in protoCommand.Steps)
             {
                 var stepResult = await _processor.Process(step);
@@ -33,9 +36,13 @@ public class CommandService : V1.CommandService.CommandServiceBase
                 if (stepResult.State == V1.CommandState.Failed)
                 {
                     result.State = V1.CommandState.Failed;
+                    _logger.LogInformation($"Failed step ”{protoCommand.Id}”");
                     break;
                 }
+                _logger.LogInformation($"Completed step ”{protoCommand.Id}”");
             }
+
+            _logger.LogInformation($"Completed command ”{protoCommand.Id}”");
         }
         catch (Exception ex)
         {

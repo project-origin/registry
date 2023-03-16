@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ProjectOrigin.VerifiableEventStore.Extensions;
 using ProjectOrigin.VerifiableEventStore.Models;
@@ -12,13 +13,15 @@ public class MemoryBatcher : IBatcher
     private readonly IEventStore _eventStore;
     private List<VerifiableEvent> _events = new();
     private readonly long _batchSize;
+    private readonly ILogger _logger;
     private const int BlockRetryWaitMilliseconds = 1000;
 
-    public MemoryBatcher(IBlockchainConnector blockchainConnector, IEventStore eventStore, IOptions<BatcherOptions> options)
+    public MemoryBatcher(IBlockchainConnector blockchainConnector, IEventStore eventStore, IOptions<BatcherOptions> options, ILogger<MemoryBatcher> logger)
     {
         _blockchainConnector = blockchainConnector;
         _eventStore = eventStore;
         _batchSize = (long)Math.Pow(2, options.Value.BatchSizeExponent);
+        _logger = logger;
     }
 
     public async Task PublishEvent(VerifiableEvent e)
@@ -38,6 +41,8 @@ public class MemoryBatcher : IBatcher
             await Task.Delay(BlockRetryWaitMilliseconds);
             block = await _blockchainConnector.GetBlock(transaction);
         }
+
+        _logger.LogInformation($"Added transaction on blockchain with hash ”{transaction.TransactionHash}”");
 
         var batch = new Batch(block.BlockId, transaction.TransactionHash, batchEvents);
         return batch;

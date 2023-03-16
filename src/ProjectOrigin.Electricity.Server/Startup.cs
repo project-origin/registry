@@ -33,9 +33,8 @@ public class Startup
                 { Registries.RegistryB, memorystoreRegB}
             };
 
-
-            var batcherRegA = new MemoryBatcher(serviceProvider.GetService<IBlockchainConnector>()!, memorystoreRegA, Options.Create(new BatcherOptions { BatchSizeExponent = 0 }));
-            var batcherRegB = new MemoryBatcher(serviceProvider.GetService<IBlockchainConnector>()!, memorystoreRegB, Options.Create(new BatcherOptions { BatchSizeExponent = 0 }));
+            var batcherRegA = new MemoryBatcher(serviceProvider.GetService<IBlockchainConnector>()!, memorystoreRegA, Options.Create(new BatcherOptions { BatchSizeExponent = 0 }), serviceProvider.GetService<ILogger<MemoryBatcher>>()!);
+            var batcherRegB = new MemoryBatcher(serviceProvider.GetService<IBlockchainConnector>()!, memorystoreRegB, Options.Create(new BatcherOptions { BatchSizeExponent = 0 }), serviceProvider.GetService<ILogger<MemoryBatcher>>()!);
 
             var fesRegA = new InProcessFederatedEventStore(batcherRegA, eventStoreDictionary);
             var fesRegB = new InProcessFederatedEventStore(batcherRegB, eventStoreDictionary);
