@@ -1,6 +1,6 @@
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Server;
-using ProjectOrigin.VerifiableEventStore.Services.Batcher;
+using ProjectOrigin.VerifiableEventStore.Models;
 
 var startup = new Startup();
 
@@ -11,7 +11,7 @@ builder.Services.AddOptions<IssuerOptions>()
     .Validate(option => option.IsValid, "Invalid issuer configuration.")
     .ValidateOnStart();
 
-builder.Services.AddOptions<BatcherOptions>()
+builder.Services.AddOptions<VerifiableEventStoreOptions>()
     .Bind(builder.Configuration.GetSection("VerifiableEventStore"))
     .ValidateDataAnnotations()
     .ValidateOnStart();

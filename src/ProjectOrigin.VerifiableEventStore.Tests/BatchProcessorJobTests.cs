@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
+using Microsoft.Extensions.Options;
 using ProjectOrigin.VerifiableEventStore.Models;
-using ProjectOrigin.VerifiableEventStore.Services.Batcher;
-using ProjectOrigin.VerifiableEventStore.Services.Batcher.Postgres;
+using ProjectOrigin.VerifiableEventStore.Services.BatchProcessor;
 using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector;
 using ProjectOrigin.VerifiableEventStore.Services.EventStore;
 
@@ -17,8 +17,8 @@ public class BatchProcessorJobTests
         var blockId = new Fixture().Create<string>();
         var transactionId = new Fixture().Create<string>();
         var blockChainConnector = new Mock<IBlockchainConnector>();
-        var batcherOptions = new BatcherOptions() { BatchSizeExponent = 2 };
-        var eventStore = new MemoryEventStore(batcherOptions);
+        var batcherOptions = new VerifiableEventStoreOptions() { BatchSizeExponent = 2 };
+        var eventStore = new MemoryEventStore(Options.Create(batcherOptions));
         var event1 = new Fixture().Create<VerifiableEvent>();
         var event2 = new Fixture().Create<VerifiableEvent>();
 

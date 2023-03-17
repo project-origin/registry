@@ -1,21 +1,22 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector;
 using ProjectOrigin.VerifiableEventStore.Services.EventStore;
 
-namespace ProjectOrigin.VerifiableEventStore.Services.Batcher.Postgres;
+namespace ProjectOrigin.VerifiableEventStore.Services.BatchProcessor;
 
 public class BatchProcessorBackgroundService : BackgroundService
 {
     private readonly TimeSpan _period = TimeSpan.FromSeconds(30);
     private readonly ILogger<BatchProcessorBackgroundService> _logger;
-    private readonly IServiceProvider _serviceProvider;
+    private readonly IEventStore _eventStore;
+    private readonly IBlockchainConnector _blockchainConnector;
 
-    public BatchProcessorBackgroundService(ILogger<BatchProcessorBackgroundService> logger, IServiceProvider serviceProvider)
+    public BatchProcessorBackgroundService(ILogger<BatchProcessorBackgroundService> logger, IEventStore eventStore, IBlockchainConnector blockchainConnector)
     {
         _logger = logger;
-        _serviceProvider = serviceProvider;
+        _eventStore = eventStore;
+        _blockchainConnector = blockchainConnector;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -27,11 +28,7 @@ public class BatchProcessorBackgroundService : BackgroundService
         {
             _logger.LogInformation("Executing BatchProcesser");
 
-            using var scope = _serviceProvider.CreateScope();
-            var blockchainConnector = scope.ServiceProvider.GetRequiredService<IBlockchainConnector>();
-            var eventStore = scope.ServiceProvider.GetRequiredService<IEventStore>();
-
-            var processer = new BatchProcessorJob(blockchainConnector, eventStore);
+            var processer = new BatchProcessorJob(_blockchainConnector, _eventStore);
             await processer.Execute(stoppingToken);
 
             _logger.LogInformation("Executed BatchProcesser");

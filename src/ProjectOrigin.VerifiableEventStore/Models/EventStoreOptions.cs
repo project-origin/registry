@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ProjectOrigin.VerifiableEventStore.Services.Batcher;
+namespace ProjectOrigin.VerifiableEventStore.Models;
 
-public record BatcherOptions
+public class VerifiableEventStoreOptions
 {
     [Required, Range(0, 20)]
     public long BatchSizeExponent { get; set; }
