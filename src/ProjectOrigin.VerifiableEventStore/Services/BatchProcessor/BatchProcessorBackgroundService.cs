@@ -9,13 +9,13 @@ public class BatchProcessorBackgroundService : BackgroundService
 {
     private readonly TimeSpan _period = TimeSpan.FromSeconds(30);
     private readonly ILogger<BatchProcessorBackgroundService> _logger;
-    private readonly IEventStore _eventStore;
+    private readonly IEnumerable<IEventStore> _eventStores;
     private readonly IBlockchainConnector _blockchainConnector;
 
-    public BatchProcessorBackgroundService(ILogger<BatchProcessorBackgroundService> logger, IEventStore eventStore, IBlockchainConnector blockchainConnector)
+    public BatchProcessorBackgroundService(ILogger<BatchProcessorBackgroundService> logger, IEnumerable<IEventStore> eventStores, IBlockchainConnector blockchainConnector)
     {
         _logger = logger;
-        _eventStore = eventStore;
+        _eventStores = eventStores;
         _blockchainConnector = blockchainConnector;
     }
 
@@ -28,8 +28,11 @@ public class BatchProcessorBackgroundService : BackgroundService
         {
             _logger.LogInformation("Executing BatchProcesser");
 
-            var processer = new BatchProcessorJob(_blockchainConnector, _eventStore);
-            await processer.Execute(stoppingToken);
+            foreach (var eventStore in _eventStores)
+            {
+                var processer = new BatchProcessorJob(_blockchainConnector, eventStore);
+                await processer.Execute(stoppingToken);
+            }
 
             _logger.LogInformation("Executed BatchProcesser");
         }

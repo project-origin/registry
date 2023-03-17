@@ -16,8 +16,12 @@ public class Startup
     {
         VerifierConfiguration.ConfigureServices(services);
 
+        var eventStores = new List<IEventStore>();
+
         services.AddGrpc();
         services.AddTransient<IBlockchainConnector, ConcordiumConnector>();
+
+        services.AddHostedService<BatchProcessorBackgroundService>(sp => new BatchProcessorBackgroundService(sp.GetService<ILogger<BatchProcessorBackgroundService>>()!, eventStores, sp.GetService<IBlockchainConnector>()!));
 
         // For single running service with two in memory registers
         services.AddSingleton<ICommandStepProcessor>((serviceProvider) =>
@@ -27,13 +31,13 @@ public class Startup
             var memorystoreRegA = new MemoryEventStore(eventStoreOptions);
             var memorystoreRegB = new MemoryEventStore(eventStoreOptions);
 
+            eventStores.Add(memorystoreRegA);
+            eventStores.Add(memorystoreRegB);
+
             var eventStoreDictionary = new Dictionary<string, IEventStore>{
                 { Registries.RegistryA, memorystoreRegA},
                 { Registries.RegistryB, memorystoreRegB}
             };
-
-            services.AddHostedService<BatchProcessorBackgroundService>(sp => new BatchProcessorBackgroundService(sp.GetService<ILogger<BatchProcessorBackgroundService>>()!, memorystoreRegA, sp.GetService<IBlockchainConnector>()!));
-            services.AddHostedService<BatchProcessorBackgroundService>(sp => new BatchProcessorBackgroundService(sp.GetService<ILogger<BatchProcessorBackgroundService>>()!, memorystoreRegB, sp.GetService<IBlockchainConnector>()!));
 
             var fesRegA = new InProcessFederatedEventStore(memorystoreRegA, eventStoreDictionary);
             var fesRegB = new InProcessFederatedEventStore(memorystoreRegB, eventStoreDictionary);
