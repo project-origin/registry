@@ -18,7 +18,7 @@ jobs:
 
       - name: Set env
         id: output-version
-        run: echo "::set-output name=version::${GITHUB_REF#refs/*/v}"
+        run: echo "version=${GITHUB_REF#refs/*/v}" >> $GITHUB_OUTPUT
 
   publish-client-nuget:
     name: Publish Electricity Client Nuget Package
@@ -30,9 +30,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
-      - name: Set env
-        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/v}" >> $GITHUB_ENV
 
       - name: Setup .NET Core SDK 7
         uses: actions/setup-dotnet@v3
