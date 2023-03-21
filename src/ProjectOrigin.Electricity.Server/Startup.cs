@@ -42,8 +42,12 @@ public class Startup
             var fesRegA = new InProcessFederatedEventStore(memorystoreRegA, eventStoreDictionary);
             var fesRegB = new InProcessFederatedEventStore(memorystoreRegB, eventStoreDictionary);
 
-            var processorRegA = new CommandStepProcessor(Options.Create(new CommandStepProcessorOptions(Registries.RegistryA)), fesRegA, serviceProvider.GetService<ICommandStepVerifiere>()!);
-            var processorRegB = new CommandStepProcessor(Options.Create(new CommandStepProcessorOptions(Registries.RegistryB)), fesRegB, serviceProvider.GetService<ICommandStepVerifiere>()!);
+            var processorRegA = new CommandStepProcessor(Options.Create(new CommandStepProcessorOptions { RegistryName = Registries.RegistryA }),
+                                                         fesRegA,
+                                                         serviceProvider.GetService<ICommandStepVerifiere>()!);
+            var processorRegB = new CommandStepProcessor(Options.Create(new CommandStepProcessorOptions { RegistryName = Registries.RegistryB }),
+                                                         fesRegB,
+                                                         serviceProvider.GetService<ICommandStepVerifiere>()!);
 
             return new CommandStepRouter(new Dictionary<string, ICommandStepProcessor>(){
                 { Registries.RegistryA, processorRegA },

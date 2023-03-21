@@ -2,7 +2,7 @@ using NSec.Cryptography;
 
 namespace ProjectOrigin.Electricity.Models;
 
-public record IssuerOptions
+public class IssuerOptions
 {
     public Dictionary<string, string> AreaIssuerPublicKeys { get; set; } = new Dictionary<string, string>();
 
