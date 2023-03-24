@@ -2,8 +2,9 @@
 name: Create Helm Release
 on:
   push:
-    - 'chart-v[0-9]+.[0-9]+.[0-9]+' # support v1.2.3
-    - 'chart-v[0-9]+.[0-9]+.[0-9]+-alpha.[0-9]+' #supports alpha versions v1.2.3-alpha.4
+    tags:
+      - 'chart-v[0-9]+.[0-9]+.[0-9]+' # support v1.2.3
+      - 'chart-v[0-9]+.[0-9]+.[0-9]+-alpha.[0-9]+' #supports alpha versions v1.2.3-alpha.4
 
 env:
   CHART_FOLDER: charts/project-origin/
