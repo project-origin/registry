@@ -26,7 +26,7 @@ jobs:
       - name: Get chart name and version
         id: variables
         run: |
-          echo "name=$(yq r ${{ env.CHART_FOLDER }}/Chart.yaml name)" >> $GITHUB_OUTPUT
+          echo "name=$(yq .name < ${{ env.CHART_FOLDER }}/Chart.yaml)" >> $GITHUB_OUTPUT
           echo "version=${GITHUB_REF#refs/*/chart-v}" >> $GITHUB_OUTPUT
 
       - name: Package and push chart
