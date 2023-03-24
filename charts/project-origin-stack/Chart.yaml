@@ -1,6 +1,6 @@
 apiVersion: v2
-name: project-origin
-description: A Helm chart for Kubernetes
+name: project-origin-stack
+description: A helm chart for deploying the Project Origin stack
 
 # A chart can be either an 'application' or a 'library' chart.
 #
