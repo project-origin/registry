@@ -1,0 +1,127 @@
+---
+{{- if .Values.concordium.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: po-concordium-node-statefulset
+  labels:
+    app: po-concordium-node
+spec:
+  replicas: 1
+  serviceName: cpo-oncordium-node
+  selector:
+    matchLabels:
+      app: po-concordium-node
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: po-concordium-node
+    spec:
+      containers:
+        - name: po-concordium-node
+          image: concordium/{{ .Values.concordium.network }}-node:5.2.4-0
+          command: ["/concordium-node"]
+          ports:
+            - containerPort: 10000
+          env:
+            # Environment specific configuration
+            # The url where IPs of the bootstrap nodes can be found.
+            - name: CONCORDIUM_NODE_CONNECTION_BOOTSTRAP_NODES
+              value: bootstrap.{{ .Values.concordium.network }}.concordium.com:8888
+            # Where the genesis is located
+            - name: CONCORDIUM_NODE_CONSENSUS_GENESIS_DATA_FILE
+              value: /{{ .Values.concordium.network }}-genesis.dat
+            # The url of the catchup file. This speeds up the catchup process.
+            - name: CONCORDIUM_NODE_CONSENSUS_DOWNLOAD_BLOCKS_FROM
+              value: https://catchup.{{ .Values.concordium.network }}.concordium.com/blocks.idx
+            # General node configuration Data and config directories (it's OK if they
+            # are the same). This should match the volume mount below. If the location
+            # of the mount inside the container is changed, then these should be
+            # changed accordingly as well.
+            - name: CONCORDIUM_NODE_DATA_DIR
+              value: /mnt/data
+            - name: CONCORDIUM_NODE_CONFIG_DIR
+              value: /mnt/data
+            # The port on which the node will listen for incoming connections. This is a
+            # port inside the container. It is mapped to an external port by the port
+            # mapping in the `ports` section below. If the internal and external ports
+            # are going to be different then you should also set
+            # `CONCORDIUM_NODE_EXTERNAL_PORT` variable to what the external port value is.
+            - name: CONCORDIUM_NODE_LISTEN_PORT
+              value: "8888"
+            # Desired number of nodes to be connected to.
+            - name: CONCORDIUM_NODE_CONNECTION_DESIRED_NODES
+              value: "5"
+            # Maximum number of __nodes__ the node will be connected to.
+            - name: CONCORDIUM_NODE_CONNECTION_MAX_ALLOWED_NODES
+              value: "10"
+            # Address of the GRPC server
+            - name: CONCORDIUM_NODE_RPC_SERVER_ADDR
+              value: "0.0.0.0"
+            # And its port
+            - name: CONCORDIUM_NODE_RPC_SERVER_PORT
+              value: "10000"
+            # Address of the V2 GRPC server
+            - name: CONCORDIUM_NODE_GRPC2_LISTEN_PORT
+              value: "20000"
+            # And its port
+            - name: CONCORDIUM_NODE_GRPC2_LISTEN_ADDRESS
+              value: "0.0.0.0"
+            # Maximum number of __connections__ the node can have. This can temporarily be more than
+            # the number of peers when incoming connections are processed. This limit
+            # ensures that there cannot be too many of those.
+            - name: CONCORDIUM_NODE_CONNECTION_HARD_CONNECTION_LIMIT
+              value: "20"
+            # Number of threads to use to process network events. This should be
+            # adjusted based on the resources the node has (in combination with
+            # `CONCORDIUM_NODE_RUNTIME_HASKELL_RTS_FLAGS`) below.
+            - name: CONCORDIUM_NODE_CONNECTION_THREAD_POOL_SIZE
+              value: "2"
+            # The bootstrapping interval in seconds. This makes the node contact the
+            # specified bootstrappers at a given interval to discover new peers.
+            - name: CONCORDIUM_NODE_CONNECTION_BOOTSTRAPPING_INTERVAL
+              value: "1800"
+            # Haskell RTS flags to pass to consensus. `-N2` means to use two threads
+            # for consensus operations. `-I0` disables the idle garbage collector
+            # which reduces CPU load for non-baking nodes.
+            - name: CONCORDIUM_NODE_RUNTIME_HASKELL_RTS_FLAGS
+              value: "-N2,-I0"
+          volumeMounts:
+            - name: po-concordium-data
+              mountPath: /mnt/data
+
+      {{- if .Values.concordium.collector.enabled }}
+        - name: po-concordium-node-collector
+          image: concordium/{{ .Values.concordium.network }}-node:5.2.4-0
+          command: ["/node-collector"]
+          env:
+            # Settings that should be customized by the user.
+            - name: CONCORDIUM_NODE_COLLECTOR_NODE_NAME
+              value: {{ required "A valid nodeName for the collector must be specified when enabled." .Values.concordium.collector.nodeName }}
+            # Environment specific settings.
+            - name: CONCORDIUM_NODE_COLLECTOR_URL
+              value: "https://dashboard.{{ .Values.concordium.network }}.concordium.com/nodes/post"
+            # Collection settings.
+            # How often to collect the statistics from the node.
+            - name: CONCORDIUM_NODE_COLLECTOR_COLLECT_INTERVAL
+              value: "{{ .Values.concordium.collector.interval }}"
+            # The URL where the node can be reached. Note that this will use the
+            # docker created network which maps `testnet-node` to the internal IP of
+            # the `testnet-node`. If the name of the node service is changed from
+            # `testnet-node` then the name here must also be changed.
+            - name: CONCORDIUM_NODE_COLLECTOR_GRPC_HOST
+              value: http://localhost:10000
+      {{- end }}
+
+  volumeClaimTemplates:
+    - metadata:
+        name: po-concordium-data
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: 100Gi
+{{- end }}

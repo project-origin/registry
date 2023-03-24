@@ -1,0 +1,54 @@
+commandOrchestrator:
+  enabled: true
+
+# issuers defines the currently accepted issuers for given areas.
+issuers: []
+  # example
+  # - area: DK1
+  #   publicKey: sJuwdQ4TOarGjc3CyEJ5c37jJNOaH6PcOiyE1ge6+24=
+
+
+# registries defines the number and configures local registries
+registries: []
+  # example
+  # - name: RegistryName
+  #   verifiableEventStore:
+  #     batchSizeExponent: 0
+  #     eventStore:
+  #       type: inMemory
+
+
+# immutableRecord holds the configuration for where and how the log is published.
+immutableRecord:
+  # type determines where the immutable log is send to, supported values are (log | concordium) if concordium is specified, then it must be configured below.
+  type: log
+
+  # concordium holds the configuration to contact and publish data on the network
+  concordium:
+    # rpcUrl are the url on which the local node is available.
+    rpcUrl: http://po-concordium:10000
+    # rpcToken is the token used to communicate with the node.
+    rpcToken: rpcadmin
+    # accountAddress must hold the address from which to use CCD
+    accountAddress: ""
+    # accountKeySecret is a reference to a kubernetes secret that holds the accountKey
+    accountKeySecret:
+      # name is the name of the kubernetes secret
+      name: ""
+      # key is the reference to the value within the secret
+      key: ""
+
+concordium:
+  # enabled specified wether or not to run a local node
+  enabled: true
+
+  # network denotes which network the concordium node should run on, allowed values are (mainnet | testnet)
+  network: ""
+
+  collector:
+    # enabled specifies if the collector should run or not.
+    enabled: true
+    # nodeName contains the name to report to the network dashboard. https://concordium.com/block-explorers/
+    nodeName: ""
+    # interval describes how often to collect the statistics from the node, in milliseconds
+    interval: 5000

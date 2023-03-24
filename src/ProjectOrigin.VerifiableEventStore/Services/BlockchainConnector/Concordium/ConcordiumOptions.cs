@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
+namespace ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector.Concordium;
+
 public class ConcordiumOptions
 {
     [Required, Url]

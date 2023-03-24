@@ -1,0 +1,34 @@
+# workflow for releasing helm-chart as OCI images on github every time a tag is created
+name: Create Helm Release
+on:
+  push:
+    - 'chart-v[0-9]+.[0-9]+.[0-9]+' # support v1.2.3
+    - 'chart-v[0-9]+.[0-9]+.[0-9]+-alpha.[0-9]+' #supports alpha versions v1.2.3-alpha.4
+
+env:
+  CHART_FOLDER: charts/project-origin/
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get chart name and version
+        id: variables
+        run: -
+          echo "name=$(yq r ${{ env.CHART_FOLDER }}/Chart.yaml name)" >> $GITHUB_OUTPUT
+          echo "version=${GITHUB_REF#refs/*/chart-v}" >> $GITHUB_OUTPUT
+
+      - name: Package and push chart
+        run: |
+          helm package ${{ env.CHART_FOLDER }} --version ${{ steps.variables.outputs.version }} --destination helm-releases
+          helm push helm-releases/${{ steps.variables.outputs.name }}-${{ steps.variables.outputs.version }}.tgz oci://ghcr.io/${{ github.repository_owner }}/${{ steps.variables.outputs.name }}

@@ -1,0 +1,44 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: po-registry-deployment
+  labels:
+    app: po-registry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: po-registry
+  template:
+    metadata:
+      labels:
+        app: po-registry
+    spec:
+      containers:
+        - name: po-registry
+          image: ghcr.io/project-origin/electricity-server:0.1.0-alpha.17
+          env:
+            {{- range .Values.issuers }}
+            - name: Issuers__AreaIssuerPublicKeys__{{ .area }}
+              value: {{ .publicKey }}
+            {{- end }}
+            {{- range .Values.registries }}
+            - name: REGISTRIES__{{ .name }}__VERIFIABLEEVENTSTORE__BATCHSIZEEXPONENT
+              value: {{ .verifiableEventStore.batchSizeExponent | quote }}
+            - name: REGISTRIES__{{ .name }}__VERIFIABLEEVENTSTORE__EVENTSTORE__TYPE
+              value: {{ .verifiableEventStore.eventStore.type }}
+            {{- end }}
+            - name: IMMUTABLELOG__TYPE
+              value: {{ .immutableRecord.type }}
+            - name: IMMUTABLELOG__CONCORDIUM__ADDRESS
+              value: {{ .immutableRecord.concordium.rpcUrl }}
+            - name: IMMUTABLELOG__CONCORDIUM__AUTHENTICATIONTOKEN
+              value: {{ .immutableRecord.concordium.rpcToken }}
+            - name: IMMUTABLELOG__CONCORDIUM__ACCOUNTADDRESS
+              value: {{ .immutableRecord.concordium.accountAddress }}
+            - name: IMMUTABLELOG__CONCORDIUM__ACCOUNTKEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .immutableRecord.concordium.accountKeySecret.name }}
+                  key: {{ .immutableRecord.concordium.accountKeySecret.key }}

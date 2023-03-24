@@ -8,6 +8,7 @@ using ProjectOrigin.Electricity.IntegrationTests.Helpers;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Server;
 using ProjectOrigin.PedersenCommitment;
+using ProjectOrigin.VerifiableEventStore.Models;
 using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector;
 using Xunit.Abstractions;
 
@@ -35,9 +36,16 @@ public class FlowTests : RegisterClientTestBase
                 services.AddTransient<IBlockchainConnector>((s) => blockchainMock.Object);
                 services.Configure<IssuerOptions>(option =>
                 {
-                    option.AreaIssuerPublicKeys = new Dictionary<string, string>(){
+                    option.Issuers = new Dictionary<string, string>(){
                         {Area_DK1, Convert.ToBase64String(_dk1_issuer_key.PublicKey.Export(KeyBlobFormat.RawPublicKey))},
                         {Area_DK2, Convert.ToBase64String(_dk2_issuer_key.PublicKey.Export(KeyBlobFormat.RawPublicKey))}
+                    };
+                });
+                services.Configure<ServerOptions>(option =>
+                {
+                    option.Registries = new Dictionary<string, RegistryOptions>(){
+                        {Registries.RegistryA, new RegistryOptions() {VerifiableEventStore = new VerifiableEventStoreOptions(){ BatchSizeExponent = 0 } }},
+                        {Registries.RegistryB, new RegistryOptions() {VerifiableEventStore = new VerifiableEventStoreOptions(){ BatchSizeExponent = 0 } }}
                     };
                 });
             });
