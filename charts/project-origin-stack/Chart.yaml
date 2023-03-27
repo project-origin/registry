@@ -11,7 +11,7 @@ annotations:
 #   description:
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/licence: Apache-2.0
-  artifacthub.io/links:
+  artifacthub.io/links: |
     - name: Source Code
       url: https://github.com/project-origin/registry
   artifacthub.io/prerelease: "true"
