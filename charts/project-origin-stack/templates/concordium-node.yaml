@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: po-concordium-node
-          image: concordium/{{ .Values.concordium.network }}-node:5.2.4-0
+          image: concordium/{{ required  "A concordium.network must be specificed ( testnet | mainnet )" .Values.concordium.network }}-node:5.2.4-0
           command: ["/concordium-node"]
           ports:
             - containerPort: 10000
@@ -89,7 +89,7 @@ spec:
             - name: CONCORDIUM_NODE_RUNTIME_HASKELL_RTS_FLAGS
               value: "-N2,-I0"
           volumeMounts:
-            {{- if not .Values.master.persistence.enabled }}
+            {{- if not .Values.concordium.persistence.enabled }}
             - name: {{ .Values.concordium.persistence.name }}
               mountPath: /mnt/data
             {{- end }}

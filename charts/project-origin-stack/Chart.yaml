@@ -6,9 +6,9 @@ version: 0.1.0
 appVersion: "0.1.0-alpha.17"
 
 annotations:
-#  artifacthub.io/changes: |
-# - kind: added | changed | removed | fixed
-#   description:
+  artifacthub.io/changes: |
+    - kind: fixed
+      description: bug where chart was undeployable
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/licence: Apache-2.0
   artifacthub.io/links: |

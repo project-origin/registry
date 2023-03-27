@@ -30,15 +30,15 @@ spec:
               value: {{ .verifiableEventStore.eventStore.type }}
             {{- end }}
             - name: IMMUTABLELOG__TYPE
-              value: {{ .immutableRecord.type }}
+              value: {{ .Values.immutableRecord.type }}
             - name: IMMUTABLELOG__CONCORDIUM__ADDRESS
-              value: {{ .immutableRecord.concordium.rpcUrl }}
+              value: {{ .Values.immutableRecord.concordium.rpcUrl }}
             - name: IMMUTABLELOG__CONCORDIUM__AUTHENTICATIONTOKEN
-              value: {{ .immutableRecord.concordium.rpcToken }}
+              value: {{ .Values.immutableRecord.concordium.rpcToken }}
             - name: IMMUTABLELOG__CONCORDIUM__ACCOUNTADDRESS
-              value: {{ .immutableRecord.concordium.accountAddress }}
+              value: {{ .Values.immutableRecord.concordium.accountAddress }}
             - name: IMMUTABLELOG__CONCORDIUM__ACCOUNTKEY
               valueFrom:
                 secretKeyRef:
-                  name: {{ .immutableRecord.concordium.accountKeySecret.name }}
-                  key: {{ .immutableRecord.concordium.accountKeySecret.key }}
+                  name: {{ .Values.immutableRecord.concordium.accountKeySecret.name }}
+                  key: {{ .Values.immutableRecord.concordium.accountKeySecret.key }}
