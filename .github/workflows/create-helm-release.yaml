@@ -22,7 +22,7 @@ jobs:
         with:
           repository: project-origin/helm-registry
           path: helm-registry
-          token: ${{ secrets.HELM_REGISTRY_TOKEN }}
+          ssh-key: ${{ secrets.HELM_REGISTRY_TOKEN }}
 
       - name: Get chart name and version
         id: variables
