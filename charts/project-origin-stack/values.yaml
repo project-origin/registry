@@ -1,4 +1,9 @@
+# This file contains the default values for the project-origin-stack chart.
+
+# commandOrchestrator holds the configuration for the command orchestrator
 commandOrchestrator:
+
+  # enabled determines if the command orchestrator is enabled
   enabled: true
 
 # issuers defines the currently accepted issuers for given areas.
@@ -38,6 +43,7 @@ immutableRecord:
       # key is the reference to the value within the secret
       key: ""
 
+# concordium holds the configuration for the concordium node
 concordium:
   # enabled specified wether or not to run a local node
   enabled: true
@@ -45,6 +51,7 @@ concordium:
   # network denotes which network the concordium node should run on, allowed values are (mainnet | testnet)
   network: ""
 
+  # collector configures the collector that collects statistics from the node and publishes them to the network dashboard.
   collector:
     # enabled specifies if the collector should run or not.
     enabled: true
@@ -52,3 +59,16 @@ concordium:
     nodeName: ""
     # interval describes how often to collect the statistics from the node, in milliseconds
     interval: 5000
+
+  # persistence holds the configuration for the persistent storage of the node
+  persistence:
+    # enabled specifies if the node should use persistent storage or not.
+    enabled: true
+    # name is the name of the persistent volume claim
+    name: po-concordium-data
+    # storageClass is the name of the storage class to use, if not specified the default storage class will be used.
+    #storageClass:
+    # accessMode is the access mode to use for the persistent volume claim, allowed values are (ReadWriteOnce | ReadWriteMany)
+    accessMode: ReadWriteOnce
+    # size is the size of the persistent volume claim
+    size: 100Gi
