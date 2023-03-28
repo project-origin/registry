@@ -20,7 +20,7 @@ spec:
           image: ghcr.io/project-origin/electricity-server:0.1.0-alpha.18
           env:
             {{- range .Values.issuers }}
-            - name: Issuers__AreaIssuerPublicKeys__{{ .area }}
+            - name: Issuers__{{ .area }}
               value: {{ .publicKey }}
             {{- end }}
             {{- range .Values.registries }}
