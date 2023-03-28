@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: po-registry
-          image: ghcr.io/project-origin/electricity-server:0.1.0-alpha.17
+          image: ghcr.io/project-origin/electricity-server:0.1.0-alpha.18
           env:
             {{- range .Values.issuers }}
             - name: Issuers__AreaIssuerPublicKeys__{{ .area }}
