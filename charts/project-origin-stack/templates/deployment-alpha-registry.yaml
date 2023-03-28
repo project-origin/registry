@@ -31,14 +31,16 @@ spec:
             {{- end }}
             - name: IMMUTABLELOG__TYPE
               value: {{ .Values.immutableRecord.type }}
+            {{- if eq .Values.immutableRecord.type "concordium" }}
             - name: IMMUTABLELOG__CONCORDIUM__ADDRESS
               value: {{ .Values.immutableRecord.concordium.rpcUrl }}
             - name: IMMUTABLELOG__CONCORDIUM__AUTHENTICATIONTOKEN
               value: {{ .Values.immutableRecord.concordium.rpcToken }}
             - name: IMMUTABLELOG__CONCORDIUM__ACCOUNTADDRESS
-              value: {{ .Values.immutableRecord.concordium.accountAddress }}
+              value: {{ required "When type is concordium, accountAddress must be set" .Values.immutableRecord.concordium.accountAddress }}
             - name: IMMUTABLELOG__CONCORDIUM__ACCOUNTKEY
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.immutableRecord.concordium.accountKeySecret.name }}
-                  key: {{ .Values.immutableRecord.concordium.accountKeySecret.key }}
+                  name: {{ required "When type is concordium, accountKeySecret.name must be set" .Values.immutableRecord.concordium.accountKeySecret.name }}
+                  key: {{ required "When type is concordium, accountKeySecret.key must be set" .Values.immutableRecord.concordium.accountKeySecret.key }}
+            {{- end }}
