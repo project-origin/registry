@@ -1,3 +1,5 @@
+- name: Overview
+  href: overview.md
 - name: Granular Certificate
   items:
   - name: Granular Certificate
@@ -22,17 +24,17 @@
       href: granular-certificates/commands/expire.md
   - name: C# client example flow
     href: granular-certificates/example.md
-- name: Registers
+- name: Registrys
   items:
   - name: What is a registry
     href: registry.md
   - name: Command and events
     href: command-and-events.md
-- name: Commitments
-  items:
-  - name: Pedersen Commitment
-    href: pedersen-commitments.md
 - name: Unique proofs using tries/merkleproofs
   items:
   - name: Merkle Proof
     href: unique-proofs-using-tries-merkleproofs.md
+- name: Commitments
+  items:
+  - name: Pedersen Commitment
+    href: pedersen-commitments.md
