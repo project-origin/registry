@@ -2,7 +2,11 @@
 
   <ItemGroup>
     <PackageReference Include="NSec.Cryptography" Version="22.4.0" />
-    <ProjectReference Include="..\ProjectOrigin.PedersenCommitment\ProjectOrigin.PedersenCommitment.csproj" />
+    <PackageReference Include="Teronis.MSBuild.Packaging.ProjectBuildInPackage" Version="1.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <ProjectReference Include="..\ProjectOrigin.PedersenCommitment\ProjectOrigin.PedersenCommitment.csproj" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
@@ -12,6 +16,11 @@
     <Protobuf Include="..\Protos\electricity.proto" Access="internal" />
     <Protobuf Include="..\Protos\primitives.proto" Access="internal" />
     <Protobuf Include="..\Protos\register.proto" GrpcServices="Client" Access="internal" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(Configuration)' == 'Release' ">
+    <None Include="../rust-ffi/target/x86_64-unknown-linux-gnu/release/librust_ffi.so" Pack="true" PackagePath="runtimes/linux-x64/native" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../rust-ffi/target/x86_64-pc-windows-gnu/release/rust_ffi.dll" Pack="true" PackagePath="runtimes/win-x64/native" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
