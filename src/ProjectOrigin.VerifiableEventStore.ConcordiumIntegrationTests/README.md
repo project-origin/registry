@@ -4,13 +4,12 @@ To be able to run the integration test with Concordium,
 a Concordium node and github self-hosted runner is required.
 
 This can be achieved using the included [docker-compose](../ProjectOrigin.VerifiableEventStore.Tests/docker-compose.yaml).
-One forking the repo, one must get a token from GitHub to be able to join runners.
 
 ## Running a node
 1. Make a .env file containing the following environment variables:
 
 ```sh
-GITHUB_RUNNER_TOKEN=#YOUR_GITHUB_RUNNER_TOKEN
+GITHUB_RUNNER_PAT=${YOUR_GITHUB_ORGANIZATION_PAT}
 CONCORDIUM_HOST_DIRECTORY=/var/concordium/data
 ```
 
