@@ -9,7 +9,7 @@ This can be achieved using the included [docker-compose](../ProjectOrigin.Verifi
 1. Make a .env file containing the following environment variables:
 
 ```sh
-GITHUB_RUNNER_PAT=${YOUR_GITHUB_ORGANIZATION_PATH}
+GITHUB_RUNNER_PATH=${YOUR_GITHUB_ORGANIZATION_PATH}
 CONCORDIUM_HOST_DIRECTORY=/var/concordium/data
 ```
 
