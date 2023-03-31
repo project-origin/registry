@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: github-runner.dockerfile
       args:
-        PAT: ${GITHUB_RUNNER_PAT}
+        PATH: ${GITHUB_RUNNER_PATH}
         REPOSITORY: https://github.com/project-origin
         NAME: concordium-workflow-runner
         LABELS: concordium-testnet

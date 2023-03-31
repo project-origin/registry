@@ -3,7 +3,7 @@ FROM ubuntu:20.04
 
 # Github runner version https://github.com/actions/runner/releases
 ARG VERSION="2.303.0"
-ARG PAT
+ARG PATH
 ARG REPOSITORY="https://github.com/project-origin"
 ARG NAME="concordium-workflow-runner"
 ARG LABELS="concordium-testnet"
@@ -36,6 +36,6 @@ RUN curl -o runner.tar.gz -L https://github.com/actions/runner/releases/download
 USER runner
 
 # Configure runner
-RUN ./config.sh --unattended --url ${REPOSITORY} --pat ${PAT} --replace --name ${NAME} --labels ${LABELS}
+RUN ./config.sh --unattended --url ${REPOSITORY} --pat ${PATH} --replace --name ${NAME} --labels ${LABELS}
 
 ENTRYPOINT ./run.sh
