@@ -24,7 +24,7 @@
       href: granular-certificates/commands/expire.md
   - name: C# client example flow
     href: granular-certificates/example.md
-- name: Registrys
+- name: Registries
   items:
   - name: What is a registry
     href: registry.md
