@@ -1,38 +1,59 @@
-src_path = src
+src_path := src
+docfx_config := doc/docfx.json
+docfx_site_dir := doc/_site
+
+header_formatting := \033[1m
+command_formatting := \033[1;34m
+desc_formatting := \033[0;32m
+no_formatting := \033[0m
 
 .PHONY: help test clean build
 
-default: help
+.DEFAULT_GOAL := help
 
-help: # Show help for each of the Makefile recipes.
-	@printf "Available targets:\n\n"
-	@grep -E '^[a-zA-Z0-9 -]+:.*#'  Makefile | sort | while read -r l; do printf "  \033[1;32m$$(echo $$l | cut -f 1 -d':')\033[00m:$$(echo $$l | cut -f 2- -d'#')\n"; done
+## Show help for each of the Makefile recipes.
+help:
+	@printf "${header_formatting}Available targets:\n"
+	@awk -F '## ' '/^## /{desc=$$2}/^[a-zA-Z0-9_-]+:/{gsub(/:.*/, "", $$1); printf "  ${command_formatting}%-20s ${desc_formatting}%s${no_formatting}\n", $$1, desc}' $(MAKEFILE_LIST) | sort
 	@printf "\n"
 
-verify: test # Verify code is ready for commit to branch, runs tests and verifies formatting.
+
+## Verify code is ready for commit to branch, runs tests and verifies formatting.
+verify: test
+	@echo "Verifying code formatting..."
 	dotnet format $(src_path) --verify-no-changes
 
-clean: # Does a dotnet clean
+## Does a dotnet clean
+clean:
 	dotnet clean $(src_path)
 
-doc-serve: # Generate docfx site and serve, navigate to 127.0.0.1:8080
-	docfx doc/docfx.json
-	docfx serve doc/_site -n 127.0.0.1
+## Generate docfx site and serve, navigate to 127.0.0.1:8080
+doc-serve:
+	@echo "Generating DocFX site..."
+	docfx $(docfx_config)
+	@echo "Serving DocFX site at http://127.0.0.1:8080/ ..."
+	docfx serve $(docfx_site_dir) -n 127.0.0.1
 
-restore: # Restores all dotnet projectts
+## Restores all dotnet projects
+restore:
 	dotnet restore $(src_path)
 
-build: # Builds all the code
+## Builds all the code
+build:
 	dotnet build $(src_path)
 
-format: # Formats files using dotnet format
+## Formats files using dotnet format
+format:
 	dotnet format $(src_path)
 
-test: # Run all tests except Concordium integration
+## Run all tests except Concordium integration
+test:
 	dotnet test $(src_path) --filter 'FullyQualifiedName!~ConcordiumIntegrationTests'
 
-unit-test: # Run all Unit-tests
+## Run all Unit-tests
+unit-test:
 	dotnet test $(src_path) --filter 'FullyQualifiedName!~IntegrationTests'
 
-concordium-tests: # Run Concordium integration tests, requires access to running node and environment variables
+## Run Concordium integration tests, requires access to running node and environment variables
+concordium-tests:
 	dotnet test $(src_path)/ProjectOrigin.VerifiableEventStore.ConcordiumIntegrationTests
