@@ -8,8 +8,10 @@ This can be achieved using the included [docker-compose](../ProjectOrigin.Verifi
 ## Running a node
 1. Make a .env file containing the following environment variables:
 
+YOUR_GITHUB_ORGANIZATION_PAT should be a Personal Access Token with the accesss to create GitHub runners on an organization level.
+
 ```sh
-GITHUB_RUNNER_PATH=${YOUR_GITHUB_ORGANIZATION_PATH}
+GITHUB_RUNNER_PAT=${YOUR_GITHUB_ORGANIZATION_PAT}
 CONCORDIUM_HOST_DIRECTORY=/var/concordium/data
 ```
 
