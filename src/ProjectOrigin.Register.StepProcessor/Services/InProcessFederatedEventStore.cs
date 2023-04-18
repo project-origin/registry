@@ -1,17 +1,17 @@
 
 using ProjectOrigin.Register.StepProcessor.Interfaces;
 using ProjectOrigin.VerifiableEventStore.Models;
-using ProjectOrigin.VerifiableEventStore.Services.Batcher;
+using ProjectOrigin.VerifiableEventStore.Services.BatchProcessor;
 using ProjectOrigin.VerifiableEventStore.Services.EventStore;
 
 namespace ProjectOrigin.Register.StepProcessor.Services;
 
 public class InProcessFederatedEventStore : IFederatedEventStore
 {
-    private IBatcher _localBatcher;
+    private IEventStore _localBatcher;
     private Dictionary<string, IEventStore> _eventStores;
 
-    public InProcessFederatedEventStore(IBatcher localBatcher, Dictionary<string, IEventStore> eventStores)
+    public InProcessFederatedEventStore(IEventStore localBatcher, Dictionary<string, IEventStore> eventStores)
     {
         _localBatcher = localBatcher;
         _eventStores = eventStores;
@@ -19,7 +19,7 @@ public class InProcessFederatedEventStore : IFederatedEventStore
 
     public Task PublishEvent(VerifiableEvent e)
     {
-        return _localBatcher.PublishEvent(e);
+        return _localBatcher.Store(e);
     }
 
     public async Task<IDictionary<V1.FederatedStreamId, IEnumerable<V1.SignedEvent>>> GetStreams(IEnumerable<V1.FederatedStreamId> streamsIds)

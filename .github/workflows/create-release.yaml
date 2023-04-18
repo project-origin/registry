@@ -8,17 +8,28 @@ on:
 
 jobs:
 
+  define-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.output-version.outputs.version }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set env
+        id: output-version
+        run: echo "version=${GITHUB_REF#refs/*/v}" >> $GITHUB_OUTPUT
+
   publish-client-nuget:
-    name: Publish Client Nuget Package
+    name: Publish Electricity Client Nuget Package
+    needs:
+      - define-version
     runs-on: ubuntu-20.04
     env:
       project: src/ProjectOrigin.Electricity.Client
 
     steps:
       - uses: actions/checkout@v3
-
-      - name: Set env
-        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/v}" >> $GITHUB_ENV
 
       - name: Setup .NET Core SDK 7
         uses: actions/setup-dotnet@v3
@@ -37,7 +48,7 @@ jobs:
 
       - name: Pack
         shell: bash
-        run: dotnet pack --output build --configuration Release --no-restore -p:Version=${{ env.RELEASE_VERSION }} ${{ env.project }}
+        run: dotnet pack --output build --configuration Release --no-restore -p:Version=${{ needs.define-version.outputs.version }} ${{ env.project }}
 
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v3
@@ -50,11 +61,39 @@ jobs:
         shell: bash
         run: dotnet nuget push build/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
 
+
+  publish-server-container:
+    name: Publish Electricity Server container
+    runs-on: ubuntu-20.04
+    needs:
+      - define-version
+    env:
+      project: src/ProjectOrigin.Electricity.Server
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: ./src
+          file: ./src/ProjectOrigin.Electricity.Server/Dockerfile
+          push: true
+          tags: ghcr.io/project-origin/electricity-server:${{ needs.define-version.outputs.version }}
+
   create-release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
     needs:
       - publish-client-nuget
+      - publish-server-container
     steps:
       - name: Download all workflow run artifacts
         uses: actions/download-artifact@v3

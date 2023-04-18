@@ -2,14 +2,15 @@ using ProjectOrigin.VerifiableEventStore.Extensions;
 using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector;
 using ProjectOrigin.VerifiableEventStore.Services.EventStore;
 
-namespace ProjectOrigin.VerifiableEventStore.Services.Batcher.Postgres;
+namespace ProjectOrigin.VerifiableEventStore.Services.BatchProcessor;
 
 public sealed class BatchProcessorJob
 {
+    private const int NumberOfBatches = 10;
+
     private readonly IBlockchainConnector _blockchainConnector;
     private readonly IEventStore _eventStore;
     private readonly TimeSpan _period = TimeSpan.FromSeconds(30);
-    private readonly int _numberOf_Batches = 10;
 
     public BatchProcessorJob(IBlockchainConnector blockchainConnector, IEventStore eventStore)
     {
@@ -21,7 +22,7 @@ public sealed class BatchProcessorJob
     {
         // go check if we have any batches that are full
         // If we have any - then go get the batch and the events
-        var batches = await _eventStore.GetBatchesForFinalization(_numberOf_Batches);
+        var batches = await _eventStore.GetBatchesForFinalization(NumberOfBatches);
         foreach (var item in batches)
         {
             var events = await _eventStore.GetEventsForBatch(item);
