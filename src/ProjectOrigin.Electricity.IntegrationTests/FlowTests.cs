@@ -35,11 +35,9 @@ public class FlowTests : RegisterClientTestBase
                 services.AddTransient<IBlockchainConnector>((s) => blockchainMock.Object);
                 services.Configure<IssuerOptions>(option =>
                 {
-                    option.AreaIssuerPublicKey = (area) => area switch
-                    {
-                        Area_DK1 => _dk1_issuer_key.PublicKey,
-                        Area_DK2 => _dk2_issuer_key.PublicKey,
-                        _ => null,
+                    option.AreaIssuerPublicKeys = new Dictionary<string, string>(){
+                        {Area_DK1, Convert.ToBase64String(_dk1_issuer_key.PublicKey.Export(KeyBlobFormat.RawPublicKey))},
+                        {Area_DK2, Convert.ToBase64String(_dk2_issuer_key.PublicKey.Export(KeyBlobFormat.RawPublicKey))}
                     };
                 });
             });

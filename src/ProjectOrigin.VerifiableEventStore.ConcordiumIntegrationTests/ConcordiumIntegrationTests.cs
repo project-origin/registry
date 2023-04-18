@@ -62,7 +62,13 @@ public class ConcordiumIntegrationTests
         var accountKey = GetEnvironmentVariable("AccountKey");
 
         var optionsMock = new Mock<IOptions<ConcordiumOptions>>();
-        optionsMock.Setup(obj => obj.Value).Returns(new ConcordiumOptions(NodeAddress, NodeToken, accountAddress, accountKey));
+        optionsMock.Setup(obj => obj.Value).Returns(new ConcordiumOptions()
+        {
+            Address = NodeAddress,
+            AuthenticationToken = NodeToken,
+            AccountAddress = accountAddress,
+            AccountKey = accountKey
+        });
 
         return new ConcordiumConnector(optionsMock.Object);
     }

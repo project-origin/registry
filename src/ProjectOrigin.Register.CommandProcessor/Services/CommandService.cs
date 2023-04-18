@@ -25,6 +25,8 @@ public class CommandService : V1.CommandService.CommandServiceBase
 
         try
         {
+            _logger.LogDebug($"Started command ”{protoCommand.Id.ToBase64()}”");
+
             foreach (var step in protoCommand.Steps)
             {
                 var stepResult = await _processor.Process(step);
@@ -33,9 +35,13 @@ public class CommandService : V1.CommandService.CommandServiceBase
                 if (stepResult.State == V1.CommandState.Failed)
                 {
                     result.State = V1.CommandState.Failed;
+                    _logger.LogDebug($"Failed step ”{protoCommand.Id.ToBase64()}”");
                     break;
                 }
+                _logger.LogDebug($"Completed step ”{protoCommand.Id.ToBase64()}”");
             }
+
+            _logger.LogDebug($"Completed command ”{protoCommand.Id.ToBase64()}”");
         }
         catch (Exception ex)
         {

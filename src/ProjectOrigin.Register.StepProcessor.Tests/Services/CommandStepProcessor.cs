@@ -88,7 +88,7 @@ public class SynchronousCommandStepProcessorTests
 
     private IOptions<CommandStepProcessorOptions> CreateOptions(string registryName)
     {
-        return CreateOptionsMock<CommandStepProcessorOptions>(new CommandStepProcessorOptions(registryName));
+        return CreateOptionsMock<CommandStepProcessorOptions>(new CommandStepProcessorOptions { RegistryName = registryName });
     }
 
     private IOptions<T> CreateOptionsMock<T>(T content) where T : class

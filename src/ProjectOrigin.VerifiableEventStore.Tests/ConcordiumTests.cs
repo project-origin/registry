@@ -15,7 +15,13 @@ public class ConcordiumTests
     public void ConcodiumConnector_Instanciate_Success()
     {
         var optionsMock = new Mock<IOptions<ConcordiumOptions>>();
-        optionsMock.Setup(obj => obj.Value).Returns(new ConcordiumOptions(NodeAddress, NodeToken, FakeAccount, FakePrivateKey));
+        optionsMock.Setup(obj => obj.Value).Returns(new ConcordiumOptions()
+        {
+            Address = NodeAddress,
+            AuthenticationToken = NodeToken,
+            AccountAddress = FakeAccount,
+            AccountKey = FakePrivateKey
+        });
         var connector = new ConcordiumConnector(optionsMock.Object);
 
         Assert.NotNull(connector);
@@ -25,7 +31,13 @@ public class ConcordiumTests
     public void ConcodiumConnector_InvalidKey_Fails()
     {
         var optionsMock = new Mock<IOptions<ConcordiumOptions>>();
-        optionsMock.Setup(obj => obj.Value).Returns(new ConcordiumOptions(NodeAddress, NodeToken, FakeAccount, "invalidkey"));
+        optionsMock.Setup(obj => obj.Value).Returns(new ConcordiumOptions()
+        {
+            Address = NodeAddress,
+            AuthenticationToken = NodeToken,
+            AccountAddress = FakeAccount,
+            AccountKey = "invalidkey"
+        });
 
         Assert.ThrowsAny<ArgumentException>(() => new ConcordiumConnector(optionsMock.Object));
     }

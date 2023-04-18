@@ -3,11 +3,10 @@ using ProjectOrigin.Register.CommandProcessor.Services;
 using ProjectOrigin.Register.StepProcessor.Interfaces;
 using ProjectOrigin.Register.StepProcessor.Models;
 using ProjectOrigin.Register.StepProcessor.Services;
-using ProjectOrigin.VerifiableEventStore.Services.Batcher;
-using ProjectOrigin.VerifiableEventStore.Services.Batcher.Postgres.Configuration;
+using ProjectOrigin.VerifiableEventStore.Models;
+using ProjectOrigin.VerifiableEventStore.Services.BatchProcessor;
 using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector;
 using ProjectOrigin.VerifiableEventStore.Services.EventStore;
-using ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres.Configuration;
 
 namespace ProjectOrigin.Electricity.Server;
 
@@ -17,32 +16,38 @@ public class Startup
     {
         VerifierConfiguration.ConfigureServices(services);
 
-        // In-memory setup
-        var batchSizeOptions = new BatcherOptions() { BatchSizeExponent = 0 };
-        var memorystoreRegA = new MemoryEventStore(batchSizeOptions);
-        var memorystoreRegB = new MemoryEventStore(batchSizeOptions);
-
-        // Persistent setup
-        // services.AddBatchProcessor();
-        // services.AddPostgresEventStore(configuration);
+        var eventStores = new List<IEventStore>();
 
         services.AddGrpc();
         services.AddTransient<IBlockchainConnector, ConcordiumConnector>();
+
+        services.AddHostedService<BatchProcessorBackgroundService>(sp => new BatchProcessorBackgroundService(sp.GetService<ILogger<BatchProcessorBackgroundService>>()!, eventStores, sp.GetService<IBlockchainConnector>()!));
+
+        // For single running service with two in memory registers
         services.AddSingleton<ICommandStepProcessor>((serviceProvider) =>
         {
+            var eventStoreOptions = serviceProvider.GetService<IOptions<VerifiableEventStoreOptions>>()!;
+
+            var memorystoreRegA = new MemoryEventStore(eventStoreOptions);
+            var memorystoreRegB = new MemoryEventStore(eventStoreOptions);
+
+            eventStores.Add(memorystoreRegA);
+            eventStores.Add(memorystoreRegB);
+
             var eventStoreDictionary = new Dictionary<string, IEventStore>{
                 { Registries.RegistryA, memorystoreRegA},
                 { Registries.RegistryB, memorystoreRegB}
             };
 
-            var batcherRegA = new MemoryBatcher(serviceProvider.GetService<IBlockchainConnector>()!, memorystoreRegA, Options.Create(new BatcherOptions { BatchSizeExponent = 0 }));
-            var batcherRegB = new MemoryBatcher(serviceProvider.GetService<IBlockchainConnector>()!, memorystoreRegB, Options.Create(new BatcherOptions { BatchSizeExponent = 0 }));
+            var fesRegA = new InProcessFederatedEventStore(memorystoreRegA, eventStoreDictionary);
+            var fesRegB = new InProcessFederatedEventStore(memorystoreRegB, eventStoreDictionary);
 
-            var fesRegA = new InProcessFederatedEventStore(batcherRegA, eventStoreDictionary);
-            var fesRegB = new InProcessFederatedEventStore(batcherRegB, eventStoreDictionary);
-
-            var processorRegA = new CommandStepProcessor(Options.Create(new CommandStepProcessorOptions(Registries.RegistryA)), fesRegA, serviceProvider.GetService<ICommandStepVerifiere>()!);
-            var processorRegB = new CommandStepProcessor(Options.Create(new CommandStepProcessorOptions(Registries.RegistryB)), fesRegB, serviceProvider.GetService<ICommandStepVerifiere>()!);
+            var processorRegA = new CommandStepProcessor(Options.Create(new CommandStepProcessorOptions { RegistryName = Registries.RegistryA }),
+                                                         fesRegA,
+                                                         serviceProvider.GetService<ICommandStepVerifiere>()!);
+            var processorRegB = new CommandStepProcessor(Options.Create(new CommandStepProcessorOptions { RegistryName = Registries.RegistryB }),
+                                                         fesRegB,
+                                                         serviceProvider.GetService<ICommandStepVerifiere>()!);
 
             return new CommandStepRouter(new Dictionary<string, ICommandStepProcessor>(){
                 { Registries.RegistryA, processorRegA },
