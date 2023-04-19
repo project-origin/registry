@@ -44,7 +44,7 @@
         },
         "template": [
             "default",
-            "template/mermaid"
+            "modern"
         ],
         "markdownEngineName": "markdig",
         "markdownEngineProperties": {
