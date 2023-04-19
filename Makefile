@@ -1,11 +1,12 @@
 src_path := src
+
 docfx_config := doc/docfx.json
 docfx_site_dir := doc/_site
 
-header_formatting := \033[1m
-command_formatting := \033[1;34m
-desc_formatting := \033[0;32m
-no_formatting := \033[0m
+formatting_header := \033[1m
+formatting_command := \033[1;34m
+formatting_desc := \033[0;32m
+formatting_none := \033[0m
 
 .PHONY: help test clean build
 
@@ -13,8 +14,9 @@ no_formatting := \033[0m
 
 ## Show help for each of the Makefile recipes.
 help:
-	@printf "${header_formatting}Available targets:\n"
-	@awk -F '## ' '/^## /{desc=$$2}/^[a-zA-Z0-9_-]+:/{gsub(/:.*/, "", $$1); printf "  ${command_formatting}%-20s ${desc_formatting}%s${no_formatting}\n", $$1, desc}' $(MAKEFILE_LIST) | sort
+
+	@printf "${formatting_header}Available targets:\n"
+	@awk -F '## ' '/^## /{desc=$$2}/^[a-zA-Z0-9_-]+:/{gsub(/:.*/, "", $$1); printf "  ${formatting_command}%-20s ${formatting_desc}%s${formatting_none}\n", $$1, desc}' $(MAKEFILE_LIST) | sort
 	@printf "\n"
 
 
