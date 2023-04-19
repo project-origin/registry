@@ -1,5 +1,5 @@
 
-namespace ProjectOrigin.Electricity.Server;
+namespace ProjectOrigin.Electricity.IntegrationTests;
 
 public static class Registries
 {

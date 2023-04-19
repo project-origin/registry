@@ -1,0 +1,15 @@
+{{- if .Values.concordium.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: po-concordium
+spec:
+  type: ClusterIP
+  selector:
+    app: po-concordium-node
+  ports:
+    - name: grpc
+      protocol: TCP
+      port: 10000
+      targetPort: 10000
+{{- end }}
