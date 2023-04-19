@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/devcontainers/dotnet:7.0
 
-# DocFX v2.65.2
+# DocFX v2.65.3
 USER vscode
-RUN dotnet tool install --global docfx --version 2.65.2
+RUN dotnet tool install --global docfx --version 2.65.3
 ENV PATH "$PATH:/home/vscode/.dotnet/tools"
