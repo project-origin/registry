@@ -4,9 +4,9 @@ namespace ProjectOrigin.Electricity.Models;
 
 public class IssuerOptions
 {
-    public Dictionary<string, string> AreaIssuerPublicKeys { get; set; } = new Dictionary<string, string>();
+    public Dictionary<string, string> Issuers { get; set; } = new Dictionary<string, string>();
 
-    public bool IsValid => AreaIssuerPublicKeys.All(set =>
+    public bool IsValid => Issuers.All(set =>
     {
         return
             PublicKey.TryImport(
@@ -14,11 +14,11 @@ public class IssuerOptions
                 Convert.FromBase64String(set.Value),
                 KeyBlobFormat.RawPublicKey,
                 out _);
-    });
+    }) && Issuers.Any();
 
     public PublicKey? GetAreaPublicKey(string area)
     {
-        if (AreaIssuerPublicKeys.TryGetValue(area, out var base64data))
+        if (Issuers.TryGetValue(area, out var base64data))
         {
             return PublicKey.Import(SignatureAlgorithm.Ed25519, Convert.FromBase64String(base64data), KeyBlobFormat.RawPublicKey);
         }

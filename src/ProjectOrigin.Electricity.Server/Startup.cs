@@ -3,7 +3,6 @@ using ProjectOrigin.Register.CommandProcessor.Services;
 using ProjectOrigin.Register.StepProcessor.Interfaces;
 using ProjectOrigin.Register.StepProcessor.Models;
 using ProjectOrigin.Register.StepProcessor.Services;
-using ProjectOrigin.VerifiableEventStore.Models;
 using ProjectOrigin.VerifiableEventStore.Services.BatchProcessor;
 using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector;
 using ProjectOrigin.VerifiableEventStore.Services.EventStore;
@@ -19,40 +18,33 @@ public class Startup
         var eventStores = new List<IEventStore>();
 
         services.AddGrpc();
-        services.AddTransient<IBlockchainConnector, ConcordiumConnector>();
+
 
         services.AddHostedService<BatchProcessorBackgroundService>(sp => new BatchProcessorBackgroundService(sp.GetService<ILogger<BatchProcessorBackgroundService>>()!, eventStores, sp.GetService<IBlockchainConnector>()!));
 
-        // For single running service with two in memory registers
+        // Only for alpha server containing all parts.
         services.AddSingleton<ICommandStepProcessor>((serviceProvider) =>
         {
-            var eventStoreOptions = serviceProvider.GetService<IOptions<VerifiableEventStoreOptions>>()!;
+            var options = serviceProvider.GetService<IOptions<ServerOptions>>()!.Value;
 
-            var memorystoreRegA = new MemoryEventStore(eventStoreOptions);
-            var memorystoreRegB = new MemoryEventStore(eventStoreOptions);
+            var eventStoreDictionary = new Dictionary<string, IEventStore>();
+            var processors = new Dictionary<string, ICommandStepProcessor>();
 
-            eventStores.Add(memorystoreRegA);
-            eventStores.Add(memorystoreRegB);
+            foreach (var reg in options.Registries!)
+            {
+                var eventStore = new MemoryEventStore(Options.Create(reg.Value.VerifiableEventStore!));
 
-            var eventStoreDictionary = new Dictionary<string, IEventStore>{
-                { Registries.RegistryA, memorystoreRegA},
-                { Registries.RegistryB, memorystoreRegB}
-            };
+                eventStores.Add(eventStore);
+                eventStoreDictionary.Add(reg.Key, eventStore);
+                var fesReg = new InProcessFederatedEventStore(eventStore, eventStoreDictionary);
 
-            var fesRegA = new InProcessFederatedEventStore(memorystoreRegA, eventStoreDictionary);
-            var fesRegB = new InProcessFederatedEventStore(memorystoreRegB, eventStoreDictionary);
+                var processor = new CommandStepProcessor(Options.Create(new CommandStepProcessorOptions { RegistryName = reg.Key }),
+                                                        fesReg,
+                                                        serviceProvider.GetService<ICommandStepVerifiere>()!);
+                processors.Add(reg.Key, processor);
+            }
 
-            var processorRegA = new CommandStepProcessor(Options.Create(new CommandStepProcessorOptions { RegistryName = Registries.RegistryA }),
-                                                         fesRegA,
-                                                         serviceProvider.GetService<ICommandStepVerifiere>()!);
-            var processorRegB = new CommandStepProcessor(Options.Create(new CommandStepProcessorOptions { RegistryName = Registries.RegistryB }),
-                                                         fesRegB,
-                                                         serviceProvider.GetService<ICommandStepVerifiere>()!);
-
-            return new CommandStepRouter(new Dictionary<string, ICommandStepProcessor>(){
-                { Registries.RegistryA, processorRegA },
-                { Registries.RegistryB, processorRegB },
-            });
+            return new CommandStepRouter(processors);
         });
 
     }

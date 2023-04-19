@@ -1,25 +1,21 @@
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Server;
-using ProjectOrigin.VerifiableEventStore.Models;
 
 var startup = new Startup();
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddOptions<ServerOptions>()
+    .Bind(builder.Configuration)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
 builder.Services.AddOptions<IssuerOptions>()
-    .Bind(builder.Configuration.GetSection("Issuers"))
-    .Validate(option => option.IsValid, "Invalid issuer configuration.")
+    .Bind(builder.Configuration)
+    .Validate(option => option.IsValid, "Invalid issuer configuration, must contain atleast one valid issuer.")
     .ValidateOnStart();
 
-builder.Services.AddOptions<VerifiableEventStoreOptions>()
-    .Bind(builder.Configuration.GetSection("VerifiableEventStore"))
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
-
-builder.Services.AddOptions<ConcordiumOptions>()
-    .Bind(builder.Configuration.GetSection("Concordium"))
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
+Configurator.ConfigureImmutableLog(builder);
 
 startup.ConfigureServices(builder.Services);
 

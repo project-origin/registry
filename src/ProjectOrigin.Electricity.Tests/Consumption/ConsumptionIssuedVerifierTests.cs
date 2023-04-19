@@ -19,7 +19,7 @@ public class ConsumptionIssuedVerifierTests : AbstractVerifierTests
         var issuerKey = Key.Create(SignatureAlgorithm.Ed25519);
         var optionsMock = CreateOptionsMock(new IssuerOptions()
         {
-            AreaIssuerPublicKeys = new Dictionary<string, string>(){
+            Issuers = new Dictionary<string, string>(){
                 {"DK1", Convert.ToBase64String(issuerKey.PublicKey.Export(KeyBlobFormat.RawPublicKey))}
             }
         });

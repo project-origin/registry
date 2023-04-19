@@ -4,7 +4,7 @@ using ConcordiumNetSdk.Transactions;
 using ConcordiumNetSdk.Types;
 using Microsoft.Extensions.Options;
 
-namespace ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector;
+namespace ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector.Concordium;
 
 public class ConcordiumConnector : IBlockchainConnector, IDisposable
 {
