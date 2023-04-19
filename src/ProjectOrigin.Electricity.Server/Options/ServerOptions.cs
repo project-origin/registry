@@ -3,6 +3,5 @@ using System.ComponentModel.DataAnnotations;
 public class ServerOptions
 {
     [Required]
-    public Dictionary<string, RegistryOptions> Registries { get; set; }
-
+    public Dictionary<string, RegistryOptions>? Registries { get; set; }
 }

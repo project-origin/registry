@@ -30,9 +30,9 @@ public class Startup
             var eventStoreDictionary = new Dictionary<string, IEventStore>();
             var processors = new Dictionary<string, ICommandStepProcessor>();
 
-            foreach (var reg in options.Registries)
+            foreach (var reg in options.Registries!)
             {
-                var eventStore = new MemoryEventStore(Options.Create(reg.Value.VerifiableEventStore));
+                var eventStore = new MemoryEventStore(Options.Create(reg.Value.VerifiableEventStore!));
 
                 eventStores.Add(eventStore);
                 eventStoreDictionary.Add(reg.Key, eventStore);
