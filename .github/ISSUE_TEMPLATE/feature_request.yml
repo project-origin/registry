@@ -14,6 +14,14 @@ body:
     validations:
       required: false
   - type: textarea
+    id: summary
+    attributes:
+      label: "Summary"
+      description: Provide a brief explanation of the feature
+      placeholder: Describe in a few lines your feature request
+    validations:
+      required: true
+  - type: textarea
     id: implementation_pr
     attributes:
       label: "Implementation PR"
@@ -29,14 +37,6 @@ body:
       placeholder: "#Issues IDs"
     validations:
       required: false
-  - type: textarea
-    id: summary
-    attributes:
-      label: "Summary"
-      description: Provide a brief explanation of the feature
-      placeholder: Describe in a few lines your feature request
-    validations:
-      required: true
   - type: textarea
     id: basic_example
     attributes:
