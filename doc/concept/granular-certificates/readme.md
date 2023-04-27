@@ -55,6 +55,9 @@ A slice is always owned by a single public-key.[^public-key]
 [^public-key]: Public-private keys was chosen since the registries do not have the concept of accounts and users. Ownership of a GC is purely done with the help of a public-private key pair.
 It is up to the integrating system to implement an accounting system and manage ownership through public-private keys.
 
+A slice can be uniquely identified by its commitment,
+[this was chosen as they were already unique and to save on adding another field with no added value.](https://github.com/orgs/project-origin/discussions/19#discussioncomment-5719035)
+
 ### Slice life-cycle
 
 A slice has a specific life-cycle. When the slice is created, it becomes **active**.
