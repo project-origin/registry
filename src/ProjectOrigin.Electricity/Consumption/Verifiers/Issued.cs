@@ -28,7 +28,7 @@ internal class ConsumptionIssuedVerifier : IEventVerifier<V1.ConsumptionIssuedEv
         if (!PublicKey.TryImport(SignatureAlgorithm.Ed25519, request.Event.OwnerPublicKey.Content.ToByteArray(), KeyBlobFormat.RawPublicKey, out _))
             return new VerificationResult.Invalid("Invalid owner key, not a valid Ed25519 publicKey");
 
-        var publicKey = _issuerOptions.AreaIssuerPublicKey(request.Event.GridArea);
+        var publicKey = _issuerOptions.GetAreaPublicKey(request.Event.GridArea);
         if (publicKey is null)
             return new VerificationResult.Invalid($"No issuer found for GridArea ”{request.Event.GridArea}”");
 

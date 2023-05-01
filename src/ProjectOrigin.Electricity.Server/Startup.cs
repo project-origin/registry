@@ -3,11 +3,9 @@ using ProjectOrigin.Register.CommandProcessor.Services;
 using ProjectOrigin.Register.StepProcessor.Interfaces;
 using ProjectOrigin.Register.StepProcessor.Models;
 using ProjectOrigin.Register.StepProcessor.Services;
-using ProjectOrigin.VerifiableEventStore.Services.Batcher;
-using ProjectOrigin.VerifiableEventStore.Services.Batcher.Postgres.Configuration;
+using ProjectOrigin.VerifiableEventStore.Services.BatchProcessor;
 using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector;
 using ProjectOrigin.VerifiableEventStore.Services.EventStore;
-using ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres.Configuration;
 
 namespace ProjectOrigin.Electricity.Server;
 
@@ -17,37 +15,36 @@ public class Startup
     {
         VerifierConfiguration.ConfigureServices(services);
 
-        // In-memory setup
-        var batchSizeOptions = new BatcherOptions() { BatchSizeExponent = 0 };
-        var memorystoreRegA = new MemoryEventStore(batchSizeOptions);
-        var memorystoreRegB = new MemoryEventStore(batchSizeOptions);
-
-        // Persistent setup
-        // services.AddBatchProcessor();
-        // services.AddPostgresEventStore(configuration);
+        var eventStores = new List<IEventStore>();
 
         services.AddGrpc();
-        services.AddTransient<IBlockchainConnector, ConcordiumConnector>();
+
+
+        services.AddHostedService<BatchProcessorBackgroundService>(sp => new BatchProcessorBackgroundService(sp.GetService<ILogger<BatchProcessorBackgroundService>>()!, eventStores, sp.GetService<IBlockchainConnector>()!));
+
+        // Only for alpha server containing all parts.
         services.AddSingleton<ICommandStepProcessor>((serviceProvider) =>
         {
-            var eventStoreDictionary = new Dictionary<string, IEventStore>{
-                { Registries.RegistryA, memorystoreRegA},
-                { Registries.RegistryB, memorystoreRegB}
-            };
+            var options = serviceProvider.GetService<IOptions<ServerOptions>>()!.Value;
 
-            var batcherRegA = new MemoryBatcher(serviceProvider.GetService<IBlockchainConnector>()!, memorystoreRegA, Options.Create(new BatcherOptions { BatchSizeExponent = 0 }));
-            var batcherRegB = new MemoryBatcher(serviceProvider.GetService<IBlockchainConnector>()!, memorystoreRegB, Options.Create(new BatcherOptions { BatchSizeExponent = 0 }));
+            var eventStoreDictionary = new Dictionary<string, IEventStore>();
+            var processors = new Dictionary<string, ICommandStepProcessor>();
 
-            var fesRegA = new InProcessFederatedEventStore(batcherRegA, eventStoreDictionary);
-            var fesRegB = new InProcessFederatedEventStore(batcherRegB, eventStoreDictionary);
+            foreach (var reg in options.Registries!)
+            {
+                var eventStore = new MemoryEventStore(Options.Create(reg.Value.VerifiableEventStore!));
 
-            var processorRegA = new CommandStepProcessor(Options.Create(new CommandStepProcessorOptions(Registries.RegistryA)), fesRegA, serviceProvider.GetService<ICommandStepVerifiere>()!);
-            var processorRegB = new CommandStepProcessor(Options.Create(new CommandStepProcessorOptions(Registries.RegistryB)), fesRegB, serviceProvider.GetService<ICommandStepVerifiere>()!);
+                eventStores.Add(eventStore);
+                eventStoreDictionary.Add(reg.Key, eventStore);
+                var fesReg = new InProcessFederatedEventStore(eventStore, eventStoreDictionary);
 
-            return new CommandStepRouter(new Dictionary<string, ICommandStepProcessor>(){
-                { Registries.RegistryA, processorRegA },
-                { Registries.RegistryB, processorRegB },
-            });
+                var processor = new CommandStepProcessor(Options.Create(new CommandStepProcessorOptions { RegistryName = reg.Key }),
+                                                        fesReg,
+                                                        serviceProvider.GetService<ICommandStepVerifiere>()!);
+                processors.Add(reg.Key, processor);
+            }
+
+            return new CommandStepRouter(processors);
         });
 
     }

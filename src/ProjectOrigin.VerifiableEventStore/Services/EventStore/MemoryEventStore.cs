@@ -1,5 +1,6 @@
+using Microsoft.Extensions.Options;
 using ProjectOrigin.VerifiableEventStore.Models;
-using ProjectOrigin.VerifiableEventStore.Services.Batcher;
+using ProjectOrigin.VerifiableEventStore.Services.BatchProcessor;
 
 namespace ProjectOrigin.VerifiableEventStore.Services.EventStore;
 
@@ -10,9 +11,9 @@ public class MemoryEventStore : IEventStore
     private readonly long _batchSize;
     private List<VerifiableEvent> _verifiableEvents = new List<VerifiableEvent>();
 
-    public MemoryEventStore(BatcherOptions options)
+    public MemoryEventStore(IOptions<VerifiableEventStoreOptions> options)
     {
-        _batchSize = (long)Math.Pow(2, options.BatchSizeExponent);
+        _batchSize = (long)Math.Pow(2, options.Value.BatchSizeExponent);
     }
 
     public Task StoreBatch(Batch batch)

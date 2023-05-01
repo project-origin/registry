@@ -1,22 +1,25 @@
-FROM mcr.microsoft.com/dotnet/aspnet:7.0-alpine AS base
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM rust:buster AS rust-builder
 WORKDIR /src
-RUN apt-get update && apt install build-essential -y
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-ENV PATH="$PATH:/root/.cargo/bin"
+COPY ./rust-ffi .
+RUN cargo build --release
+
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS dotnet-build
+WORKDIR /src
 COPY . .
 RUN dotnet restore
 RUN dotnet build ProjectOrigin.Electricity.Server -c Release --no-restore -o /app/build
 
-FROM build AS publish
+FROM dotnet-build AS dotnet-publish
 RUN dotnet publish ProjectOrigin.Electricity.Server -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=dotnet-publish /app/publish .
+COPY --from=rust-builder /src/target/release/librust_ffi.so .
 HEALTHCHECK CMD curl --fail http://localhost:5000/health || exit 1
 ENTRYPOINT ["dotnet", "ProjectOrigin.Electricity.Server.dll"]

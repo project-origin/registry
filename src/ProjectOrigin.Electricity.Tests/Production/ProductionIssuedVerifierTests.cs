@@ -20,7 +20,9 @@ public class ProductionIssuedVerifierTests : AbstractVerifierTests
         var issuerKey = Key.Create(SignatureAlgorithm.Ed25519);
         var optionsMock = CreateOptionsMock(new IssuerOptions()
         {
-            AreaIssuerPublicKey = (area) => area == "DK1" ? issuerKey.PublicKey : null
+            Issuers = new Dictionary<string, string>(){
+                {"DK1", Convert.ToBase64String(issuerKey.PublicKey.Export(KeyBlobFormat.RawPublicKey))}
+            }
         });
 
         var processor = new ProductionIssuedVerifier(optionsMock);

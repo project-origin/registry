@@ -1,7 +1,7 @@
 using Google.Protobuf;
 using ProjectOrigin.Register.StepProcessor.Services;
 using ProjectOrigin.VerifiableEventStore.Models;
-using ProjectOrigin.VerifiableEventStore.Services.Batcher;
+using ProjectOrigin.VerifiableEventStore.Services.BatchProcessor;
 using ProjectOrigin.VerifiableEventStore.Services.EventStore;
 
 namespace ProjectOrigin.Register.StepProcessor.Tests;
@@ -12,14 +12,14 @@ public class InProcessFederatedEventStoreTests
     public async Task PublishEvent_Success()
     {
         var fixture = new Fixture();
-        var batcherMock = new Mock<IBatcher>();
+        var batcherMock = new Mock<IEventStore>();
 
         var federatedEventStore = new InProcessFederatedEventStore(batcherMock.Object, new());
         var @event = fixture.Create<VerifiableEvent>();
 
         await federatedEventStore.PublishEvent(@event);
 
-        batcherMock.Verify(obj => obj.PublishEvent(It.Is<VerifiableEvent>(e => e == @event)), Times.Once);
+        batcherMock.Verify(obj => obj.Store(It.Is<VerifiableEvent>(e => e == @event)), Times.Once);
     }
 
     [Fact]
