@@ -32,7 +32,7 @@ clean:
 ## Generate docfx site and serve, navigate to 127.0.0.1:8080
 doc-serve:
 	@echo "Generating DocFX site..."
-	docfx $(docfx_config)
+	docfx build $(docfx_config)
 	@echo "Serving DocFX site at http://127.0.0.1:8080/ ..."
 	docfx serve $(docfx_site_dir) -n 127.0.0.1
 
