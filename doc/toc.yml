@@ -4,5 +4,7 @@
   href: architecture/
 - name: Client API Documentation
   href: client/
+- name: Server Registry
+  href: server/
 - name: Contribute
   href: contribute/

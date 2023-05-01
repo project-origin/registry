@@ -64,6 +64,7 @@ namespace ProjectOrigin.Electricity.IntegrationTests.Helpers
                     {
                         webHost
                             .UseTestServer()
+                            .UseEnvironment("Development")
                             .UseStartup<TStartup>();
 
                         _configureWebHost?.Invoke(webHost);
