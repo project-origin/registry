@@ -21,7 +21,13 @@ public class CommandStatusEvent
     /// </summary>
     public string? Error { get; }
 
-    internal CommandStatusEvent(CommandId id, CommandState state, string? error)
+    /// <summary>
+    /// Constructor for CommandStatusEvent.
+    /// </summary>
+    /// <param name="id">The ID/CommandReference to the command the update relates to.</param>
+    /// <param name="state">The actual state the command is in, on the registry.</param>
+    /// <param name="error">If the CommandState is Failed, then this value will contain the message associated with the failure.</param>
+    public CommandStatusEvent(CommandId id, CommandState state, string? error)
     {
         Id = id;
         State = state;
