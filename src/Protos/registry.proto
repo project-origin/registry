@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+import "common.proto";
+
+package ProjectOrigin.Registry.v1;
+
+service TransactionProcessorService {
+    rpc SubmitTransaction (OrchestratorTransaction) returns (SubmitTransactionResponse);
+    rpc GetTransactionStatus (TransactionStatusRequest) returns (TransactionStatusResponse);
+}
+
+message SubmitTransactionResponse {}
+
+enum TransactionState {
+    UNKNOWN = 0;
+    PENDING = 1;
+    INVALID = 2;
+    VALID = 3;
+    FINALIZED = 4;
+}
+
+message TransactionStatusRequest {
+    // The id of the transaction.
+    bytes transation_id = 1;
+}
+
+message  TransactionStatusResponse {
+    // The state of the transaction.
+    TransactionState state = 1;
+
+    // The error message if the transaction is invalid.
+    string message = 2;
+
+    // The id of the batch the finalized transaction is in.
+    bytes batchId = 3;
+}
+
+message OrchestratorTransactionHeader {
+    // The target stream for which this transaction is intended
+    ProjectOrigin.Register.v1.FederatedStreamId target_stream = 1;
+
+    // A list of other streams that should be read,
+    // so the transaction processor can verify that the transaction is valid.
+    repeated ProjectOrigin.Register.v1.FederatedStreamId other_streams = 2;
+
+    // The type of this transaction, determines how the payload should be
+    // interpreted and validated.
+    string transaction_type = 3;
+
+    // The SHA-512 hash of the serialized payload.
+    bytes body_sha512 = 4;
+
+    // A random string that provides uniqueness for transactions with
+    // otherwise identical fields.
+    string nonce = 5;
+}
+
+// A transaction holds a single atomic change, signed and submitted by the orchestrator.
+message OrchestratorTransaction {
+
+    // The header of the transaction, contains metadata about the transaction.
+    OrchestratorTransactionHeader header = 1;
+
+    // The signature of the transaction header signed by the orchestrator
+    Signature header_signature = 2;
+
+    // The body of the transaction, contains the payload of the transaction.
+    Transaction body = 3;
+}
+
+// A transaction holds a single atomic change to the state of a stream signed by the owner.
+message Transaction {
+    // The metadata of the transaction,
+    // helps the transaction processor process the transaction.
+    ProjectOrigin.Common.v1.TransactionHeader header = 1;
+
+    // The signature of the transaction header.
+    Signature header_signature = 2;
+
+    // The serialized payload of the transaction
+    bytes payload = 3;
+}

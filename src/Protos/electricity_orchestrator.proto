@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "electricity.proto";
+import "common.proto";
+
+package ProjectOrigin.Electricity.Orchestrator.v1;
+
+service ElectricityOrchestratorService {
+    rpc IssueProduction (IssueProductionRequest) returns (IssueProductionResponse);
+    rpc IssueConsumption (IssueConsumptionRequest) returns (IssueConsumptionResponse);
+    rpc Transfer (TransferRequest) returns (TransferResponse);
+    rpc Slice (SliceRequest) returns (SliceResponse);
+    rpc Claim (ClaimRequest) returns (ClaimResponse);
+}
+
+service ElectricityOrchestratorResponseService {
+    rpc ResultChannel (stream TransactionReceivedAcknowled) returns (stream TransactionResult);
+}
+
+message IssueProductionRequest {
+    ProjectOrigin.Common.v1.TransactionHeader header = 1;
+    ProjectOrigin.Common.v1.Signature header_signature = 2;
+    ProjectOrigin.Electricity.Models.v1.IssueProductionBody body = 3;
+}
+
+message IssueProductionResponse {}
+
+message IssueConsumptionRequest {
+    ProjectOrigin.Common.v1.TransactionHeader header = 1;
+    ProjectOrigin.Common.v1.Signature header_signature = 2;
+    ProjectOrigin.Electricity.Models.v1.IssueConsumptionBody body = 3;
+}
+
+message IssueConsumptionResponse {}
+
+message TransferRequest {
+    ProjectOrigin.Common.v1.TransactionHeader header = 1;
+    ProjectOrigin.Common.v1.Signature header_signature = 2;
+    ProjectOrigin.Electricity.Models.v1.TransferBody body = 3;
+}
+
+message TransferResponse {}
+
+message SliceRequest {
+    ProjectOrigin.Common.v1.TransactionHeader header = 1;
+    ProjectOrigin.Common.v1.Signature header_signature = 2;
+    ProjectOrigin.Electricity.Models.v1.SliceBody body = 3;
+}
+
+message SliceResponse {}
+
+message ClaimRequest {
+    ProjectOrigin.Common.v1.TransactionHeader header = 1;
+    ProjectOrigin.Common.v1.Signature header_production_signature = 2;
+    ProjectOrigin.Common.v1.Signature header_consumption_signature = 3;
+    ProjectOrigin.Electricity.Models.v1.ClaimBody body = 4;
+}
+
+message ClaimResponse {}

@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package ProjectOrigin.Common.v1;
+
+message FederatedStreamId {
+    string Registry = 1;
+    Uuid StreamId = 2;
+}
+
+message Uuid {
+    string Value = 1;
+}
+
+message TransactionHeader {
+    // The public key of the orchestrator that created this transaction
+    bytes orchestrator_public_key = 1;
+
+    // The type of the payload, determines how the payload should be
+    // deserialized and validated.
+    string payload_type = 2;
+
+    // The SHA-512 hash of the serialized payload.
+    bytes payload_sha512 = 3;
+}
+
+message Signature {
+    bytes signature = 1;
+}
+
+message PublicKey {
+    bytes content = 1;
+}
