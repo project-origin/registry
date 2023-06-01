@@ -13,7 +13,7 @@ service TransactionProcessorService {
 
 message SendTransactionsRequest {
     // list of transactions to be processed
-    repeated ProjectOrigin.Common.v1.Transaction transactions = 1;
+    repeated Transaction transactions = 1;
 }
 
 message SubmitTransactionResponse {}
@@ -25,12 +25,12 @@ message GetStreamTransactionsRequest {
 
 message GetStreamTransactionsResponse {
     // The stream of transactions.
-    repeated ProjectOrigin.Common.v1.Transaction transactions = 1;
+    repeated Transaction transactions = 1;
 }
 
 message GetTransactionStatusRequest {
     // The id of the transaction.
-    ProjectOrigin.Common.v1.TransactionId id = 1;
+    TransactionId id = 1;
 }
 
 message GetTransactionStatusResponse {
@@ -49,9 +49,53 @@ enum TransactionState {
 }
 
 message GetTransactionProofRequest {
-    ProjectOrigin.Common.v1.TransactionId id = 1;
+    TransactionId id = 1;
 }
 
 message GetTransactionProofResponse {
-    ProjectOrigin.Common.v1.MerkleProof proof = 1;
+    MerkleProof proof = 1;
+}
+
+message TransactionHeader {
+    // The target stream for which this transaction is intended
+    ProjectOrigin.Common.v1.Uuid StreamId = 1;
+
+    // The type of the payload, determines how the payload should be
+    // deserialized and validated.
+    string payload_type = 2;
+
+    // The SHA-512 hash of the serialized payload.
+    bytes payload_sha512 = 3;
+
+    // A random string that provides uniqueness for transactions with
+    // otherwise identical fields.
+    string nonce = 4;
+}
+
+// A transaction holds a single atomic change to the state of a stream signed by the owner.
+message Transaction {
+    // The metadata of the transaction,
+    // helps the transaction processor process the transaction.
+    TransactionHeader header = 1;
+
+    // The signature of the transaction header.
+    Signature header_signature = 2;
+
+    // The serialized payload of the transaction
+    bytes payload = 3;
+}
+
+message TransactionId {
+    bytes id = 1;
+}
+
+message MerkleProof {
+    Transaction transaction = 1;
+    int32 leaf_index = 2;
+    repeated bytes hashes = 3;
+    bytes block_id = 4;
+}
+
+message Signature {
+    bytes signature = 1;
 }

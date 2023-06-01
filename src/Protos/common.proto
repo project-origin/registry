@@ -2,36 +2,6 @@ syntax = "proto3";
 
 package ProjectOrigin.Common.v1;
 
-
-message TransactionHeader {
-    // The target stream for which this transaction is intended
-    Uuid StreamId = 1;
-
-    // The type of the payload, determines how the payload should be
-    // deserialized and validated.
-    string payload_type = 2;
-
-    // The SHA-512 hash of the serialized payload.
-    bytes payload_sha512 = 3;
-
-    // A random string that provides uniqueness for transactions with
-    // otherwise identical fields.
-    string nonce = 4;
-}
-
-// A transaction holds a single atomic change to the state of a stream signed by the owner.
-message Transaction {
-    // The metadata of the transaction,
-    // helps the transaction processor process the transaction.
-    TransactionHeader header = 1;
-
-    // The signature of the transaction header.
-    Signature header_signature = 2;
-
-    // The serialized payload of the transaction
-    bytes payload = 3;
-}
-
 message FederatedStreamId {
     string registry = 1;
     Uuid stream_id = 2;
@@ -40,20 +10,3 @@ message FederatedStreamId {
 message Uuid {
     string value = 1;
 }
-
-message Signature {
-    bytes signature = 1;
-}
-
-
-message MerkleProof {
-    Transaction transaction = 1;
-    int32 leaf_index = 2;
-    repeated bytes hashes = 3;
-    bytes block_id = 4;
-}
-
-message TransactionId {
-    bytes id = 1;
-}
-
