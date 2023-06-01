@@ -5,18 +5,18 @@ import "common.proto";
 package ProjectOrigin.Registry.v1;
 
 service TransactionProcessorService {
-    rpc SubmitTransaction (OrchestratorTransaction) returns (SubmitTransactionResponse);
-    rpc GetTransactionStatus (TransactionStatusRequest) returns (TransactionStatusResponse);
+    rpc SendTransactions (SendTransactionsRequest) returns (SubmitTransactionResponse);
+    rpc GetStreamTransactions (GetStreamTransactionsRequest) returns (GetStreamTransactionsResponse);
+    rpc GetTransactionStatus(GetTransactionStatusRequest) returns (GetTransactionStatusResponse);
+    rpc GetTransactionProof (GetTransactionProofRequest) returns (GetTransactionProofResponse);
 }
 
-message SubmitTransactionResponse {}
+message SendTransactionsRequest {
+    // list of transactions to be processed
+    repeated ProjectOrigin.Common.v1.Transaction transactions = 1;
+}
 
-enum TransactionState {
-    UNKNOWN = 0;
-    PENDING = 1;
-    INVALID = 2;
-    VALID = 3;
-    FINALIZED = 4;
+message SendTransactionsResponse {
 }
 
 message TransactionStatusRequest {
@@ -35,48 +35,37 @@ message  TransactionStatusResponse {
     bytes batchId = 3;
 }
 
-message OrchestratorTransactionHeader {
-    // The target stream for which this transaction is intended
-    ProjectOrigin.Register.v1.FederatedStreamId target_stream = 1;
-
-    // A list of other streams that should be read,
-    // so the transaction processor can verify that the transaction is valid.
-    repeated ProjectOrigin.Register.v1.FederatedStreamId other_streams = 2;
-
-    // The type of this transaction, determines how the payload should be
-    // interpreted and validated.
-    string transaction_type = 3;
-
-    // The SHA-512 hash of the serialized payload.
-    bytes body_sha512 = 4;
-
-    // A random string that provides uniqueness for transactions with
-    // otherwise identical fields.
-    string nonce = 5;
+message GetStreamTransactionsRequest {
+    // The id of the transaction to get stream of transactions from.
+    ProjectOrigin.Common.v1.Uuid id = 1;
 }
 
-// A transaction holds a single atomic change, signed and submitted by the orchestrator.
-message OrchestratorTransaction {
-
-    // The header of the transaction, contains metadata about the transaction.
-    OrchestratorTransactionHeader header = 1;
-
-    // The signature of the transaction header signed by the orchestrator
-    Signature header_signature = 2;
-
-    // The body of the transaction, contains the payload of the transaction.
-    Transaction body = 3;
+message GetStreamTransactionsResponse {
+    // The stream of transactions.
+    repeated ProjectOrigin.Common.v1.Transaction transactions = 1;
 }
 
-// A transaction holds a single atomic change to the state of a stream signed by the owner.
-message Transaction {
-    // The metadata of the transaction,
-    // helps the transaction processor process the transaction.
-    ProjectOrigin.Common.v1.TransactionHeader header = 1;
+message GetTransactionStatusRequest {
+    // The id of the transaction.
+    ProjectOrigin.Common.v1.TransactionId id = 1;
+}
 
-    // The signature of the transaction header.
-    Signature header_signature = 2;
+message GetTransactionStatusResponse {
+    // The state of the transaction.
+    CommandStatus status = 1;
+}
 
-    // The serialized payload of the transaction
-    bytes payload = 3;
+enum TransactionState {
+    UNKNOWN = 0;
+    PENDING = 1;
+    FAILED = 2;
+    COMMITTED = 3;
+}
+
+message GetTransactionProofRequest {
+    ProjectOrigin.Common.v1.TransactionId id = 1;
+}
+
+message GetTransactionProofResponse {
+    ProjectOrigin.Common.v1.MerkleProof proof = 1;
 }
