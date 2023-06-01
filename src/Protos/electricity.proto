@@ -26,6 +26,12 @@ message ProductionIssuedEvent {
     PublicKey owner_public_key = 9;
 }
 
+message TransferredEvent{
+    ProjectOrigin.Register.v1.FederatedStreamId certificate_id = 1;
+    SliceId source_slice = 2;
+    PublicKey new_owner = 3;
+}
+
 message SlicedEvent{
     message Slice {
         Commitment quantity = 1;
@@ -39,17 +45,17 @@ message SlicedEvent{
 }
 
 message AllocatedEvent {
-    ProjectOrigin.Common.v1.Uuid AllocationId = 1;
-    ProjectOrigin.Common.v1.FederatedStreamId  ProductionCertificateId = 2;
-    ProjectOrigin.Common.v1.FederatedStreamId  ConsumptionCertificateId = 3;
-    SliceId ProductionSourceSlice = 4;
-    SliceId ConsumptionSourceSlice = 5;
-    bytes EqualityProof = 6;
+    ProjectOrigin.Common.v1.Uuid allocation_id = 1;
+    ProjectOrigin.Common.v1.FederatedStreamId  production_certificate_id = 2;
+    ProjectOrigin.Common.v1.FederatedStreamId  consumption_certificate_id = 3;
+    SliceId production_source_slice = 4;
+    SliceId consumption_source_slice = 5;
+    bytes equality_proof = 6;
 }
 
 message ClaimedEvent {
-    ProjectOrigin.Common.v1.FederatedStreamId  CertificateId = 1;
-    ProjectOrigin.Common.v1.Uuid AllocationId = 2;
+    ProjectOrigin.Common.v1.FederatedStreamId  certificate_id = 1;
+    ProjectOrigin.Common.v1.Uuid allocation_id = 2;
 }
 
 message DateInterval {
