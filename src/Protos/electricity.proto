@@ -27,7 +27,7 @@ message ProductionIssuedEvent {
 }
 
 message TransferredEvent{
-    ProjectOrigin.Register.v1.FederatedStreamId certificate_id = 1;
+    ProjectOrigin.Common.v1.FederatedStreamId certificate_id = 1;
     SliceId source_slice = 2;
     PublicKey new_owner = 3;
 }

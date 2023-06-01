@@ -16,24 +16,7 @@ message SendTransactionsRequest {
     repeated ProjectOrigin.Common.v1.Transaction transactions = 1;
 }
 
-message SendTransactionsResponse {
-}
-
-message TransactionStatusRequest {
-    // The id of the transaction.
-    bytes transation_id = 1;
-}
-
-message  TransactionStatusResponse {
-    // The state of the transaction.
-    TransactionState state = 1;
-
-    // The error message if the transaction is invalid.
-    string message = 2;
-
-    // The id of the batch the finalized transaction is in.
-    bytes batchId = 3;
-}
+message SubmitTransactionResponse {}
 
 message GetStreamTransactionsRequest {
     // The id of the transaction to get stream of transactions from.
@@ -52,7 +35,10 @@ message GetTransactionStatusRequest {
 
 message GetTransactionStatusResponse {
     // The state of the transaction.
-    CommandStatus status = 1;
+    TransactionState status = 1;
+
+    // The error message if the transaction is invalid.
+    string message = 2;
 }
 
 enum TransactionState {
