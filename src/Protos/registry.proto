@@ -4,7 +4,7 @@ import "common.proto";
 
 package ProjectOrigin.Registry.v1;
 
-service TransactionProcessorService {
+service RegistryService {
     rpc SendTransactions (SendTransactionsRequest) returns (SubmitTransactionResponse);
     rpc GetStreamTransactions (GetStreamTransactionsRequest) returns (GetStreamTransactionsResponse);
     rpc GetTransactionStatus(GetTransactionStatusRequest) returns (GetTransactionStatusResponse);
@@ -20,7 +20,7 @@ message SubmitTransactionResponse {}
 
 message GetStreamTransactionsRequest {
     // The id of the transaction to get stream of transactions from.
-    ProjectOrigin.Common.v1.Uuid id = 1;
+    ProjectOrigin.Common.v1.Uuid stream_id = 1;
 }
 
 message GetStreamTransactionsResponse {
@@ -58,7 +58,7 @@ message GetTransactionProofResponse {
 
 message TransactionHeader {
     // The target stream for which this transaction is intended
-    ProjectOrigin.Common.v1.Uuid StreamId = 1;
+    ProjectOrigin.Common.v1.FederatedStreamId federated_stream_id = 1;
 
     // The type of the payload, determines how the payload should be
     // deserialized and validated.
@@ -86,7 +86,7 @@ message Transaction {
 }
 
 message TransactionId {
-    bytes id = 1;
+    string value = 1;
 }
 
 message MerkleProof {
@@ -97,5 +97,5 @@ message MerkleProof {
 }
 
 message Signature {
-    bytes signature = 1;
+    bytes value = 1;
 }

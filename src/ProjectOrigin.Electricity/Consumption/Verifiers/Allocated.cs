@@ -1,32 +1,41 @@
 using Google.Protobuf;
-using NSec.Cryptography;
 using ProjectOrigin.Electricity.Production;
 using ProjectOrigin.Electricity.V1;
-using ProjectOrigin.Register.StepProcessor.Interfaces;
-using ProjectOrigin.Register.StepProcessor.Models;
+using ProjectOrigin.Registry.Utils;
+using ProjectOrigin.Registry.Utils.Interfaces;
+using ProjectOrigin.Registry.V1;
 
 namespace ProjectOrigin.Electricity.Consumption.Verifiers;
 
-internal class ConsumptionAllocatedVerifier : IEventVerifier<ConsumptionCertificate, V1.AllocatedEvent>
+public class ConsumptionAllocatedVerifier : IEventVerifier<ConsumptionCertificate, V1.AllocatedEvent>
 {
-    public Task<VerificationResult> Verify(Register.StepProcessor.Interfaces.VerificationRequest<AllocatedEvent> request)
+    private IRemoteModelLoader _remoteModelLoader;
+
+    public ConsumptionAllocatedVerifier(IRemoteModelLoader something)
     {
-        if (!request.TryGetModel<ConsumptionCertificate>(request.Event.ConsumptionCertificateId, out var consumptionCertificate))
+        _remoteModelLoader = something;
+    }
+
+    public async Task<VerificationResult> Verify(Transaction transaction, ConsumptionCertificate? consumptionCertificate, AllocatedEvent payload)
+    {
+        if (consumptionCertificate is null)
             return new VerificationResult.Invalid("Certificate does not exist");
 
-        var consumptionSlice = consumptionCertificate.GetCertificateSlice(request.Event.ConsumptionSourceSlice);
+        var consumptionSlice = consumptionCertificate.GetCertificateSlice(payload.ConsumptionSourceSlice);
         if (consumptionSlice is null)
             return new VerificationResult.Invalid("Slice not found");
 
-        if (!Ed25519.Ed25519.Verify(consumptionSlice.Owner, request.Event.ToByteArray(), request.Signature))
+        if (consumptionSlice.Owner.VerifySignature(transaction.Header.ToByteArray(), transaction.HeaderSignature))
             return new VerificationResult.Invalid($"Invalid signature for slice");
 
-        if (!request.TryGetModel<ProductionCertificate>(request.Event.ProductionCertificateId, out var productionCertificate))
+        var productionCertificate = await _remoteModelLoader.GetModel<ProductionCertificate>(payload.ProductionCertificateId);
+        if (productionCertificate is null)
             return new VerificationResult.Invalid("ProductionCertificate does not exist");
 
-        if (!productionCertificate.HasAllocation(request.Event.AllocationId))
+        if (!productionCertificate.HasAllocation(payload.AllocationId))
             return new VerificationResult.Invalid("Production not allocated");
 
         return new VerificationResult.Valid();
     }
+
 }

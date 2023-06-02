@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Options;
 using ProjectOrigin.VerifiableEventStore.Models;
-using ProjectOrigin.VerifiableEventStore.Services.BatchProcessor;
 
 namespace ProjectOrigin.VerifiableEventStore.Services.EventStore;
 

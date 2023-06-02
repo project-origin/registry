@@ -1,13 +1,13 @@
 using System.Security.Cryptography;
 using Google.Protobuf;
-using NSec.Cryptography;
+using ProjectOrigin.Electricity.Interfaces;
 using ProjectOrigin.PedersenCommitment;
 
 namespace ProjectOrigin.Electricity.Models;
 
-internal record AllocationSlice(Commitment Commitment, PublicKey Owner, Register.V1.Uuid AllocationId, Register.V1.FederatedStreamId ProductionCertificateId, Register.V1.FederatedStreamId ConsumptionCertificateId) : CertificateSlice(Commitment, Owner);
+public record AllocationSlice(Commitment Commitment, IPublicKey Owner, Common.V1.Uuid AllocationId, Common.V1.FederatedStreamId ProductionCertificateId, Common.V1.FederatedStreamId ConsumptionCertificateId) : CertificateSlice(Commitment, Owner);
 
-internal record CertificateSlice(Commitment Commitment, PublicKey Owner)
+public record CertificateSlice(Commitment Commitment, IPublicKey Owner)
 {
     public V1.SliceId Id
     {

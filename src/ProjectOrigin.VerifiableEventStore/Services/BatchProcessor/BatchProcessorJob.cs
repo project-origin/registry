@@ -28,18 +28,18 @@ public sealed class BatchProcessorJob
             var events = await _eventStore.GetEventsForBatch(item);
             var merkleRoot = events.CalculateMerkleRoot(x => x.Content);
 
-            var transaction = await _blockchainConnector.PublishBytes(merkleRoot);
+            var blockchainTransaction = await _blockchainConnector.PublishBytes(merkleRoot);
 
             // This should be in another service
-            var block = await _blockchainConnector.GetBlock(transaction);
+            var block = await _blockchainConnector.GetBlock(blockchainTransaction);
             while (block == null || !block.Final)
             {
                 await Task.Delay(_period, stoppingToken);
-                block = await _blockchainConnector.GetBlock(transaction);
+                block = await _blockchainConnector.GetBlock(blockchainTransaction);
             }
 
             // Update batch in EventStore
-            await _eventStore.FinalizeBatch(item, block.BlockId, transaction.TransactionHash);
+            await _eventStore.FinalizeBatch(item, block.BlockId, blockchainTransaction.TransactionHash);
         }
 
         return;

@@ -1,27 +1,35 @@
 using Google.Protobuf;
-using NSec.Cryptography;
 using ProjectOrigin.Electricity.Consumption;
 using ProjectOrigin.PedersenCommitment;
-using ProjectOrigin.Register.StepProcessor.Interfaces;
-using ProjectOrigin.Register.StepProcessor.Models;
+using ProjectOrigin.Registry.Utils;
+using ProjectOrigin.Registry.Utils.Interfaces;
+using ProjectOrigin.Registry.V1;
 
 namespace ProjectOrigin.Electricity.Production.Verifiers;
 
-internal class ProductionAllocatedVerifier : IEventVerifier<ProductionCertificate, V1.AllocatedEvent>
+public class ProductionAllocatedVerifier : IEventVerifier<ProductionCertificate, V1.AllocatedEvent>
 {
-    public Task<VerificationResult> Verify(Register.StepProcessor.Interfaces.VerificationRequest<V1.AllocatedEvent> request)
+    private IRemoteModelLoader _remoteModelLoader;
+
+    public ProductionAllocatedVerifier(IRemoteModelLoader something)
     {
-        if (!request.TryGetModel<ProductionCertificate>(request.Event.ProductionCertificateId, out var productionCertificate))
+        _remoteModelLoader = something;
+    }
+
+    public async Task<VerificationResult> Verify(Transaction transaction, ProductionCertificate? productionCertificate, V1.AllocatedEvent payload)
+    {
+        if (productionCertificate is null)
             return new VerificationResult.Invalid("Certificate does not exist");
 
-        var productionSlice = productionCertificate.GetCertificateSlice(request.Event.ProductionSourceSlice);
+        var productionSlice = productionCertificate.GetCertificateSlice(payload.ProductionSourceSlice);
         if (productionSlice is null)
             return new VerificationResult.Invalid("Production slice does not exist");
 
-        if (!Ed25519.Ed25519.Verify(productionSlice.Owner, request.Event.ToByteArray(), request.Signature))
+        if (productionSlice.Owner.VerifySignature(transaction.Header.ToByteArray(), transaction.HeaderSignature))
             return new VerificationResult.Invalid($"Invalid signature for slice");
 
-        if (!request.TryGetModel<ConsumptionCertificate>(request.Event.ConsumptionCertificateId, out var consumptionCertificate))
+        var consumptionCertificate = await _remoteModelLoader.GetModel<ConsumptionCertificate>(payload.ConsumptionCertificateId);
+        if (consumptionCertificate is null)
             return new VerificationResult.Invalid("ConsumptionCertificate does not exist");
 
         if (consumptionCertificate.Period != productionCertificate.Period)
@@ -30,15 +38,15 @@ internal class ProductionAllocatedVerifier : IEventVerifier<ProductionCertificat
         if (consumptionCertificate.GridArea != productionCertificate.GridArea)
             return new VerificationResult.Invalid("Certificates are not in the same area");
 
-        var consumptionSlice = consumptionCertificate.GetCertificateSlice(request.Event.ConsumptionSourceSlice);
+        var consumptionSlice = consumptionCertificate.GetCertificateSlice(payload.ConsumptionSourceSlice);
         if (consumptionSlice is null)
             return new VerificationResult.Invalid("Consumption slice does not exist");
 
         if (!Commitment.VerifyEqualityProof(
-            request.Event.EqualityProof.ToByteArray(),
+            payload.EqualityProof.ToByteArray(),
             productionSlice.Commitment,
             consumptionSlice.Commitment,
-            request.Event.AllocationId.Value))
+            payload.AllocationId.Value))
             return new VerificationResult.Invalid("Invalid Equality proof");
 
         return new VerificationResult.Valid();
