@@ -2,6 +2,7 @@ using ProjectOrigin.Electricity.IntegrationTests.TestClassFixtures;
 using ProjectOrigin.Electricity.Server;
 using Xunit.Abstractions;
 using System;
+using Xunit;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 

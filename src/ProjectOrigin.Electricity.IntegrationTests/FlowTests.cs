@@ -16,6 +16,7 @@ using Google.Protobuf.WellKnownTypes;
 using FluentAssertions;
 using System.Security.Cryptography;
 using ProjectOrigin.PedersenCommitment;
+using Xunit;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
