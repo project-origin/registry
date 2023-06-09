@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace ProjectOrigin.PedersenCommitment.Ristretto;
 
-public sealed class Point
+internal sealed class Point
 {
     private class Native
     {
@@ -167,7 +167,7 @@ public sealed class Point
     }
 }
 
-public readonly struct CompressedPoint
+internal readonly struct CompressedPoint
 {
 
     public const int ByteSize = 32;

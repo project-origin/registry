@@ -18,11 +18,10 @@
 
 using System;
 using System.Diagnostics;
-using System.Threading;
 using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
 
-namespace ProjectOrigin.Electricity.IntegrationTests.Helpers
+namespace ProjectOrigin.Electricity.IntegrationTests.TestClassFixtures.GrpcHelpers
 {
     internal class GrpcTestContext<TStartup> : IDisposable where TStartup : class
     {

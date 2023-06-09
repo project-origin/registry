@@ -5,7 +5,7 @@ namespace ProjectOrigin.PedersenCommitment.Ristretto;
 /// <summary>
 /// Scalar referencing a Rust object, guaranteed to always be in the field.
 /// </summary>
-public sealed class Scalar
+internal sealed class Scalar
 {
     private class Native
     {

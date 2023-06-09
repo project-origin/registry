@@ -1,6 +1,6 @@
 using ProjectOrigin.Electricity.Extensions;
-using ProjectOrigin.Electricity.Interfaces;
 using ProjectOrigin.Electricity.Models;
+using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.PedersenCommitment;
 
 namespace ProjectOrigin.Electricity;
@@ -15,9 +15,9 @@ public abstract class AbstractCertificate
     private Dictionary<V1.SliceId, CertificateSlice> _availableSlices = new Dictionary<V1.SliceId, CertificateSlice>();
     private Dictionary<Common.V1.Uuid, AllocationSlice> _allocationSlices = new Dictionary<Common.V1.Uuid, AllocationSlice>();
     private Dictionary<Common.V1.Uuid, AllocationSlice> _claimedSlices = new Dictionary<Common.V1.Uuid, AllocationSlice>();
-    private IKeyAlgorithm _keyAlgorithm;
+    private IHDAlgorithm _keyAlgorithm;
 
-    public AbstractCertificate(IKeyAlgorithm keyAlgorithm)
+    public AbstractCertificate(IHDAlgorithm keyAlgorithm)
     {
         _keyAlgorithm = keyAlgorithm;
     }

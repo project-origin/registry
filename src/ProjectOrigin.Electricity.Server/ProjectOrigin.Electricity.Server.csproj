@@ -6,7 +6,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\Protos\verifier.proto" GrpcServices="Server" />
+    <Protobuf Include="..\Protos\verifier.proto" GrpcServices="Server" Access="Internal" />
   </ItemGroup>
 
 </Project>

@@ -4,24 +4,24 @@ using AutoFixture;
 using Google.Protobuf;
 using NSec.Cryptography;
 using ProjectOrigin.Electricity.Consumption;
-using ProjectOrigin.Electricity.Interfaces;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Production;
+using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
+using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.PedersenCommitment;
-using ProjectOrigin.WalletSystem.Server.HDWallet;
 
 namespace ProjectOrigin.Electricity.Tests;
 
 internal static class FakeRegister
 {
     const string Registry = "OurReg";
-    static IKeyAlgorithm algorithm = new Secp256k1Algorithm();
+    static IHDAlgorithm algorithm = new Secp256k1Algorithm();
 
     private static DateInterval _defaultPeriod = new DateInterval(
             new DateTimeOffset(2022, 09, 25, 12, 0, 0, TimeSpan.Zero),
             new DateTimeOffset(2022, 09, 25, 13, 0, 0, TimeSpan.Zero));
 
-    public static Registry.V1.Transaction SignTransaction(Common.V1.FederatedStreamId id, IMessage @event, IPrivateKey signerKey)
+    public static Registry.V1.Transaction SignTransaction(Common.V1.FederatedStreamId id, IMessage @event, IHDPrivateKey signerKey)
     {
         var header = new Registry.V1.TransactionHeader()
         {
@@ -124,7 +124,7 @@ internal static class FakeRegister
         )
     {
         var id = CreateFederatedId();
-        var owner = ownerKeyOverride ?? algorithm.Create().PublicKey.ToProto();
+        var owner = ownerKeyOverride ?? algorithm.GenerateNewPrivateKey().PublicKey.ToProto();
         var gsrnHash = SHA256.HashData(BitConverter.GetBytes(5700000000000001));
         var quantityCommmitment = new SecretCommitmentInfo(150).ToProtoCommitment(id.StreamId.Value);
 
@@ -149,7 +149,7 @@ internal static class FakeRegister
         )
     {
         var id = CreateFederatedId();
-        var owner = ownerKeyOverride ?? algorithm.Create().PublicKey.ToProto();
+        var owner = ownerKeyOverride ?? algorithm.GenerateNewPrivateKey().PublicKey.ToProto();
         var gsrnHash = SHA256.HashData(BitConverter.GetBytes(5700000000000001));
         var quantityCommmitmentParams = new SecretCommitmentInfo(150);
         var quantityCommmitment = quantityCommmitmentParams.ToProtoCommitment(id.StreamId.Value);
@@ -194,7 +194,7 @@ internal static class FakeRegister
         var slice = new SecretCommitmentInfo(quantity);
         var remainder = new SecretCommitmentInfo(sourceParams.Message - quantity);
 
-        var newOwner = newOwnerOverride ?? algorithm.Create().PublicKey.ToProto();
+        var newOwner = newOwnerOverride ?? algorithm.GenerateNewPrivateKey().PublicKey.ToProto();
 
         var @event = new V1.SlicedEvent
         {

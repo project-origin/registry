@@ -1,16 +1,16 @@
 using System.Threading.Tasks;
 using AutoFixture;
-using ProjectOrigin.Electricity.Interfaces;
 using ProjectOrigin.Electricity.Production.Verifiers;
+using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
+using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.PedersenCommitment;
-using ProjectOrigin.WalletSystem.Server.HDWallet;
 using Xunit;
 
 namespace ProjectOrigin.Electricity.Tests;
 
 public class ProductionTransferredVerifierTests : AssertExtensions
 {
-    private IKeyAlgorithm _algorithm;
+    private IHDAlgorithm _algorithm;
     private ProductionTransferredVerifier _verifier;
 
     public ProductionTransferredVerifierTests()
@@ -22,8 +22,8 @@ public class ProductionTransferredVerifierTests : AssertExtensions
     [Fact]
     public async Task ProductionTransferredVerifierTests_TransferCertificate_Valid()
     {
-        var ownerKey = _algorithm.Create();
-        var newOwnerKey = _algorithm.Create();
+        var ownerKey = _algorithm.GenerateNewPrivateKey();
+        var newOwnerKey = _algorithm.GenerateNewPrivateKey();
         var (cert, sourceParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
 
         var @event = FakeRegister.CreateTransferEvent(cert, sourceParams, newOwnerKey.PublicKey.ToProto());
@@ -37,8 +37,8 @@ public class ProductionTransferredVerifierTests : AssertExtensions
     [Fact]
     public async Task ProductionTransferredVerifierTests_NullCertificate_Invalid()
     {
-        var ownerKey = _algorithm.Create();
-        var newOwnerKey = _algorithm.Create();
+        var ownerKey = _algorithm.GenerateNewPrivateKey();
+        var newOwnerKey = _algorithm.GenerateNewPrivateKey();
         var (cert, sourceParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
 
         var @event = FakeRegister.CreateTransferEvent(cert, sourceParams, newOwnerKey.PublicKey.ToProto());
@@ -52,8 +52,8 @@ public class ProductionTransferredVerifierTests : AssertExtensions
     [Fact]
     public async Task ProductionTransferredVerifierTests_InvalidPublicKey_InvalidFormat()
     {
-        var ownerKey = _algorithm.Create();
-        var newOwnerKey = _algorithm.Create();
+        var ownerKey = _algorithm.GenerateNewPrivateKey();
+        var newOwnerKey = _algorithm.GenerateNewPrivateKey();
         var (cert, sourceParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
 
         var randomOwnerKeyData = new V1.PublicKey
@@ -72,8 +72,8 @@ public class ProductionTransferredVerifierTests : AssertExtensions
     [Fact]
     public async Task ProductionTransferredVerifierTests_FakeSlice_SliceNotFound()
     {
-        var ownerKey = _algorithm.Create();
-        var newOwnerKey = _algorithm.Create();
+        var ownerKey = _algorithm.GenerateNewPrivateKey();
+        var newOwnerKey = _algorithm.GenerateNewPrivateKey();
         var (cert, sourceParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
 
         var fakeSliceParams = new SecretCommitmentInfo(250);
@@ -88,8 +88,8 @@ public class ProductionTransferredVerifierTests : AssertExtensions
     [Fact]
     public async Task ProductionTransferredVerifierTests_WrongKey_InvalidSignature()
     {
-        var ownerKey = _algorithm.Create();
-        var newOwnerKey = _algorithm.Create();
+        var ownerKey = _algorithm.GenerateNewPrivateKey();
+        var newOwnerKey = _algorithm.GenerateNewPrivateKey();
         var (cert, sourceParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
 
         var @event = FakeRegister.CreateTransferEvent(cert, sourceParams, newOwnerKey.PublicKey.ToProto());

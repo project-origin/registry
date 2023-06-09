@@ -4,7 +4,7 @@ using ProjectOrigin.Verifier.V1;
 
 namespace ProjectOrigin.Electricity;
 
-public class ElectricityVerifierService : ProjectOrigin.Verifier.V1.VerifierService.VerifierServiceBase
+internal class ElectricityVerifierService : ProjectOrigin.Verifier.V1.VerifierService.VerifierServiceBase
 {
     private IVerifierDispatcher _verifierDispatcher;
 

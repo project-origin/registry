@@ -8,6 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ProjectOrigin.Registry.Utils\ProjectOrigin.Registry.Utils.csproj" />
     <ProjectReference Include="..\ProjectOrigin.PedersenCommitment\ProjectOrigin.PedersenCommitment.csproj" />
+    <ProjectReference Include="..\ProjectOrigin.HierarchicalDeterministicKeys\ProjectOrigin.HierarchicalDeterministicKeys.csproj" />
   </ItemGroup>
 
   <ItemGroup>

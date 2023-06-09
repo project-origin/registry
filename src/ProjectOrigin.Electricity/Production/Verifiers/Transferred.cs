@@ -1,6 +1,5 @@
-using Google.Protobuf;
 using ProjectOrigin.Electricity.Extensions;
-using ProjectOrigin.Electricity.Interfaces;
+using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.Registry.Utils;
 using ProjectOrigin.Registry.V1;
 
@@ -8,9 +7,9 @@ namespace ProjectOrigin.Electricity.Production.Verifiers;
 
 public class ProductionTransferredVerifier : IEventVerifier<ProductionCertificate, V1.TransferredEvent>
 {
-    private IKeyAlgorithm _keyAlgorithm;
+    private IHDAlgorithm _keyAlgorithm;
 
-    public ProductionTransferredVerifier(IKeyAlgorithm keyAlgorithm)
+    public ProductionTransferredVerifier(IHDAlgorithm keyAlgorithm)
     {
         _keyAlgorithm = keyAlgorithm;
     }

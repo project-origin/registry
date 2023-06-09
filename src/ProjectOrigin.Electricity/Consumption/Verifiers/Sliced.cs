@@ -1,6 +1,5 @@
-using Google.Protobuf;
 using ProjectOrigin.Electricity.Extensions;
-using ProjectOrigin.Electricity.Interfaces;
+using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.PedersenCommitment;
 using ProjectOrigin.Registry.Utils;
 using ProjectOrigin.Registry.V1;
@@ -9,9 +8,9 @@ namespace ProjectOrigin.Electricity.Consumption.Verifiers;
 
 public class ConsumptionSlicedVerifier : IEventVerifier<ConsumptionCertificate, V1.SlicedEvent>
 {
-    private IKeyAlgorithm _keyAlgorithm;
+    private IHDAlgorithm _keyAlgorithm;
 
-    public ConsumptionSlicedVerifier(IKeyAlgorithm keyAlgorithm)
+    public ConsumptionSlicedVerifier(IHDAlgorithm keyAlgorithm)
     {
         _keyAlgorithm = keyAlgorithm;
     }

@@ -16,9 +16,10 @@
 // https://github.com/dotnet/AspNetCore.Docs/blob/main/aspnetcore/grpc/test-services/sample/Tests/Server/IntegrationTests/Helpers/ForwardingLoggerProvider.cs
 #endregion
 
+using System;
 using Microsoft.Extensions.Logging;
 
-namespace ProjectOrigin.Electricity.IntegrationTests.Helpers
+namespace ProjectOrigin.Electricity.IntegrationTests.TestClassFixtures.GrpcHelpers
 {
     internal class ForwardingLoggerProvider : ILoggerProvider
     {

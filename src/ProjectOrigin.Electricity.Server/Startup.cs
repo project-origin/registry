@@ -2,13 +2,15 @@ using System.Reflection;
 using ProjectOrigin.Electricity.Consumption;
 using ProjectOrigin.Electricity.Consumption.Verifiers;
 using ProjectOrigin.Electricity.Interfaces;
+using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Production;
 using ProjectOrigin.Electricity.Production.Verifiers;
 using ProjectOrigin.Electricity.Services;
+using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
+using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.Registry.Utils;
 using ProjectOrigin.Registry.Utils.Interfaces;
 using ProjectOrigin.Registry.Utils.Services;
-using ProjectOrigin.WalletSystem.Server.HDWallet;
 
 namespace ProjectOrigin.Electricity.Server;
 
@@ -35,7 +37,13 @@ public class Startup
         services.AddTransient<IVerifierDispatcher, VerifierDispatcher>();
         services.AddTransient<IRemoteModelLoader, GrpcRemoteModelLoader>();
         services.AddTransient<IModelHydrater, ElectricityModelHydrater>();
-        services.AddTransient<IKeyAlgorithm, Secp256k1Algorithm>();
+        services.AddTransient<IHDAlgorithm, Secp256k1Algorithm>();
+        services.AddTransient<IAreaIssuerService, AreaIssuerOptionsService>();
+
+        services.AddOptions<IssuerOptions>().Configure<IConfiguration>((settings, configuration) =>
+        {
+            configuration.Bind(settings);
+        });
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -2,21 +2,20 @@ using System.Security.Cryptography;
 using Google.Protobuf;
 using ProjectOrigin.Electricity.Extensions;
 using ProjectOrigin.Electricity.Consumption;
-using ProjectOrigin.Electricity.Interfaces;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.PedersenCommitment;
-using ProjectOrigin.WalletSystem.Server.HDWallet;
 using Xunit;
 using System;
 using AutoFixture;
+using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
+using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 
 namespace ProjectOrigin.Electricity.Tests;
 
 public class ConsumptionCertificateApplyTests
 {
     private Fixture _fixture = new Fixture();
-    private IKeyAlgorithm _algorithm = new Secp256k1Algorithm();
-
+    private IHDAlgorithm _algorithm = new Secp256k1Algorithm();
 
     private Common.V1.FederatedStreamId CreateId()
     {
@@ -41,7 +40,7 @@ public class ConsumptionCertificateApplyTests
             new DateTimeOffset(2022, 09, 25, 13, 0, 0, TimeSpan.Zero));
         var gsrnHash = SHA256.HashData(BitConverter.GetBytes(new Fixture().Create<ulong>()));
         var quantity = new SecretCommitmentInfo(_fixture.Create<uint>());
-        var ownerKey = _algorithm.Create();
+        var ownerKey = _algorithm.GenerateNewPrivateKey();
         var certId = CreateId();
 
         var @event = new V1.ConsumptionIssuedEvent()
@@ -71,7 +70,7 @@ public class ConsumptionCertificateApplyTests
             new DateTimeOffset(2022, 09, 25, 13, 0, 0, TimeSpan.Zero));
         var gsrnHash = SHA256.HashData(BitConverter.GetBytes(_fixture.Create<ulong>()));
         var quantity = new SecretCommitmentInfo(_fixture.Create<uint>());
-        var ownerKey = _algorithm.Create();
+        var ownerKey = _algorithm.GenerateNewPrivateKey();
 
 
         var @event = new V1.ConsumptionIssuedEvent()
@@ -113,7 +112,7 @@ public class ConsumptionCertificateApplyTests
         };
 
         var slice1 = new SecretCommitmentInfo(_fixture.Create<uint>());
-        var owner1 = _algorithm.Create();
+        var owner1 = _algorithm.GenerateNewPrivateKey();
         @event.NewSlices.Add(new V1.SlicedEvent.Types.Slice
         {
             Quantity = slice1.ToProtoCommitment(cert.Id.StreamId.Value),
@@ -121,7 +120,7 @@ public class ConsumptionCertificateApplyTests
         });
 
         var slice2 = new SecretCommitmentInfo(_fixture.Create<uint>());
-        var owner2 = _algorithm.Create();
+        var owner2 = _algorithm.GenerateNewPrivateKey();
         @event.NewSlices.Add(new V1.SlicedEvent.Types.Slice
         {
             Quantity = slice2.ToProtoCommitment(cert.Id.StreamId.Value),

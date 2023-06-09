@@ -2,7 +2,7 @@ namespace ProjectOrigin.PedersenCommitment.Ristretto;
 using System.Text;
 using System.Runtime.InteropServices;
 
-public class Oracle
+internal class Oracle
 {
 
     private class NativeTranscript

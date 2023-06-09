@@ -1,13 +1,13 @@
-using ProjectOrigin.Electricity.Interfaces;
+using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.Registry.Utils.Services;
 
 namespace ProjectOrigin.Electricity.Services;
 
 public class ElectricityModelHydrater : AbstractModelHydrator
 {
-    private IKeyAlgorithm _keyAlgorithm;
+    private IHDAlgorithm _keyAlgorithm;
 
-    public ElectricityModelHydrater(IKeyAlgorithm keyAlgorithm)
+    public ElectricityModelHydrater(IHDAlgorithm keyAlgorithm)
     {
         _keyAlgorithm = keyAlgorithm;
     }

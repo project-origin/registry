@@ -1,6 +1,6 @@
 using ProjectOrigin.Electricity.Extensions;
-using ProjectOrigin.Electricity.Interfaces;
 using ProjectOrigin.Electricity.Models;
+using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 
 namespace ProjectOrigin.Electricity.Consumption;
 
@@ -12,7 +12,7 @@ public class ConsumptionCertificate : AbstractCertificate
 
     private V1.ConsumptionIssuedEvent _issued;
 
-    public ConsumptionCertificate(V1.ConsumptionIssuedEvent e, IKeyAlgorithm keyAlgorithm)
+    public ConsumptionCertificate(V1.ConsumptionIssuedEvent e, IHDAlgorithm keyAlgorithm)
         : base(keyAlgorithm)
     {
         _issued = e;

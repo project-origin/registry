@@ -5,12 +5,13 @@ using AutoFixture;
 using Microsoft.Extensions.Options;
 using Moq;
 using ProjectOrigin.Electricity.Extensions;
-using ProjectOrigin.Electricity.Interfaces;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Production;
 using ProjectOrigin.Electricity.Production.Verifiers;
+using ProjectOrigin.Electricity.Services;
+using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
+using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.PedersenCommitment;
-using ProjectOrigin.WalletSystem.Server.HDWallet;
 using Xunit;
 
 namespace ProjectOrigin.Electricity.Tests;
@@ -18,24 +19,25 @@ namespace ProjectOrigin.Electricity.Tests;
 public class ProductionIssuedVerifierTests : AssertExtensions
 {
     const string IssuerArea = "DK1";
-    private IKeyAlgorithm _algorithm;
-    private IPrivateKey _issuerKey;
+    private IHDAlgorithm _algorithm;
+    private IHDPrivateKey _issuerKey;
     private ProductionIssuedVerifier _verifier;
 
     public ProductionIssuedVerifierTests()
     {
         _algorithm = new Secp256k1Algorithm();
-        _issuerKey = _algorithm.Create();
+        _issuerKey = _algorithm.GenerateNewPrivateKey();
 
         var optionsMock = new Mock<IOptions<IssuerOptions>>();
-        optionsMock.Setup(obj => obj.Value).Returns(new IssuerOptions(_algorithm)
+        optionsMock.Setup(obj => obj.Value).Returns(new IssuerOptions()
         {
             Issuers = new Dictionary<string, string>(){
                 {IssuerArea, Convert.ToBase64String(_issuerKey.PublicKey.Export())},
             }
         });
+        var issuerService = new AreaIssuerOptionsService(_algorithm, optionsMock.Object);
 
-        _verifier = new ProductionIssuedVerifier(optionsMock.Object, _algorithm);
+        _verifier = new ProductionIssuedVerifier(issuerService, _algorithm);
     }
 
     [Fact]
@@ -114,7 +116,7 @@ public class ProductionIssuedVerifierTests : AssertExtensions
     [Fact]
     public async Task ProductionIssuedVerifier_InvalidSignature_Fail()
     {
-        var invalidKey = _algorithm.Create();
+        var invalidKey = _algorithm.GenerateNewPrivateKey();
 
         var @event = FakeRegister.CreateProductionIssuedEvent();
         var transaction = FakeRegister.SignTransaction(@event.CertificateId, @event, invalidKey);

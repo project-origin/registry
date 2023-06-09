@@ -16,14 +16,20 @@
 // https://github.com/dotnet/AspNetCore.Docs/blob/main/aspnetcore/grpc/test-services/sample/Tests/Server/IntegrationTests/Helpers/GrpcTestFixture.cs
 #endregion
 
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using Grpc.Net.Client;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Configuration.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using ProjectOrigin.Electricity.IntegrationTests.TestClassFixtures.GrpcHelpers;
 using Xunit.Abstractions;
 
-namespace ProjectOrigin.Electricity.IntegrationTests.Helpers
+namespace ProjectOrigin.Electricity.IntegrationTests.TestClassFixtures
 {
     public delegate void LogMessage(LogLevel logLevel, string categoryName, EventId eventId, string message, Exception? exception);
 
@@ -32,9 +38,13 @@ namespace ProjectOrigin.Electricity.IntegrationTests.Helpers
         private TestServer? _server;
         private IHost? _host;
         private HttpMessageHandler? _handler;
-        private Action<IWebHostBuilder>? _configureWebHost;
+        private GrpcChannel? _channel;
+        private Dictionary<string, string?>? _configurationDictionary;
 
         public event LogMessage? LoggedMessage;
+        public GrpcChannel Channel => _channel ??= CreateChannel();
+
+        public Action<IServiceCollection>? testServicesConfigure;
 
         public GrpcTestFixture()
         {
@@ -45,17 +55,35 @@ namespace ProjectOrigin.Electricity.IntegrationTests.Helpers
             }));
         }
 
-        public void ConfigureWebHost(Action<IWebHostBuilder> configure)
+        public T GetRequiredService<T>() where T : class
         {
-            _configureWebHost = configure;
+            EnsureServer();
+            return _host!.Services.GetRequiredService<T>();
+        }
+
+        public void ConfigureHostConfiguration(Dictionary<string, string?> configuration)
+        {
+            _configurationDictionary = configuration;
         }
 
         private void EnsureServer()
         {
             if (_host == null)
             {
+                var builder = new HostBuilder();
 
-                var builder = new HostBuilder()
+                if (_configurationDictionary != null)
+                {
+                    builder.ConfigureHostConfiguration(config =>
+                        {
+                            config.Add(new MemoryConfigurationSource()
+                            {
+                                InitialData = _configurationDictionary
+                            });
+                        });
+                }
+
+                builder
                     .ConfigureServices(services =>
                     {
                         services.AddSingleton<ILoggerFactory>(LoggerFactory);
@@ -67,7 +95,8 @@ namespace ProjectOrigin.Electricity.IntegrationTests.Helpers
                             .UseEnvironment("Development")
                             .UseStartup<TStartup>();
 
-                        _configureWebHost?.Invoke(webHost);
+                        if (testServicesConfigure is not null)
+                            webHost.ConfigureTestServices(testServicesConfigure);
                     });
 
                 _host = builder.Start();
@@ -78,23 +107,26 @@ namespace ProjectOrigin.Electricity.IntegrationTests.Helpers
 
         public LoggerFactory LoggerFactory { get; }
 
-        public HttpMessageHandler Handler
+        private GrpcChannel CreateChannel()
         {
-            get
+            EnsureServer();
+
+            return GrpcChannel.ForAddress(_server!.BaseAddress, new GrpcChannelOptions
             {
-                EnsureServer();
-                return _handler!;
-            }
+                LoggerFactory = LoggerFactory,
+                HttpHandler = _handler
+            });
         }
 
         public void Dispose()
         {
+            _channel?.Dispose();
             _handler?.Dispose();
             _host?.Dispose();
             _server?.Dispose();
         }
 
-        public IDisposable GetTestContext(ITestOutputHelper outputHelper)
+        public IDisposable GetTestLogger(ITestOutputHelper outputHelper)
         {
             return new GrpcTestContext<TStartup>(this, outputHelper);
         }

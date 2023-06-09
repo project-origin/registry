@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 using Google.Protobuf;
-using ProjectOrigin.Electricity.Interfaces;
+using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.PedersenCommitment;
 
 namespace ProjectOrigin.Electricity.Models;

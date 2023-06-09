@@ -1,6 +1,6 @@
 using AutoFixture;
 using FluentAssertions;
-using ProjectOrigin.WalletSystem.Server.HDWallet;
+using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
 using Xunit;
 
 namespace ProjectOrigin.Electricity.Tests;
@@ -19,25 +19,24 @@ public class Secp256k1Tests
     [Fact]
     public void signature_is_valid()
     {
-        var key = _algorithm.Create();
+        var key = _algorithm.GenerateNewPrivateKey();
         var data = _fixture.Create<byte[]>();
         var signature = key.Sign(data).ToArray();
 
-        var verifcationResult = key.PublicKey.VerifySignature(data, signature);
+        var verifcationResult = key.PublicKey.Verify(data, signature);
 
         verifcationResult.Should().BeTrue();
     }
 
-
     [Fact]
     public void signature_is_invalid()
     {
-        var key = _algorithm.Create();
-        var otherKey = _algorithm.Create();
+        var key = _algorithm.GenerateNewPrivateKey();
+        var otherKey = _algorithm.GenerateNewPrivateKey();
         var data = _fixture.Create<byte[]>();
         var signature = otherKey.Sign(data).ToArray();
 
-        var verifcationResult = key.PublicKey.VerifySignature(data, signature);
+        var verifcationResult = key.PublicKey.Verify(data, signature);
 
         verifcationResult.Should().BeFalse();
     }

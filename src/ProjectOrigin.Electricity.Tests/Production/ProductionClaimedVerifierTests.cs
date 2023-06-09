@@ -2,17 +2,17 @@ using System;
 using System.Threading.Tasks;
 using Moq;
 using ProjectOrigin.Electricity.Consumption;
-using ProjectOrigin.Electricity.Interfaces;
 using ProjectOrigin.Electricity.Production.Verifiers;
+using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
+using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.Registry.Utils.Interfaces;
-using ProjectOrigin.WalletSystem.Server.HDWallet;
 using Xunit;
 
 namespace ProjectOrigin.Electricity.Tests;
 
 public class ProductionClaimedVerifierTests : AssertExtensions
 {
-    private IKeyAlgorithm _algorithm;
+    private IHDAlgorithm _algorithm;
     private ProductionClaimedVerifier _verifier;
     private ConsumptionCertificate? _otherCertificate;
 
@@ -30,7 +30,7 @@ public class ProductionClaimedVerifierTests : AssertExtensions
     [Fact]
     public async Task ProductionClaimedVerifier_Valid()
     {
-        var ownerKey = _algorithm.Create();
+        var ownerKey = _algorithm.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
         var allocationId = prodCert.Allocated(consCert, prodParams, consParams);
@@ -48,7 +48,7 @@ public class ProductionClaimedVerifierTests : AssertExtensions
     [Fact]
     public async Task ProductionClaimedVerifier_Invalid_CertificateNotExists()
     {
-        var ownerKey = _algorithm.Create();
+        var ownerKey = _algorithm.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
         var allocationId = prodCert.Allocated(consCert, prodParams, consParams);
@@ -66,7 +66,7 @@ public class ProductionClaimedVerifierTests : AssertExtensions
     [Fact]
     public async Task ProductionClaimedVerifier_Invalid_AllocationNotExist()
     {
-        var ownerKey = _algorithm.Create();
+        var ownerKey = _algorithm.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
         var allocationId = Guid.NewGuid();
@@ -84,8 +84,8 @@ public class ProductionClaimedVerifierTests : AssertExtensions
     [Fact]
     public async Task ProductionClaimedVerifier_Invalid_InvalidSignature()
     {
-        var ownerKey = _algorithm.Create();
-        var otherKey = _algorithm.Create();
+        var ownerKey = _algorithm.GenerateNewPrivateKey();
+        var otherKey = _algorithm.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
         var allocationId = prodCert.Allocated(consCert, prodParams, consParams);
@@ -103,7 +103,7 @@ public class ProductionClaimedVerifierTests : AssertExtensions
     [Fact]
     public async Task ProductionClaimedVerifier_Invalid_ConsumptionNotFound()
     {
-        var ownerKey = _algorithm.Create();
+        var ownerKey = _algorithm.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
         var allocationId = prodCert.Allocated(consCert, prodParams, consParams);
@@ -121,7 +121,7 @@ public class ProductionClaimedVerifierTests : AssertExtensions
     [Fact]
     public async Task ProductionClaimedVerifier_Invalid_ConsumptionNotAllocated()
     {
-        var ownerKey = _algorithm.Create();
+        var ownerKey = _algorithm.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
         var allocationId = prodCert.Allocated(consCert, prodParams, consParams);

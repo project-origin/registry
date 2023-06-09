@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace ProjectOrigin.PedersenCommitment.Ristretto;
 
-public record RangeProof
+internal record RangeProof
 {
     private class Native
     {
@@ -136,13 +136,13 @@ public record RangeProof
 }
 
 [StructLayout(LayoutKind.Sequential)]
-struct RangeProofWithCommit
+internal struct RangeProofWithCommit
 {
     public IntPtr Proof;
     public IntPtr CompressedPoint;
 }
 
-public record BulletProofGen
+internal record BulletProofGen
 {
     public static Lazy<BulletProofGen> LazyGenerator = new Lazy<BulletProofGen>(() =>
     {

@@ -1,6 +1,6 @@
 using ProjectOrigin.Electricity.Extensions;
-using ProjectOrigin.Electricity.Interfaces;
 using ProjectOrigin.Electricity.Models;
+using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 
 namespace ProjectOrigin.Electricity.Production;
 
@@ -12,7 +12,7 @@ public class ProductionCertificate : AbstractCertificate
 
     private V1.ProductionIssuedEvent _issued;
 
-    internal ProductionCertificate(V1.ProductionIssuedEvent e, IKeyAlgorithm keyAlgorithm)
+    internal ProductionCertificate(V1.ProductionIssuedEvent e, IHDAlgorithm keyAlgorithm)
         : base(keyAlgorithm)
     {
         _issued = e;

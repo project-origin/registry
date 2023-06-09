@@ -1,6 +1,5 @@
-using Google.Protobuf;
 using ProjectOrigin.Electricity.Extensions;
-using ProjectOrigin.Electricity.Interfaces;
+using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.PedersenCommitment;
 using ProjectOrigin.Registry.Utils;
 using ProjectOrigin.Registry.V1;
@@ -9,9 +8,9 @@ namespace ProjectOrigin.Electricity.Production.Verifiers;
 
 public class ProductionSlicedVerifier : IEventVerifier<ProductionCertificate, V1.SlicedEvent>
 {
-    private IKeyAlgorithm _keyAlgorithm;
+    private IHDAlgorithm _keyAlgorithm;
 
-    public ProductionSlicedVerifier(IKeyAlgorithm keyAlgorithm)
+    public ProductionSlicedVerifier(IHDAlgorithm keyAlgorithm)
     {
         _keyAlgorithm = keyAlgorithm;
     }

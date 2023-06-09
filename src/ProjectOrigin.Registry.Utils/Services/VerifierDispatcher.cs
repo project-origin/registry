@@ -27,9 +27,10 @@ public class VerifierDispatcher : IVerifierDispatcher
             ? typeof(IEventVerifier<,>).MakeGenericType(model.GetType(), @event.GetType())
             : typeof(IEventVerifier<>).MakeGenericType(@event.GetType());
 
-        var verifier = _serviceProvider.GetService(verifierInterfaceType);
+        var verifier = _serviceProvider.GetService(verifierInterfaceType)
+            ?? throw new Exception($"Verifier for ”{verifierInterfaceType}” could not be resolved");
 
-        var methodInfo = verifierInterfaceType.GetMethod(VerifyMethodName)
+        var methodInfo = verifier.GetType().GetMethod(VerifyMethodName)
             ?? throw new Exception($"Could not find ”{VerifyMethodName}” method");
 
         return methodInfo.Invoke(verifier, new object[] { transaction, model!, @event }) as Task<VerificationResult>
