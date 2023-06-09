@@ -26,7 +26,7 @@ public record SecretCommitmentInfo
 
     public SecretCommitmentInfo(uint message) : this(message, Ristretto.Scalar.Random()) { }
     public SecretCommitmentInfo(uint message, ReadOnlySpan<byte> blinding) : this(message, new Ristretto.Scalar(blinding)) { }
-    internal SecretCommitmentInfo(uint message, Ristretto.Scalar blinding)
+    public SecretCommitmentInfo(uint message, Ristretto.Scalar blinding)
     {
         Message = message;
         _blindingValue = blinding;

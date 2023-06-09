@@ -5,7 +5,7 @@ using ProjectOrigin.PedersenCommitment.Ristretto;
 
 namespace ProjectOrigin.PedersenCommitment;
 
-internal sealed record Generator
+public sealed record Generator
 {
     private class Native
     {

@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 namespace ProjectOrigin.PedersenCommitment.Ristretto;
 
-internal static class Extensions
+public static class Extensions
 {
     internal static byte[] ToByteArray(this ulong value, uint arrayLength)
     {

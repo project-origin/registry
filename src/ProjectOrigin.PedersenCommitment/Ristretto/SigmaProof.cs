@@ -3,7 +3,7 @@ namespace ProjectOrigin.PedersenCommitment.Ristretto;
 /// <summary>
 /// A sigma proof for proving a commitment is made to zero
 /// </summary>
-internal class ZeroProof
+public class ZeroProof
 {
 
     private Scalar c;
@@ -87,7 +87,7 @@ internal class ZeroProof
     }
 }
 
-internal class EqualProof
+public class EqualProof
 {
     private ZeroProof proof;
 
@@ -141,7 +141,7 @@ internal class EqualProof
     }
 }
 
-internal class SumProof
+public class SumProof
 {
     private ZeroProof proof;
 
