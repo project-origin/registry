@@ -34,7 +34,7 @@ public class ConsumptionIssuedVerifier : IEventVerifier<V1.ConsumptionIssuedEven
         if (publicKey is null)
             return new VerificationResult.Invalid($"No issuer found for GridArea ”{tEvent.GridArea}”");
 
-        if (!publicKey.VerifySignature(transaction.Header.ToByteArray(), transaction.HeaderSignature))
+        if (!transaction.IsSignatureValid(publicKey))
             return new VerificationResult.Invalid($"Invalid issuer signature for GridArea ”{tEvent.GridArea}”");
 
         return new VerificationResult.Valid();

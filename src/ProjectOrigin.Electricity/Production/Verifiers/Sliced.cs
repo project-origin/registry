@@ -25,7 +25,7 @@ public class ProductionSlicedVerifier : IEventVerifier<ProductionCertificate, V1
         if (certificateSlice is null)
             return new VerificationResult.Invalid("Slice not found");
 
-        if (certificateSlice.Owner.VerifySignature(transaction.Header.ToByteArray(), transaction.HeaderSignature))
+        if (!transaction.IsSignatureValid(certificateSlice.Owner))
             return new VerificationResult.Invalid($"Invalid signature for slice");
 
         foreach (var slice in payload.NewSlices)

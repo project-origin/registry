@@ -1,42 +1,48 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using AutoFixture;
 using Microsoft.Extensions.Options;
-using NSec.Cryptography;
+using Moq;
+using ProjectOrigin.Electricity.Consumption;
 using ProjectOrigin.Electricity.Consumption.Verifiers;
+using ProjectOrigin.Electricity.Interfaces;
 using ProjectOrigin.Electricity.Models;
+using ProjectOrigin.WalletSystem.Server.HDWallet;
+using Xunit;
 
 namespace ProjectOrigin.Electricity.Tests;
 
-public class ConsumptionIssuedVerifierTests : AbstractVerifierTests
+public class ConsumptionIssuedVerifierTests : AssertExtensions
 {
-    private IOptions<T> CreateOptionsMock<T>(T content) where T : class
-    {
-        var optionsMock = new Mock<IOptions<T>>();
-        optionsMock.Setup(obj => obj.Value).Returns(content);
-        return optionsMock.Object;
-    }
+    const string IssuerArea = "DK1";
+    private IKeyAlgorithm _algorithm;
+    private IPrivateKey _issuerKey;
+    private ConsumptionIssuedVerifier _verifier;
 
-    private (ConsumptionIssuedVerifier, Key) SetupIssuer()
+    public ConsumptionIssuedVerifierTests()
     {
-        var issuerKey = Key.Create(SignatureAlgorithm.Ed25519);
-        var optionsMock = CreateOptionsMock(new IssuerOptions()
+        _algorithm = new Secp256k1Algorithm();
+        _issuerKey = _algorithm.Create();
+
+        var optionsMock = new Mock<IOptions<IssuerOptions>>();
+        optionsMock.Setup(obj => obj.Value).Returns(new IssuerOptions(_algorithm)
         {
             Issuers = new Dictionary<string, string>(){
-                {"DK1", Convert.ToBase64String(issuerKey.PublicKey.Export(KeyBlobFormat.RawPublicKey))}
+                {IssuerArea, Convert.ToBase64String(_issuerKey.PublicKey.Export())},
             }
         });
 
-        var processor = new ConsumptionIssuedVerifier(optionsMock);
-
-        return (processor, issuerKey);
+        _verifier = new ConsumptionIssuedVerifier(optionsMock.Object, _algorithm);
     }
 
     [Fact]
     public async Task ConsumptionIssuedVerifier_IssueCertificate_Success()
     {
-        var (processor, issuerKey) = SetupIssuer();
+        var @event = FakeRegister.CreateConsumptionIssuedEvent();
+        var transaction = FakeRegister.SignTransaction(@event.CertificateId, @event, _issuerKey);
 
-        var request = FakeRegister.CreateConsumptionIssuedRequest(issuerKey);
-
-        var result = await processor.Verify(request);
+        var result = await _verifier.Verify(transaction, null, @event);
 
         AssertValid(result);
     }
@@ -44,23 +50,22 @@ public class ConsumptionIssuedVerifierTests : AbstractVerifierTests
     [Fact]
     public async Task ConsumptionIssuedVerifier_CertificateExists_Fail()
     {
-        var (processor, issuerKey) = SetupIssuer();
+        var @event = FakeRegister.CreateConsumptionIssuedEvent();
+        var transaction = FakeRegister.SignTransaction(@event.CertificateId, @event, _issuerKey);
+        var certificate = new ConsumptionCertificate(@event, _algorithm);
 
-        var request = FakeRegister.CreateConsumptionIssuedRequest(issuerKey, exists: true);
+        var result = await _verifier.Verify(transaction, certificate, @event);
 
-        var result = await processor.Verify(request);
-
-        AssertInvalid(result, $"Certificate with id ”{request.Event.CertificateId.StreamId}” already exists");
+        AssertInvalid(result, $"Certificate with id ”{@event.CertificateId.StreamId}” already exists");
     }
 
     [Fact]
     public async Task ConsumptionIssuedVerifier_QuantityCommitmentInvalid_Fail()
     {
-        var (processor, issuerKey) = SetupIssuer();
+        var @event = FakeRegister.CreateConsumptionIssuedEvent(quantityCommitmentOverride: FakeRegister.InvalidCommitment());
+        var transaction = FakeRegister.SignTransaction(@event.CertificateId, @event, _issuerKey);
 
-        var request = FakeRegister.CreateConsumptionIssuedRequest(issuerKey, quantityCommitmentOverride: FakeRegister.InvalidCommitment());
-
-        var result = await processor.Verify(request);
+        var result = await _verifier.Verify(transaction, null, @event);
 
         AssertInvalid(result, "Invalid range proof for Quantity commitment");
     }
@@ -68,30 +73,28 @@ public class ConsumptionIssuedVerifierTests : AbstractVerifierTests
     [Fact]
     public async Task ConsumptionIssuedVerifier_InvalidOwner_Fail()
     {
-        var (processor, issuerKey) = SetupIssuer();
-
         var randomOwnerKeyData = new V1.PublicKey
         {
             Content = Google.Protobuf.ByteString.CopyFrom(new Fixture().Create<byte[]>())
         };
 
-        var request = FakeRegister.CreateConsumptionIssuedRequest(issuerKey, ownerKeyOverride: randomOwnerKeyData);
+        var @event = FakeRegister.CreateConsumptionIssuedEvent(ownerKeyOverride: randomOwnerKeyData);
+        var transaction = FakeRegister.SignTransaction(@event.CertificateId, @event, _issuerKey);
 
-        var result = await processor.Verify(request);
+        var result = await _verifier.Verify(transaction, null, @event);
 
-        AssertInvalid(result, "Invalid owner key, not a valid Ed25519 publicKey");
+        AssertInvalid(result, "Invalid owner key, not a valid publicKey");
     }
 
     [Fact]
     public async Task ConsumptionIssuedVerifier_InvalidSignature_Fail()
     {
-        var (processor, issuerKey) = SetupIssuer();
+        var someOtherKey = _algorithm.Create();
 
-        var someOtherKey = Key.Create(SignatureAlgorithm.Ed25519);
+        var @event = FakeRegister.CreateConsumptionIssuedEvent();
+        var transaction = FakeRegister.SignTransaction(@event.CertificateId, @event, someOtherKey);
 
-        var request = FakeRegister.CreateConsumptionIssuedRequest(someOtherKey);
-
-        var result = await processor.Verify(request);
+        var result = await _verifier.Verify(transaction, null, @event);
 
         AssertInvalid(result, "Invalid issuer signature for GridArea ”DK1”");
     }
@@ -99,13 +102,12 @@ public class ConsumptionIssuedVerifierTests : AbstractVerifierTests
     [Fact]
     public async Task ConsumptionIssuedVerifier_NoIssuerForArea_Fail()
     {
-        var (processor, issuerKey) = SetupIssuer();
+        var someOtherKey = _algorithm.Create();
 
-        var someOtherKey = Key.Create(SignatureAlgorithm.Ed25519);
+        var @event = FakeRegister.CreateConsumptionIssuedEvent(gridAreaOverride: "DK2");
+        var transaction = FakeRegister.SignTransaction(@event.CertificateId, @event, someOtherKey);
 
-        var request = FakeRegister.CreateConsumptionIssuedRequest(someOtherKey, gridAreaOverride: "DK2");
-
-        var result = await processor.Verify(request);
+        var result = await _verifier.Verify(transaction, null, @event);
 
         AssertInvalid(result, "No issuer found for GridArea ”DK2”");
     }

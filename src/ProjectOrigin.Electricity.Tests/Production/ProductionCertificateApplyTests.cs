@@ -1,25 +1,31 @@
+using System;
 using System.Security.Cryptography;
+using AutoFixture;
 using Google.Protobuf;
-using NSec.Cryptography;
+using ProjectOrigin.Electricity.Extensions;
+using ProjectOrigin.Electricity.Interfaces;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Production;
 using ProjectOrigin.PedersenCommitment;
+using ProjectOrigin.WalletSystem.Server.HDWallet;
+using Xunit;
 
 namespace ProjectOrigin.Electricity.Tests;
 
 public class ProductionCertificateApplyTests
 {
     private Fixture _fix = new Fixture();
+    private IKeyAlgorithm _algorithm = new Secp256k1Algorithm();
 
-    private Register.V1.FederatedStreamId CreateId()
+    private Common.V1.FederatedStreamId CreateId()
     {
         var registry = _fix.Create<string>();
         var streamId = Guid.NewGuid();
 
-        return new Register.V1.FederatedStreamId
+        return new Common.V1.FederatedStreamId
         {
             Registry = registry,
-            StreamId = new Register.V1.Uuid
+            StreamId = new Common.V1.Uuid
             {
                 Value = streamId.ToString()
             }
@@ -34,7 +40,7 @@ public class ProductionCertificateApplyTests
             new DateTimeOffset(2022, 09, 25, 13, 0, 0, TimeSpan.Zero));
         var gsrnHash = SHA256.HashData(BitConverter.GetBytes(new Fixture().Create<ulong>()));
         var quantity = new SecretCommitmentInfo(_fix.Create<uint>());
-        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
+        var ownerKey = _algorithm.Create();
         var certId = CreateId();
 
         var @event = new V1.ProductionIssuedEvent()
@@ -47,7 +53,7 @@ public class ProductionCertificateApplyTests
             OwnerPublicKey = ownerKey.PublicKey.ToProto(),
         };
 
-        var cert = new ProductionCertificate(@event);
+        var cert = new ProductionCertificate(@event, _algorithm);
 
         return (cert, quantity);
     }
@@ -64,15 +70,15 @@ public class ProductionCertificateApplyTests
             new DateTimeOffset(2022, 09, 25, 13, 0, 0, TimeSpan.Zero));
         var gsrnHash = SHA256.HashData(BitConverter.GetBytes(new Fixture().Create<ulong>()));
         var quantity = new SecretCommitmentInfo(_fix.Create<uint>());
-        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
+        var ownerKey = _algorithm.Create();
 
 
         var @event = new V1.ProductionIssuedEvent()
         {
-            CertificateId = new Register.V1.FederatedStreamId
+            CertificateId = new Common.V1.FederatedStreamId
             {
                 Registry = registry,
-                StreamId = new Register.V1.Uuid
+                StreamId = new Common.V1.Uuid
                 {
                     Value = streamId.ToString()
                 }
@@ -84,7 +90,7 @@ public class ProductionCertificateApplyTests
             OwnerPublicKey = ownerKey.PublicKey.ToProto(),
         };
 
-        var cert = new ProductionCertificate(@event);
+        var cert = new ProductionCertificate(@event, _algorithm);
 
         Assert.Equal(registry, cert.Id.Registry);
         Assert.Equal(streamId, cert.Id.StreamId.ToModel());
@@ -106,7 +112,7 @@ public class ProductionCertificateApplyTests
         };
 
         var slice1 = new SecretCommitmentInfo(_fix.Create<uint>());
-        var owner1 = Key.Create(SignatureAlgorithm.Ed25519);
+        var owner1 = _algorithm.Create();
         @event.NewSlices.Add(new V1.SlicedEvent.Types.Slice
         {
             Quantity = slice1.ToProtoCommitment(cert.Id.StreamId.Value),
@@ -114,7 +120,7 @@ public class ProductionCertificateApplyTests
         });
 
         var slice2 = new SecretCommitmentInfo(_fix.Create<uint>());
-        var owner2 = Key.Create(SignatureAlgorithm.Ed25519);
+        var owner2 = _algorithm.Create();
         @event.NewSlices.Add(new V1.SlicedEvent.Types.Slice
         {
             Quantity = slice2.ToProtoCommitment(cert.Id.StreamId.Value),
@@ -134,23 +140,23 @@ public class ProductionCertificateApplyTests
         var allocationId = Guid.NewGuid().ToProto();
         var (cert, slice0) = Create();
 
-        var newOwner = Key.Create(SignatureAlgorithm.Ed25519).PublicKey;
+        var newOwner = _algorithm.Create();
 
         var @event = new V1.TransferredEvent()
         {
             CertificateId = cert.Id,
             SourceSlice = slice0.ToSliceId(),
-            NewOwner = newOwner.ToProto()
+            NewOwner = newOwner.PublicKey.ToProto()
         };
 
         var slice = cert.GetCertificateSlice(slice0.ToSliceId());
         Assert.NotNull(slice);
-        Assert.NotEqual(newOwner, slice!.Owner);
+        Assert.NotEqual(newOwner.PublicKey, slice!.Owner);
 
         cert.Apply(@event);
         slice = cert.GetCertificateSlice(slice0.ToSliceId());
         Assert.NotNull(slice);
-        Assert.Equal(newOwner, slice!.Owner);
+        Assert.Equal(newOwner.PublicKey, slice!.Owner);
     }
 
     [Fact]

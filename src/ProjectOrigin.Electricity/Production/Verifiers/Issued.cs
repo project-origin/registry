@@ -34,11 +34,11 @@ public class ProductionIssuedVerifier : IEventVerifier<V1.ProductionIssuedEvent>
         if (!_keyAlgorithm.TryImport(payload.OwnerPublicKey.Content.Span, out _))
             return new VerificationResult.Invalid("Invalid owner key, not a valid publicKey");
 
-        var publicKey = _issuerOptions.GetAreaPublicKey(payload.GridArea);
-        if (publicKey is null)
+        var areaPublicKey = _issuerOptions.GetAreaPublicKey(payload.GridArea);
+        if (areaPublicKey is null)
             return new VerificationResult.Invalid($"No issuer found for GridArea ”{payload.GridArea}”");
 
-        if (publicKey.VerifySignature(transaction.Header.ToByteArray(), transaction.HeaderSignature))
+        if (!transaction.IsSignatureValid(areaPublicKey))
             return new VerificationResult.Invalid($"Invalid issuer signature for GridArea ”{payload.GridArea}”");
 
         return new VerificationResult.Valid();

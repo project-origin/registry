@@ -1,6 +1,7 @@
-using ProjectOrigin.Register.StepProcessor.Models;
+using ProjectOrigin.Registry.Utils;
+using Xunit;
 
-public abstract class AbstractVerifierTests
+public abstract class AssertExtensions
 {
     public void AssertValid(VerificationResult result)
     {

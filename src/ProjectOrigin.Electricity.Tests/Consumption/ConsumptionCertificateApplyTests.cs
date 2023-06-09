@@ -1,25 +1,32 @@
 using System.Security.Cryptography;
 using Google.Protobuf;
-using NSec.Cryptography;
+using ProjectOrigin.Electricity.Extensions;
 using ProjectOrigin.Electricity.Consumption;
+using ProjectOrigin.Electricity.Interfaces;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.PedersenCommitment;
+using ProjectOrigin.WalletSystem.Server.HDWallet;
+using Xunit;
+using System;
+using AutoFixture;
 
 namespace ProjectOrigin.Electricity.Tests;
 
 public class ConsumptionCertificateApplyTests
 {
-    private Fixture _fix = new Fixture();
+    private Fixture _fixture = new Fixture();
+    private IKeyAlgorithm _algorithm = new Secp256k1Algorithm();
 
-    private Register.V1.FederatedStreamId CreateId()
+
+    private Common.V1.FederatedStreamId CreateId()
     {
-        var registry = _fix.Create<string>();
+        var registry = _fixture.Create<string>();
         var streamId = Guid.NewGuid();
 
-        return new Register.V1.FederatedStreamId
+        return new Common.V1.FederatedStreamId
         {
             Registry = registry,
-            StreamId = new Register.V1.Uuid
+            StreamId = new Common.V1.Uuid
             {
                 Value = streamId.ToString()
             }
@@ -28,13 +35,13 @@ public class ConsumptionCertificateApplyTests
 
     private (ConsumptionCertificate, SecretCommitmentInfo) Create()
     {
-        var area = _fix.Create<string>();
+        var area = _fixture.Create<string>();
         var period = new DateInterval(
             new DateTimeOffset(2022, 09, 25, 12, 0, 0, TimeSpan.Zero),
             new DateTimeOffset(2022, 09, 25, 13, 0, 0, TimeSpan.Zero));
         var gsrnHash = SHA256.HashData(BitConverter.GetBytes(new Fixture().Create<ulong>()));
-        var quantity = new SecretCommitmentInfo(_fix.Create<uint>());
-        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
+        var quantity = new SecretCommitmentInfo(_fixture.Create<uint>());
+        var ownerKey = _algorithm.Create();
         var certId = CreateId();
 
         var @event = new V1.ConsumptionIssuedEvent()
@@ -47,7 +54,7 @@ public class ConsumptionCertificateApplyTests
             OwnerPublicKey = ownerKey.PublicKey.ToProto(),
         };
 
-        var cert = new ConsumptionCertificate(@event);
+        var cert = new ConsumptionCertificate(@event, _algorithm);
 
         return (cert, quantity);
     }
@@ -56,23 +63,23 @@ public class ConsumptionCertificateApplyTests
     public void ConsumptionCertificate_Create()
     {
 
-        var registry = _fix.Create<string>();
+        var registry = _fixture.Create<string>();
         var streamId = Guid.NewGuid();
-        var area = _fix.Create<string>();
+        var area = _fixture.Create<string>();
         var period = new DateInterval(
             new DateTimeOffset(2022, 09, 25, 12, 0, 0, TimeSpan.Zero),
             new DateTimeOffset(2022, 09, 25, 13, 0, 0, TimeSpan.Zero));
-        var gsrnHash = SHA256.HashData(BitConverter.GetBytes(new Fixture().Create<ulong>()));
-        var quantity = new SecretCommitmentInfo(_fix.Create<uint>());
-        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
+        var gsrnHash = SHA256.HashData(BitConverter.GetBytes(_fixture.Create<ulong>()));
+        var quantity = new SecretCommitmentInfo(_fixture.Create<uint>());
+        var ownerKey = _algorithm.Create();
 
 
         var @event = new V1.ConsumptionIssuedEvent()
         {
-            CertificateId = new Register.V1.FederatedStreamId
+            CertificateId = new Common.V1.FederatedStreamId
             {
                 Registry = registry,
-                StreamId = new Register.V1.Uuid
+                StreamId = new Common.V1.Uuid
                 {
                     Value = streamId.ToString()
                 }
@@ -84,7 +91,7 @@ public class ConsumptionCertificateApplyTests
             OwnerPublicKey = ownerKey.PublicKey.ToProto(),
         };
 
-        var cert = new ConsumptionCertificate(@event);
+        var cert = new ConsumptionCertificate(@event, _algorithm);
 
         Assert.Equal(registry, cert.Id.Registry);
         Assert.Equal(streamId, cert.Id.StreamId.ToModel());
@@ -105,16 +112,16 @@ public class ConsumptionCertificateApplyTests
             SourceSlice = slice0.ToSliceId(),
         };
 
-        var slice1 = new SecretCommitmentInfo(_fix.Create<uint>());
-        var owner1 = Key.Create(SignatureAlgorithm.Ed25519);
+        var slice1 = new SecretCommitmentInfo(_fixture.Create<uint>());
+        var owner1 = _algorithm.Create();
         @event.NewSlices.Add(new V1.SlicedEvent.Types.Slice
         {
             Quantity = slice1.ToProtoCommitment(cert.Id.StreamId.Value),
             NewOwner = owner1.PublicKey.ToProto()
         });
 
-        var slice2 = new SecretCommitmentInfo(_fix.Create<uint>());
-        var owner2 = Key.Create(SignatureAlgorithm.Ed25519);
+        var slice2 = new SecretCommitmentInfo(_fixture.Create<uint>());
+        var owner2 = _algorithm.Create();
         @event.NewSlices.Add(new V1.SlicedEvent.Types.Slice
         {
             Quantity = slice2.ToProtoCommitment(cert.Id.StreamId.Value),
@@ -134,7 +141,7 @@ public class ConsumptionCertificateApplyTests
         var allocationId = Guid.NewGuid().ToProto();
         var productionId = CreateId();
         var (cert, consQuantity) = Create();
-        var prodQuantity = new SecretCommitmentInfo(_fix.Create<uint>());
+        var prodQuantity = new SecretCommitmentInfo(_fixture.Create<uint>());
 
         var @event = new V1.AllocatedEvent()
         {
@@ -160,7 +167,7 @@ public class ConsumptionCertificateApplyTests
         var allocationId = Guid.NewGuid().ToProto();
         var productionId = CreateId();
         var (cert, consQuantity) = Create();
-        var prodQuantity = new SecretCommitmentInfo(_fix.Create<uint>());
+        var prodQuantity = new SecretCommitmentInfo(_fixture.Create<uint>());
 
         var allocationEvent = new V1.AllocatedEvent()
         {

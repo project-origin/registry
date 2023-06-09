@@ -6,9 +6,19 @@ public interface IKeyAlgorithm
 {
     IPublicKey ImportPublicKey(ReadOnlySpan<byte> span);
     bool TryImport(ReadOnlySpan<byte> span, out IPublicKey _);
+
+    IPrivateKey Create();
 }
 
 public interface IPublicKey
 {
-    bool VerifySignature(ReadOnlySpan<byte> data, Signature signature);
+    ReadOnlySpan<byte> Export();
+    bool VerifySignature(ReadOnlySpan<byte> data, ReadOnlySpan<byte> signature);
+}
+
+public interface IPrivateKey
+{
+    ReadOnlySpan<byte> Sign(ReadOnlySpan<byte> data);
+
+    IPublicKey PublicKey { get; }
 }

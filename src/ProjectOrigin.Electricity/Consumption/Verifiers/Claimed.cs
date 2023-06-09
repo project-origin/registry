@@ -1,4 +1,5 @@
 using Google.Protobuf;
+using ProjectOrigin.Electricity.Extensions;
 using ProjectOrigin.Electricity.Production;
 using ProjectOrigin.Electricity.V1;
 using ProjectOrigin.Registry.Utils;
@@ -25,7 +26,7 @@ public class ConsumptionClaimedVerifier : IEventVerifier<ConsumptionCertificate,
         if (slice is null)
             return new VerificationResult.Invalid("Allocation does not exist");
 
-        if (!slice.Owner.VerifySignature(transaction.Header.ToByteArray(), transaction.HeaderSignature))
+        if (!transaction.IsSignatureValid(slice.Owner))
             return new VerificationResult.Invalid($"Invalid signature for slice");
 
         var productionCertificate = await _remoteModelLoader.GetModel<ProductionCertificate>(slice.ProductionCertificateId);

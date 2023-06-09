@@ -1,4 +1,5 @@
 using Google.Protobuf;
+using ProjectOrigin.Electricity.Extensions;
 using ProjectOrigin.Electricity.Interfaces;
 using ProjectOrigin.Registry.Utils;
 using ProjectOrigin.Registry.V1;
@@ -23,7 +24,7 @@ public class ProductionTransferredVerifier : IEventVerifier<ProductionCertificat
         if (certificateSlice is null)
             return new VerificationResult.Invalid("Slice not found");
 
-        if (certificateSlice.Owner.VerifySignature(transaction.Header.ToByteArray(), transaction.HeaderSignature))
+        if (!transaction.IsSignatureValid(certificateSlice.Owner))
             return new VerificationResult.Invalid($"Invalid signature for slice");
 
         if (!_keyAlgorithm.TryImport(payload.NewOwner.Content.Span, out _))

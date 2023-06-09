@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.Registry.Util
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.Electricity.Server", "ProjectOrigin.Electricity.Server\ProjectOrigin.Electricity.Server.csproj", "{401E3E53-9CA1-46B5-BEA4-DCBE662ADF7C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.Electricity.Tests", "ProjectOrigin.Electricity.Tests\ProjectOrigin.Electricity.Tests.csproj", "{4910B564-4DCF-4AC4-AA5B-4A404A905962}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,5 +73,9 @@ Global
 		{401E3E53-9CA1-46B5-BEA4-DCBE662ADF7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{401E3E53-9CA1-46B5-BEA4-DCBE662ADF7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{401E3E53-9CA1-46B5-BEA4-DCBE662ADF7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4910B564-4DCF-4AC4-AA5B-4A404A905962}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4910B564-4DCF-4AC4-AA5B-4A404A905962}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4910B564-4DCF-4AC4-AA5B-4A404A905962}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4910B564-4DCF-4AC4-AA5B-4A404A905962}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
