@@ -1,10 +1,9 @@
 using Grpc.Net.Client;
 using Microsoft.Extensions.Options;
 using ProjectOrigin.Common.V1;
-using ProjectOrigin.Registry.Utils.Interfaces;
+using ProjectOrigin.Verifier.Utils.Interfaces;
 
-namespace ProjectOrigin.Registry.Utils.Services;
-
+namespace ProjectOrigin.Verifier.Utils.Services;
 public class GrpcRemoteModelLoader : IRemoteModelLoader
 {
     private IModelHydrater _modelHydrater;
@@ -34,7 +33,7 @@ public class GrpcRemoteModelLoader : IRemoteModelLoader
     {
         using (var channel = GetChannel(federatedStreamId.Registry))
         {
-            var client = new V1.RegistryService.RegistryServiceClient(channel);
+            var client = new Registry.V1.RegistryService.RegistryServiceClient(channel);
 
             var stream = await client.GetStreamTransactionsAsync(new Registry.V1.GetStreamTransactionsRequest
             {

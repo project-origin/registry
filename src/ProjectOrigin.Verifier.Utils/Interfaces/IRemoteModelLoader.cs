@@ -1,6 +1,6 @@
 using ProjectOrigin.Common.V1;
 
-namespace ProjectOrigin.Registry.Utils.Interfaces;
+namespace ProjectOrigin.Verifier.Utils.Interfaces;
 
 public interface IRemoteModelLoader
 {

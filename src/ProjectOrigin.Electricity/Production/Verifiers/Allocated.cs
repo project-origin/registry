@@ -2,8 +2,8 @@ using Google.Protobuf;
 using ProjectOrigin.Electricity.Consumption;
 using ProjectOrigin.Electricity.Extensions;
 using ProjectOrigin.PedersenCommitment;
-using ProjectOrigin.Registry.Utils;
-using ProjectOrigin.Registry.Utils.Interfaces;
+using ProjectOrigin.Verifier.Utils;
+using ProjectOrigin.Verifier.Utils.Interfaces;
 using ProjectOrigin.Registry.V1;
 
 namespace ProjectOrigin.Electricity.Production.Verifiers;

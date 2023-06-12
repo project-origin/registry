@@ -1,8 +1,8 @@
 using ProjectOrigin.Electricity.Extensions;
 using ProjectOrigin.Electricity.Production;
 using ProjectOrigin.Electricity.V1;
-using ProjectOrigin.Registry.Utils;
-using ProjectOrigin.Registry.Utils.Interfaces;
+using ProjectOrigin.Verifier.Utils;
+using ProjectOrigin.Verifier.Utils.Interfaces;
 using ProjectOrigin.Registry.V1;
 
 namespace ProjectOrigin.Electricity.Consumption.Verifiers;

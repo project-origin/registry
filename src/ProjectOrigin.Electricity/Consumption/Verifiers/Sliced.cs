@@ -1,7 +1,7 @@
 using ProjectOrigin.Electricity.Extensions;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.PedersenCommitment;
-using ProjectOrigin.Registry.Utils;
+using ProjectOrigin.Verifier.Utils;
 using ProjectOrigin.Registry.V1;
 
 namespace ProjectOrigin.Electricity.Consumption.Verifiers;

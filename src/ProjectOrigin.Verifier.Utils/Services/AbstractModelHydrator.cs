@@ -1,6 +1,6 @@
-using ProjectOrigin.Registry.Utils.Interfaces;
+using ProjectOrigin.Verifier.Utils.Interfaces;
 
-namespace ProjectOrigin.Registry.Utils.Services;
+namespace ProjectOrigin.Verifier.Utils.Services;
 
 public abstract class AbstractModelHydrator : IModelHydrater
 {

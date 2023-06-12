@@ -1,4 +1,4 @@
-namespace ProjectOrigin.Registry.Utils;
+namespace ProjectOrigin.Verifier.Utils;
 
 public interface IVerifierDispatcher
 {

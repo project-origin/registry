@@ -1,4 +1,4 @@
-using ProjectOrigin.Registry.Utils;
+using ProjectOrigin.Verifier.Utils;
 using Xunit;
 
 public abstract class AssertExtensions

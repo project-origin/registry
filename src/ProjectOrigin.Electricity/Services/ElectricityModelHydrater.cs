@@ -1,5 +1,5 @@
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
-using ProjectOrigin.Registry.Utils.Services;
+using ProjectOrigin.Verifier.Utils.Services;
 
 namespace ProjectOrigin.Electricity.Services;
 

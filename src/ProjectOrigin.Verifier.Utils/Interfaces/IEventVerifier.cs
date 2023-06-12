@@ -1,4 +1,4 @@
-namespace ProjectOrigin.Registry.Utils;
+namespace ProjectOrigin.Verifier.Utils;
 
 public interface IEventVerifier<TModel, TEvent> where TEvent : Google.Protobuf.IMessage
 {

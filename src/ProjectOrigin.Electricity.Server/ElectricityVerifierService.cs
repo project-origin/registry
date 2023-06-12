@@ -1,5 +1,5 @@
 using Grpc.Core;
-using ProjectOrigin.Registry.Utils;
+using ProjectOrigin.Verifier.Utils;
 using ProjectOrigin.Verifier.V1;
 
 namespace ProjectOrigin.Electricity;

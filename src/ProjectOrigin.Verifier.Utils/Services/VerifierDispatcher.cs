@@ -1,7 +1,7 @@
 using Google.Protobuf;
-using ProjectOrigin.Registry.Utils.Interfaces;
+using ProjectOrigin.Verifier.Utils.Interfaces;
 
-namespace ProjectOrigin.Registry.Utils;
+namespace ProjectOrigin.Verifier.Utils;
 
 public class VerifierDispatcher : IVerifierDispatcher
 {

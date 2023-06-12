@@ -5,7 +5,7 @@ using ProjectOrigin.Electricity.Consumption;
 using ProjectOrigin.Electricity.Production.Verifiers;
 using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
-using ProjectOrigin.Registry.Utils.Interfaces;
+using ProjectOrigin.Verifier.Utils.Interfaces;
 using Xunit;
 
 namespace ProjectOrigin.Electricity.Tests;

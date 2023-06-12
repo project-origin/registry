@@ -8,9 +8,9 @@ using ProjectOrigin.Electricity.Production.Verifiers;
 using ProjectOrigin.Electricity.Services;
 using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
-using ProjectOrigin.Registry.Utils;
-using ProjectOrigin.Registry.Utils.Interfaces;
-using ProjectOrigin.Registry.Utils.Services;
+using ProjectOrigin.Verifier.Utils;
+using ProjectOrigin.Verifier.Utils.Interfaces;
+using ProjectOrigin.Verifier.Utils.Services;
 
 namespace ProjectOrigin.Electricity.Server;
 

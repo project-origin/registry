@@ -1,6 +1,6 @@
 using ProjectOrigin.Electricity.Extensions;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
-using ProjectOrigin.Registry.Utils;
+using ProjectOrigin.Verifier.Utils;
 using ProjectOrigin.Registry.V1;
 
 namespace ProjectOrigin.Electricity.Production.Verifiers;

@@ -1,4 +1,4 @@
-namespace ProjectOrigin.Registry.Utils.Interfaces;
+namespace ProjectOrigin.Verifier.Utils.Interfaces;
 
 public interface IModelHydrater
 {
