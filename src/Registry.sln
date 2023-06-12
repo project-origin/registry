@@ -14,7 +14,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.PedersenCommi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.Registry.Server", "ProjectOrigin.Registry.Server\ProjectOrigin.Registry.Server.csproj", "{EC541F55-C0A9-4694-A902-B41026E9AC73}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.Registry.Server.Tests", "ProjectOrigin.Registry.Server.Tests\ProjectOrigin.Registry.Server.Tests.csproj", "{0C7EF78A-5D77-4B04-BDC4-EBE2C5F179AA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.Registry.IntegrationTests", "ProjectOrigin.Registry.IntegrationTests\ProjectOrigin.Registry.IntegrationTests.csproj", "{0C7EF78A-5D77-4B04-BDC4-EBE2C5F179AA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.Electricity", "ProjectOrigin.Electricity\ProjectOrigin.Electricity.csproj", "{D7DE4F91-544E-428A-860F-339DE1D7307D}"
 EndProject
