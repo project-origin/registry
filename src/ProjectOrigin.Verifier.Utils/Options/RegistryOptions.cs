@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 public class RegistryOptions
 {
     public Dictionary<string, RegistryInfo> Registries { get; set; } = new Dictionary<string, RegistryInfo>();

@@ -1,6 +1,7 @@
 namespace ProjectOrigin.PedersenCommitment.Ristretto;
 using System.Text;
 using System.Runtime.InteropServices;
+using System;
 
 public class Oracle
 {

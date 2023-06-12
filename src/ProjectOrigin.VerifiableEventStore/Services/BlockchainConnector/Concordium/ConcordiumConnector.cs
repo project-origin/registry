@@ -1,3 +1,6 @@
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using ConcordiumNetSdk;
 using ConcordiumNetSdk.SignKey;
 using ConcordiumNetSdk.Transactions;

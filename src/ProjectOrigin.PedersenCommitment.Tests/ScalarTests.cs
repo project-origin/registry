@@ -1,5 +1,6 @@
 using System.Numerics;
 using ProjectOrigin.PedersenCommitment.Ristretto;
+using Xunit;
 
 namespace ProjectOrigin.PedersenCommitment.Tests;
 

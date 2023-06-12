@@ -5,6 +5,7 @@ using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.Verifier.Utils;
 using ProjectOrigin.Registry.V1;
+using System.Threading.Tasks;
 
 namespace ProjectOrigin.Electricity.Consumption.Verifiers;
 

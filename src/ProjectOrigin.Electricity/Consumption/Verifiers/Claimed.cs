@@ -4,6 +4,7 @@ using ProjectOrigin.Electricity.V1;
 using ProjectOrigin.Verifier.Utils;
 using ProjectOrigin.Verifier.Utils.Interfaces;
 using ProjectOrigin.Registry.V1;
+using System.Threading.Tasks;
 
 namespace ProjectOrigin.Electricity.Consumption.Verifiers;
 

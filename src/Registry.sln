@@ -30,6 +30,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.HierarchicalD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.HierarchicalDeterministicKeys.Tests", "ProjectOrigin.HierarchicalDeterministicKeys.Tests\ProjectOrigin.HierarchicalDeterministicKeys.Tests.csproj", "{F6CF50A0-7F10-47EE-B4D4-57270C5A83D8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.TestUtils", "ProjectOrigin.TestUtils\ProjectOrigin.TestUtils.csproj", "{C65249D6-1C33-4FD1-8E43-8B09E10BACA5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -95,5 +97,9 @@ Global
 		{F6CF50A0-7F10-47EE-B4D4-57270C5A83D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6CF50A0-7F10-47EE-B4D4-57270C5A83D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6CF50A0-7F10-47EE-B4D4-57270C5A83D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C65249D6-1C33-4FD1-8E43-8B09E10BACA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C65249D6-1C33-4FD1-8E43-8B09E10BACA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C65249D6-1C33-4FD1-8E43-8B09E10BACA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C65249D6-1C33-4FD1-8E43-8B09E10BACA5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

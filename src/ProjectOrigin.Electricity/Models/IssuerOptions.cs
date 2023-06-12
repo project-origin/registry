@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace ProjectOrigin.Electricity.Models;
 
 public class IssuerOptions

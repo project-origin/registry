@@ -21,7 +21,7 @@ using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
 
-namespace ProjectOrigin.Electricity.IntegrationTests.TestClassFixtures.GrpcHelpers
+namespace ProjectOrigin.TestUtils
 {
     internal class GrpcTestContext<TStartup> : IDisposable where TStartup : class
     {

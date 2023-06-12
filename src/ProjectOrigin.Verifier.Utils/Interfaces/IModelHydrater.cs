@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace ProjectOrigin.Verifier.Utils.Interfaces;
 
 public interface IModelHydrater

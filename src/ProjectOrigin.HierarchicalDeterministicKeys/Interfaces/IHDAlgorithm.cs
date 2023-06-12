@@ -1,3 +1,5 @@
+using System;
+
 namespace ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 
 /// <summary>

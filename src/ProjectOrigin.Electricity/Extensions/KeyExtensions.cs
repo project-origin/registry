@@ -1,3 +1,4 @@
+using System;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 
 namespace ProjectOrigin.Electricity.Extensions;

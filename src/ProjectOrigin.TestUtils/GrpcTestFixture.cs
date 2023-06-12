@@ -26,10 +26,9 @@ using Microsoft.Extensions.Configuration.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using ProjectOrigin.Electricity.IntegrationTests.TestClassFixtures.GrpcHelpers;
 using Xunit.Abstractions;
 
-namespace ProjectOrigin.Electricity.IntegrationTests.TestClassFixtures
+namespace ProjectOrigin.TestUtils
 {
     public delegate void LogMessage(LogLevel logLevel, string categoryName, EventId eventId, string message, Exception? exception);
 

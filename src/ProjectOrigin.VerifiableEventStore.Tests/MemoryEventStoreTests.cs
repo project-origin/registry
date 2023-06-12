@@ -1,3 +1,5 @@
+using System.Linq;
+using System.Threading.Tasks;
 using AutoFixture;
 using Microsoft.Extensions.Options;
 using ProjectOrigin.VerifiableEventStore.Models;

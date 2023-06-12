@@ -1,3 +1,4 @@
+using System;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.PedersenCommitment;
 

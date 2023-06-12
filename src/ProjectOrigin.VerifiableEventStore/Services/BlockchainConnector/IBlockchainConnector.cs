@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 namespace ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector;
 
 public interface IBlockchainConnector

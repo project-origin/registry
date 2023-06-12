@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using ProjectOrigin.VerifiableEventStore.Models;
 
 namespace ProjectOrigin.VerifiableEventStore.Services.EventProver;

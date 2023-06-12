@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using ProjectOrigin.Electricity.IntegrationTests.TestClassFixtures;
 using ProjectOrigin.Electricity.Server;
 using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
@@ -17,10 +16,11 @@ using FluentAssertions;
 using System.Security.Cryptography;
 using ProjectOrigin.PedersenCommitment;
 using Xunit;
+using ProjectOrigin.TestUtils;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
-public class FlowTests : GrpcTestsBase
+public class FlowTests : GrpcTestBase<Startup>
 {
     IHDAlgorithm _algorithm;
     private IHDPrivateKey _issuerKey;

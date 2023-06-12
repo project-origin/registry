@@ -19,7 +19,7 @@
 using System;
 using Microsoft.Extensions.Logging;
 
-namespace ProjectOrigin.Electricity.IntegrationTests.TestClassFixtures.GrpcHelpers
+namespace ProjectOrigin.TestUtils
 {
     internal class ForwardingLoggerProvider : ILoggerProvider
     {

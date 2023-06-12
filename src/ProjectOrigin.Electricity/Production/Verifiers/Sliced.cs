@@ -3,6 +3,8 @@ using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.PedersenCommitment;
 using ProjectOrigin.Verifier.Utils;
 using ProjectOrigin.Registry.V1;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace ProjectOrigin.Electricity.Production.Verifiers;
 

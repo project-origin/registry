@@ -1,3 +1,4 @@
+using System;
 using NBitcoin;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 

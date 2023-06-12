@@ -5,6 +5,7 @@ using ProjectOrigin.PedersenCommitment;
 using ProjectOrigin.Verifier.Utils;
 using ProjectOrigin.Verifier.Utils.Interfaces;
 using ProjectOrigin.Registry.V1;
+using System.Threading.Tasks;
 
 namespace ProjectOrigin.Electricity.Production.Verifiers;
 

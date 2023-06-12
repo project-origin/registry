@@ -1,4 +1,6 @@
+using System;
 using System.Buffers.Binary;
+using System.IO;
 using ConcordiumNetSdk.Types;
 
 namespace ConcordiumNetSdk.Transactions;

@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ProjectOrigin.TestUtils\ProjectOrigin.TestUtils.csproj" />
     <ProjectReference Include="..\ProjectOrigin.Registry.Server\ProjectOrigin.Registry.Server.csproj" />
   </ItemGroup>
 </Project>
