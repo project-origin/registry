@@ -6,6 +6,7 @@ using ProjectOrigin.Registry.Server.Extensions;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
+using ProjectOrigin.VerifiableEventStore.Services.TransactionStatusCache;
 
 namespace ProjectOrigin.Registry.Server;
 
@@ -24,19 +25,15 @@ public class RegistryService : V1.RegistryService.RegistryServiceBase
 
     public override async Task<SubmitTransactionResponse> SendTransactions(SendTransactionsRequest request, ServerCallContext context)
     {
-        var jobs = request.Transactions.Select(transaction => new TransactionJob(transaction));
-
+        var jobs = request.Transactions.Select(transaction => TransactionJob.Create(transaction));
         await _bus.PublishBatch(jobs);
 
         request.Transactions.AsParallel().ForAll(async transaction =>
         {
             await _transactionStatusService.SetTransactionStatus(
                 transaction.GetTransactionId(),
-                new V1.Internal.TransactionStatus
-                {
-                    State = TransactionState.Pending,
-                    Message = string.Empty
-                });
+                new VerifiableEventStore.Models.TransactionStatusRecord(VerifiableEventStore.Models.TransactionStatus.Pending)
+                );
         });
 
         return new SubmitTransactionResponse();
@@ -44,10 +41,10 @@ public class RegistryService : V1.RegistryService.RegistryServiceBase
 
     public override async Task<GetTransactionStatusResponse> GetTransactionStatus(GetTransactionStatusRequest request, ServerCallContext context)
     {
-        var state = await _transactionStatusService.GetTransactionStatus(request.Id);
+        var state = await _transactionStatusService.GetTransactionStatus(request.Id.Value);
         return new GetTransactionStatusResponse
         {
-            Status = state.State,
+            Status = (V1.TransactionState)state.NewStatus,
             Message = state.Message,
         };
     }
@@ -62,5 +59,12 @@ public class RegistryService : V1.RegistryService.RegistryServiceBase
         response.Transactions.AddRange(transactions);
 
         return response;
+    }
+
+    public override Task<GetTransactionProofResponse> GetTransactionProof(GetTransactionProofRequest request, ServerCallContext context)
+    {
+
+
+        return base.GetTransactionProof(request, context);
     }
 }

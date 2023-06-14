@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres
+namespace ProjectOrigin.VerifiableEventStore.Services.EventStore
 {
     [Serializable]
     public class OutOfOrderException : Exception

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
-using ProjectOrigin.VerifiableEventStore.Models;
 
 namespace ProjectOrigin.VerifiableEventStore.Services.EventProver;
 
-public record MerkleProof(EventId EventId, byte[] Event, string BlockId, string TransactionId, long leafIndex, IEnumerable<byte[]> Hashes);
+public record MerkleProof(string transactionId, byte[] Event, string BlockId, string TransactionId, long leafIndex, IEnumerable<byte[]> Hashes);

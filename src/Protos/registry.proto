@@ -49,6 +49,7 @@ enum TransactionState {
 }
 
 message GetTransactionProofRequest {
+    //Bitcoin Base58 encoded SHA256 hash of the transaction
     TransactionId id = 1;
 }
 
