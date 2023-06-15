@@ -22,7 +22,7 @@ public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityService
 {
     private Secp256k1Algorithm _algorithm;
     private ElectricityServiceFixture _verifierFixture;
-    private const string RegistryName = "arg";
+    private const string RegistryName = "SomeRegistry";
 
     private Registry.V1.RegistryService.RegistryServiceClient Client => new Registry.V1.RegistryService.RegistryServiceClient(_grpcFixture.Channel);
 
@@ -50,8 +50,6 @@ public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityService
 
         var transaction = SignTransaction(@event.CertificateId, @event, _verifierFixture.IssuerKey);
 
-        await Task.Delay(4000);
-
         var status = await GetStatus(transaction);
         status.Status.Should().Be(Registry.V1.TransactionState.Unknown);
 
@@ -59,13 +57,33 @@ public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityService
         status = await GetStatus(transaction);
         status.Status.Should().Be(Registry.V1.TransactionState.Pending);
 
-        await Task.Delay(30000);
-        status = await GetStatus(transaction);
+        status = await RepeatUntilOrTimeout(
+            () => GetStatus(transaction),
+            (result => result.Status == Registry.V1.TransactionState.Committed),
+            TimeSpan.FromSeconds(60));
+
         status.Message.Should().BeEmpty();
-        status.Status.Should().Be(Registry.V1.TransactionState.Committed);
 
         var stream = await GetStream(certId);
         stream.Transactions.Should().HaveCount(1);
+    }
+
+    private async Task<TResult> RepeatUntilOrTimeout<TResult>(Func<Task<TResult>> getResultFunc, Func<TResult, bool> isValidFunc, TimeSpan timeout)
+    {
+        var began = DateTimeOffset.UtcNow;
+        while (true)
+        {
+            var result = await getResultFunc();
+            if (isValidFunc(result))
+                return result;
+
+            await Task.Delay(1000);
+
+            if (began + timeout < DateTimeOffset.UtcNow)
+            {
+                throw new TimeoutException();
+            }
+        }
     }
 
     private ConsumptionIssuedEvent CreateIssuedEvent(IHDPrivateKey owner, SecretCommitmentInfo commitmentInfo, Guid certId)

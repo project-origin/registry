@@ -33,6 +33,8 @@ public class ElectricityServiceFixture : IAsyncLifetime
     {
         await _container.StartAsync()
             .ConfigureAwait(false);
+
+        await Task.Delay(4000);
     }
 
     public async Task DisposeAsync()

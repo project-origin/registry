@@ -1,7 +1,6 @@
 using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres.Configuration;
 
@@ -18,7 +17,6 @@ public static class Registration
         services.AddSingleton(options);
         throw new NotSupportedException();
         // services.TryAddSingleton<IEventStore, PostgresqlEventStore>();
-
-        return services;
+        //return services;
     }
 }
