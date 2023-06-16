@@ -32,6 +32,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.HierarchicalD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.TestUtils", "ProjectOrigin.TestUtils\ProjectOrigin.TestUtils.csproj", "{C65249D6-1C33-4FD1-8E43-8B09E10BACA5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.Electricity.Example", "ProjectOrigin.Electricity.Example\ProjectOrigin.Electricity.Example.csproj", "{C0BF3E85-BF19-413C-986F-C15895C740FC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -101,5 +103,9 @@ Global
 		{C65249D6-1C33-4FD1-8E43-8B09E10BACA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C65249D6-1C33-4FD1-8E43-8B09E10BACA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C65249D6-1C33-4FD1-8E43-8B09E10BACA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0BF3E85-BF19-413C-986F-C15895C740FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0BF3E85-BF19-413C-986F-C15895C740FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0BF3E85-BF19-413C-986F-C15895C740FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0BF3E85-BF19-413C-986F-C15895C740FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
