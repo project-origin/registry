@@ -23,6 +23,9 @@ public class Startup
 {
     public void ConfigureServices(IServiceCollection services)
     {
+        var algorithm = new Secp256k1Algorithm();
+        services.AddSingleton<IHDAlgorithm>(algorithm);
+
         services.AddGrpc();
 
         services.AddSingleton<IProtoDeserializer>(new ProtoDeserializer(Assembly.GetAssembly(typeof(V1.ConsumptionIssuedEvent))
@@ -42,13 +45,23 @@ public class Startup
         services.AddTransient<IVerifierDispatcher, VerifierDispatcher>();
         services.AddTransient<IRemoteModelLoader, GrpcRemoteModelLoader>();
         services.AddTransient<IModelHydrater, ElectricityModelHydrater>();
-        services.AddTransient<IHDAlgorithm, Secp256k1Algorithm>();
         services.AddTransient<IAreaIssuerService, AreaIssuerOptionsService>();
 
-        services.AddOptions<IssuerOptions>().Configure<IConfiguration>((settings, configuration) =>
-        {
-            configuration.Bind(settings);
-        });
+        services.AddOptions<IssuerOptions>()
+            .Configure<IConfiguration>((settings, configuration) =>
+            {
+                configuration.Bind(settings);
+            })
+            .Validate((option => option.Verify(algorithm)))
+            .ValidateOnStart();
+
+        services.AddOptions<RegistryOptions>()
+            .Configure<IConfiguration>((settings, configuration) =>
+            {
+                configuration.Bind(settings);
+            })
+            .Validate(x => x.Verify())
+            .ValidateOnStart();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

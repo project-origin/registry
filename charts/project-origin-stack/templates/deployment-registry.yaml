@@ -2,33 +2,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: po-registry-deployment
+  name: {{ required ".values.name must be specified" .Values.name }}-registry-deployment
   labels:
-    app: po-registry
+    app: {{ .Values.name }}-registry
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: po-registry
+      app: {{ .Values.name }}-registry
   template:
     metadata:
       labels:
-        app: po-registry
+        app: {{ .Values.name }}-registry
     spec:
       containers:
-        - name: po-registry
-          image: ghcr.io/project-origin/electricity-server:0.1.0-alpha.18
+        - name: {{ .Values.name }}-registry
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
           env:
-            {{- range .Values.issuers }}
-            - name: Issuers__{{ .area }}
-              value: {{ .publicKey }}
+            {{- range .Values.verifiers }}
+            - name: VERIFIERS__{{ .type }}
+              value: http://{{ .name }}-verifier:80
             {{- end }}
-            {{- range .Values.registries }}
-            - name: REGISTRIES__{{ .name }}__VERIFIABLEEVENTSTORE__BATCHSIZEEXPONENT
-              value: {{ .verifiableEventStore.batchSizeExponent | quote }}
-            - name: REGISTRIES__{{ .name }}__VERIFIABLEEVENTSTORE__EVENTSTORE__TYPE
-              value: {{ .verifiableEventStore.eventStore.type }}
-            {{- end }}
+            - name: VERIFIABLEEVENTSTORE__BATCHSIZEEXPONENT
+              value: {{ .Values.verifiableEventStore.batchSizeExponent | quote }}
+            - name: VERIFIABLEEVENTSTORE__EVENTSTORE__TYPE
+              value: {{ .Values.verifiableEventStore.eventStore.type }}
             - name: IMMUTABLELOG__TYPE
               value: {{ .Values.immutableRecord.type }}
             {{- if eq .Values.immutableRecord.type "concordium" }}

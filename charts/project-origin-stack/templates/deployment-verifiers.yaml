@@ -1,0 +1,33 @@
+{{- range .Values.verifiers }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .name }}-verifier-deployment
+  labels:
+    app: {{ .name }}-verifier
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .name }}-verifier
+  template:
+    metadata:
+      labels:
+        app: {{ .name }}-verifier
+    spec:
+      containers:
+        - name: {{ .name }}-verifier
+          image: {{ .image.repository }}:{{ .image.tag }}
+          env:
+            {{- range .issuers }}
+            - name: Issuers__{{ .area }}
+              value: {{ .publicKey }}
+            {{- end }}
+            - name: Registries__{{ $.Values.name }}__address
+              value: http://{{ $.name }}-registry:80
+            {{- range .registries }}
+            - name: Registries__{{ .area }}
+              value: {{ .publicKey }}
+            {{- end }}
+{{- end }}

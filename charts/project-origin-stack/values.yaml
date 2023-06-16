@@ -1,26 +1,39 @@
 # This file contains the default values for the project-origin-stack chart.
 
-# commandOrchestrator holds the configuration for the command orchestrator
-commandOrchestrator:
+name: #po-registry
+image:
+  # repository is the repository to pull the image from
+  repository: ghcr.io/project-origin/registry-server
+  # tag is the tag to pull
+  tag:
 
-  # enabled determines if the command orchestrator is enabled
-  enabled: true
+verifiableEventStore:
+  batchSizeExponent: 0
+  eventStore:
+    type: inMemory
 
-# issuers defines the currently accepted issuers for given areas.
-issuers: []
-  # example
-  # - area: DK1
-  #   publicKey: sJuwdQ4TOarGjc3CyEJ5c37jJNOaH6PcOiyE1ge6+24=
+# verifiers defines the local verifiers
+verifiers:
+    # name is the name of the verifier
+  - name: electricity-v1
+    type: ProjectOrigin.Electricity.v1
+    # image is the image to use for the verifier
+    image:
+      # repository is the repository to pull the image from
+      repository: ghcr.io/project-origin/electricity-server
+      # tag is the tag to pull
+      tag: 0.2.0-rc.4
 
+    # issuers defines the currently accepted issuers for given areas.
+    issuers:
+    # example
+      - area: DK1
+        publicKey: sJuwdQ4TOarGjc3CyEJ5c37jJNOaH6PcOiyE1ge6+24=
 
-# registries defines the number and configures local registries
-registries: []
-  # example
-  # - name: RegistryName
-  #   verifiableEventStore:
-  #     batchSizeExponent: 0
-  #     eventStore:
-  #       type: inMemory
+    registries: []
+    # example
+    # - name: DK1
+    #   address: sJuwdQ4TOarGjc3CyEJ5c37jJNOaH6PcOiyE1ge6+24=
 
 
 # immutableRecord holds the configuration for where and how the log is published.
@@ -46,7 +59,7 @@ immutableRecord:
 # concordium holds the configuration for the concordium node
 concordium:
   # enabled specified wether or not to run a local node
-  enabled: true
+  enabled: false
 
   # network denotes which network the concordium node should run on, allowed values are (mainnet | testnet)
   network: ""

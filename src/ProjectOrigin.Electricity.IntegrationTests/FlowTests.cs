@@ -35,7 +35,8 @@ public class FlowTests : GrpcTestBase<Startup>
 
         grpcFixture.ConfigureHostConfiguration(new Dictionary<string, string?>()
         {
-            {$"Issuers:{Area}", Convert.ToBase64String(_issuerKey.PublicKey.Export())}
+            {$"Issuers:{Area}", Convert.ToBase64String(_issuerKey.PublicKey.Export())},
+            {$"Registries:{Registry}:Address", "http://localhost:80"}
         });
 
         grpcFixture.testServicesConfigure = (services) =>
