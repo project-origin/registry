@@ -1,6 +1,6 @@
 # Project-Origin Pedersen Commitment
 
-This client library has a interface and currently a single implementation of HD keys as descriped in BIP32, and implemented using NBitcoin with the Secp256k1 curve.
+This client library has an interface and currently a single implementation of HD keys as descriped in BIP32, and implemented using NBitcoin with the Secp256k1 curve.
 
 ## How to
 
@@ -12,7 +12,7 @@ var secret = new SecretCommitmentInfo(250);
 
 ```
 
-The secret has two fields one must persist to later prove the data, the Message and BlindingValue.
+The secret has two fields that must be persisted to later prove the data, the Message and BlindingValue.
 
 ```csharp
 // store these values
@@ -28,7 +28,7 @@ ReadOnlySpan<byte> commitment = secret.Commitment.C;
 
 ### Range proofs
 
-If one wants to prove the commitment is withint he allowed value, one can easily create a range proof using a label:
+If one wants to prove the commitment is within the allowed value, one can easily create a range proof using a label:
 
 > Note: In ProjectOrigin Electricity the label is always the string representation of certificate uuid.
 

@@ -15,7 +15,7 @@ public class ElectricityServiceFixture : IAsyncLifetime
     public IHDPrivateKey IssuerKey { get; init; }
     private IContainer _container;
 
-    public string Url { get => $"http://{_container.Hostname}:{_container.GetMappedPublicPort(GrpcPort)}"; }
+    public string Url => $"http://{_container.Hostname}:{_container.GetMappedPublicPort(GrpcPort)}"; 
 
     public ElectricityServiceFixture()
     {
