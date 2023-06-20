@@ -1,9 +1,9 @@
 using ProjectOrigin.Verifier.Utils;
 using Xunit;
 
-public abstract class AssertExtensions
+public static class AssertExtensions
 {
-    public void AssertValid(VerificationResult result)
+    public static void AssertValid(this VerificationResult result)
     {
         var invalid = result as VerificationResult.Invalid;
         if (invalid is not null)
@@ -12,7 +12,7 @@ public abstract class AssertExtensions
         }
     }
 
-    public void AssertInvalid(VerificationResult result, string expectedError)
+    public static void AssertInvalid(this VerificationResult result, string expectedError)
     {
         var invalid = result as VerificationResult.Invalid;
 

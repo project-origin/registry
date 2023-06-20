@@ -8,7 +8,7 @@ using Xunit;
 
 namespace ProjectOrigin.Electricity.Tests;
 
-public class ProductionTransferredVerifierTests : AssertExtensions
+public class ProductionTransferredVerifierTests
 {
     private IHDAlgorithm _algorithm;
     private ProductionTransferredVerifier _verifier;
@@ -31,7 +31,7 @@ public class ProductionTransferredVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, cert, @event);
 
-        AssertValid(result);
+        result.AssertValid();
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class ProductionTransferredVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, null, @event);
 
-        AssertInvalid(result, "Certificate does not exist");
+        result.AssertInvalid("Certificate does not exist");
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public class ProductionTransferredVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, cert, @event);
 
-        AssertInvalid(result, "Invalid NewOwner key, not a valid publicKey");
+        result.AssertInvalid("Invalid NewOwner key, not a valid publicKey");
     }
 
     [Fact]
@@ -82,7 +82,7 @@ public class ProductionTransferredVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, cert, @event);
 
-        AssertInvalid(result, "Slice not found");
+        result.AssertInvalid("Slice not found");
     }
 
     [Fact]
@@ -97,6 +97,6 @@ public class ProductionTransferredVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, cert, @event);
 
-        AssertInvalid(result, "Invalid signature for slice");
+        result.AssertInvalid("Invalid signature for slice");
     }
 }

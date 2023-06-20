@@ -16,7 +16,7 @@ using Xunit;
 
 namespace ProjectOrigin.Electricity.Tests;
 
-public class ProductionIssuedVerifierTests : AssertExtensions
+public class ProductionIssuedVerifierTests
 {
     const string IssuerArea = "DK1";
     private IHDAlgorithm _algorithm;
@@ -48,7 +48,7 @@ public class ProductionIssuedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, null, @event);
 
-        AssertValid(result);
+        result.AssertValid();
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public class ProductionIssuedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, null, @event);
 
-        AssertValid(result);
+        result.AssertValid();
     }
 
     [Fact]
@@ -72,7 +72,7 @@ public class ProductionIssuedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, new ProductionCertificate(@event, _algorithm), @event);
 
-        AssertInvalid(result, $"Certificate with id ”{@event.CertificateId.StreamId}” already exists");
+        result.AssertInvalid($"Certificate with id ”{@event.CertificateId.StreamId}” already exists");
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class ProductionIssuedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, null, @event);
 
-        AssertInvalid(result, "Invalid range proof for Quantity commitment");
+        result.AssertInvalid("Invalid range proof for Quantity commitment");
     }
 
     [Fact]
@@ -94,7 +94,7 @@ public class ProductionIssuedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, null, @event);
 
-        AssertInvalid(result, "Private and public quantity proof does not match");
+        result.AssertInvalid("Private and public quantity proof does not match");
     }
 
     [Fact]
@@ -110,7 +110,7 @@ public class ProductionIssuedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, null, @event);
 
-        AssertInvalid(result, "Invalid owner key, not a valid publicKey");
+        result.AssertInvalid("Invalid owner key, not a valid publicKey");
     }
 
     [Fact]
@@ -123,7 +123,7 @@ public class ProductionIssuedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, null, @event);
 
-        AssertInvalid(result, "Invalid issuer signature for GridArea ”DK1”");
+        result.AssertInvalid("Invalid issuer signature for GridArea ”DK1”");
     }
 
     [Fact]
@@ -134,6 +134,6 @@ public class ProductionIssuedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, null, @event);
 
-        AssertInvalid(result, "No issuer found for GridArea ”DK2”");
+        result.AssertInvalid("No issuer found for GridArea ”DK2”");
     }
 }

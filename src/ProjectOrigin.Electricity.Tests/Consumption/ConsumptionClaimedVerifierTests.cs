@@ -9,7 +9,7 @@ using Xunit;
 
 namespace ProjectOrigin.Electricity.Tests;
 
-public class ConsumptionClaimedVerifierTests : AssertExtensions
+public class ConsumptionClaimedVerifierTests
 {
     private IHDAlgorithm _algorithm;
     private ConsumptionClaimedVerifier _verifier;
@@ -42,7 +42,7 @@ public class ConsumptionClaimedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, consCert, @event);
 
-        AssertValid(result);
+        result.AssertValid();
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public class ConsumptionClaimedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, null, @event);
 
-        AssertInvalid(result, "Certificate does not exist");
+        result.AssertInvalid("Certificate does not exist");
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public class ConsumptionClaimedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, consCert, @event);
 
-        AssertInvalid(result, "Allocation does not exist");
+        result.AssertInvalid("Allocation does not exist");
     }
 
     [Fact]
@@ -99,7 +99,7 @@ public class ConsumptionClaimedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, consCert, @event);
 
-        AssertInvalid(result, "Invalid signature for slice");
+        result.AssertInvalid("Invalid signature for slice");
     }
 
     [Fact]
@@ -118,7 +118,7 @@ public class ConsumptionClaimedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, consCert, @event);
 
-        AssertInvalid(result, "ProductionCertificate does not exist");
+        result.AssertInvalid("ProductionCertificate does not exist");
     }
 
     [Fact]
@@ -136,6 +136,6 @@ public class ConsumptionClaimedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, consCert, @event);
 
-        AssertInvalid(result, "Production not claimed");
+        result.AssertInvalid("Production not claimed");
     }
 }

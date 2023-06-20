@@ -10,7 +10,7 @@ using Xunit;
 
 namespace ProjectOrigin.Electricity.Tests;
 
-public class ProductionSlicedVerifierTests : AssertExtensions
+public class ProductionSlicedVerifierTests
 {
     private IHDAlgorithm _algorithm;
     private ProductionSlicedVerifier _verifier;
@@ -32,7 +32,7 @@ public class ProductionSlicedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, cert, @event);
 
-        AssertValid(result);
+        result.AssertValid();
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class ProductionSlicedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, null, @event);
 
-        AssertInvalid(result, $"Certificate does not exist");
+        result.AssertInvalid($"Certificate does not exist");
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public class ProductionSlicedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, cert, @event);
 
-        AssertInvalid(result, "Slice not found");
+        result.AssertInvalid("Slice not found");
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public class ProductionSlicedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, cert, @event);
 
-        AssertInvalid(result, "Invalid signature for slice");
+        result.AssertInvalid("Invalid signature for slice");
     }
 
 
@@ -97,7 +97,7 @@ public class ProductionSlicedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, cert, @event);
 
-        AssertInvalid(result, "Invalid NewOwner key, not a valid publicKey");
+        result.AssertInvalid("Invalid NewOwner key, not a valid publicKey");
     }
 
     [Fact]
@@ -113,6 +113,6 @@ public class ProductionSlicedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, cert, @event);
 
-        AssertInvalid(result, "Invalid sum proof");
+        result.AssertInvalid("Invalid sum proof");
     }
 }

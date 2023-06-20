@@ -14,7 +14,7 @@ using Xunit;
 
 namespace ProjectOrigin.Electricity.Tests;
 
-public class ConsumptionIssuedVerifierTests : AssertExtensions
+public class ConsumptionIssuedVerifierTests
 {
     const string IssuerArea = "DK1";
     private IHDAlgorithm _algorithm;
@@ -46,7 +46,7 @@ public class ConsumptionIssuedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, null, @event);
 
-        AssertValid(result);
+        result.AssertValid();
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public class ConsumptionIssuedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, certificate, @event);
 
-        AssertInvalid(result, $"Certificate with id ”{@event.CertificateId.StreamId}” already exists");
+        result.AssertInvalid($"Certificate with id ”{@event.CertificateId.StreamId}” already exists");
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public class ConsumptionIssuedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, null, @event);
 
-        AssertInvalid(result, "Invalid range proof for Quantity commitment");
+        result.AssertInvalid("Invalid range proof for Quantity commitment");
     }
 
     [Fact]
@@ -85,7 +85,7 @@ public class ConsumptionIssuedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, null, @event);
 
-        AssertInvalid(result, "Invalid owner key, not a valid publicKey");
+        result.AssertInvalid("Invalid owner key, not a valid publicKey");
     }
 
     [Fact]
@@ -98,7 +98,7 @@ public class ConsumptionIssuedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, null, @event);
 
-        AssertInvalid(result, "Invalid issuer signature for GridArea ”DK1”");
+        result.AssertInvalid("Invalid issuer signature for GridArea ”DK1”");
     }
 
     [Fact]
@@ -111,6 +111,6 @@ public class ConsumptionIssuedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, null, @event);
 
-        AssertInvalid(result, "No issuer found for GridArea ”DK2”");
+        result.AssertInvalid("No issuer found for GridArea ”DK2”");
     }
 }

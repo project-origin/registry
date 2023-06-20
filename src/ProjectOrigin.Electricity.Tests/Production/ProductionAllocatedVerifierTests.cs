@@ -13,7 +13,7 @@ using Xunit;
 
 namespace ProjectOrigin.Electricity.Tests;
 
-public class ProductionAllocatedVerifierTests : AssertExtensions
+public class ProductionAllocatedVerifierTests
 {
     private IHDAlgorithm _algorithm;
     private ProductionAllocatedVerifier _verifier;
@@ -43,7 +43,7 @@ public class ProductionAllocatedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, prodCert, @event);
 
-        AssertValid(result);
+        result.AssertValid();
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class ProductionAllocatedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, null, @event);
 
-        AssertInvalid(result, "Certificate does not exist");
+        result.AssertInvalid("Certificate does not exist");
     }
 
     [Fact]
@@ -75,7 +75,7 @@ public class ProductionAllocatedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, prodCert, @event);
 
-        AssertInvalid(result, "Production slice does not exist");
+        result.AssertInvalid("Production slice does not exist");
     }
 
     [Fact]
@@ -92,7 +92,7 @@ public class ProductionAllocatedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, prodCert, @event);
 
-        AssertInvalid(result, "Invalid signature for slice");
+        result.AssertInvalid("Invalid signature for slice");
     }
 
     [Fact]
@@ -108,7 +108,7 @@ public class ProductionAllocatedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, prodCert, @event);
 
-        AssertInvalid(result, "ConsumptionCertificate does not exist");
+        result.AssertInvalid("ConsumptionCertificate does not exist");
     }
 
     [Fact]
@@ -125,7 +125,7 @@ public class ProductionAllocatedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, prodCert, @event);
 
-        AssertInvalid(result, "Certificates are not in the same period");
+        result.AssertInvalid("Certificates are not in the same period");
     }
 
     [Fact]
@@ -141,7 +141,7 @@ public class ProductionAllocatedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, prodCert, @event);
 
-        AssertInvalid(result, "Certificates are not in the same area");
+        result.AssertInvalid("Certificates are not in the same area");
     }
 
     [Fact]
@@ -157,7 +157,7 @@ public class ProductionAllocatedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, prodCert, @event);
 
-        AssertInvalid(result, "Consumption slice does not exist");
+        result.AssertInvalid("Consumption slice does not exist");
     }
 
     [Fact]
@@ -173,6 +173,6 @@ public class ProductionAllocatedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, prodCert, @event);
 
-        AssertInvalid(result, "Invalid Equality proof");
+        result.AssertInvalid("Invalid Equality proof");
     }
 }

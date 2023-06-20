@@ -10,7 +10,7 @@ using Xunit;
 
 namespace ProjectOrigin.Electricity.Tests;
 
-public class ConsumptionAllocatedVerifierTests : AssertExtensions
+public class ConsumptionAllocatedVerifierTests
 {
     private IHDAlgorithm _algorithm;
     private ConsumptionAllocatedVerifier _verifier;
@@ -42,7 +42,7 @@ public class ConsumptionAllocatedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, consCert, @event);
 
-        AssertValid(result);
+        result.AssertValid();
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class ConsumptionAllocatedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, null, @event);
 
-        AssertInvalid(result, "Certificate does not exist");
+        result.AssertInvalid("Certificate does not exist");
     }
 
     [Fact]
@@ -76,7 +76,7 @@ public class ConsumptionAllocatedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, consCert, @event);
 
-        AssertInvalid(result, "Slice not found");
+        result.AssertInvalid("Slice not found");
     }
 
     [Fact]
@@ -94,7 +94,7 @@ public class ConsumptionAllocatedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, consCert, @event);
 
-        AssertInvalid(result, "Invalid signature for slice");
+        result.AssertInvalid("Invalid signature for slice");
     }
 
     [Fact]
@@ -111,7 +111,7 @@ public class ConsumptionAllocatedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, consCert, @event);
 
-        AssertInvalid(result, "ProductionCertificate does not exist");
+        result.AssertInvalid("ProductionCertificate does not exist");
     }
 
     [Fact]
@@ -127,6 +127,6 @@ public class ConsumptionAllocatedVerifierTests : AssertExtensions
 
         var result = await _verifier.Verify(transaction, consCert, @event);
 
-        AssertInvalid(result, "Production not allocated");
+        result.AssertInvalid("Production not allocated");
     }
 }
