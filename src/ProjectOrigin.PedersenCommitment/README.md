@@ -28,7 +28,7 @@ ReadOnlySpan<byte> commitment = secret.Commitment.C;
 
 ### Range proofs
 
-If one wants to prove the commitment is withint he allowed value, one can easily create a range proof using a label:
+If one wants to prove the commitment is within the allowed value, one can easily create a range proof using a label:
 
 > Note: In ProjectOrigin Electricity the label is always the string representation of certificate uuid.
 
