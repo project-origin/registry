@@ -7,6 +7,10 @@ image:
   # tag is the tag to pull
   tag:
 
+service:
+  type: ClusterIp
+  nodePort:
+
 verifiableEventStore:
   batchSizeExponent: 0
   eventStore:
@@ -25,15 +29,16 @@ verifiers:
       tag: 0.2.0-rc.11
 
     # issuers defines the currently accepted issuers for given areas.
-    issuers:
-    # example
-      - area: DK1
-        publicKey: sJuwdQ4TOarGjc3CyEJ5c37jJNOaH6PcOiyE1ge6+24=
+    issuers: []
+      # example
+      # - area: DK1
+      #   publicKey: Ay02vkc6FGV8FwtvVsmBO2p7UdbZIcFhvMGFB40D3DKX
 
+    # Registries is a list of all the known registries in the network
     registries: []
-    # example
-    # - name: DK1
-    #   address: sJuwdQ4TOarGjc3CyEJ5c37jJNOaH6PcOiyE1ge6+24=
+      # example
+      # - name: test
+      #   address: http://test-registry:80
 
 
 # immutableRecord holds the configuration for where and how the log is published.

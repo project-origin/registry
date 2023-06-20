@@ -22,16 +22,18 @@
                 return await flow.Run();
 
             case "WithoutWalletFlow":
-                if (args.Length < 5)
+                if (args.Length < 7)
                 {
                     Console.Error.WriteLine("Insufficient arguments for 'WithoutWalletFlow'");
                     return 1;
                 }
-                string registryName = args[1];
-                string registryAddress = args[2];
-                string area = args[3];
-                string signerKeyPath = args[4];
-                var flow2 = new WithoutWalletFlow(registryName, registryAddress, area, signerKeyPath);
+                string area = args[1];
+                string signerKeyPath = args[2];
+                string prodRegistryName = args[3];
+                string prodRegistryAddress = args[4];
+                string consRegistryName = args[5];
+                string consRegistryAddress = args[6];
+                var flow2 = new WithoutWalletFlow(area, signerKeyPath, prodRegistryName, prodRegistryAddress, consRegistryName, consRegistryAddress);
                 return await flow2.Run();
 
             default:
@@ -46,6 +48,6 @@
         Console.WriteLine("Usage: programName [command] [args]");
         Console.WriteLine("Available commands:");
         Console.WriteLine("  GenerateKey [Filename]");
-        Console.WriteLine("  WithoutWalletFlow [RegistryName] [RegistryAddress] [Area] [SignerKeyPath]");
+        Console.WriteLine("  WithoutWalletFlow [Area] [SignerKeyPath] [ProdRegistryName] [ProdRegistryAddress] [ConsRegistryName] [ConsRegistryAddress]");
     }
 }

@@ -1,13 +1,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: project-origin
+  name: registry-{{ .Values.name }}
 spec:
-  type: ClusterIP
+  type:  {{ .Values.service.type }}
   selector:
-    app: po-registry
+    app: registry-{{ .Values.name }}
   ports:
     - name: grpc
       protocol: TCP
       port: 80
       targetPort: 80
+      {{- if .Values.service.nodePort }}
+      nodePort: {{ .Values.service.nodePort }}
+      {{- end }}

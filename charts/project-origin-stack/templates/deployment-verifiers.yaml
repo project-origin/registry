@@ -3,31 +3,43 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .name }}-verifier-deployment
+  name: registry-{{ $.Values.name }}-verifier-{{ .name }}-deployment
   labels:
-    app: {{ .name }}-verifier
+    app: registry-{{ $.Values.name }}-verifier-{{ .name }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ .name }}-verifier
+      app: registry-{{ $.Values.name }}-verifier-{{ .name }}
   template:
     metadata:
       labels:
-        app: {{ .name }}-verifier
+        app: registry-{{ $.Values.name }}-verifier-{{ .name }}
     spec:
       containers:
-        - name: {{ .name }}-verifier
+        - name: registry-{{ $.Values.name }}-verifier-{{ .name }}
           image: {{ .image.repository }}:{{ .image.tag }}
           env:
             {{- range .issuers }}
             - name: Issuers__{{ .area }}
               value: {{ .publicKey }}
             {{- end }}
-            - name: Registries__{{ $.Values.name }}__address
-              value: http://{{ $.name }}-registry:80
             {{- range .registries }}
-            - name: Registries__{{ .area }}
-              value: {{ .publicKey }}
+            - name: Registries__{{ .name }}__address
+              value: {{ .address }}
             {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry-{{ $.Values.name }}-verifier-{{ .name }}
+spec:
+  type: ClusterIP
+  selector:
+    app: registry-{{ $.Values.name }}-verifier-{{ .name }}
+  ports:
+    - name: grpc
+      protocol: TCP
+      port: 80
+      targetPort: 80
 {{- end }}
