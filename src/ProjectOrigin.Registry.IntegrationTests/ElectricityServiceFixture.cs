@@ -11,7 +11,7 @@ public class ElectricityServiceFixture : IAsyncLifetime
     private const string ElectricityVerifierImage = "ghcr.io/project-origin/electricity-server:0.2.0-rc.3";
     private const int GrpcPort = 80;
 
-    public string IssuerArea { get => "SomeArea"; }
+    public string IssuerArea => "SomeArea";
     public IHDPrivateKey IssuerKey { get; init; }
     private IContainer _container;
 
