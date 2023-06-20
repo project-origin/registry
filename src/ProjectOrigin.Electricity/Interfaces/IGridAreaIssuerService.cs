@@ -2,7 +2,7 @@ using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 
 namespace ProjectOrigin.Electricity.Interfaces;
 
-public interface IAreaIssuerService
+public interface IGridAreaIssuerService
 {
     IPublicKey? GetAreaPublicKey(string area);
 }

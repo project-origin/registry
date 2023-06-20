@@ -6,12 +6,12 @@ using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 
 namespace ProjectOrigin.Electricity.Services;
 
-public class AreaIssuerOptionsService : IAreaIssuerService
+public class GridAreaIssuerOptionsService : IGridAreaIssuerService
 {
     private IHDAlgorithm _algorithm;
     private IssuerOptions _options;
 
-    public AreaIssuerOptionsService(IHDAlgorithm algorithm, IOptions<IssuerOptions> options)
+    public GridAreaIssuerOptionsService(IHDAlgorithm algorithm, IOptions<IssuerOptions> options)
     {
 
         _algorithm = algorithm;

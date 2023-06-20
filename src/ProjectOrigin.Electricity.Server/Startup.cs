@@ -45,7 +45,7 @@ public class Startup
         services.AddTransient<IVerifierDispatcher, VerifierDispatcher>();
         services.AddTransient<IRemoteModelLoader, GrpcRemoteModelLoader>();
         services.AddTransient<IModelHydrater, ElectricityModelHydrater>();
-        services.AddTransient<IAreaIssuerService, AreaIssuerOptionsService>();
+        services.AddTransient<IGridAreaIssuerService, GridAreaIssuerOptionsService>();
 
         services.AddOptions<IssuerOptions>()
             .Configure<IConfiguration>((settings, configuration) =>

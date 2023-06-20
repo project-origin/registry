@@ -9,12 +9,12 @@ namespace ProjectOrigin.Electricity.Consumption.Verifiers;
 
 public class ConsumptionIssuedVerifier : IEventVerifier<V1.ConsumptionIssuedEvent>
 {
-    private IAreaIssuerService _areaIssuerService;
+    private IGridAreaIssuerService _gridAreaIssuerService;
     private IHDAlgorithm _keyAlgorithm;
 
-    public ConsumptionIssuedVerifier(IAreaIssuerService areaIssuerService, IHDAlgorithm keyAlgorithm)
+    public ConsumptionIssuedVerifier(IGridAreaIssuerService gridAreaIssuerService, IHDAlgorithm keyAlgorithm)
     {
-        _areaIssuerService = areaIssuerService;
+        _gridAreaIssuerService = gridAreaIssuerService;
         _keyAlgorithm = keyAlgorithm;
     }
 
@@ -29,7 +29,7 @@ public class ConsumptionIssuedVerifier : IEventVerifier<V1.ConsumptionIssuedEven
         if (!_keyAlgorithm.TryImport(tEvent.OwnerPublicKey.Content.Span, out _))
             return new VerificationResult.Invalid("Invalid owner key, not a valid publicKey");
 
-        var publicKey = _areaIssuerService.GetAreaPublicKey(tEvent.GridArea);
+        var publicKey = _gridAreaIssuerService.GetAreaPublicKey(tEvent.GridArea);
         if (publicKey is null)
             return new VerificationResult.Invalid($"No issuer found for GridArea ”{tEvent.GridArea}”");
 

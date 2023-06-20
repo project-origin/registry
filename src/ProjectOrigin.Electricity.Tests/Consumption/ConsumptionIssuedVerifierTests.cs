@@ -33,7 +33,7 @@ public class ConsumptionIssuedVerifierTests
                 {IssuerArea, Convert.ToBase64String(_issuerKey.PublicKey.Export())},
             }
         });
-        var issuerService = new AreaIssuerOptionsService(_algorithm, optionsMock.Object);
+        var issuerService = new GridAreaIssuerOptionsService(_algorithm, optionsMock.Object);
 
         _verifier = new ConsumptionIssuedVerifier(issuerService, _algorithm);
     }

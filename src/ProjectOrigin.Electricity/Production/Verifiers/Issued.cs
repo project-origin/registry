@@ -9,12 +9,12 @@ namespace ProjectOrigin.Electricity.Production.Verifiers;
 
 public class ProductionIssuedVerifier : IEventVerifier<V1.ProductionIssuedEvent>
 {
-    private IAreaIssuerService _areaIssuerService;
+    private IGridAreaIssuerService _gridAreaIssuerService;
     private IHDAlgorithm _keyAlgorithm;
 
-    public ProductionIssuedVerifier(IAreaIssuerService areaIssuerService, IHDAlgorithm keyAlgorithm)
+    public ProductionIssuedVerifier(IGridAreaIssuerService gridAreaIssuerService, IHDAlgorithm keyAlgorithm)
     {
-        _areaIssuerService = areaIssuerService;
+        _gridAreaIssuerService = gridAreaIssuerService;
         _keyAlgorithm = keyAlgorithm;
     }
 
@@ -33,7 +33,7 @@ public class ProductionIssuedVerifier : IEventVerifier<V1.ProductionIssuedEvent>
         if (!_keyAlgorithm.TryImport(payload.OwnerPublicKey.Content.Span, out _))
             return new VerificationResult.Invalid("Invalid owner key, not a valid publicKey");
 
-        var areaPublicKey = _areaIssuerService.GetAreaPublicKey(payload.GridArea);
+        var areaPublicKey = _gridAreaIssuerService.GetAreaPublicKey(payload.GridArea);
         if (areaPublicKey is null)
             return new VerificationResult.Invalid($"No issuer found for GridArea ”{payload.GridArea}”");
 
