@@ -27,7 +27,6 @@ public class ConsumptionAllocatedVerifierTests
         _verifier = new ConsumptionAllocatedVerifier(modelLoaderMock.Object);
     }
 
-
     [Fact]
     public async Task Verifier_AllocateCertificate_Valid()
     {
