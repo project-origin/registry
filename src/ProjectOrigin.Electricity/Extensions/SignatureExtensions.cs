@@ -3,7 +3,7 @@ using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 
 namespace ProjectOrigin.Electricity.Extensions;
 
-public static class ProtoExtensions
+public static class SignatureExtensions
 {
     public static bool IsSignatureValid(this Registry.V1.Transaction transaction, IPublicKey publicKey)
     {
