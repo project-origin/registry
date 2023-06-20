@@ -1,4 +1,4 @@
-﻿public class Program
+public class Program
 {
     static async Task<int> Main(string[] args)
     {
