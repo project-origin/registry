@@ -65,8 +65,8 @@ verify-chart:
 	charts/project-origin-stack/run_kind_test.sh
 
 ## Generate docfx site and serve, navigate to 127.0.0.1:8080
-doc-serve:
-	docfx doc/docfx.json
+doc-serve: build
+	docfx build doc/docfx.json
 	docfx serve doc/_site -n 127.0.0.1
 
 ## Run Concordium integration tests, requires access to running node and environment variables
