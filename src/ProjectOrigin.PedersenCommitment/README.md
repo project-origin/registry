@@ -12,7 +12,7 @@ var secret = new SecretCommitmentInfo(250);
 
 ```
 
-The secret has two fields one must persist to later prove the data, the Message and BlindingValue.
+The secret has two fields that must be persisted to later prove the data, the Message and BlindingValue.
 
 ```csharp
 // store these values
