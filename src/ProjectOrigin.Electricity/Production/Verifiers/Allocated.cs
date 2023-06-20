@@ -13,9 +13,9 @@ public class ProductionAllocatedVerifier : IEventVerifier<ProductionCertificate,
 {
     private IRemoteModelLoader _remoteModelLoader;
 
-    public ProductionAllocatedVerifier(IRemoteModelLoader something)
+    public ProductionAllocatedVerifier(IRemoteModelLoader remoteModelLoader)
     {
-        _remoteModelLoader = something;
+        _remoteModelLoader = remoteModelLoader;
     }
 
     public async Task<VerificationResult> Verify(Transaction transaction, ProductionCertificate? productionCertificate, V1.AllocatedEvent payload)

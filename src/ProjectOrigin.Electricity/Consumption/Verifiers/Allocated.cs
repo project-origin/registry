@@ -12,9 +12,9 @@ public class ConsumptionAllocatedVerifier : IEventVerifier<ConsumptionCertificat
 {
     private IRemoteModelLoader _remoteModelLoader;
 
-    public ConsumptionAllocatedVerifier(IRemoteModelLoader something)
+    public ConsumptionAllocatedVerifier(IRemoteModelLoader remoteModelLoader)
     {
-        _remoteModelLoader = something;
+        _remoteModelLoader = remoteModelLoader;
     }
 
     public async Task<VerificationResult> Verify(Transaction transaction, ConsumptionCertificate? consumptionCertificate, AllocatedEvent payload)
@@ -38,5 +38,4 @@ public class ConsumptionAllocatedVerifier : IEventVerifier<ConsumptionCertificat
 
         return new VerificationResult.Valid();
     }
-
 }

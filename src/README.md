@@ -7,11 +7,6 @@ This file describes the content of the individual source folders.
 Implements Verifiers and Orchestrators used by the Command and Step processors.
 Uses the defined protobuf schema to serialize Electricity commands and events defined.
 
-## ProjectOrigin.Electricity.Client
-
-Uses gRPC based on the .proto files that define the command service and messages to call the CommandProcessor
-Uses the defined protobuf schema to serialize Electricity commands and events defined.
-
 ## ProjectOrigin.Electricity.IntegrationTests
 
 Contains integrations tests running a local TestServer that contains the full stack (with Mock blockchain connector)

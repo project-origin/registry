@@ -12,9 +12,9 @@ public class ConsumptionClaimedVerifier : IEventVerifier<ConsumptionCertificate,
 {
     private IRemoteModelLoader _remoteModelLoader;
 
-    public ConsumptionClaimedVerifier(IRemoteModelLoader something)
+    public ConsumptionClaimedVerifier(IRemoteModelLoader remoteModelLoader)
     {
-        _remoteModelLoader = something;
+        _remoteModelLoader = remoteModelLoader;
     }
 
     public async Task<VerificationResult> Verify(Transaction transaction, ConsumptionCertificate? consumptionCertificate, ClaimedEvent payload)

@@ -13,9 +13,9 @@ public class ProductionClaimedVerifier : IEventVerifier<ProductionCertificate, V
 {
     private IRemoteModelLoader _remoteModelLoader;
 
-    public ProductionClaimedVerifier(IRemoteModelLoader something)
+    public ProductionClaimedVerifier(IRemoteModelLoader remoteModelLoader)
     {
-        _remoteModelLoader = something;
+        _remoteModelLoader = remoteModelLoader;
     }
 
     public async Task<VerificationResult> Verify(Transaction transaction, ProductionCertificate? productionCertificate, ClaimedEvent payload)
