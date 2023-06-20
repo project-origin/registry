@@ -39,7 +39,7 @@ public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityService
     }
 
     [Fact]
-    public async Task test()
+    public async Task issue_comsumption_certificate_success()
     {
         var owner = _algorithm.GenerateNewPrivateKey();
 
