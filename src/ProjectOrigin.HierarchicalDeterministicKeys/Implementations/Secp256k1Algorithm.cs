@@ -14,6 +14,7 @@ public class Secp256k1Algorithm : IHDAlgorithm
     public IHDPrivateKey ImportHDPrivateKey(ReadOnlySpan<byte> privateKeyBytes)
     {
         return new Secp256k1HDPrivateKey(ExtKey.CreateFromBytes(privateKeyBytes));
+
     }
 
     public IHDPublicKey ImportHDPublicKey(ReadOnlySpan<byte> publicKeyBytes)
@@ -38,6 +39,11 @@ public class Secp256k1Algorithm : IHDAlgorithm
         public Secp256k1HDPrivateKey(ExtKey key)
         {
             _key = key;
+
+            var a = Network.Main.CreateBitcoinExtKey(key);
+
+            a.ToString();
+
         }
 
         public ReadOnlySpan<byte> Sign(ReadOnlySpan<byte> data)

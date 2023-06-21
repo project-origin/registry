@@ -1,30 +1,16 @@
 using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
+using SimpleBase;
 
-public class GenerateKey
+public class GeneratePrivateKey
 {
-    private string _filename;
-
-    public GenerateKey(string filename)
-    {
-        _filename = filename;
-    }
-
-    public async Task<int> Run()
+    public Task<int> Run()
     {
         var algorithm = new Secp256k1Algorithm();
+
         var privateKey = algorithm.GenerateNewPrivateKey();
 
-        await WriteToFile(Convert.ToBase64String(privateKey.Export()), $"{_filename}.key");
-        await WriteToFile(Convert.ToBase64String(privateKey.PublicKey.Export()), $"{_filename}.pub");
+        Console.WriteLine(Base58.Bitcoin.Encode(privateKey.Export()));
 
-        return 0;
-    }
-
-    private async Task WriteToFile(string data, string filepath)
-    {
-        using (StreamWriter outputFile = new StreamWriter(Path.Combine(Environment.CurrentDirectory, filepath)))
-        {
-            await outputFile.WriteAsync(data);
-        }
+        return Task.FromResult(0);
     }
 }

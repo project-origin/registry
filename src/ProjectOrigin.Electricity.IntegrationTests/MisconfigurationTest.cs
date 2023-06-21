@@ -7,6 +7,7 @@ using ProjectOrigin.TestUtils;
 using AutoFixture;
 using Microsoft.Extensions.Options;
 using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
+using SimpleBase;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
@@ -25,7 +26,7 @@ public class MisconfigurationTest : GrpcTestBase<Startup>
     {
         _grpcFixture.ConfigureHostConfiguration(new Dictionary<string, string?>()
         {
-            {$"Issuers:{Area}", Convert.ToBase64String(_fixture.Create<byte[]>())}
+            {$"Issuers:{Area}", Base58.Bitcoin.Encode(_fixture.Create<byte[]>())}
         });
 
         var ex = Assert.Throws<OptionsValidationException>(() => { var channel = _grpcFixture.Channel; });
@@ -51,7 +52,7 @@ public class MisconfigurationTest : GrpcTestBase<Startup>
 
         _grpcFixture.ConfigureHostConfiguration(new Dictionary<string, string?>()
         {
-            {$"Issuers:{Area}", Convert.ToBase64String(issuerKey.PublicKey.Export())},
+            {$"Issuers:{Area}", Base58.Bitcoin.Encode(issuerKey.PublicKey.Export())},
             {$"Registries:MyRegistry:Address", "This is not a url"}
         });
 

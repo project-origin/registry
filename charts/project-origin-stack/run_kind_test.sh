@@ -17,7 +17,6 @@ trap 'rm -fr $temp_folder; kind delete cluster -n helm-test  >/dev/null 2>&1' 0
 
 # define variables
 temp_folder=$(mktemp -d)
-key_file_name=${temp_folder}/TestKey
 override_values_filename=${temp_folder}/values_override.sh
 kind_filename=${temp_folder}/kind.yaml
 example_area=Narnia
@@ -46,8 +45,8 @@ kind delete cluster -n helm-test
 kind create cluster -n helm-test --config "$kind_filename"
 
 # generate keys
-dotnet run --project src/ProjectOrigin.Electricity.Example GenerateKey "$key_file_name"
-PublicKey=$(cat "$key_file_name.pub")
+PrivateKey=$(dotnet run --project src/ProjectOrigin.Electricity.Example GeneratePrivateKey)
+PublicKey=$(dotnet run --project src/ProjectOrigin.Electricity.Example DerivePublicKey "$PrivateKey")
 
 # generate values
 cat << EOF > "${override_values_filename}"
@@ -77,5 +76,5 @@ echo "Registry B installed"
 sleep 15
 
 # run test
-dotnet run --project src/ProjectOrigin.Electricity.Example WithoutWalletFlow $example_area "$key_file_name.key" ${registry_a_name} http://localhost:$registry_a_port ${registry_b_name} http://localhost:$registry_b_port
+dotnet run --project src/ProjectOrigin.Electricity.Example WithoutWalletFlow $example_area $PrivateKey ${registry_a_name} http://localhost:$registry_a_port ${registry_b_name} http://localhost:$registry_b_port
 echo "Test completed"

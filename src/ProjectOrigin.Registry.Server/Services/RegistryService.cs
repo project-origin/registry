@@ -60,11 +60,4 @@ public class RegistryService : V1.RegistryService.RegistryServiceBase
 
         return response;
     }
-
-    public override Task<GetTransactionProofResponse> GetTransactionProof(GetTransactionProofRequest request, ServerCallContext context)
-    {
-
-
-        return base.GetTransactionProof(request, context);
-    }
 }

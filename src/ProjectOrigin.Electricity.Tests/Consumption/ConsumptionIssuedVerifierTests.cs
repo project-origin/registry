@@ -10,6 +10,7 @@ using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Services;
 using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
+using SimpleBase;
 using Xunit;
 
 namespace ProjectOrigin.Electricity.Tests;
@@ -30,7 +31,7 @@ public class ConsumptionIssuedVerifierTests
         optionsMock.Setup(obj => obj.Value).Returns(new IssuerOptions()
         {
             Issuers = new Dictionary<string, string>(){
-                {IssuerArea, Convert.ToBase64String(_issuerKey.PublicKey.Export())},
+                {IssuerArea, Base58.Bitcoin.Encode(_issuerKey.PublicKey.Export())},
             }
         });
         var issuerService = new GridAreaIssuerOptionsService(_algorithm, optionsMock.Object);

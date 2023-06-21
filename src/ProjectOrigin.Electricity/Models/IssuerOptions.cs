@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Options;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
+using SimpleBase;
 
 namespace ProjectOrigin.Electricity.Models;
 
@@ -18,7 +19,7 @@ public class IssuerOptions
         {
             try
             {
-                algorithm.ImportPublicKey(Convert.FromBase64String(pair.Value));
+                algorithm.ImportPublicKey(Base58.Bitcoin.Decode(pair.Value));
             }
             catch (Exception)
             {

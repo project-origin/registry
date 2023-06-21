@@ -17,6 +17,7 @@ using System.Security.Cryptography;
 using ProjectOrigin.PedersenCommitment;
 using Xunit;
 using ProjectOrigin.TestUtils;
+using SimpleBase;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
@@ -35,7 +36,7 @@ public class FlowTests : GrpcTestBase<Startup>
 
         grpcFixture.ConfigureHostConfiguration(new Dictionary<string, string?>()
         {
-            {$"Issuers:{Area}", Convert.ToBase64String(_issuerKey.PublicKey.Export())},
+            {$"Issuers:{Area}", Base58.Bitcoin.Encode(_issuerKey.PublicKey.Export())},
             {$"Registries:{Registry}:Address", "http://localhost:80"}
         });
 

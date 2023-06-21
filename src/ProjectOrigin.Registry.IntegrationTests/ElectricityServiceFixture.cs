@@ -4,6 +4,7 @@ using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
 using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
+using SimpleBase;
 using Xunit;
 
 public class ElectricityServiceFixture : IAsyncLifetime
@@ -25,7 +26,7 @@ public class ElectricityServiceFixture : IAsyncLifetime
         _container = new ContainerBuilder()
                 .WithImage(ElectricityVerifierImage)
                 .WithPortBinding(GrpcPort, true)
-                .WithEnvironment($"Issuers__{IssuerArea}", Convert.ToBase64String(IssuerKey.PublicKey.Export()))
+                .WithEnvironment($"Issuers__{IssuerArea}", Base58.Bitcoin.Encode(IssuerKey.PublicKey.Export()))
                 .Build();
     }
 

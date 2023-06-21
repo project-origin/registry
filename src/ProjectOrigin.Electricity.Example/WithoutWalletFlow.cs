@@ -3,11 +3,12 @@ using ProjectOrigin.Electricity.Example;
 using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
 using ProjectOrigin.PedersenCommitment;
 using ProjectOrigin.Registry.V1;
+using SimpleBase;
 
 public class WithoutWalletFlow
 {
     private string area;
-    private string signerKeyPath;
+    private string signerKey;
     private string prodRegistryName;
     private string prodRegistryAddress;
     private string consRegistryName;
@@ -15,14 +16,14 @@ public class WithoutWalletFlow
 
     public WithoutWalletFlow(
         string area,
-        string signerKeyPath,
+        string signerKey,
         string prodRegistryName,
         string prodRegistryAddress,
         string consRegistryName,
         string consRegistryAddress)
     {
         this.area = area;
-        this.signerKeyPath = signerKeyPath;
+        this.signerKey = signerKey;
         this.prodRegistryName = prodRegistryName;
         this.prodRegistryAddress = prodRegistryAddress;
         this.consRegistryName = consRegistryName;
@@ -35,8 +36,7 @@ public class WithoutWalletFlow
         var algorithm = new Secp256k1Algorithm();
 
         // Import the key for the issuing body of the area;
-        var encodedKey = File.ReadAllText(signerKeyPath);
-        var issuerKey = algorithm.ImportHDPrivateKey(Convert.FromBase64String(encodedKey));
+        var issuerKey = algorithm.ImportHDPrivateKey(Base58.Bitcoin.Decode(signerKey));
 
         // Create a new key for the owner since we have no wallet in this example
         var ownerKey = algorithm.GenerateNewPrivateKey();
