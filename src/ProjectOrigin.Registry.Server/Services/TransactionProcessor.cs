@@ -69,11 +69,18 @@ public class TransactionProcessor : IJobConsumer<TransactionJob>
         }
         catch (InvalidTransactionException ex)
         {
+            _logger.LogWarning(ex, $"Invalid transaction {transaction.GetTransactionId()} - {ex.Message}");
+
             await _transactionStatusService.SetTransactionStatus(
                 transaction.GetTransactionId(),
                 new TransactionStatusRecord(
                 TransactionStatus.Failed,
                 ex.Message));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unknown exction for transaction {transaction.GetTransactionId()} -  {ex.Message}");
+            throw;
         }
     }
 }

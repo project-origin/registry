@@ -9,7 +9,7 @@ using Xunit;
 
 public class ElectricityServiceFixture : IAsyncLifetime
 {
-    private const string ElectricityVerifierImage = "ghcr.io/project-origin/electricity-server:0.2.0-rc.3";
+    private const string ElectricityVerifierImage = "ghcr.io/project-origin/electricity-server:0.2.0-rc.12";
     private const int GrpcPort = 80;
 
     public string IssuerArea => "SomeArea";
@@ -35,12 +35,14 @@ public class ElectricityServiceFixture : IAsyncLifetime
         await _container.StartAsync()
             .ConfigureAwait(false);
 
-        await Task.Delay(4000);
+        await Task.Delay(5000);
     }
 
     public async Task DisposeAsync()
     {
+        // var log = await _container.GetLogsAsync();
+        // Console.WriteLine("CONTAINERLOG: " + log.Stdout);
+        // Console.WriteLine("CONTAINERERR: " + log.Stderr);
         await _container.StopAsync();
     }
-
 }

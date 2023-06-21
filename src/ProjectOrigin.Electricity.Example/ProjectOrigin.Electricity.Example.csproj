@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ProjectOrigin.PedersenCommitment" Version="0.2.0-rc.9" />
-    <PackageReference Include="ProjectOrigin.HierarchicalDeterministicKeys" Version="0.2.0-rc.9" />
+    <PackageReference Include="ProjectOrigin.PedersenCommitment" Version="0.2.0-rc.11" />
+    <PackageReference Include="ProjectOrigin.HierarchicalDeterministicKeys" Version="0.2.0-rc.11" />
     <PackageReference Include="SimpleBase" Version="4.0.0" />
     <PackageReference Include="Google.Protobuf" Version="3.23.2" />
     <PackageReference Include="Grpc.Tools" Version="2.54.0" />
