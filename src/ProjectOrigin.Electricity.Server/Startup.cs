@@ -11,8 +11,6 @@ using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Production;
 using ProjectOrigin.Electricity.Production.Verifiers;
 using ProjectOrigin.Electricity.Services;
-using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
-using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.Verifier.Utils;
 using ProjectOrigin.Verifier.Utils.Interfaces;
 using ProjectOrigin.Verifier.Utils.Services;
@@ -23,9 +21,6 @@ public class Startup
 {
     public void ConfigureServices(IServiceCollection services)
     {
-        var algorithm = new Secp256k1Algorithm();
-        services.AddSingleton<IHDAlgorithm>(algorithm);
-
         services.AddGrpc();
 
         services.AddSingleton<IProtoDeserializer>(new ProtoDeserializer(Assembly.GetAssembly(typeof(V1.ConsumptionIssuedEvent))

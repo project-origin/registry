@@ -45,8 +45,9 @@ kind delete cluster -n helm-test
 kind create cluster -n helm-test --config "$kind_filename"
 
 # generate keys
-PrivateKey=$(dotnet run --project src/ProjectOrigin.Electricity.Example GeneratePrivateKey)
-PublicKey=$(dotnet run --project src/ProjectOrigin.Electricity.Example DerivePublicKey "$PrivateKey")
+PrivateKey=$(openssl genpkey -algorithm ED25519)
+PrivateKeyBase64=$(echo "$PrivateKey" | base64 -w 0)
+PublicKeyBase64=$(echo "$PrivateKey" | openssl pkey -pubout | base64 -w 0)
 
 # generate values
 cat << EOF > "${override_values_filename}"
@@ -58,7 +59,7 @@ verifiers:
       tag: 0.2.0-rc.13
     issuers:
       - area: $example_area
-        publicKey: $PublicKey
+        publicKey: $PublicKeyBase64
     registries:
       - name: ${registry_a_name}
         address: http://registry-${registry_a_name}:80
@@ -67,14 +68,14 @@ verifiers:
 EOF
 
 # install two registries
-helm install ${registry_a_name} charts/project-origin-stack --set name=${registry_a_name},service.nodePort=$registry_a_nodeport,service.type=NodePort -f "${override_values_filename}" --wait >/dev/null 2>&1
+helm install ${registry_a_name} charts/project-origin-registry --set service.nodePort=$registry_a_nodeport,service.type=NodePort -f "${override_values_filename}" --wait >/dev/null 2>&1
 echo "Registry A installed"
-helm install ${registry_b_name} charts/project-origin-stack --set name=${registry_b_name},service.nodePort=$registry_b_nodeport,service.type=NodePort -f "${override_values_filename}" --wait >/dev/null 2>&1
+helm install ${registry_b_name} charts/project-origin-registry --set service.nodePort=$registry_b_nodeport,service.type=NodePort -f "${override_values_filename}" --wait >/dev/null 2>&1
 echo "Registry B installed"
 
 # wait for cluster to be ready
 sleep 15
 
 # run test
-dotnet run --project src/ProjectOrigin.Electricity.Example WithoutWalletFlow $example_area $PrivateKey ${registry_a_name} http://localhost:$registry_a_port ${registry_b_name} http://localhost:$registry_b_port
+dotnet run --project src/ProjectOrigin.Electricity.Example WithoutWalletFlow $example_area $PrivateKeyBase64 ${registry_a_name} http://localhost:$registry_a_port ${registry_b_name} http://localhost:$registry_b_port
 echo "Test completed"

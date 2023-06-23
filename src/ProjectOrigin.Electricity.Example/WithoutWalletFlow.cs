@@ -33,8 +33,6 @@ public class WithoutWalletFlow
 
     public async Task<int> Run()
     {
-        var algorithm = new Secp256k1Algorithm();
-
         // Create a new key for the owner since we have no wallet in this example
         var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
 

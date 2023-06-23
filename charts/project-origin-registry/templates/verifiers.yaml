@@ -3,21 +3,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: registry-{{ $.Values.name }}-verifier-{{ .name }}-deployment
+  name: registry-{{ $.Release.Name }}-verifier-{{ .name }}-deployment
   labels:
-    app: registry-{{ $.Values.name }}-verifier-{{ .name }}
+    app: registry-{{ $.Release.Name }}-verifier-{{ .name }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: registry-{{ $.Values.name }}-verifier-{{ .name }}
+      app: registry-{{ $.Release.Name }}-verifier-{{ .name }}
   template:
     metadata:
       labels:
-        app: registry-{{ $.Values.name }}-verifier-{{ .name }}
+        app: registry-{{ $.Release.Name }}-verifier-{{ .name }}
     spec:
       containers:
-        - name: registry-{{ $.Values.name }}-verifier-{{ .name }}
+        - name: registry-{{ $.Release.Name }}-verifier-{{ .name }}
           image: {{ .image.repository }}:{{ .image.tag }}
           env:
             {{- range .issuers }}
@@ -32,11 +32,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: registry-{{ $.Values.name }}-verifier-{{ .name }}
+  name: registry-{{ $.Release.Name }}-verifier-{{ .name }}
 spec:
   type: ClusterIP
   selector:
-    app: registry-{{ $.Values.name }}-verifier-{{ .name }}
+    app: registry-{{ $.Release.Name }}-verifier-{{ .name }}
   ports:
     - name: grpc
       protocol: TCP

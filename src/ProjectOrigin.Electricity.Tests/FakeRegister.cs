@@ -6,6 +6,7 @@ using NSec.Cryptography;
 using ProjectOrigin.Electricity.Consumption;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Production;
+using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.PedersenCommitment;
@@ -15,7 +16,6 @@ namespace ProjectOrigin.Electricity.Tests;
 internal static class FakeRegister
 {
     const string Registry = "OurReg";
-    static IHDAlgorithm algorithm = new Secp256k1Algorithm();
 
     private static DateInterval _defaultPeriod = new DateInterval(
             new DateTimeOffset(2022, 09, 25, 12, 0, 0, TimeSpan.Zero),
@@ -121,7 +121,7 @@ internal static class FakeRegister
         )
     {
         var id = CreateFederatedId();
-        var owner = ownerKeyOverride ?? algorithm.GenerateNewPrivateKey().PublicKey.ToProto();
+        var owner = ownerKeyOverride ?? Algorithms.Secp256k1.GenerateNewPrivateKey().PublicKey.ToProto();
         var gsrnHash = SHA256.HashData(BitConverter.GetBytes(5700000000000001));
         var quantityCommmitment = new SecretCommitmentInfo(150).ToProtoCommitment(id.StreamId.Value);
 
@@ -146,7 +146,7 @@ internal static class FakeRegister
         )
     {
         var id = CreateFederatedId();
-        var owner = ownerKeyOverride ?? algorithm.GenerateNewPrivateKey().PublicKey.ToProto();
+        var owner = ownerKeyOverride ?? Algorithms.Secp256k1.GenerateNewPrivateKey().PublicKey.ToProto();
         var gsrnHash = SHA256.HashData(BitConverter.GetBytes(5700000000000001));
         var quantityCommmitmentParams = new SecretCommitmentInfo(150);
         var quantityCommmitment = quantityCommmitmentParams.ToProtoCommitment(id.StreamId.Value);
@@ -191,7 +191,7 @@ internal static class FakeRegister
         var slice = new SecretCommitmentInfo(quantity);
         var remainder = new SecretCommitmentInfo(sourceParams.Message - quantity);
 
-        var newOwner = newOwnerOverride ?? algorithm.GenerateNewPrivateKey().PublicKey.ToProto();
+        var newOwner = newOwnerOverride ?? Algorithms.Secp256k1.GenerateNewPrivateKey().PublicKey.ToProto();
 
         var @event = new V1.SlicedEvent
         {

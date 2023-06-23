@@ -14,12 +14,12 @@ using Google.Protobuf.WellKnownTypes;
 using FluentAssertions;
 using ProjectOrigin.Registry.V1;
 using ProjectOrigin.Electricity.V1;
+using ProjectOrigin.HierarchicalDeterministicKeys;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
 public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityServiceFixture>
 {
-    private Secp256k1Algorithm _algorithm;
     private ElectricityServiceFixture _verifierFixture;
     private const string RegistryName = "SomeRegistry";
 
@@ -27,8 +27,6 @@ public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityService
 
     public FlowTests(ElectricityServiceFixture verifierFixture, GrpcTestFixture<Startup> grpcFixture, ITestOutputHelper outputHelper) : base(grpcFixture, outputHelper)
     {
-        _algorithm = new Secp256k1Algorithm();
-
         _verifierFixture = verifierFixture;
         grpcFixture.ConfigureHostConfiguration(new Dictionary<string, string?>()
         {
@@ -37,10 +35,10 @@ public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityService
         });
     }
 
-    //[Fact]
+    [Fact]
     public async Task issue_comsumption_certificate_success()
     {
-        var owner = _algorithm.GenerateNewPrivateKey();
+        var owner = Algorithms.Secp256k1.GenerateNewPrivateKey();
 
         var commitmentInfo = new SecretCommitmentInfo(250);
         var certId = Guid.NewGuid();
@@ -143,7 +141,7 @@ public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityService
         });
     }
 
-    private Registry.V1.Transaction SignTransaction(Common.V1.FederatedStreamId streamId, IMessage @event, IHDPrivateKey signerKey)
+    private Registry.V1.Transaction SignTransaction(Common.V1.FederatedStreamId streamId, IMessage @event, IPrivateKey signerKey)
     {
         var header = new Registry.V1.TransactionHeader()
         {

@@ -34,16 +34,6 @@ public interface IHDPrivateKey : IPrivateKey
     public IHDPublicKey Neuter();
 
     /// <summary>
-    /// Signs the given data with the private key.
-    /// </summary>
-    public ReadOnlySpan<byte> Sign(ReadOnlySpan<byte> data);
-
-    /// <summary>
-    /// Exports the private key as a byte array.
-    /// </summary>
-    public ReadOnlySpan<byte> Export();
-
-    /// <summary>
     /// Derives a child private key from this private key.
     /// </summary>
     public IHDPrivateKey Derive(int position);

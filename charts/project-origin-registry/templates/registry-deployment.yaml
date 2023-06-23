@@ -2,28 +2,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: registry-{{ required ".values.name must be specified" .Values.name }}-deployment
+  name: registry-{{ .Release.Name }}-deployment
   labels:
-    app: registry-{{ .Values.name }}
+    app: registry-{{ .Release.Name }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: registry-{{ .Values.name }}
+      app: registry-{{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: registry-{{ .Values.name }}
+        app: registry-{{ .Release.Name }}
     spec:
       containers:
-        - name: registry-{{ .Values.name }}
+        - name: registry-{{ .Release.Name }}
           image: {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
           env:
             - name: REGISTRYNAME
-              value: {{ .Values.name }}
+              value: {{ .Release.Name }}
             {{- range .Values.verifiers }}
             - name: VERIFIERS__{{ .type }}
-              value: http://registry-{{ $.Values.name }}-verifier-{{ .name }}:80
+              value: http://registry-{{ $.Release.Name }}-verifier-{{ .name }}:80
             {{- end }}
             - name: VERIFIABLEEVENTSTORE__BATCHSIZEEXPONENT
               value: {{ .Values.verifiableEventStore.batchSizeExponent | quote }}

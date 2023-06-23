@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
+using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using Xunit;
@@ -13,15 +14,14 @@ public class ElectricityServiceFixture : IAsyncLifetime
     private const int GrpcPort = 80;
 
     public string IssuerArea => "SomeArea";
-    public IHDPrivateKey IssuerKey { get; init; }
+    public IPrivateKey IssuerKey { get; init; }
     private IContainer _container;
 
     public string Url => $"http://{_container.Hostname}:{_container.GetMappedPublicPort(GrpcPort)}";
 
     public ElectricityServiceFixture()
     {
-        var algorithm = new Secp256k1Algorithm();
-        IssuerKey = algorithm.GenerateNewPrivateKey();
+        IssuerKey = Algorithms.Ed25519.GenerateNewPrivateKey();
 
         _container = new ContainerBuilder()
                 .WithImage(ElectricityVerifierImage)
