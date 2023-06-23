@@ -63,15 +63,6 @@ public class Helper
         return @event;
     }
 
-    private static V1.Commitment CommitmentToProto(FederatedStreamId certId, SecretCommitmentInfo commitmentInfo)
-    {
-        return new Electricity.V1.Commitment
-        {
-            Content = ByteString.CopyFrom(commitmentInfo.Commitment.C),
-            RangeProof = ByteString.CopyFrom(commitmentInfo.CreateRangeProof(certId.StreamId.Value))
-        };
-    }
-
     public Electricity.V1.SlicedEvent CreateSliceEvent(FederatedStreamId certId, IPublicKey newOwnerKey, SecretCommitmentInfo sourceSlice, params SecretCommitmentInfo[] slices)
     {
         var sumOfNewSlices = slices.Aggregate((left, right) => left + right);
@@ -115,7 +106,8 @@ public class Helper
         };
     }
 
-    internal Electricity.V1.ClaimedEvent CreateClaimEvent(Guid allocationId, FederatedStreamId certificateId)
+
+    public Electricity.V1.ClaimedEvent CreateClaimEvent(Guid allocationId, FederatedStreamId certificateId)
     {
         return new Electricity.V1.ClaimedEvent
         {
@@ -124,10 +116,6 @@ public class Helper
         };
     }
 
-    private ByteString ToSliceId(PedersenCommitment.Commitment commitment)
-    {
-        return ByteString.CopyFrom(SHA256.HashData(commitment.C));
-    }
 
     public FederatedStreamId ToCertId(string registry, Guid certId)
     {
@@ -187,12 +175,26 @@ public class Helper
         }
     }
 
-    public Registry.V1.GetTransactionStatusRequest CreateStatusRequest(Registry.V1.Transaction signedTransaction)
+    private Registry.V1.GetTransactionStatusRequest CreateStatusRequest(Registry.V1.Transaction signedTransaction)
     {
         return new ProjectOrigin.Registry.V1.GetTransactionStatusRequest()
         {
             Id = Convert.ToBase64String(SHA256.HashData(signedTransaction.ToByteArray()))
         };
+    }
+
+    private static V1.Commitment CommitmentToProto(FederatedStreamId certId, SecretCommitmentInfo commitmentInfo)
+    {
+        return new Electricity.V1.Commitment
+        {
+            Content = ByteString.CopyFrom(commitmentInfo.Commitment.C),
+            RangeProof = ByteString.CopyFrom(commitmentInfo.CreateRangeProof(certId.StreamId.Value))
+        };
+    }
+
+    private ByteString ToSliceId(PedersenCommitment.Commitment commitment)
+    {
+        return ByteString.CopyFrom(SHA256.HashData(commitment.C));
     }
 
 }

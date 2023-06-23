@@ -160,10 +160,10 @@ public class WithoutWalletFlow
         var consClaimRequest = new ProjectOrigin.Registry.V1.SendTransactionsRequest();
         consClaimRequest.Transactions.Add(singedTransaction);
         await client.SendTransactionsAsync(consClaimRequest);
-        Console.WriteLine($"- transaction queued");
+        Console.WriteLine("- transaction queued");
 
         // Wait for status of the transaction to be committed.
         await helper.WaitForCommittedOrTimeout(client, singedTransaction, TimeSpan.FromMinutes(1));
-        Console.WriteLine($"- transaction committed");
+        Console.WriteLine("- transaction committed");
     }
 }
