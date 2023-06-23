@@ -34,7 +34,7 @@ Once one have generated a key and added it to the values file,
 one can install the chart using the following command:
 
 ```shell
-helm install -f values.yaml my-example-registry project-origin-registry --version 0.1.0-rc.1 --repo https://project-origin.github.io/helm-registry .
+helm install -f values.yaml my-example-registry project-origin-registry --version 0.2.0-rc.1 --repo https://project-origin.github.io/helm-registry .
 ```
 
 ### 1. Generating a issuer key
