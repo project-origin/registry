@@ -29,8 +29,8 @@ message GetStreamTransactionsResponse {
 }
 
 message GetTransactionStatusRequest {
-    // The id of the transaction.
-    TransactionId id = 1;
+    //Base64 encoded SHA256 hash of the transaction
+    string id = 1;
 }
 
 message GetTransactionStatusResponse {
@@ -49,8 +49,8 @@ enum TransactionState {
 }
 
 message GetTransactionProofRequest {
-    //Bitcoin Base58 encoded SHA256 hash of the transaction
-    TransactionId id = 1;
+    //Base64 encoded SHA256 hash of the transaction
+    string id = 1;
 }
 
 message GetTransactionProofResponse {
@@ -80,14 +80,10 @@ message Transaction {
     TransactionHeader header = 1;
 
     // The signature of the transaction header.
-    Signature header_signature = 2;
+    bytes header_signature = 2;
 
     // The serialized payload of the transaction
     bytes payload = 3;
-}
-
-message TransactionId {
-    string value = 1;
 }
 
 message MerkleProof {
@@ -95,8 +91,4 @@ message MerkleProof {
     int32 leaf_index = 2;
     repeated bytes hashes = 3;
     bytes block_id = 4;
-}
-
-message Signature {
-    bytes value = 1;
 }

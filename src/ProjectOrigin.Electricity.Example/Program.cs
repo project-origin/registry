@@ -11,25 +11,6 @@ public class Program
         string command = args[0];
         switch (command)
         {
-            case "GeneratePrivateKey":
-                if (args.Length < 1)
-                {
-                    Console.Error.WriteLine("Insufficient arguments for 'GenerateKey'");
-                    return 1;
-                }
-                var flow = new GeneratePrivateKey();
-                return await flow.Run();
-
-            case "DerivePublicKey":
-                if (args.Length < 2)
-                {
-                    Console.Error.WriteLine("Insufficient arguments for 'GenerateKey'");
-                    return 1;
-                }
-                string base58PrivateKey = args[1];
-                var flow1 = new DerivePublicKey(base58PrivateKey);
-                return await flow1.Run();
-
             case "WithoutWalletFlow":
                 if (args.Length < 7)
                 {

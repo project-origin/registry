@@ -3,8 +3,7 @@ using System.Threading.Tasks;
 using Moq;
 using ProjectOrigin.Electricity.Consumption.Verifiers;
 using ProjectOrigin.Electricity.Production;
-using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
-using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
+using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.Verifier.Utils.Interfaces;
 using Xunit;
 
@@ -12,14 +11,11 @@ namespace ProjectOrigin.Electricity.Tests;
 
 public class ConsumptionAllocatedVerifierTests
 {
-    private IHDAlgorithm _algorithm;
     private ConsumptionAllocatedVerifier _verifier;
     private ProductionCertificate? _otherCertificate;
 
     public ConsumptionAllocatedVerifierTests()
     {
-        _algorithm = new Secp256k1Algorithm();
-
         var modelLoaderMock = new Mock<IRemoteModelLoader>();
         modelLoaderMock.Setup(obj => obj.GetModel<ProductionCertificate>(It.IsAny<Common.V1.FederatedStreamId>()))
             .Returns(() => Task.FromResult(_otherCertificate));
@@ -30,7 +26,7 @@ public class ConsumptionAllocatedVerifierTests
     [Fact]
     public async Task Verifier_AllocateCertificate_Valid()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
         var allocationId = prodCert.Allocated(consCert, prodParams, consParams);
@@ -47,7 +43,7 @@ public class ConsumptionAllocatedVerifierTests
     [Fact]
     public async Task Verifier_CertNotFound_Invalid()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
         var allocationId = prodCert.Allocated(consCert, prodParams, consParams);
@@ -64,7 +60,7 @@ public class ConsumptionAllocatedVerifierTests
     [Fact]
     public async Task Verifier_SliceNotFound_Invalid()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
         var allocationId = prodCert.Allocated(consCert, prodParams, consParams);
@@ -81,8 +77,8 @@ public class ConsumptionAllocatedVerifierTests
     [Fact]
     public async Task Verifier_InvalidSignatureForSlice_Invalid()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
-        var otherKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
+        var otherKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
         var allocationId = prodCert.Allocated(consCert, prodParams, consParams);
@@ -99,7 +95,7 @@ public class ConsumptionAllocatedVerifierTests
     [Fact]
     public async Task Verifier_ProductionNotFound_Invalid()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
         var allocationId = prodCert.Allocated(consCert, prodParams, consParams);
@@ -116,7 +112,7 @@ public class ConsumptionAllocatedVerifierTests
     [Fact]
     public async Task Verifier_ProdNotAllocated_Invalid()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
         _otherCertificate = prodCert;

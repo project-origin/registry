@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <PackageReference Include="NBitcoin" Version="7.0.25" />
+    <PackageReference Include="NSec.Cryptography" Version="22.4.0" />
   </ItemGroup>
 
   <ItemGroup>

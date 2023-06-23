@@ -1,9 +1,10 @@
+using System.Text;
 using Grpc.Net.Client;
 using ProjectOrigin.Electricity.Example;
+using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
 using ProjectOrigin.PedersenCommitment;
 using ProjectOrigin.Registry.V1;
-using SimpleBase;
 
 public class WithoutWalletFlow
 {
@@ -32,14 +33,16 @@ public class WithoutWalletFlow
 
     public async Task<int> Run()
     {
-        // We will bee using the Secp256k1 algorithm, same as bitcoin uses.
         var algorithm = new Secp256k1Algorithm();
 
-        // Import the key for the issuing body of the area;
-        var issuerKey = algorithm.ImportHDPrivateKey(Base58.Bitcoin.Decode(signerKey));
-
         // Create a new key for the owner since we have no wallet in this example
-        var ownerKey = algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
+
+        // Decode text key from base64 string
+        var keyText = Encoding.UTF8.GetString(Convert.FromBase64String(signerKey));
+
+        // Import the key for the issuing body of the area;
+        var issuerKey = Algorithms.Ed25519.ImportPrivateKeyText(keyText);
 
         // Create channel and client
         var prodChannel = GrpcChannel.ForAddress(prodRegistryAddress);

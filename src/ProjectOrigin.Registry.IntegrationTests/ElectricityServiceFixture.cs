@@ -1,15 +1,15 @@
 using System;
+using System.Text;
 using System.Threading.Tasks;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
 using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
-using SimpleBase;
 using Xunit;
 
 public class ElectricityServiceFixture : IAsyncLifetime
 {
-    private const string ElectricityVerifierImage = "ghcr.io/project-origin/electricity-server:0.2.0-rc.12";
+    private const string ElectricityVerifierImage = "ghcr.io/project-origin/electricity-server:0.2.0-rc.13";
     private const int GrpcPort = 80;
 
     public string IssuerArea => "SomeArea";
@@ -26,7 +26,7 @@ public class ElectricityServiceFixture : IAsyncLifetime
         _container = new ContainerBuilder()
                 .WithImage(ElectricityVerifierImage)
                 .WithPortBinding(GrpcPort, true)
-                .WithEnvironment($"Issuers__{IssuerArea}", Base58.Bitcoin.Encode(IssuerKey.PublicKey.Export()))
+                .WithEnvironment($"Issuers__{IssuerArea}", Convert.ToBase64String(Encoding.UTF8.GetBytes(IssuerKey.PublicKey.ExportPkixText())))
                 .Build();
     }
 

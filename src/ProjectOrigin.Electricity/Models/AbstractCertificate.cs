@@ -1,28 +1,22 @@
 using System;
 using System.Collections.Generic;
+using Google.Protobuf;
 using ProjectOrigin.Electricity.Extensions;
 using ProjectOrigin.Electricity.Models;
-using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.PedersenCommitment;
 
 namespace ProjectOrigin.Electricity;
 
 public abstract class AbstractCertificate
 {
-    public CertificateSlice? GetCertificateSlice(V1.SliceId id) => _availableSlices.GetValueOrDefault(id);
+    public CertificateSlice? GetCertificateSlice(ByteString id) => _availableSlices.GetValueOrDefault(id);
     public bool HasClaim(Common.V1.Uuid allocationId) => _claimedSlices.ContainsKey(allocationId);
     public bool HasAllocation(Common.V1.Uuid allocationId) => _allocationSlices.ContainsKey(allocationId);
     public AllocationSlice? GetAllocation(Common.V1.Uuid allocationId) => _allocationSlices.GetValueOrDefault(allocationId);
 
-    private Dictionary<V1.SliceId, CertificateSlice> _availableSlices = new Dictionary<V1.SliceId, CertificateSlice>();
+    private Dictionary<ByteString, CertificateSlice> _availableSlices = new Dictionary<ByteString, CertificateSlice>();
     private Dictionary<Common.V1.Uuid, AllocationSlice> _allocationSlices = new Dictionary<Common.V1.Uuid, AllocationSlice>();
     private Dictionary<Common.V1.Uuid, AllocationSlice> _claimedSlices = new Dictionary<Common.V1.Uuid, AllocationSlice>();
-    private IHDAlgorithm _keyAlgorithm;
-
-    public AbstractCertificate(IHDAlgorithm keyAlgorithm)
-    {
-        _keyAlgorithm = keyAlgorithm;
-    }
 
     public void Apply(V1.ClaimedEvent e)
     {
@@ -33,30 +27,29 @@ public abstract class AbstractCertificate
 
     public void Apply(V1.SlicedEvent e)
     {
-        TakeAvailableSlice(e.SourceSlice);
+        TakeAvailableSlice(e.SourceSliceHash);
         foreach (var newSlice in e.NewSlices)
         {
             AddAvailableSlice(newSlice.Quantity.ToModel(), newSlice.NewOwner);
         }
     }
 
-    protected CertificateSlice TakeAvailableSlice(V1.SliceId sliceId)
+    protected CertificateSlice TakeAvailableSlice(ByteString sliceHash)
     {
-        var oldSlice = GetCertificateSlice(sliceId) ?? throw new Exception("Invalid state");
-        _availableSlices.Remove(sliceId);
+        var oldSlice = GetCertificateSlice(sliceHash) ?? throw new Exception("Invalid state");
+        _availableSlices.Remove(sliceHash);
         return oldSlice;
     }
 
-    protected void AddAvailableSlice(Commitment commitment, V1.PublicKey key)
+    protected void AddAvailableSlice(Commitment commitment, V1.PublicKey publicKey)
     {
-        var publicKey = _keyAlgorithm.ImportPublicKey(key.Content.Span);
         var slice = new CertificateSlice(commitment, publicKey);
-        _availableSlices.Add(slice.Id, slice);
+        _availableSlices.Add(slice.Hash, slice);
     }
 
-    protected void AllocateSlice(V1.SliceId id, V1.AllocatedEvent e)
+    protected void AllocateSlice(ByteString sliceHash, V1.AllocatedEvent e)
     {
-        var oldSlice = TakeAvailableSlice(id);
+        var oldSlice = TakeAvailableSlice(sliceHash);
         var newSlice = new AllocationSlice(oldSlice.Commitment, oldSlice.Owner, e.AllocationId, e.ProductionCertificateId, e.ConsumptionCertificateId);
         _allocationSlices.Add(e.AllocationId, newSlice);
     }

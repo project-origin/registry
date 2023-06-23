@@ -1,5 +1,4 @@
 using ProjectOrigin.Electricity.Extensions;
-using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.PedersenCommitment;
 using ProjectOrigin.Verifier.Utils;
 using ProjectOrigin.Registry.V1;
@@ -10,19 +9,12 @@ namespace ProjectOrigin.Electricity.Consumption.Verifiers;
 
 public class ConsumptionSlicedVerifier : IEventVerifier<ConsumptionCertificate, V1.SlicedEvent>
 {
-    private IHDAlgorithm _keyAlgorithm;
-
-    public ConsumptionSlicedVerifier(IHDAlgorithm keyAlgorithm)
-    {
-        _keyAlgorithm = keyAlgorithm;
-    }
-
     public Task<VerificationResult> Verify(Transaction transaction, ConsumptionCertificate? certificate, V1.SlicedEvent payload)
     {
         if (certificate is null)
             return new VerificationResult.Invalid("Certificate does not exist");
 
-        var certificateSlice = certificate.GetCertificateSlice(payload.SourceSlice);
+        var certificateSlice = certificate.GetCertificateSlice(payload.SourceSliceHash);
         if (certificateSlice is null)
             return new VerificationResult.Invalid("Slice not found");
 
@@ -31,7 +23,7 @@ public class ConsumptionSlicedVerifier : IEventVerifier<ConsumptionCertificate, 
 
         foreach (var slice in payload.NewSlices)
         {
-            if (!_keyAlgorithm.TryImport(slice.NewOwner.Content.Span, out _))
+            if (!slice.NewOwner.TryToModel(out _))
                 return new VerificationResult.Invalid("Invalid NewOwner key, not a valid publicKey");
 
             if (!slice.Quantity.VerifyCommitment(payload.CertificateId.StreamId.Value))

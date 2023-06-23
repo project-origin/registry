@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using AutoFixture;
 using Microsoft.Extensions.Options;
@@ -8,9 +9,8 @@ using ProjectOrigin.Electricity.Consumption;
 using ProjectOrigin.Electricity.Consumption.Verifiers;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Services;
-using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
+using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
-using SimpleBase;
 using Xunit;
 
 namespace ProjectOrigin.Electricity.Tests;
@@ -18,25 +18,23 @@ namespace ProjectOrigin.Electricity.Tests;
 public class ConsumptionIssuedVerifierTests
 {
     const string IssuerArea = "DK1";
-    private IHDAlgorithm _algorithm;
-    private IHDPrivateKey _issuerKey;
+    private IPrivateKey _issuerKey;
     private ConsumptionIssuedVerifier _verifier;
 
     public ConsumptionIssuedVerifierTests()
     {
-        _algorithm = new Secp256k1Algorithm();
-        _issuerKey = _algorithm.GenerateNewPrivateKey();
+        _issuerKey = Algorithms.Ed25519.GenerateNewPrivateKey();
 
         var optionsMock = new Mock<IOptions<IssuerOptions>>();
         optionsMock.Setup(obj => obj.Value).Returns(new IssuerOptions()
         {
             Issuers = new Dictionary<string, string>(){
-                {IssuerArea, Base58.Bitcoin.Encode(_issuerKey.PublicKey.Export())},
+                {IssuerArea, Convert.ToBase64String(Encoding.UTF8.GetBytes(_issuerKey.PublicKey.ExportPkixText()))},
             }
         });
-        var issuerService = new GridAreaIssuerOptionsService(_algorithm, optionsMock.Object);
+        var issuerService = new GridAreaIssuerOptionsService(optionsMock.Object);
 
-        _verifier = new ConsumptionIssuedVerifier(issuerService, _algorithm);
+        _verifier = new ConsumptionIssuedVerifier(issuerService);
     }
 
     [Fact]
@@ -55,7 +53,7 @@ public class ConsumptionIssuedVerifierTests
     {
         var @event = FakeRegister.CreateConsumptionIssuedEvent();
         var transaction = FakeRegister.SignTransaction(@event.CertificateId, @event, _issuerKey);
-        var certificate = new ConsumptionCertificate(@event, _algorithm);
+        var certificate = new ConsumptionCertificate(@event);
 
         var result = await _verifier.Verify(transaction, certificate, @event);
 
@@ -92,7 +90,7 @@ public class ConsumptionIssuedVerifierTests
     [Fact]
     public async Task ConsumptionIssuedVerifier_InvalidSignature_Fail()
     {
-        var someOtherKey = _algorithm.GenerateNewPrivateKey();
+        var someOtherKey = Algorithms.Ed25519.GenerateNewPrivateKey();
 
         var @event = FakeRegister.CreateConsumptionIssuedEvent();
         var transaction = FakeRegister.SignTransaction(@event.CertificateId, @event, someOtherKey);
@@ -105,7 +103,7 @@ public class ConsumptionIssuedVerifierTests
     [Fact]
     public async Task ConsumptionIssuedVerifier_NoIssuerForArea_Fail()
     {
-        var someOtherKey = _algorithm.GenerateNewPrivateKey();
+        var someOtherKey = Algorithms.Ed25519.GenerateNewPrivateKey();
 
         var @event = FakeRegister.CreateConsumptionIssuedEvent(gridAreaOverride: "DK2");
         var transaction = FakeRegister.SignTransaction(@event.CertificateId, @event, someOtherKey);

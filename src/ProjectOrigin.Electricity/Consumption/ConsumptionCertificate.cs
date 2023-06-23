@@ -1,6 +1,5 @@
 using ProjectOrigin.Electricity.Extensions;
 using ProjectOrigin.Electricity.Models;
-using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 
 namespace ProjectOrigin.Electricity.Consumption;
 
@@ -12,8 +11,7 @@ public class ConsumptionCertificate : AbstractCertificate
 
     private V1.ConsumptionIssuedEvent _issued;
 
-    public ConsumptionCertificate(V1.ConsumptionIssuedEvent e, IHDAlgorithm keyAlgorithm)
-        : base(keyAlgorithm)
+    public ConsumptionCertificate(V1.ConsumptionIssuedEvent e)
     {
         _issued = e;
         AddAvailableSlice(e.QuantityCommitment.ToModel(), e.OwnerPublicKey);
@@ -21,6 +19,6 @@ public class ConsumptionCertificate : AbstractCertificate
 
     public void Apply(V1.AllocatedEvent e)
     {
-        AllocateSlice(e.ConsumptionSourceSlice, e);
+        AllocateSlice(e.ConsumptionSourceSliceHash, e);
     }
 }

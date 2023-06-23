@@ -1,6 +1,5 @@
 using ProjectOrigin.Electricity.Extensions;
 using ProjectOrigin.Electricity.Interfaces;
-using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.Verifier.Utils;
 using ProjectOrigin.Registry.V1;
 using System.Threading.Tasks;
@@ -10,12 +9,10 @@ namespace ProjectOrigin.Electricity.Production.Verifiers;
 public class ProductionIssuedVerifier : IEventVerifier<V1.ProductionIssuedEvent>
 {
     private IGridAreaIssuerService _gridAreaIssuerService;
-    private IHDAlgorithm _keyAlgorithm;
 
-    public ProductionIssuedVerifier(IGridAreaIssuerService gridAreaIssuerService, IHDAlgorithm keyAlgorithm)
+    public ProductionIssuedVerifier(IGridAreaIssuerService gridAreaIssuerService)
     {
         _gridAreaIssuerService = gridAreaIssuerService;
-        _keyAlgorithm = keyAlgorithm;
     }
 
     public Task<VerificationResult> Verify(Transaction transaction, object? model, V1.ProductionIssuedEvent payload)
@@ -30,7 +27,7 @@ public class ProductionIssuedVerifier : IEventVerifier<V1.ProductionIssuedEvent>
             && !payload.QuantityCommitment.VerifyPublication(payload.QuantityPublication))
             return new VerificationResult.Invalid($"Private and public quantity proof does not match");
 
-        if (!_keyAlgorithm.TryImport(payload.OwnerPublicKey.Content.Span, out _))
+        if (!payload.OwnerPublicKey.TryToModel(out _))
             return new VerificationResult.Invalid("Invalid owner key, not a valid publicKey");
 
         var areaPublicKey = _gridAreaIssuerService.GetAreaPublicKey(payload.GridArea);

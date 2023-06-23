@@ -28,7 +28,7 @@ message ProductionIssuedEvent {
 
 message TransferredEvent{
     ProjectOrigin.Common.v1.FederatedStreamId certificate_id = 1;
-    SliceId source_slice = 2;
+    bytes source_slice_hash = 2;
     PublicKey new_owner = 3;
 }
 
@@ -39,7 +39,7 @@ message SlicedEvent{
     }
 
     ProjectOrigin.Common.v1.FederatedStreamId certificate_id = 1;
-    SliceId source_slice = 2;
+    bytes source_slice_hash = 2;
     repeated Slice new_slices = 3;
     bytes sum_proof = 4;
 }
@@ -48,8 +48,8 @@ message AllocatedEvent {
     ProjectOrigin.Common.v1.Uuid allocation_id = 1;
     ProjectOrigin.Common.v1.FederatedStreamId  production_certificate_id = 2;
     ProjectOrigin.Common.v1.FederatedStreamId  consumption_certificate_id = 3;
-    SliceId production_source_slice = 4;
-    SliceId consumption_source_slice = 5;
+    bytes production_source_slice_hash = 4;
+    bytes consumption_source_slice_hash = 5;
     bytes equality_proof = 6;
 }
 
@@ -75,8 +75,10 @@ message CommitmentPublication {
 
 message PublicKey {
     bytes content = 1;
+    KeyType type = 2;
 }
 
-message SliceId {
-    bytes hash = 1;
+enum KeyType {
+    Secp256k1 = 0;
+    ED25519 = 1;
 }

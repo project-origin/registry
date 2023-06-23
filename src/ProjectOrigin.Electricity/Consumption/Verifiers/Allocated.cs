@@ -22,7 +22,7 @@ public class ConsumptionAllocatedVerifier : IEventVerifier<ConsumptionCertificat
         if (consumptionCertificate is null)
             return new VerificationResult.Invalid("Certificate does not exist");
 
-        var consumptionSlice = consumptionCertificate.GetCertificateSlice(payload.ConsumptionSourceSlice);
+        var consumptionSlice = consumptionCertificate.GetCertificateSlice(payload.ConsumptionSourceSliceHash);
         if (consumptionSlice is null)
             return new VerificationResult.Invalid("Slice not found");
 

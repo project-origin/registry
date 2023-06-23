@@ -3,8 +3,7 @@ using System.Threading.Tasks;
 using AutoFixture;
 using Google.Protobuf;
 using ProjectOrigin.Electricity.Consumption.Verifiers;
-using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
-using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
+using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.PedersenCommitment;
 using Xunit;
 
@@ -12,19 +11,17 @@ namespace ProjectOrigin.Electricity.Tests;
 
 public class ConsumptionSlicedVerifierTests
 {
-    private IHDAlgorithm _algorithm;
     private ConsumptionSlicedVerifier _verifier;
 
     public ConsumptionSlicedVerifierTests()
     {
-        _algorithm = new Secp256k1Algorithm();
-        _verifier = new ConsumptionSlicedVerifier(_algorithm);
+        _verifier = new ConsumptionSlicedVerifier();
     }
 
     [Fact]
     public async Task ConsumptionSlicedEventVerifier_TransferCertificate_Valid()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (cert, sourceParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
 
         var @event = FakeRegister.CreateSliceEvent(cert.Id, sourceParams, 150, ownerKey.PublicKey);
@@ -38,7 +35,7 @@ public class ConsumptionSlicedVerifierTests
     [Fact]
     public async Task ConsumptionSlicedEventVerifier_NoCertificate_Invalid()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (cert, sourceParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
 
         var @event = FakeRegister.CreateSliceEvent(cert.Id, sourceParams, 150, ownerKey.PublicKey);
@@ -52,8 +49,8 @@ public class ConsumptionSlicedVerifierTests
     [Fact]
     public async Task ConsumptionSlicedEventVerifier_FakeSlice_SliceNotFound()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
-        var newOwnerKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
+        var newOwnerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (cert, sourceParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
 
         var fakeSliceParams = new SecretCommitmentInfo(250);
@@ -68,8 +65,8 @@ public class ConsumptionSlicedVerifierTests
     [Fact]
     public async Task ConsumptionSlicedEventVerifier_WrongKey_InvalidSignature()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
-        var otherKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
+        var otherKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (cert, sourceParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
 
         var @event = FakeRegister.CreateSliceEvent(cert.Id, sourceParams, 150, otherKey.PublicKey);
@@ -83,7 +80,7 @@ public class ConsumptionSlicedVerifierTests
     [Fact]
     public async Task ConsumptionSlicedEventVerifier_InvalidSlicePublicKey_InvalidFormat()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (cert, sourceParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
 
         var randomOwnerKeyData = new V1.PublicKey
@@ -102,7 +99,7 @@ public class ConsumptionSlicedVerifierTests
     [Fact]
     public async Task ConsumptionSlicedEventVerifier_InvalidSumProof_Invalid()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (cert, sourceParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
 
         var sumOverride = ByteString.CopyFrom(new Fixture().CreateMany<byte>(64).ToArray());

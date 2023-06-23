@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
@@ -9,6 +10,7 @@ namespace ProjectOrigin.VerifiableEventStore.Services.TransactionStatusCache;
 
 public class TransactionStatusService : ITransactionStatusService
 {
+    private static readonly TimeSpan CacheTime = TimeSpan.FromMinutes(60);
     private ILogger<TransactionStatusService> _logger;
     private IDistributedCache _cache;
     private IEventStore _eventStore;
@@ -37,6 +39,9 @@ public class TransactionStatusService : ITransactionStatusService
     public Task SetTransactionStatus(string transactionId, TransactionStatusRecord record)
     {
         _logger.LogInformation($"Setting transaction status for {transactionId} to {record.NewStatus}");
-        return _cache.SetStringAsync(transactionId, JsonSerializer.Serialize(record));
+        return _cache.SetStringAsync(transactionId, JsonSerializer.Serialize(record), new DistributedCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = CacheTime
+        });
     }
 }

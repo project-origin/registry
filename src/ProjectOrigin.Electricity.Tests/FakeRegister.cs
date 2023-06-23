@@ -21,7 +21,7 @@ internal static class FakeRegister
             new DateTimeOffset(2022, 09, 25, 12, 0, 0, TimeSpan.Zero),
             new DateTimeOffset(2022, 09, 25, 13, 0, 0, TimeSpan.Zero));
 
-    public static Registry.V1.Transaction SignTransaction(Common.V1.FederatedStreamId id, IMessage @event, IHDPrivateKey signerKey)
+    public static Registry.V1.Transaction SignTransaction(Common.V1.FederatedStreamId id, IMessage @event, IPrivateKey signerKey)
     {
         var header = new Registry.V1.TransactionHeader()
         {
@@ -34,10 +34,7 @@ internal static class FakeRegister
         var transaction = new Registry.V1.Transaction()
         {
             Header = header,
-            HeaderSignature = new Registry.V1.Signature
-            {
-                Value = ByteString.CopyFrom(signerKey.Sign(header.ToByteArray()))
-            },
+            HeaderSignature = ByteString.CopyFrom(signerKey.Sign(header.ToByteArray())),
             Payload = @event.ToByteString()
         };
 
@@ -57,7 +54,7 @@ internal static class FakeRegister
                 area,
                 periodOverride);
 
-        var cert = new ConsumptionCertificate(@event, algorithm);
+        var cert = new ConsumptionCertificate(@event);
 
         return (cert, quantityCommitmentParameters);
     }
@@ -76,7 +73,7 @@ internal static class FakeRegister
                 area,
                 periodOverride);
 
-        var cert = new ProductionCertificate(@event, algorithm);
+        var cert = new ProductionCertificate(@event);
 
         return (cert, quantityCommitmentParameters);
     }
@@ -179,7 +176,7 @@ internal static class FakeRegister
         return new V1.TransferredEvent
         {
             CertificateId = certificate.Id,
-            SourceSlice = sourceSliceParameters.ToSliceId(),
+            SourceSliceHash = sourceSliceParameters.ToSliceId(),
             NewOwner = newOwner
         };
     }
@@ -199,7 +196,7 @@ internal static class FakeRegister
         var @event = new V1.SlicedEvent
         {
             CertificateId = id,
-            SourceSlice = sourceParams.ToSliceId(),
+            SourceSliceHash = sourceParams.ToSliceId(),
             SumProof = sumOverride ?? ByteString.CopyFrom(SecretCommitmentInfo.CreateEqualityProof(sourceParams, slice + remainder, id.StreamId.Value))
         };
 
@@ -231,8 +228,8 @@ internal static class FakeRegister
             AllocationId = allocationId.ToProto(),
             ProductionCertificateId = productionId,
             ConsumptionCertificateId = consumptionId,
-            ProductionSourceSlice = productionSlice.ToSliceId(),
-            ConsumptionSourceSlice = consumptionSlice.ToSliceId(),
+            ProductionSourceSliceHash = productionSlice.ToSliceId(),
+            ConsumptionSourceSliceHash = consumptionSlice.ToSliceId(),
             EqualityProof = ByteString.CopyFrom(overwrideEqualityProof ?? SecretCommitmentInfo.CreateEqualityProof(productionSlice, consumptionSlice, allocationId.ToString()))
         };
     }

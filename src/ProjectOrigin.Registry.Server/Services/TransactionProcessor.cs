@@ -1,12 +1,12 @@
 using System;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Google.Protobuf;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ProjectOrigin.Registry.Server.Exceptions;
-using ProjectOrigin.Registry.Server.Extensions;
 using ProjectOrigin.Registry.Server.Interfaces;
 using ProjectOrigin.Registry.Server.Models;
 using ProjectOrigin.VerifiableEventStore.Models;
@@ -44,9 +44,11 @@ public class TransactionProcessor : IJobConsumer<TransactionJob>
 
     private async Task ProcessTransaction(V1.Transaction transaction)
     {
+        var transactionHash = Convert.ToBase64String(SHA256.HashData(transaction.ToByteArray()));
+
         try
         {
-            _logger.LogInformation($"Processing transaction {transaction.GetTransactionId()}");
+            _logger.LogInformation($"Processing transaction {transactionHash}");
 
             if (transaction.Header.FederatedStreamId.Registry != _options.RegistryName)
                 throw new InvalidTransactionException("Invalid registry for transaction");
@@ -62,24 +64,24 @@ public class TransactionProcessor : IJobConsumer<TransactionJob>
 
             var nextEventIndex = stream.Count();
             var eventId = new VerifiableEventStore.Models.EventId(streamId, nextEventIndex);
-            var verifiableEvent = new VerifiableEvent(eventId, transaction.GetTransactionId(), transaction.ToByteArray());
+            var verifiableEvent = new VerifiableEvent(eventId, transactionHash, transaction.ToByteArray());
             await _eventStore.Store(verifiableEvent);
 
-            _logger.LogInformation($"Completed transaction {transaction.GetTransactionId()}");
+            _logger.LogInformation($"Completed transaction {transactionHash}");
         }
         catch (InvalidTransactionException ex)
         {
-            _logger.LogWarning(ex, $"Invalid transaction {transaction.GetTransactionId()} - {ex.Message}");
+            _logger.LogWarning(ex, $"Invalid transaction {transactionHash} - {ex.Message}");
 
             await _transactionStatusService.SetTransactionStatus(
-                transaction.GetTransactionId(),
+                transactionHash,
                 new TransactionStatusRecord(
                 TransactionStatus.Failed,
                 ex.Message));
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Unknown exction for transaction {transaction.GetTransactionId()} -  {ex.Message}");
+            _logger.LogError(ex, $"Unknown exction for transaction {transactionHash} -  {ex.Message}");
             throw;
         }
     }

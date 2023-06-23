@@ -1,6 +1,5 @@
 using ProjectOrigin.Electricity.Extensions;
 using ProjectOrigin.Electricity.Models;
-using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 
 namespace ProjectOrigin.Electricity.Production;
 
@@ -12,8 +11,7 @@ public class ProductionCertificate : AbstractCertificate
 
     private V1.ProductionIssuedEvent _issued;
 
-    internal ProductionCertificate(V1.ProductionIssuedEvent e, IHDAlgorithm keyAlgorithm)
-        : base(keyAlgorithm)
+    internal ProductionCertificate(V1.ProductionIssuedEvent e)
     {
         _issued = e;
         AddAvailableSlice(e.QuantityCommitment.ToModel(), e.OwnerPublicKey);
@@ -21,12 +19,12 @@ public class ProductionCertificate : AbstractCertificate
 
     public void Apply(V1.TransferredEvent e)
     {
-        var oldSlice = TakeAvailableSlice(e.SourceSlice);
+        var oldSlice = TakeAvailableSlice(e.SourceSliceHash);
         AddAvailableSlice(oldSlice.Commitment, e.NewOwner);
     }
 
     public void Apply(V1.AllocatedEvent e)
     {
-        AllocateSlice(e.ProductionSourceSlice, e);
+        AllocateSlice(e.ProductionSourceSliceHash, e);
     }
 }

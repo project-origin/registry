@@ -1,8 +1,7 @@
 using System.Threading.Tasks;
 using AutoFixture;
 using ProjectOrigin.Electricity.Production.Verifiers;
-using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
-using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
+using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.PedersenCommitment;
 using Xunit;
 
@@ -10,20 +9,18 @@ namespace ProjectOrigin.Electricity.Tests;
 
 public class ProductionTransferredVerifierTests
 {
-    private IHDAlgorithm _algorithm;
     private ProductionTransferredVerifier _verifier;
 
     public ProductionTransferredVerifierTests()
     {
-        _algorithm = new Secp256k1Algorithm();
-        _verifier = new ProductionTransferredVerifier(_algorithm);
+        _verifier = new ProductionTransferredVerifier();
     }
 
     [Fact]
     public async Task ProductionTransferredVerifierTests_TransferCertificate_Valid()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
-        var newOwnerKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
+        var newOwnerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (cert, sourceParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
 
         var @event = FakeRegister.CreateTransferEvent(cert, sourceParams, newOwnerKey.PublicKey.ToProto());
@@ -37,8 +34,8 @@ public class ProductionTransferredVerifierTests
     [Fact]
     public async Task ProductionTransferredVerifierTests_NullCertificate_Invalid()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
-        var newOwnerKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
+        var newOwnerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (cert, sourceParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
 
         var @event = FakeRegister.CreateTransferEvent(cert, sourceParams, newOwnerKey.PublicKey.ToProto());
@@ -52,8 +49,8 @@ public class ProductionTransferredVerifierTests
     [Fact]
     public async Task ProductionTransferredVerifierTests_InvalidPublicKey_InvalidFormat()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
-        var newOwnerKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
+        var newOwnerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (cert, sourceParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
 
         var randomOwnerKeyData = new V1.PublicKey
@@ -72,8 +69,8 @@ public class ProductionTransferredVerifierTests
     [Fact]
     public async Task ProductionTransferredVerifierTests_FakeSlice_SliceNotFound()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
-        var newOwnerKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
+        var newOwnerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (cert, sourceParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
 
         var fakeSliceParams = new SecretCommitmentInfo(250);
@@ -88,8 +85,8 @@ public class ProductionTransferredVerifierTests
     [Fact]
     public async Task ProductionTransferredVerifierTests_WrongKey_InvalidSignature()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
-        var newOwnerKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
+        var newOwnerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (cert, sourceParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
 
         var @event = FakeRegister.CreateTransferEvent(cert, sourceParams, newOwnerKey.PublicKey.ToProto());

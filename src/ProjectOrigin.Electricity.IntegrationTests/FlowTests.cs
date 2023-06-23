@@ -17,26 +17,25 @@ using System.Security.Cryptography;
 using ProjectOrigin.PedersenCommitment;
 using Xunit;
 using ProjectOrigin.TestUtils;
-using SimpleBase;
+using System.Text;
+using ProjectOrigin.HierarchicalDeterministicKeys;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
 public class FlowTests : GrpcTestBase<Startup>
 {
-    IHDAlgorithm _algorithm;
-    private IHDPrivateKey _issuerKey;
+    private IPrivateKey _issuerKey;
 
     const string Area = "TestArea";
     const string Registry = "test-registry";
 
     public FlowTests(GrpcTestFixture<Startup> grpcFixture, ITestOutputHelper outputHelper) : base(grpcFixture, outputHelper)
     {
-        _algorithm = new Secp256k1Algorithm();
-        _issuerKey = _algorithm.GenerateNewPrivateKey();
+        _issuerKey = Algorithms.Ed25519.GenerateNewPrivateKey();
 
         grpcFixture.ConfigureHostConfiguration(new Dictionary<string, string?>()
         {
-            {$"Issuers:{Area}", Base58.Bitcoin.Encode(_issuerKey.PublicKey.Export())},
+            {$"Issuers:{Area}", Convert.ToBase64String(Encoding.UTF8.GetBytes(_issuerKey.PublicKey.ExportPkixText()))},
             {$"Registries:{Registry}:Address", "http://localhost:80"}
         });
 
@@ -50,7 +49,7 @@ public class FlowTests : GrpcTestBase<Startup>
     [Fact]
     public async Task IssueConsumptionCertificate_Success()
     {
-        var owner = _algorithm.GenerateNewPrivateKey();
+        var owner = Algorithms.Secp256k1.GenerateNewPrivateKey();
 
         var commitmentInfo = new SecretCommitmentInfo(250);
         var certId = Guid.NewGuid().ToString();
@@ -89,7 +88,7 @@ public class FlowTests : GrpcTestBase<Startup>
         result.Valid.Should().BeTrue();
     }
 
-    private async Task<VerifyTransactionResponse> SignEventAndVerify(Common.V1.FederatedStreamId streamId, IMessage @event, IHDPrivateKey key, IEnumerable<Registry.V1.Transaction>? stream = null)
+    private async Task<VerifyTransactionResponse> SignEventAndVerify(Common.V1.FederatedStreamId streamId, IMessage @event, IPrivateKey key, IEnumerable<Registry.V1.Transaction>? stream = null)
     {
         var client = new Verifier.V1.VerifierService.VerifierServiceClient(_grpcFixture.Channel);
         var request = new Verifier.V1.VerifyTransactionRequest
@@ -104,7 +103,7 @@ public class FlowTests : GrpcTestBase<Startup>
         return result;
     }
 
-    private Registry.V1.Transaction SignEvent(Common.V1.FederatedStreamId streamId, IMessage @event, IHDPrivateKey signerKey)
+    private Registry.V1.Transaction SignEvent(Common.V1.FederatedStreamId streamId, IMessage @event, IPrivateKey signerKey)
     {
         var header = new Registry.V1.TransactionHeader()
         {
@@ -117,10 +116,7 @@ public class FlowTests : GrpcTestBase<Startup>
         var transaction = new Registry.V1.Transaction()
         {
             Header = header,
-            HeaderSignature = new Registry.V1.Signature
-            {
-                Value = ByteString.CopyFrom(signerKey.Sign(header.ToByteArray()))
-            },
+            HeaderSignature = ByteString.CopyFrom(signerKey.Sign(header.ToByteArray())),
             Payload = @event.ToByteString()
         };
 

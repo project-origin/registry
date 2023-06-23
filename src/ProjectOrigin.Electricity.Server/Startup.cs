@@ -52,7 +52,7 @@ public class Startup
             {
                 configuration.Bind(settings);
             })
-            .Validate((option => option.Verify(algorithm)))
+            .Validate((option => option.Verify()))
             .ValidateOnStart();
 
         services.AddOptions<RegistryOptions>()

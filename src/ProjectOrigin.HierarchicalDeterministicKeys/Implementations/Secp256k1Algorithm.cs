@@ -32,6 +32,11 @@ public class Secp256k1Algorithm : IHDAlgorithm
         return new uint256(NBitcoin.Crypto.Hashes.SHA256(data));
     }
 
+    public IPrivateKey New()
+    {
+        throw new NotImplementedException();
+    }
+
     internal class Secp256k1HDPrivateKey : IHDPrivateKey
     {
         private readonly ExtKey _key;
@@ -43,7 +48,6 @@ public class Secp256k1Algorithm : IHDAlgorithm
             var a = Network.Main.CreateBitcoinExtKey(key);
 
             a.ToString();
-
         }
 
         public ReadOnlySpan<byte> Sign(ReadOnlySpan<byte> data)
@@ -58,6 +62,13 @@ public class Secp256k1Algorithm : IHDAlgorithm
         public IHDPrivateKey Derive(int position) => new Secp256k1HDPrivateKey(_key.Derive((uint)position));
 
         public IHDPublicKey Neuter() => new Secp256k1HDPublicKey(_key.Neuter());
+
+        public string ExportPkixText()
+        {
+            return "-----BEGIN PRIVATE KEY-----\n" +
+                Convert.ToBase64String(_key.PrivateKey.ToBytes()) +
+                "\n-----END PRIVATE KEY-----";
+        }
     }
 
     internal class Secp256k1HDPublicKey : IHDPublicKey
@@ -116,6 +127,13 @@ public class Secp256k1Algorithm : IHDAlgorithm
         public override int GetHashCode()
         {
             return _pubKey.GetHashCode();
+        }
+
+        public string ExportPkixText()
+        {
+            return "-----BEGIN PUBLIC KEY-----\n" +
+                Convert.ToBase64String(_pubKey.ToBytes()) +
+                "\n-----END PUBLIC KEY-----";
         }
     }
 }

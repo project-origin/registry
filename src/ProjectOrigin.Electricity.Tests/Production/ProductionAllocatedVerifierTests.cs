@@ -6,8 +6,7 @@ using Moq;
 using ProjectOrigin.Electricity.Consumption;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Production.Verifiers;
-using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
-using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
+using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.Verifier.Utils.Interfaces;
 using Xunit;
 
@@ -15,14 +14,11 @@ namespace ProjectOrigin.Electricity.Tests;
 
 public class ProductionAllocatedVerifierTests
 {
-    private IHDAlgorithm _algorithm;
     private ProductionAllocatedVerifier _verifier;
     private ConsumptionCertificate? _otherCertificate;
 
     public ProductionAllocatedVerifierTests()
     {
-        _algorithm = new Secp256k1Algorithm();
-
         var modelLoaderMock = new Mock<IRemoteModelLoader>();
         modelLoaderMock.Setup(obj => obj.GetModel<ConsumptionCertificate>(It.IsAny<Common.V1.FederatedStreamId>()))
             .Returns(() => Task.FromResult(_otherCertificate));
@@ -33,7 +29,7 @@ public class ProductionAllocatedVerifierTests
     [Fact]
     public async Task Verifier_AllocateCertificate_Valid()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
         _otherCertificate = consCert;
@@ -49,7 +45,7 @@ public class ProductionAllocatedVerifierTests
     [Fact]
     public async Task Verifier_AllocateCertificate_ProdCertNotFould()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
         _otherCertificate = consCert;
@@ -65,7 +61,7 @@ public class ProductionAllocatedVerifierTests
     [Fact]
     public async Task Verifier_InvalidProductionSlice_SliceNotFound()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
         _otherCertificate = consCert;
@@ -81,8 +77,8 @@ public class ProductionAllocatedVerifierTests
     [Fact]
     public async Task Verifier_WrongKey_InvalidSignature()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
-        var otherKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
+        var otherKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
         _otherCertificate = consCert;
@@ -98,7 +94,7 @@ public class ProductionAllocatedVerifierTests
     [Fact]
     public async Task Verifier_AllocateCertificate_ConsCertNotFould()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
         _otherCertificate = null;
@@ -114,7 +110,7 @@ public class ProductionAllocatedVerifierTests
     [Fact]
     public async Task Verifier_AllocateCertificate_InvalidPeriod()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var hourLater = new DateInterval(consCert.Period.Start, consCert.Period.End.AddHours(1));
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250, periodOverride: hourLater);
@@ -131,7 +127,7 @@ public class ProductionAllocatedVerifierTests
     [Fact]
     public async Task Verifier_AllocateCertificate_InvalidArea()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250, area: "DK1");
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250, area: "DK2");
         _otherCertificate = consCert;
@@ -147,7 +143,7 @@ public class ProductionAllocatedVerifierTests
     [Fact]
     public async Task Verifier_WrongConsumptionSlice_SliceNotFound()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
         _otherCertificate = consCert;
@@ -163,7 +159,7 @@ public class ProductionAllocatedVerifierTests
     [Fact]
     public async Task Verifier_RandomProofData_InvalidEqualityProof()
     {
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
         _otherCertificate = consCert;

@@ -3,7 +3,7 @@ name: project-origin-stack
 description: A helm chart for deploying the Project Origin stack, includes the registry, verifiers and concordium node.
 type: application
 version: 0.2.0
-appVersion: "0.2.0-rc.12"
+appVersion: "0.2.0-rc.13"
 
 annotations:
   artifacthub.io/containsSecurityUpdates: "false"

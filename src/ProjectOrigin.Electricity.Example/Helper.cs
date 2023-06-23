@@ -2,10 +2,8 @@ using System.Security.Cryptography;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using ProjectOrigin.Common.V1;
-using ProjectOrigin.Electricity.V1;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.PedersenCommitment;
-using SimpleBase;
 
 namespace ProjectOrigin.Electricity.Example;
 
@@ -83,7 +81,7 @@ public class Helper
         var @event = new Electricity.V1.SlicedEvent
         {
             CertificateId = certId,
-            SourceSlice = ToSliceId(sourceSlice.Commitment),
+            SourceSliceHash = ToSliceId(sourceSlice.Commitment),
             SumProof = ByteString.CopyFrom(equalityProof)
         };
 
@@ -111,8 +109,8 @@ public class Helper
             AllocationId = new Common.V1.Uuid { Value = allocationId.ToString() },
             ProductionCertificateId = prodCertId,
             ConsumptionCertificateId = consCertId,
-            ProductionSourceSlice = ToSliceId(prodComtInfo.Commitment),
-            ConsumptionSourceSlice = ToSliceId(consComtInfo.Commitment),
+            ProductionSourceSliceHash = ToSliceId(prodComtInfo.Commitment),
+            ConsumptionSourceSliceHash = ToSliceId(consComtInfo.Commitment),
             EqualityProof = ByteString.CopyFrom(equalityProof)
         };
     }
@@ -126,12 +124,9 @@ public class Helper
         };
     }
 
-    private SliceId ToSliceId(PedersenCommitment.Commitment commitment)
+    private ByteString ToSliceId(PedersenCommitment.Commitment commitment)
     {
-        return new V1.SliceId
-        {
-            Hash = ByteString.CopyFrom(SHA256.HashData(commitment.C)),
-        };
+        return ByteString.CopyFrom(SHA256.HashData(commitment.C));
     }
 
     public FederatedStreamId ToCertId(string registry, Guid certId)
@@ -146,7 +141,7 @@ public class Helper
         };
     }
 
-    public Registry.V1.Transaction SignTransaction(Common.V1.FederatedStreamId streamId, IMessage @event, IHDPrivateKey signerKey)
+    public Registry.V1.Transaction SignTransaction(Common.V1.FederatedStreamId streamId, IMessage @event, IPrivateKey signerKey)
     {
         var header = new Registry.V1.TransactionHeader()
         {
@@ -159,10 +154,7 @@ public class Helper
         var transaction = new Registry.V1.Transaction()
         {
             Header = header,
-            HeaderSignature = new Registry.V1.Signature
-            {
-                Value = ByteString.CopyFrom(signerKey.Sign(header.ToByteArray()))
-            },
+            HeaderSignature = ByteString.CopyFrom(signerKey.Sign(header.ToByteArray())),
             Payload = @event.ToByteString()
         };
 
@@ -197,15 +189,9 @@ public class Helper
 
     public Registry.V1.GetTransactionStatusRequest CreateStatusRequest(Registry.V1.Transaction signedTransaction)
     {
-        var sha = SHA256.HashData(signedTransaction.ToByteArray());
-        var transactionId = Base58.Bitcoin.Encode(sha);
-
         return new ProjectOrigin.Registry.V1.GetTransactionStatusRequest()
         {
-            Id = new Registry.V1.TransactionId
-            {
-                Value = transactionId
-            }
+            Id = Convert.ToBase64String(SHA256.HashData(signedTransaction.ToByteArray()))
         };
     }
 

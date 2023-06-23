@@ -2,11 +2,12 @@ using Grpc.Core;
 using MassTransit;
 using ProjectOrigin.Registry.V1;
 using ProjectOrigin.VerifiableEventStore.Services.EventStore;
-using ProjectOrigin.Registry.Server.Extensions;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
 using ProjectOrigin.VerifiableEventStore.Services.TransactionStatusCache;
+using System.Security.Cryptography;
+using Google.Protobuf;
 
 namespace ProjectOrigin.Registry.Server;
 
@@ -30,8 +31,9 @@ public class RegistryService : V1.RegistryService.RegistryServiceBase
 
         request.Transactions.AsParallel().ForAll(async transaction =>
         {
+            var transactionHash = Convert.ToBase64String(SHA256.HashData(transaction.ToByteArray()));
             await _transactionStatusService.SetTransactionStatus(
-                transaction.GetTransactionId(),
+                transactionHash,
                 new VerifiableEventStore.Models.TransactionStatusRecord(VerifiableEventStore.Models.TransactionStatus.Pending)
                 );
         });
@@ -41,7 +43,7 @@ public class RegistryService : V1.RegistryService.RegistryServiceBase
 
     public override async Task<GetTransactionStatusResponse> GetTransactionStatus(GetTransactionStatusRequest request, ServerCallContext context)
     {
-        var state = await _transactionStatusService.GetTransactionStatus(request.Id.Value);
+        var state = await _transactionStatusService.GetTransactionStatus(request.Id);
         return new GetTransactionStatusResponse
         {
             Status = (V1.TransactionState)state.NewStatus,

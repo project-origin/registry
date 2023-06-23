@@ -1,6 +1,5 @@
 using ProjectOrigin.Electricity.Extensions;
 using ProjectOrigin.Electricity.Interfaces;
-using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.Verifier.Utils;
 using ProjectOrigin.Registry.V1;
 using System.Threading.Tasks;
@@ -10,12 +9,10 @@ namespace ProjectOrigin.Electricity.Consumption.Verifiers;
 public class ConsumptionIssuedVerifier : IEventVerifier<V1.ConsumptionIssuedEvent>
 {
     private IGridAreaIssuerService _gridAreaIssuerService;
-    private IHDAlgorithm _keyAlgorithm;
 
-    public ConsumptionIssuedVerifier(IGridAreaIssuerService gridAreaIssuerService, IHDAlgorithm keyAlgorithm)
+    public ConsumptionIssuedVerifier(IGridAreaIssuerService gridAreaIssuerService)
     {
         _gridAreaIssuerService = gridAreaIssuerService;
-        _keyAlgorithm = keyAlgorithm;
     }
 
     public Task<VerificationResult> Verify(Transaction transaction, object? model, V1.ConsumptionIssuedEvent tEvent)
@@ -26,7 +23,7 @@ public class ConsumptionIssuedVerifier : IEventVerifier<V1.ConsumptionIssuedEven
         if (!tEvent.QuantityCommitment.VerifyCommitment(tEvent.CertificateId.StreamId.Value))
             return new VerificationResult.Invalid("Invalid range proof for Quantity commitment");
 
-        if (!_keyAlgorithm.TryImport(tEvent.OwnerPublicKey.Content.Span, out _))
+        if (!tEvent.OwnerPublicKey.TryToModel(out _))
             return new VerificationResult.Invalid("Invalid owner key, not a valid publicKey");
 
         var publicKey = _gridAreaIssuerService.GetAreaPublicKey(tEvent.GridArea);

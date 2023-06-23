@@ -1,4 +1,3 @@
-using Google.Protobuf;
 using ProjectOrigin.Electricity.Consumption;
 using ProjectOrigin.Electricity.Extensions;
 using ProjectOrigin.PedersenCommitment;
@@ -23,7 +22,7 @@ public class ProductionAllocatedVerifier : IEventVerifier<ProductionCertificate,
         if (productionCertificate is null)
             return new VerificationResult.Invalid("Certificate does not exist");
 
-        var productionSlice = productionCertificate.GetCertificateSlice(payload.ProductionSourceSlice);
+        var productionSlice = productionCertificate.GetCertificateSlice(payload.ProductionSourceSliceHash);
         if (productionSlice is null)
             return new VerificationResult.Invalid("Production slice does not exist");
 
@@ -40,7 +39,7 @@ public class ProductionAllocatedVerifier : IEventVerifier<ProductionCertificate,
         if (consumptionCertificate.GridArea != productionCertificate.GridArea)
             return new VerificationResult.Invalid("Certificates are not in the same area");
 
-        var consumptionSlice = consumptionCertificate.GetCertificateSlice(payload.ConsumptionSourceSlice);
+        var consumptionSlice = consumptionCertificate.GetCertificateSlice(payload.ConsumptionSourceSliceHash);
         if (consumptionSlice is null)
             return new VerificationResult.Invalid("Consumption slice does not exist");
 

@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using Microsoft.Extensions.Options;
-using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
-using SimpleBase;
+using ProjectOrigin.HierarchicalDeterministicKeys;
 
 namespace ProjectOrigin.Electricity.Models;
 
@@ -10,7 +10,7 @@ public class IssuerOptions
 {
     public Dictionary<string, string> Issuers { get; set; } = new Dictionary<string, string>();
 
-    public bool Verify(IHDAlgorithm algorithm)
+    public bool Verify()
     {
         if (Issuers.Count == 0)
             throw new OptionsValidationException(nameof(IssuerOptions), typeof(IssuerOptions), new string[] { "No Issuer areas configured." });
@@ -19,7 +19,8 @@ public class IssuerOptions
         {
             try
             {
-                algorithm.ImportPublicKey(Base58.Bitcoin.Decode(pair.Value));
+                var keyText = Encoding.UTF8.GetString(Convert.FromBase64String(pair.Value));
+                Algorithms.Ed25519.ImportPublicKeyText(keyText);
             }
             catch (Exception)
             {

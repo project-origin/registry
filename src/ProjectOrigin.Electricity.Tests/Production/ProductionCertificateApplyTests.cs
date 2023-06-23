@@ -5,8 +5,7 @@ using Google.Protobuf;
 using ProjectOrigin.Electricity.Extensions;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.Electricity.Production;
-using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
-using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
+using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.PedersenCommitment;
 using Xunit;
 
@@ -15,7 +14,6 @@ namespace ProjectOrigin.Electricity.Tests;
 public class ProductionCertificateApplyTests
 {
     private Fixture _fix = new Fixture();
-    private IHDAlgorithm _algorithm = new Secp256k1Algorithm();
 
     private Common.V1.FederatedStreamId CreateId()
     {
@@ -40,7 +38,7 @@ public class ProductionCertificateApplyTests
             new DateTimeOffset(2022, 09, 25, 13, 0, 0, TimeSpan.Zero));
         var gsrnHash = SHA256.HashData(BitConverter.GetBytes(new Fixture().Create<ulong>()));
         var quantity = new SecretCommitmentInfo(_fix.Create<uint>());
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var certId = CreateId();
 
         var @event = new V1.ProductionIssuedEvent()
@@ -53,7 +51,7 @@ public class ProductionCertificateApplyTests
             OwnerPublicKey = ownerKey.PublicKey.ToProto(),
         };
 
-        var cert = new ProductionCertificate(@event, _algorithm);
+        var cert = new ProductionCertificate(@event);
 
         return (cert, quantity);
     }
@@ -70,7 +68,7 @@ public class ProductionCertificateApplyTests
             new DateTimeOffset(2022, 09, 25, 13, 0, 0, TimeSpan.Zero));
         var gsrnHash = SHA256.HashData(BitConverter.GetBytes(new Fixture().Create<ulong>()));
         var quantity = new SecretCommitmentInfo(_fix.Create<uint>());
-        var ownerKey = _algorithm.GenerateNewPrivateKey();
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
 
 
         var @event = new V1.ProductionIssuedEvent()
@@ -90,7 +88,7 @@ public class ProductionCertificateApplyTests
             OwnerPublicKey = ownerKey.PublicKey.ToProto(),
         };
 
-        var cert = new ProductionCertificate(@event, _algorithm);
+        var cert = new ProductionCertificate(@event);
 
         Assert.Equal(registry, cert.Id.Registry);
         Assert.Equal(streamId, cert.Id.StreamId.ToModel());
@@ -108,11 +106,11 @@ public class ProductionCertificateApplyTests
         var @event = new V1.SlicedEvent()
         {
             CertificateId = cert.Id,
-            SourceSlice = slice0.ToSliceId(),
+            SourceSliceHash = slice0.ToSliceId(),
         };
 
         var slice1 = new SecretCommitmentInfo(_fix.Create<uint>());
-        var owner1 = _algorithm.GenerateNewPrivateKey();
+        var owner1 = Algorithms.Secp256k1.GenerateNewPrivateKey();
         @event.NewSlices.Add(new V1.SlicedEvent.Types.Slice
         {
             Quantity = slice1.ToProtoCommitment(cert.Id.StreamId.Value),
@@ -120,7 +118,7 @@ public class ProductionCertificateApplyTests
         });
 
         var slice2 = new SecretCommitmentInfo(_fix.Create<uint>());
-        var owner2 = _algorithm.GenerateNewPrivateKey();
+        var owner2 = Algorithms.Secp256k1.GenerateNewPrivateKey();
         @event.NewSlices.Add(new V1.SlicedEvent.Types.Slice
         {
             Quantity = slice2.ToProtoCommitment(cert.Id.StreamId.Value),
@@ -140,23 +138,23 @@ public class ProductionCertificateApplyTests
         var allocationId = Guid.NewGuid().ToProto();
         var (cert, slice0) = Create();
 
-        var newOwner = _algorithm.GenerateNewPrivateKey();
+        var newOwner = Algorithms.Secp256k1.GenerateNewPrivateKey();
 
         var @event = new V1.TransferredEvent()
         {
             CertificateId = cert.Id,
-            SourceSlice = slice0.ToSliceId(),
+            SourceSliceHash = slice0.ToSliceId(),
             NewOwner = newOwner.PublicKey.ToProto()
         };
 
         var slice = cert.GetCertificateSlice(slice0.ToSliceId());
         Assert.NotNull(slice);
-        Assert.NotEqual(newOwner.PublicKey, slice!.Owner);
+        Assert.NotEqual(newOwner.PublicKey.ToProto(), slice!.Owner);
 
         cert.Apply(@event);
         slice = cert.GetCertificateSlice(slice0.ToSliceId());
         Assert.NotNull(slice);
-        Assert.Equal(newOwner.PublicKey, slice!.Owner);
+        Assert.Equal(newOwner.PublicKey.ToProto(), slice!.Owner);
     }
 
     [Fact]
@@ -172,8 +170,8 @@ public class ProductionCertificateApplyTests
             AllocationId = allocationId,
             ProductionCertificateId = cert.Id,
             ConsumptionCertificateId = consumptionId,
-            ProductionSourceSlice = prodQuantity.ToSliceId(),
-            ConsumptionSourceSlice = consQuantity.ToSliceId(),
+            ProductionSourceSliceHash = prodQuantity.ToSliceId(),
+            ConsumptionSourceSliceHash = consQuantity.ToSliceId(),
             EqualityProof = ByteString.CopyFrom(SecretCommitmentInfo.CreateEqualityProof(consQuantity, prodQuantity, allocationId.Value))
         };
 
@@ -198,8 +196,8 @@ public class ProductionCertificateApplyTests
             AllocationId = allocationId,
             ProductionCertificateId = cert.Id,
             ConsumptionCertificateId = consumptionId,
-            ProductionSourceSlice = prodQuantity.ToSliceId(),
-            ConsumptionSourceSlice = consQuantity.ToSliceId(),
+            ProductionSourceSliceHash = prodQuantity.ToSliceId(),
+            ConsumptionSourceSliceHash = consQuantity.ToSliceId(),
             EqualityProof = ByteString.CopyFrom(SecretCommitmentInfo.CreateEqualityProof(consQuantity, prodQuantity, allocationId.Value))
         };
         cert.Apply(allocationEvent);

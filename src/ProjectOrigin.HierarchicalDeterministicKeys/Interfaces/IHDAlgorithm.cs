@@ -1,4 +1,5 @@
 using System;
+using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
 
 namespace ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 
@@ -9,33 +10,33 @@ namespace ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 /// This interface is used to abstract the HD algorithm from the rest of the application.
 /// This allows for easy swapping of the HD algorithm in the future.
 /// </remarks>
-public interface IHDAlgorithm
+public interface IHDAlgorithm : IPublicKeyAlgorithm
 {
+    private static Lazy<IHDAlgorithm> secp256k1 = new Lazy<IHDAlgorithm>(() => new Secp256k1Algorithm());
+
+    public static IHDAlgorithm Secp256k1 => secp256k1.Value;
+
     public IHDPrivateKey GenerateNewPrivateKey();
     public IHDPrivateKey ImportHDPrivateKey(ReadOnlySpan<byte> privateKeyBytes);
     public IHDPublicKey ImportHDPublicKey(ReadOnlySpan<byte> publicKeyBytes);
-    public IPublicKey ImportPublicKey(ReadOnlySpan<byte> privateKeyBytes);
 }
 
 /// <summary>
 /// This is a simple interface for a Hierarchical Deterministic (HD) private key.
 /// </summary>
-public interface IHDPrivateKey
+public interface IHDPrivateKey : IPrivateKey
 {
-    /// <summary>
-    /// Signs the given data with the private key.
-    /// </summary>
-    public ReadOnlySpan<byte> Sign(ReadOnlySpan<byte> data);
 
-    /// <summary>
-    /// The public key that corresponds to this private key.
-    /// </summary>
-    public IPublicKey PublicKey { get; }
 
     /// <summary>
     /// The HD public key that corresponds to this private key.
     /// </summary>
     public IHDPublicKey Neuter();
+
+    /// <summary>
+    /// Signs the given data with the private key.
+    /// </summary>
+    public ReadOnlySpan<byte> Sign(ReadOnlySpan<byte> data);
 
     /// <summary>
     /// Exports the private key as a byte array.
@@ -73,17 +74,4 @@ public interface IHDPublicKey
     /// can not be used to derive any more child keys.
     /// </summary>
     public IPublicKey GetPublicKey();
-}
-
-public interface IPublicKey
-{
-    /// <summary>
-    /// Export the public key as a span.
-    /// </summary>
-    ReadOnlySpan<byte> Export();
-
-    /// <summary>
-    /// Verify the given signature against the given data.
-    /// </summary>
-    bool Verify(ReadOnlySpan<byte> data, ReadOnlySpan<byte> signature);
 }
