@@ -1,25 +1,29 @@
 using System.Security.Cryptography;
 using Google.Protobuf;
-using NSec.Cryptography;
+using ProjectOrigin.Electricity.Extensions;
 using ProjectOrigin.Electricity.Consumption;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.PedersenCommitment;
+using Xunit;
+using System;
+using AutoFixture;
+using ProjectOrigin.HierarchicalDeterministicKeys;
 
 namespace ProjectOrigin.Electricity.Tests;
 
 public class ConsumptionCertificateApplyTests
 {
-    private Fixture _fix = new Fixture();
+    private Fixture _fixture = new Fixture();
 
-    private Register.V1.FederatedStreamId CreateId()
+    private Common.V1.FederatedStreamId CreateId()
     {
-        var registry = _fix.Create<string>();
+        var registry = _fixture.Create<string>();
         var streamId = Guid.NewGuid();
 
-        return new Register.V1.FederatedStreamId
+        return new Common.V1.FederatedStreamId
         {
             Registry = registry,
-            StreamId = new Register.V1.Uuid
+            StreamId = new Common.V1.Uuid
             {
                 Value = streamId.ToString()
             }
@@ -28,13 +32,13 @@ public class ConsumptionCertificateApplyTests
 
     private (ConsumptionCertificate, SecretCommitmentInfo) Create()
     {
-        var area = _fix.Create<string>();
+        var area = _fixture.Create<string>();
         var period = new DateInterval(
             new DateTimeOffset(2022, 09, 25, 12, 0, 0, TimeSpan.Zero),
             new DateTimeOffset(2022, 09, 25, 13, 0, 0, TimeSpan.Zero));
         var gsrnHash = SHA256.HashData(BitConverter.GetBytes(new Fixture().Create<ulong>()));
-        var quantity = new SecretCommitmentInfo(_fix.Create<uint>());
-        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
+        var quantity = new SecretCommitmentInfo(_fixture.Create<uint>());
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var certId = CreateId();
 
         var @event = new V1.ConsumptionIssuedEvent()
@@ -56,23 +60,23 @@ public class ConsumptionCertificateApplyTests
     public void ConsumptionCertificate_Create()
     {
 
-        var registry = _fix.Create<string>();
+        var registry = _fixture.Create<string>();
         var streamId = Guid.NewGuid();
-        var area = _fix.Create<string>();
+        var area = _fixture.Create<string>();
         var period = new DateInterval(
             new DateTimeOffset(2022, 09, 25, 12, 0, 0, TimeSpan.Zero),
             new DateTimeOffset(2022, 09, 25, 13, 0, 0, TimeSpan.Zero));
-        var gsrnHash = SHA256.HashData(BitConverter.GetBytes(new Fixture().Create<ulong>()));
-        var quantity = new SecretCommitmentInfo(_fix.Create<uint>());
-        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
+        var gsrnHash = SHA256.HashData(BitConverter.GetBytes(_fixture.Create<ulong>()));
+        var quantity = new SecretCommitmentInfo(_fixture.Create<uint>());
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
 
 
         var @event = new V1.ConsumptionIssuedEvent()
         {
-            CertificateId = new Register.V1.FederatedStreamId
+            CertificateId = new Common.V1.FederatedStreamId
             {
                 Registry = registry,
-                StreamId = new Register.V1.Uuid
+                StreamId = new Common.V1.Uuid
                 {
                     Value = streamId.ToString()
                 }
@@ -102,19 +106,19 @@ public class ConsumptionCertificateApplyTests
         var @event = new V1.SlicedEvent()
         {
             CertificateId = cert.Id,
-            SourceSlice = slice0.ToSliceId(),
+            SourceSliceHash = slice0.ToSliceId(),
         };
 
-        var slice1 = new SecretCommitmentInfo(_fix.Create<uint>());
-        var owner1 = Key.Create(SignatureAlgorithm.Ed25519);
+        var slice1 = new SecretCommitmentInfo(_fixture.Create<uint>());
+        var owner1 = Algorithms.Secp256k1.GenerateNewPrivateKey();
         @event.NewSlices.Add(new V1.SlicedEvent.Types.Slice
         {
             Quantity = slice1.ToProtoCommitment(cert.Id.StreamId.Value),
             NewOwner = owner1.PublicKey.ToProto()
         });
 
-        var slice2 = new SecretCommitmentInfo(_fix.Create<uint>());
-        var owner2 = Key.Create(SignatureAlgorithm.Ed25519);
+        var slice2 = new SecretCommitmentInfo(_fixture.Create<uint>());
+        var owner2 = Algorithms.Secp256k1.GenerateNewPrivateKey();
         @event.NewSlices.Add(new V1.SlicedEvent.Types.Slice
         {
             Quantity = slice2.ToProtoCommitment(cert.Id.StreamId.Value),
@@ -134,15 +138,15 @@ public class ConsumptionCertificateApplyTests
         var allocationId = Guid.NewGuid().ToProto();
         var productionId = CreateId();
         var (cert, consQuantity) = Create();
-        var prodQuantity = new SecretCommitmentInfo(_fix.Create<uint>());
+        var prodQuantity = new SecretCommitmentInfo(_fixture.Create<uint>());
 
         var @event = new V1.AllocatedEvent()
         {
             AllocationId = allocationId,
             ProductionCertificateId = productionId,
             ConsumptionCertificateId = cert.Id,
-            ProductionSourceSlice = prodQuantity.ToSliceId(),
-            ConsumptionSourceSlice = consQuantity.ToSliceId(),
+            ProductionSourceSliceHash = prodQuantity.ToSliceId(),
+            ConsumptionSourceSliceHash = consQuantity.ToSliceId(),
             EqualityProof = ByteString.CopyFrom(SecretCommitmentInfo.CreateEqualityProof(consQuantity, prodQuantity, allocationId.Value))
         };
 
@@ -160,15 +164,15 @@ public class ConsumptionCertificateApplyTests
         var allocationId = Guid.NewGuid().ToProto();
         var productionId = CreateId();
         var (cert, consQuantity) = Create();
-        var prodQuantity = new SecretCommitmentInfo(_fix.Create<uint>());
+        var prodQuantity = new SecretCommitmentInfo(_fixture.Create<uint>());
 
         var allocationEvent = new V1.AllocatedEvent()
         {
             AllocationId = allocationId,
             ProductionCertificateId = productionId,
             ConsumptionCertificateId = cert.Id,
-            ProductionSourceSlice = prodQuantity.ToSliceId(),
-            ConsumptionSourceSlice = consQuantity.ToSliceId(),
+            ProductionSourceSliceHash = prodQuantity.ToSliceId(),
+            ConsumptionSourceSliceHash = consQuantity.ToSliceId(),
             EqualityProof = ByteString.CopyFrom(SecretCommitmentInfo.CreateEqualityProof(consQuantity, prodQuantity, allocationId.Value))
         };
         cert.Apply(allocationEvent);

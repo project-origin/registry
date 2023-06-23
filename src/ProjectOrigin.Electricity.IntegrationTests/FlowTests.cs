@@ -1,309 +1,126 @@
-using AutoFixture;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
-using NSec.Cryptography;
-using ProjectOrigin.Electricity.Client;
-using ProjectOrigin.Electricity.Client.Models;
-using ProjectOrigin.Electricity.IntegrationTests.Helpers;
-using ProjectOrigin.Electricity.Models;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using ProjectOrigin.Electricity.Server;
-using ProjectOrigin.PedersenCommitment;
-using ProjectOrigin.VerifiableEventStore.Models;
-using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector;
+using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
+using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
+using ProjectOrigin.Verifier.Utils.Interfaces;
+using ProjectOrigin.Verifier.Utils.Services;
+using ProjectOrigin.Verifier.V1;
 using Xunit.Abstractions;
+using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
+using FluentAssertions;
+using System.Security.Cryptography;
+using ProjectOrigin.PedersenCommitment;
+using Xunit;
+using ProjectOrigin.TestUtils;
+using System.Text;
+using ProjectOrigin.HierarchicalDeterministicKeys;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
-public class FlowTests : RegisterClientTestBase
+public class FlowTests : GrpcTestBase<Startup>
 {
-    private static Key _dk1_issuer_key = Key.Create(SignatureAlgorithm.Ed25519);
-    private static Key _dk2_issuer_key = Key.Create(SignatureAlgorithm.Ed25519);
+    private IPrivateKey _issuerKey;
 
+    const string Area = "TestArea";
+    const string Registry = "test-registry";
 
-    private const string Area_DK1 = nameof(Area_DK1);
-    private const string Area_DK2 = nameof(Area_DK2);
-
-    public FlowTests(GrpcTestFixture<Startup> fixture, ITestOutputHelper outputHelper) : base(fixture, outputHelper)
+    public FlowTests(GrpcTestFixture<Startup> grpcFixture, ITestOutputHelper outputHelper) : base(grpcFixture, outputHelper)
     {
-        var blockchainMock = new Mock<IBlockchainConnector>();
-        blockchainMock.Setup(obj => obj.PublishBytes(It.IsAny<byte[]>())).Returns(Task.FromResult(new TransactionReference(new Fixture().Create<string>())));
-        blockchainMock.Setup(obj => obj.GetBlock(It.IsAny<TransactionReference>())).Returns(Task.FromResult<Block?>(new Block(new Fixture().Create<string>(), true)));
+        _issuerKey = Algorithms.Ed25519.GenerateNewPrivateKey();
 
-        fixture.ConfigureWebHost((webHostBuilder) =>
+        grpcFixture.ConfigureHostConfiguration(new Dictionary<string, string?>()
         {
-            webHostBuilder.ConfigureServices((services) =>
-            {
-                services.AddTransient<IBlockchainConnector>((s) => blockchainMock.Object);
-                services.Configure<IssuerOptions>(option =>
-                {
-                    option.Issuers = new Dictionary<string, string>(){
-                        {Area_DK1, Convert.ToBase64String(_dk1_issuer_key.PublicKey.Export(KeyBlobFormat.RawPublicKey))},
-                        {Area_DK2, Convert.ToBase64String(_dk2_issuer_key.PublicKey.Export(KeyBlobFormat.RawPublicKey))}
-                    };
-                });
-                services.Configure<ServerOptions>(option =>
-                {
-                    option.Registries = new Dictionary<string, RegistryOptions>(){
-                        {Registries.RegistryA, new RegistryOptions() {VerifiableEventStore = new VerifiableEventStoreOptions(){ BatchSizeExponent = 0 } }},
-                        {Registries.RegistryB, new RegistryOptions() {VerifiableEventStore = new VerifiableEventStoreOptions(){ BatchSizeExponent = 0 } }}
-                    };
-                });
-            });
+            {$"Issuers:{Area}", Convert.ToBase64String(Encoding.UTF8.GetBytes(_issuerKey.PublicKey.ExportPkixText()))},
+            {$"Registries:{Registry}:Address", "http://localhost:80"}
         });
+
+        grpcFixture.testServicesConfigure = (services) =>
+        {
+            services.RemoveAll<IRemoteModelLoader>();
+            services.AddTransient<IRemoteModelLoader, GrpcRemoteModelLoader>();
+        };
     }
 
     [Fact]
     public async Task IssueConsumptionCertificate_Success()
     {
-        var commandBuilder = new ElectricityCommandBuilder();
-        var gsrn = new Fixture().Create<ulong>();
-        var quantity = new ShieldedValue(250);
-        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
+        var owner = Algorithms.Secp256k1.GenerateNewPrivateKey();
 
-        var id = await commandBuilder
-            .IssueConsumptionCertificate(
-                new FederatedCertifcateId(
-                    Registries.RegistryA,
-                    Guid.NewGuid()
-                ),
-                new Client.Models.DateInterval(
-                    new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
-                    new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
-                ),
-                Area_DK1,
-                gsrn,
-                quantity,
-                ownerKey.PublicKey,
-                _dk1_issuer_key
-                )
-            .Execute(Client);
+        var commitmentInfo = new SecretCommitmentInfo(250);
+        var certId = Guid.NewGuid().ToString();
 
-        var res = await GetResult();
+        var @event = new Electricity.V1.ConsumptionIssuedEvent
+        {
+            CertificateId = new Common.V1.FederatedStreamId
+            {
+                Registry = Registry,
+                StreamId = new Common.V1.Uuid
+                {
+                    Value = certId
+                },
+            },
+            Period = new Electricity.V1.DateInterval
+            {
+                Start = Timestamp.FromDateTimeOffset(new DateTimeOffset(2023, 1, 1, 12, 0, 0, 0, TimeSpan.Zero)),
+                End = Timestamp.FromDateTimeOffset(new DateTimeOffset(2023, 1, 1, 13, 0, 0, 0, TimeSpan.Zero))
+            },
+            GridArea = Area,
+            GsrnHash = ByteString.Empty,
+            QuantityCommitment = new Electricity.V1.Commitment
+            {
+                Content = ByteString.CopyFrom(commitmentInfo.Commitment.C),
+                RangeProof = ByteString.CopyFrom(commitmentInfo.CreateRangeProof(certId))
+            },
+            OwnerPublicKey = new Electricity.V1.PublicKey
+            {
+                Content = ByteString.CopyFrom(owner.PublicKey.Export())
+            }
+        };
 
-        AssertValid(id, res);
+        VerifyTransactionResponse result = await SignEventAndVerify(@event.CertificateId, @event, _issuerKey);
+
+        result.ErrorMessage.Should().BeEmpty();
+        result.Valid.Should().BeTrue();
     }
 
-    [Fact]
-    public async Task IssueConsumptionCertificate_Invalid()
+    private async Task<VerifyTransactionResponse> SignEventAndVerify(Common.V1.FederatedStreamId streamId, IMessage @event, IPrivateKey key, IEnumerable<Registry.V1.Transaction>? stream = null)
     {
-        var commandBuilder = new ElectricityCommandBuilder();
-        var gsrn = new Fixture().Create<ulong>();
-        var quantity = new ShieldedValue(250);
-        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
+        var client = new Verifier.V1.VerifierService.VerifierServiceClient(_grpcFixture.Channel);
+        var request = new Verifier.V1.VerifyTransactionRequest
+        {
+            Transaction = SignEvent(streamId, @event, key)
+        };
 
-        var id = await commandBuilder
-            .IssueConsumptionCertificate(
-                new FederatedCertifcateId(
-                    Registries.RegistryA,
-                    Guid.NewGuid()
-                ),
-                new Client.Models.DateInterval(
-                    new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
-                    new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
-                ),
-                Area_DK1,
-                gsrn,
-                quantity,
-                ownerKey.PublicKey,
-                ownerKey
-                )
-            .Execute(Client);
+        if (stream is not null)
+            request.Stream.AddRange(stream);
 
-        var res = await GetResult();
-
-        AssertInvalid(id, res, "Invalid issuer signature for GridArea ”Area_DK1”");
+        var result = await client.VerifyTransactionAsync(request);
+        return result;
     }
 
-    [Fact]
-    public async Task IssueProductionCertificate_Success()
+    private Registry.V1.Transaction SignEvent(Common.V1.FederatedStreamId streamId, IMessage @event, IPrivateKey signerKey)
     {
-        var commandBuilder = new ElectricityCommandBuilder();
-        var gsrn = new Fixture().Create<ulong>();
-        var quantity = new ShieldedValue(250);
-        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
+        var header = new Registry.V1.TransactionHeader()
+        {
+            FederatedStreamId = streamId,
+            PayloadType = @event.Descriptor.FullName,
+            PayloadSha512 = ByteString.CopyFrom(SHA512.HashData(@event.ToByteArray())),
+            Nonce = Guid.NewGuid().ToString(),
+        };
 
-        var id = await commandBuilder
-            .IssueProductionCertificate(
-            new FederatedCertifcateId(
-                Registries.RegistryB,
-                Guid.NewGuid()
-            ),
-            new Client.Models.DateInterval(
-                new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
-                new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
-            ),
-            Area_DK2,
-            "F01050100",
-            "T020002",
-            gsrn,
-            quantity,
-            ownerKey.PublicKey,
-            _dk2_issuer_key
-            )
-            .Execute(Client);
+        var transaction = new Registry.V1.Transaction()
+        {
+            Header = header,
+            HeaderSignature = ByteString.CopyFrom(signerKey.Sign(header.ToByteArray())),
+            Payload = @event.ToByteString()
+        };
 
-        var res = await GetResult();
-
-        AssertValid(id, res);
-    }
-
-    [Fact]
-    public async Task SliceCertificate_Success()
-    {
-        var commandBuilder = new ElectricityCommandBuilder();
-        var gsrn = new Fixture().Create<ulong>();
-
-        var ownerKey1 = Key.Create(SignatureAlgorithm.Ed25519);
-        var ownerKey2 = Key.Create(SignatureAlgorithm.Ed25519);
-        var ownerKey3 = Key.Create(SignatureAlgorithm.Ed25519);
-
-        var slice_0 = new ShieldedValue(250);
-        var slice_1 = new ShieldedValue(150);
-        var slice_1_1 = new ShieldedValue(100);
-        var slice_1_2 = new ShieldedValue(50);
-
-        var slicer = new Slicer(slice_0);
-        slicer.CreateSlice(slice_1, ownerKey2.PublicKey);
-        var collection1 = slicer.Collect();
-        Assert.NotNull(collection1.Remainder);
-
-        var slicer2 = new Slicer(slice_1);
-        slicer2.CreateSlice(slice_1_1, ownerKey3.PublicKey);
-        slicer2.CreateSlice(slice_1_2, ownerKey1.PublicKey);
-        var collection2 = slicer2.Collect();
-        Assert.Null(collection2.Remainder);
-
-        var certId = new FederatedCertifcateId(
-            Registries.RegistryB,
-            Guid.NewGuid()
-        );
-
-        var id = await commandBuilder
-            .IssueProductionCertificate(
-                certId,
-                new Client.Models.DateInterval(
-                    new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
-                    new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
-                ),
-                Area_DK2,
-                "F01050100",
-                "T020002",
-                gsrn,
-                slice_0,
-                ownerKey1.PublicKey,
-                _dk2_issuer_key
-                )
-            .SliceCertificate(
-                certId,
-                collection1,
-                ownerKey1
-                )
-            .SliceCertificate(
-                certId,
-                collection2,
-                ownerKey2
-                )
-            .Execute(Client);
-
-        var res = await GetResult();
-        AssertValid(id, res);
-    }
-
-    [Fact]
-    public async Task ClaimCertificate_Success()
-    {
-        var commandBuilder = new ElectricityCommandBuilder();
-        var gsrn = new Fixture().Create<ulong>();
-        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
-
-        var consCertId = new FederatedCertifcateId(
-            Registries.RegistryB,
-            Guid.NewGuid()
-        );
-        var consQuantity = new ShieldedValue(150);
-
-        var prodCertId = new FederatedCertifcateId(
-            Registries.RegistryB,
-            Guid.NewGuid()
-        );
-        var prodQuantity = new ShieldedValue(250);
-        var prod_slice = new ShieldedValue(150);
-
-        var claimQuantity = new ShieldedValue(150);
-
-        var slicer = new Slicer(prodQuantity);
-        slicer.CreateSlice(prod_slice, ownerKey.PublicKey);
-        var collection1 = slicer.Collect();
-        Assert.NotNull(collection1.Remainder);
-
-        var id = await commandBuilder
-            .IssueProductionCertificate(
-                prodCertId,
-                new Client.Models.DateInterval(
-                    new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
-                    new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
-                ),
-                Area_DK1,
-                "F01050100",
-                "T020002",
-                gsrn,
-                prodQuantity,
-                ownerKey.PublicKey,
-                _dk1_issuer_key
-            )
-            .IssueConsumptionCertificate(
-                consCertId,
-                new Client.Models.DateInterval(
-                    new DateTimeOffset(2022, 10, 1, 12, 0, 0, TimeSpan.Zero),
-                    new DateTimeOffset(2022, 10, 1, 13, 0, 0, TimeSpan.Zero)
-                ),
-                Area_DK1,
-                gsrn,
-                consQuantity,
-                ownerKey.PublicKey,
-                _dk1_issuer_key
-                )
-            .SliceCertificate(
-                prodCertId,
-                collection1,
-                ownerKey
-                )
-            .ClaimCertificate(
-                claimQuantity,
-                consCertId,
-                consQuantity,
-                ownerKey,
-                prodCertId,
-                prod_slice,
-                ownerKey
-            )
-            .Execute(Client);
-
-        AssertValid(id, await GetResult());
-    }
-
-    private static void AssertValid(CommandId id, CommandStatusEvent? res)
-    {
-        Assert.NotNull(res);
-        Assert.Equal(id.Hash, res!.Id.Hash);
-        if (!string.IsNullOrEmpty(res.Error)) throw new Xunit.Sdk.XunitException(res.Error);
-        Assert.Equal(CommandState.Succeeded, res.State);
-    }
-
-    private static void AssertInvalid(CommandId id, CommandStatusEvent? res, string expectedError)
-    {
-        Assert.NotNull(res);
-        Assert.Equal(id.Hash, res!.Id.Hash);
-        if (string.IsNullOrEmpty(res.Error)) throw new Xunit.Sdk.XunitException($"Error field is empty, expected ”{expectedError}”");
-        Assert.Equal(expectedError, res.Error);
-        Assert.Equal(CommandState.Failed, res.State);
+        return transaction;
     }
 }
 
-public static class Extensions
-{
-    public static ShieldedValue ToShieldedValue(this SecretCommitmentInfo cm)
-    {
-        return new ShieldedValue(cm.Message, cm.BlindingValue);
-    }
-}

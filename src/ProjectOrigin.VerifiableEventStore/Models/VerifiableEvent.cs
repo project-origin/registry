@@ -1,3 +1,3 @@
 namespace ProjectOrigin.VerifiableEventStore.Models;
 
-public record VerifiableEvent(EventId Id, byte[] Content);
+public record VerifiableEvent(EventId Id, string TransactionId, byte[] Content);

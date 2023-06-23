@@ -1,0 +1,45 @@
+{{- range .Values.verifiers }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: registry-{{ $.Release.Name }}-verifier-{{ .name }}-deployment
+  labels:
+    app: registry-{{ $.Release.Name }}-verifier-{{ .name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: registry-{{ $.Release.Name }}-verifier-{{ .name }}
+  template:
+    metadata:
+      labels:
+        app: registry-{{ $.Release.Name }}-verifier-{{ .name }}
+    spec:
+      containers:
+        - name: registry-{{ $.Release.Name }}-verifier-{{ .name }}
+          image: {{ .image.repository }}:{{ .image.tag }}
+          env:
+            {{- range .issuers }}
+            - name: Issuers__{{ .area }}
+              value: {{ .publicKey }}
+            {{- end }}
+            {{- range .registries }}
+            - name: Registries__{{ .name }}__address
+              value: {{ .address }}
+            {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry-{{ $.Release.Name }}-verifier-{{ .name }}
+spec:
+  type: ClusterIP
+  selector:
+    app: registry-{{ $.Release.Name }}-verifier-{{ .name }}
+  ports:
+    - name: grpc
+      protocol: TCP
+      port: 80
+      targetPort: 80
+{{- end }}

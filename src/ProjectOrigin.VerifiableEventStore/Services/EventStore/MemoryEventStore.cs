@@ -1,96 +1,115 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using ProjectOrigin.VerifiableEventStore.Models;
-using ProjectOrigin.VerifiableEventStore.Services.BatchProcessor;
 
 namespace ProjectOrigin.VerifiableEventStore.Services.EventStore;
 
 public class MemoryEventStore : IEventStore
 {
-    private readonly List<Batch> _batches = new List<Batch>();
     private readonly List<BatchWrapper> _batchWrappers = new();
-    private readonly long _batchSize;
-    private List<VerifiableEvent> _verifiableEvents = new List<VerifiableEvent>();
+    private readonly int _batchSize;
+
+    private BatchWrapper _currentBatch;
+    private List<VerifiableEvent> _currentBatchEvents;
 
     public MemoryEventStore(IOptions<VerifiableEventStoreOptions> options)
     {
-        _batchSize = (long)Math.Pow(2, options.Value.BatchSizeExponent);
+        _batchSize = 1 << options.Value.BatchSizeExponent;
+
+        _currentBatchEvents = new List<VerifiableEvent>();
+        _currentBatch = new BatchWrapper(new Batch(Guid.NewGuid(), Guid.Empty, "", ""), _currentBatchEvents);
+        _batchWrappers.Add(_currentBatch);
     }
 
-    public Task StoreBatch(Batch batch)
+    public async Task Store(VerifiableEvent @event)
     {
-        _batches.Add(batch);
-        return Task.CompletedTask;
-    }
+        int nextValidIndex = await GetNextValidIndex(@event.Id.EventStreamId);
+        if (@event.Id.Index != nextValidIndex)
+            throw new OutOfOrderException($"expected {nextValidIndex} got {@event.Id.Index}");
 
-    public Task<Batch?> GetBatch(EventId eventId)
-    {
-        var b = _batchWrappers.SingleOrDefault(b => b.Batch.Events.Select(e => e.Id).Contains(eventId));
-        if (b is null || b.Batch is null)
+        _currentBatchEvents.Add(@event);
+
+        if (_currentBatchEvents.Count >= _batchSize)
         {
-            return Task.FromResult<Batch?>(null);
+            NewBatch();
         }
-        return Task.FromResult<Batch?>(b.Batch);
+    }
+
+    public Task<Batch?> GetBatch(Guid batchId)
+    {
+        var batchWrapper = _batchWrappers.SingleOrDefault(b => b.Batch.Id == batchId);
+        return Task.FromResult<Batch?>(batchWrapper?.Batch);
+    }
+
+    public Task<Batch?> GetBatchFromEventId(EventId eventId)
+    {
+        var batchWrapper = _batchWrappers.SingleOrDefault(b => b.Events.Select(e => e.Id).Contains(eventId));
+        return Task.FromResult<Batch?>(batchWrapper?.Batch);
+    }
+
+    public Task<Batch?> GetBatchFromTransactionId(string transactionId)
+    {
+        var batchWrapper = _batchWrappers.SingleOrDefault(x => x.Events.Any(t => t.TransactionId == transactionId));
+
+        return Task.FromResult<Batch?>(batchWrapper?.Batch);
     }
 
     public Task<IEnumerable<VerifiableEvent>> GetEventsForBatch(Guid batchId)
     {
-        var batchWrapper = _batchWrappers.Where(b => b.Guid == batchId).SingleOrDefault();
-        if (batchWrapper is null)
-        {
-            return Task.FromResult(Enumerable.Empty<VerifiableEvent>());
-        }
-        return Task.FromResult(batchWrapper.Batch.Events.AsEnumerable());
+        var batchWrapper = _batchWrappers.SingleOrDefault(b => b.Batch.Id == batchId);
+        return Task.FromResult(batchWrapper?.Events.AsEnumerable()
+            ?? Enumerable.Empty<VerifiableEvent>());
     }
 
     public Task<IEnumerable<VerifiableEvent>> GetEventsForEventStream(Guid streamId)
     {
-        var events = _batchWrappers.SelectMany(b => b.Batch.Events.Where(e => e.Id.EventStreamId == streamId));
-        return Task.FromResult(events);
+        var events = _batchWrappers.SelectMany(b => b.Events.Where(e => e.Id.EventStreamId == streamId));
+        return Task.FromResult(events.OrderBy(x => x.Id.Index).AsEnumerable());
     }
 
-    public Task Store(VerifiableEvent @event)
+    public Task FinalizeBatch(Guid batchId, string externalBlockId, string externalTransactionId)
     {
-        _verifiableEvents.Add(@event);
 
-        if (_verifiableEvents.Count >= _batchSize)
-        {
-            var batchEvents = _verifiableEvents;
-            _verifiableEvents = new List<VerifiableEvent>();
-            var batch = new Batch(string.Empty, string.Empty, batchEvents);
-            var batchWrapper = new BatchWrapper(Guid.NewGuid(), batch);
-            _batchWrappers.Add(batchWrapper);
-        }
-        return Task.CompletedTask;
-    }
-
-    public Task FinalizeBatch(Guid batchId, string blockId, string transactionHash)
-    {
-        var batch = _batchWrappers.Where(b => b.Guid == batchId).Select(b => b.Batch).FirstOrDefault();
-        if (batch is null)
+        var foundBatchWrapper = _batchWrappers.FirstOrDefault(b => b.Batch.Id == batchId);
+        if (foundBatchWrapper is null)
         {
             throw new ArgumentException("Batch not found", nameof(batchId));
         }
-        batch = new Batch(blockId, transactionHash, batch.Events);
-        _batchWrappers.Remove(_batchWrappers.Single(x => x.Guid == batchId));
-        _batchWrappers.Add(new BatchWrapper(batchId, batch));
+        _batchWrappers.Remove(foundBatchWrapper);
+        _batchWrappers.Add(new BatchWrapper(new Batch(foundBatchWrapper.Batch.Id, foundBatchWrapper.Batch.PreviousBatchId, externalBlockId, externalTransactionId), foundBatchWrapper.Events));
         return Task.CompletedTask;
     }
 
-    public Task<IEnumerable<Guid>> GetBatchesForFinalization(int numberOfBatches)
+    public Task<TransactionStatus> GetTransactionStatus(string transactionId)
     {
-        var batches = _batchWrappers.Where(x => x.Batch.BlockId == string.Empty && x.Batch.TransactionId == string.Empty).ToList();
-        return Task.FromResult(batches.Select(b => b.Guid));
-    }
-}
+        var batchWrapper = _batchWrappers.SingleOrDefault(x => x.Events.Any(t => t.TransactionId == transactionId));
+        if (batchWrapper is null)
+            return Task.FromResult(TransactionStatus.Unknown);
 
-internal class BatchWrapper
-{
-    public BatchWrapper(Guid guid, Batch batch)
-    {
-        Guid = guid;
-        Batch = batch;
+        return Task.FromResult(batchWrapper.Batch.IsFinalized ? TransactionStatus.Committed : TransactionStatus.Pending);
     }
 
-    public Guid Guid { get; }
-    public Batch Batch { get; }
+    public Task<bool> TryGetNextBatchForFinalization(out Batch batch)
+    {
+        batch = _batchWrappers.FirstOrDefault(x => !x.Batch.IsFinalized && x.Events.Count == _batchSize)?.Batch!;
+        return Task.FromResult(batch is not null);
+    }
+
+    private void NewBatch()
+    {
+        _currentBatchEvents = new List<VerifiableEvent>();
+        _currentBatch = new BatchWrapper(new Batch(Guid.NewGuid(), _currentBatch.Batch.Id, "", ""), _currentBatchEvents);
+        _batchWrappers.Add(_currentBatch);
+    }
+
+    private async Task<int> GetNextValidIndex(Guid streamID)
+    {
+        var stream = await GetEventsForEventStream(streamID);
+        return stream.Select(x => x.Id.Index).DefaultIfEmpty(-1).Max() + 1;
+    }
+
+    private record BatchWrapper(Batch Batch, IList<VerifiableEvent> Events);
 }

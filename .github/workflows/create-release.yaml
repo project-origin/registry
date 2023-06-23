@@ -4,7 +4,7 @@ on:
   push:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+' # support v1.2.3
-      - 'v[0-9]+.[0-9]+.[0-9]+-alpha.[0-9]+' #supports alpha versions v1.2.3-alpha.4
+      - 'v[0-9]+.[0-9]+.[0-9]+-rc.[0-9]+' #supports release candidate versions v1.2.3-rc.4
 
 jobs:
 
@@ -20,13 +20,13 @@ jobs:
         id: output-version
         run: echo "version=${GITHUB_REF#refs/*/v}" >> $GITHUB_OUTPUT
 
-  publish-client-nuget:
-    name: Publish Electricity Client Nuget Package
+  publish-hdkeys-nuget:
+    name: Publish Hierarchical Deterministic Keys Nuget package
     needs:
       - define-version
     runs-on: ubuntu-20.04
     env:
-      project: src/ProjectOrigin.Electricity.Client
+      project: src/ProjectOrigin.HierarchicalDeterministicKeys
 
     steps:
       - uses: actions/checkout@v3
@@ -35,12 +35,6 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: "7.0.203"
-
-      - name: Install windows cross-compile
-        run: |
-          sudo apt-get update
-          sudo apt-get install gcc-mingw-w64 -y
-          rustup target add x86_64-pc-windows-gnu
 
       - name: Build
         shell: bash
@@ -61,8 +55,61 @@ jobs:
         shell: bash
         run: dotnet nuget push build/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
 
+  publish-pedersen-nuget:
+    name: Publish PedersenCommitment Nuget package
+    needs:
+      - define-version
+    runs-on: ubuntu-20.04
+    env:
+      project: src/ProjectOrigin.PedersenCommitment
 
-  publish-server-container:
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup .NET Core SDK 7
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "7.0.203"
+
+      - name: Update apt-get
+        run: |
+          sudo apt-get update
+
+      - name: Install windows cross-compile
+        run: |
+          sudo apt-get install gcc-mingw-w64 -y
+          rustup target add x86_64-pc-windows-gnu
+
+      - name: Install aarch64-linux cross-compile
+        run: |
+          sudo apt-get install gcc-aarch64-linux-gnu -y
+          rustup target add aarch64-unknown-linux-gnu
+          mkdir .cargo
+          cat << EOF > .cargo/config.toml
+          [target.aarch64-unknown-linux-gnu]
+          linker = "aarch64-linux-gnu-gcc"
+          EOF
+
+      - name: Build
+        shell: bash
+        run: dotnet build --configuration Release ${{ env.project }}
+
+      - name: Pack
+        shell: bash
+        run: dotnet pack --output build --configuration Release --no-restore -p:Version=${{ needs.define-version.outputs.version }} ${{ env.project }}
+
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v3
+        with:
+          name: nuget-packages
+          path: build/*.nupkg
+          retention-days: 1
+
+      - name: Publish
+        shell: bash
+        run: dotnet nuget push build/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+
+  publish-electricity-container:
     name: Publish Electricity Server container
     runs-on: ubuntu-20.04
     needs:
@@ -84,16 +131,44 @@ jobs:
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
           context: ./src
-          file: ./src/ProjectOrigin.Electricity.Server/Dockerfile
+          file: ${{ env.project }}/Dockerfile
           push: true
           tags: ghcr.io/project-origin/electricity-server:${{ needs.define-version.outputs.version }}
+
+  publish-registry-container:
+    name: Publish Registry Server container
+    runs-on: ubuntu-20.04
+    needs:
+      - define-version
+    env:
+      project: src/ProjectOrigin.Registry.Server
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: ./src
+          file: ${{ env.project }}/Dockerfile
+          push: true
+          tags: ghcr.io/project-origin/registry-server:${{ needs.define-version.outputs.version }}
 
   create-release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
     needs:
-      - publish-client-nuget
-      - publish-server-container
+      - publish-hdkeys-nuget
+      - publish-pedersen-nuget
+      - publish-electricity-container
+      - publish-registry-container
     steps:
       - name: Download all workflow run artifacts
         uses: actions/download-artifact@v3
@@ -103,6 +178,6 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          draft: "${{ contains( env.GITHUB_REF, '-alpha.') }}"
+          draft: "${{ contains( env.GITHUB_REF, '-rc.') }}"
           generate_release_notes: true
           files: artifacts/**

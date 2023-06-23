@@ -1,9 +1,12 @@
-using System.Security.Cryptography;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using ProjectOrigin.VerifiableEventStore.Models;
 using ProjectOrigin.VerifiableEventStore.Services.BatchProcessor;
 using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector;
 using ProjectOrigin.VerifiableEventStore.Services.EventStore;
+using ProjectOrigin.VerifiableEventStore.Services.TransactionStatusCache;
 
 namespace ProjectOrigin.VerifiableEventStore.Tests;
 
@@ -26,16 +29,18 @@ public class BatchProcessorJobTests
         var blockId = fixture.Create<string>();
         var transactionId = fixture.Create<string>();
         var blockChainConnector = new Mock<IBlockchainConnector>();
+        var iTransactionService = new Mock<ITransactionStatusService>();
         var batcherOptions = new VerifiableEventStoreOptions() { BatchSizeExponent = batchExponent };
         var eventStore = new MemoryEventStore(Options.Create(batcherOptions));
+        var eventsPerBatch = 1 << batchExponent;
 
         for (int i = 0; i < numberOfEvents; i++)
         {
-            var @event = fixture.Create<VerifiableEvent>();
+            var @event = new VerifiableEvent(new EventId(Guid.NewGuid(), 0), fixture.Create<string>(), fixture.Create<byte[]>());
             await eventStore.Store(@event);
         }
 
-        var job = new BatchProcessorJob(blockChainConnector.Object, eventStore);
+        var job = new BatchProcessorJob(blockChainConnector.Object, eventStore, iTransactionService.Object);
         blockChainConnector.Setup(obj => obj.PublishBytes(It.IsAny<byte[]>())).Returns(Task.FromResult(new TransactionReference(transactionId)));
         blockChainConnector.Setup(obj => obj.GetBlock(It.IsAny<TransactionReference>())).Returns(Task.FromResult<Block?>(new Block(blockId, true)));
 
@@ -44,8 +49,11 @@ public class BatchProcessorJobTests
 
         // Then
         blockChainConnector.Verify(obj => obj.PublishBytes(It.IsAny<byte[]>()), Times.Exactly(expectedBatches));
+        iTransactionService.Verify(obj => obj.SetTransactionStatus(It.IsAny<string>(), It.Is<TransactionStatusRecord>(x => x.NewStatus == TransactionStatus.Committed && string.IsNullOrEmpty(x.Message))),
+            Times.Exactly(eventsPerBatch * expectedBatches));
 
-        var result = await eventStore.GetBatchesForFinalization(10);
-        Assert.Empty(result);
+        var result = await eventStore.TryGetNextBatchForFinalization(out var batch);
+        Assert.False(result);
+        Assert.Null(batch);
     }
 }

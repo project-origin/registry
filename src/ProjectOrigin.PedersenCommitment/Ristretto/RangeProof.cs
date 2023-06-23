@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.InteropServices;
 
 namespace ProjectOrigin.PedersenCommitment.Ristretto;
@@ -136,7 +137,7 @@ public record RangeProof
 }
 
 [StructLayout(LayoutKind.Sequential)]
-struct RangeProofWithCommit
+public struct RangeProofWithCommit
 {
     public IntPtr Proof;
     public IntPtr CompressedPoint;

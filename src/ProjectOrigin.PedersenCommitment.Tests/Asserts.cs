@@ -1,3 +1,6 @@
+using System;
+using Xunit;
+
 namespace ProjectOrigin.PedersenCommitment.Tests;
 
 public static class AssertExt

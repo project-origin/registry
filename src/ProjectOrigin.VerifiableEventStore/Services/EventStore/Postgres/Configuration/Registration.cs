@@ -1,6 +1,6 @@
+using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres.Configuration;
 
@@ -15,8 +15,8 @@ public static class Registration
             ConnectionString = configuration.GetConnectionString("EventStore") ?? string.Empty
         };
         services.AddSingleton(options);
-        services.TryAddSingleton<IEventStore, PostgresqlEventStore>();
-
-        return services;
+        throw new NotSupportedException();
+        // services.TryAddSingleton<IEventStore, PostgresqlEventStore>();
+        //return services;
     }
 }

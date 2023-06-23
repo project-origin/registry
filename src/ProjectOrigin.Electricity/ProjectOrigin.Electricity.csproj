@@ -2,13 +2,12 @@
 
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
-    <PackageReference Include="NSec.Cryptography" Version="22.4.0" />
+    <PackageReference Include="ProjectOrigin.PedersenCommitment" Version="0.2.0-rc.13" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ProjectOrigin.Register.Utils\ProjectOrigin.Register.Utils.csproj" />
-    <ProjectReference Include="..\ProjectOrigin.PedersenCommitment\ProjectOrigin.PedersenCommitment.csproj" />
-    <ProjectReference Include="..\ProjectOrigin.Register.StepProcessor\ProjectOrigin.Register.StepProcessor.csproj" />
+    <ProjectReference Include="..\ProjectOrigin.Verifier.Utils\ProjectOrigin.Verifier.Utils.csproj" />
+    <ProjectReference Include="..\ProjectOrigin.HierarchicalDeterministicKeys\ProjectOrigin.HierarchicalDeterministicKeys.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,16 +16,16 @@
     </AssemblyAttribute>
   </ItemGroup>
 
-    <ItemGroup>
+  <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-	  <_Parameter1>$(AssemblyName).IntegrationTests</_Parameter1>
+      <_Parameter1>$(AssemblyName).IntegrationTests</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.21.9" />
-    <PackageReference Include="Grpc.Tools" Version="2.50.0" />
-    <Protobuf Include="..\Protos\electricity.proto" Access="internal" />
+    <PackageReference Include="Google.Protobuf" Version="3.23.2" />
+    <PackageReference Include="Grpc.Tools" Version="2.54.0" />
+    <Protobuf Include="..\Protos\electricity.proto" GrpcServices="None" />
   </ItemGroup>
 
 </Project>

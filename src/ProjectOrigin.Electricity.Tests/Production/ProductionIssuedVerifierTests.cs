@@ -1,136 +1,138 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+using AutoFixture;
 using Microsoft.Extensions.Options;
-using NSec.Cryptography;
+using Moq;
+using ProjectOrigin.Electricity.Extensions;
 using ProjectOrigin.Electricity.Models;
+using ProjectOrigin.Electricity.Production;
 using ProjectOrigin.Electricity.Production.Verifiers;
+using ProjectOrigin.Electricity.Services;
+using ProjectOrigin.HierarchicalDeterministicKeys;
+using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.PedersenCommitment;
+using Xunit;
 
 namespace ProjectOrigin.Electricity.Tests;
 
-public class ProductionIssuedVerifierTests : AbstractVerifierTests
+public class ProductionIssuedVerifierTests
 {
-    private IOptions<T> CreateOptionsMock<T>(T content) where T : class
-    {
-        var optionsMock = new Mock<IOptions<T>>();
-        optionsMock.Setup(obj => obj.Value).Returns(content);
-        return optionsMock.Object;
-    }
+    const string IssuerArea = "DK1";
+    private IPrivateKey _issuerKey;
+    private ProductionIssuedVerifier _verifier;
 
-    private (ProductionIssuedVerifier, Key) SetupIssuer()
+    public ProductionIssuedVerifierTests()
     {
-        var issuerKey = Key.Create(SignatureAlgorithm.Ed25519);
-        var optionsMock = CreateOptionsMock(new IssuerOptions()
+        _issuerKey = Algorithms.Ed25519.GenerateNewPrivateKey();
+
+        var optionsMock = new Mock<IOptions<IssuerOptions>>();
+        optionsMock.Setup(obj => obj.Value).Returns(new IssuerOptions()
         {
             Issuers = new Dictionary<string, string>(){
-                {"DK1", Convert.ToBase64String(issuerKey.PublicKey.Export(KeyBlobFormat.RawPublicKey))}
+                {IssuerArea, Convert.ToBase64String(Encoding.UTF8.GetBytes(_issuerKey.PublicKey.ExportPkixText()))},
             }
         });
+        var issuerService = new GridAreaIssuerOptionsService(optionsMock.Object);
 
-        var processor = new ProductionIssuedVerifier(optionsMock);
-
-        return (processor, issuerKey);
+        _verifier = new ProductionIssuedVerifier(issuerService);
     }
 
     [Fact]
     public async Task ProductionIssuedVerifier_IssueCertificate_Success()
     {
-        var (processor, issuerKey) = SetupIssuer();
+        var @event = FakeRegister.CreateProductionIssuedEvent();
+        var transaction = FakeRegister.SignTransaction(@event.CertificateId, @event, _issuerKey);
 
-        var request = FakeRegister.CreateProductionIssuedRequest(issuerKey);
+        var result = await _verifier.Verify(transaction, null, @event);
 
-        var result = await processor.Verify(request);
-
-        AssertValid(result);
+        result.AssertValid();
     }
 
     [Fact]
     public async Task ProductionIssuedVerifier_IssueCertificateWithPublicQuantity_Success()
     {
-        var (processor, issuerKey) = SetupIssuer();
+        var @event = FakeRegister.CreateProductionIssuedEvent(publicQuantity: true);
+        var transaction = FakeRegister.SignTransaction(@event.CertificateId, @event, _issuerKey);
 
-        var request = FakeRegister.CreateProductionIssuedRequest(issuerKey, publicQuantity: true);
+        var a = transaction.IsSignatureValid(_issuerKey.PublicKey);
 
-        var result = await processor.Verify(request);
+        var result = await _verifier.Verify(transaction, null, @event);
 
-        AssertValid(result);
+        result.AssertValid();
     }
 
     [Fact]
     public async Task ProductionIssuedVerifier_CertificateExists_Fail()
     {
-        var (processor, issuerKey) = SetupIssuer();
+        var @event = FakeRegister.CreateProductionIssuedEvent();
+        var transaction = FakeRegister.SignTransaction(@event.CertificateId, @event, _issuerKey);
 
-        var request = FakeRegister.CreateProductionIssuedRequest(issuerKey, exists: true);
-        var result = await processor.Verify(request);
+        var result = await _verifier.Verify(transaction, new ProductionCertificate(@event), @event);
 
-        AssertInvalid(result, $"Certificate with id ”{request.Event.CertificateId.StreamId}” already exists");
+        result.AssertInvalid($"Certificate with id ”{@event.CertificateId.StreamId}” already exists");
     }
 
     [Fact]
     public async Task ProductionIssuedVerifier_QuantityCommitmentInvalid_Fail()
     {
-        var (processor, issuerKey) = SetupIssuer();
+        var @event = FakeRegister.CreateProductionIssuedEvent(quantityCommitmentOverride: FakeRegister.InvalidCommitment());
+        var transaction = FakeRegister.SignTransaction(@event.CertificateId, @event, _issuerKey);
 
-        var request = FakeRegister.CreateProductionIssuedRequest(issuerKey, quantityCommitmentOverride: FakeRegister.InvalidCommitment());
+        var result = await _verifier.Verify(transaction, null, @event);
 
-        var result = await processor.Verify(request);
-
-        AssertInvalid(result, "Invalid range proof for Quantity commitment");
+        result.AssertInvalid("Invalid range proof for Quantity commitment");
     }
 
     [Fact]
     public async Task ProductionIssuedVerifier_InvalidPublicParameters_Fail()
     {
-        var (processor, issuerKey) = SetupIssuer();
+        var @event = FakeRegister.CreateProductionIssuedEvent(publicQuantityCommitmentOverride: new SecretCommitmentInfo(695956), publicQuantity: true);
+        var transaction = FakeRegister.SignTransaction(@event.CertificateId, @event, _issuerKey);
 
-        var request = FakeRegister.CreateProductionIssuedRequest(issuerKey, publicQuantityCommitmentOverride: new SecretCommitmentInfo(695956), publicQuantity: true);
+        var result = await _verifier.Verify(transaction, null, @event);
 
-        var result = await processor.Verify(request);
-
-        AssertInvalid(result, "Private and public quantity proof does not match");
+        result.AssertInvalid("Private and public quantity proof does not match");
     }
 
     [Fact]
     public async Task ProductionIssuedVerifier_InvalidOwner_Fail()
     {
-        var (processor, issuerKey) = SetupIssuer();
-
         var randomOwnerKeyData = new V1.PublicKey
         {
             Content = Google.Protobuf.ByteString.CopyFrom(new Fixture().Create<byte[]>())
         };
 
-        var request = FakeRegister.CreateProductionIssuedRequest(issuerKey, ownerKeyOverride: randomOwnerKeyData);
+        var @event = FakeRegister.CreateProductionIssuedEvent(ownerKeyOverride: randomOwnerKeyData);
+        var transaction = FakeRegister.SignTransaction(@event.CertificateId, @event, _issuerKey);
 
-        var result = await processor.Verify(request);
+        var result = await _verifier.Verify(transaction, null, @event);
 
-        AssertInvalid(result, "Invalid owner key, not a valid Ed25519 publicKey");
+        result.AssertInvalid("Invalid owner key, not a valid publicKey");
     }
 
     [Fact]
     public async Task ProductionIssuedVerifier_InvalidSignature_Fail()
     {
-        var (processor, issuerKey) = SetupIssuer();
+        var invalidKey = Algorithms.Ed25519.GenerateNewPrivateKey();
 
-        var someOtherKey = Key.Create(SignatureAlgorithm.Ed25519);
+        var @event = FakeRegister.CreateProductionIssuedEvent();
+        var transaction = FakeRegister.SignTransaction(@event.CertificateId, @event, invalidKey);
 
-        var request = FakeRegister.CreateProductionIssuedRequest(someOtherKey);
+        var result = await _verifier.Verify(transaction, null, @event);
 
-        var result = await processor.Verify(request);
-
-        AssertInvalid(result, "Invalid issuer signature for GridArea ”DK1”");
+        result.AssertInvalid("Invalid issuer signature for GridArea ”DK1”");
     }
 
     [Fact]
     public async Task ProductionIssuedVerifier_NoIssuerForArea_Fail()
     {
-        var (processor, issuerKey) = SetupIssuer();
+        var @event = FakeRegister.CreateProductionIssuedEvent(gridAreaOverride: "DK2");
+        var transaction = FakeRegister.SignTransaction(@event.CertificateId, @event, _issuerKey);
 
-        var someOtherKey = Key.Create(SignatureAlgorithm.Ed25519);
+        var result = await _verifier.Verify(transaction, null, @event);
 
-        var request = FakeRegister.CreateProductionIssuedRequest(someOtherKey, gridAreaOverride: "DK2");
-
-        var result = await processor.Verify(request);
-
-        AssertInvalid(result, "No issuer found for GridArea ”DK2”");
+        result.AssertInvalid("No issuer found for GridArea ”DK2”");
     }
 }

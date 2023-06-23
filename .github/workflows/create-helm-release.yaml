@@ -1,18 +1,19 @@
-# workflow for releasing helm-chart as OCI images on github every time a tag is created
+# workflow for releasing helm-chart on github every time a tag is created
 name: Create Helm Release
 on:
   push:
     tags:
       - 'chart-v[0-9]+.[0-9]+.[0-9]+' # support v1.2.3
-      - 'chart-v[0-9]+.[0-9]+.[0-9]+-alpha.[0-9]+' #supports alpha versions v1.2.3-alpha.4
+      - 'chart-v[0-9]+.[0-9]+.[0-9]+-rc.[0-9]+' #supports rc versions v1.2.3-rc.4
 
 env:
-  CHART_FOLDER: this/charts/project-origin-stack/
+  CHART_FOLDER: charts/project-origin-registry/
+  HELM_REGISTRY_REPOSITORY: project-origin/helm-registry
 
 jobs:
-  build:
-    name: Build
-    runs-on: ubuntu-latest
+  release:
+    name: Release helm chart
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
         with:
@@ -20,26 +21,26 @@ jobs:
 
       - uses: actions/checkout@v3
         with:
-          repository: project-origin/helm-registry
+          repository: ${{ env.HELM_REGISTRY_REPOSITORY }}
           path: helm-registry
           ssh-key: ${{ secrets.HELM_REGISTRY_TOKEN }}
 
       - name: Get chart name and version
         id: variables
         run: |
-          echo "name=$(yq .name < ${{ env.CHART_FOLDER }}/Chart.yaml)" >> $GITHUB_OUTPUT
+          echo "name=$(yq .name < this/${{ env.CHART_FOLDER }}/Chart.yaml)" >> $GITHUB_OUTPUT
           echo "version=${GITHUB_REF#refs/*/chart-v}" >> $GITHUB_OUTPUT
 
       - name: Package and generate index
         run: |
-          helm package ${{ env.CHART_FOLDER }} --version ${{ steps.variables.outputs.version }} --destination helm-releases
-          helm repo index helm-releases --merge helm-registry/index.yaml --url https://github.com/project-origin/registry/releases/download/chart-v${{ steps.variables.outputs.version }}/
+          helm package this/${{ env.CHART_FOLDER }} --version ${{ steps.variables.outputs.version }} --destination helm-releases
+          helm repo index helm-releases --merge helm-registry/index.yaml --url https://github.com/${{ github.repository }}/releases/download/chart-v${{ steps.variables.outputs.version }}/
           cp helm-releases/index.yaml helm-registry/index.yaml
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          draft: "${{ contains( env.GITHUB_REF, '-alpha.') }}"
+          draft: "${{ contains( env.GITHUB_REF, '-rc.') }}"
           generate_release_notes: true
           files: helm-releases/${{ steps.variables.outputs.name }}-${{ steps.variables.outputs.version }}.tgz
 

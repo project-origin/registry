@@ -1,10 +1,11 @@
+using ProjectOrigin.Electricity.Extensions;
 using ProjectOrigin.Electricity.Models;
 
 namespace ProjectOrigin.Electricity.Consumption;
 
-internal class ConsumptionCertificate : AbstractCertificate
+public class ConsumptionCertificate : AbstractCertificate
 {
-    public Register.V1.FederatedStreamId Id { get => _issued.CertificateId; }
+    public Common.V1.FederatedStreamId Id { get => _issued.CertificateId; }
     public DateInterval Period { get => _issued.Period.ToModel(); }
     public string GridArea { get => _issued.GridArea; }
 
@@ -18,6 +19,6 @@ internal class ConsumptionCertificate : AbstractCertificate
 
     public void Apply(V1.AllocatedEvent e)
     {
-        AllocateSlice(e.ConsumptionSourceSlice, e);
+        AllocateSlice(e.ConsumptionSourceSliceHash, e);
     }
 }

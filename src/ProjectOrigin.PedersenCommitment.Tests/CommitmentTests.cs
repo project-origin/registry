@@ -1,3 +1,6 @@
+using AutoFixture;
+using Xunit;
+
 namespace ProjectOrigin.PedersenCommitment.Tests;
 
 public class CommitmentTests

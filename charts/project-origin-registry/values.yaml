@@ -1,0 +1,91 @@
+# This file contains the default values for the project-origin-registry chart.
+
+image:
+  # repository is the repository to pull the image from
+  repository: ghcr.io/project-origin/registry-server
+  # tag is the tag to pull
+  tag:
+
+service:
+  type: ClusterIp
+  nodePort:
+
+verifiableEventStore:
+  batchSizeExponent: 0
+  eventStore:
+    type: inMemory
+
+# verifiers defines the local verifiers
+verifiers:
+    # name is the name of the verifier
+  - name: electricity-v1
+    type: ProjectOrigin.Electricity.v1
+    # image is the image to use for the verifier
+    image:
+      # repository is the repository to pull the image from
+      repository: ghcr.io/project-origin/electricity-server
+      # tag is the tag to pull
+      tag: 0.2.0-rc.13
+
+    # issuers defines the currently accepted issuers for given areas.
+    issuers: []
+      # example
+      # - area: DK1
+      #   publicKey: Ay02vkc6FGV8FwtvVsmBO2p7UdbZIcFhvMGFB40D3DKX
+
+    # Registries is a list of all the known registries in the network
+    registries: []
+      # example
+      # - name: test
+      #   address: http://test-registry:80
+
+
+# immutableRecord holds the configuration for where and how the log is published.
+immutableRecord:
+  # type determines where the immutable log is send to, supported values are (log | concordium) if concordium is specified, then it must be configured below.
+  type: log
+
+  # concordium holds the configuration to contact and publish data on the network
+  concordium:
+    # rpcUrl are the url on which the local node is available.
+    rpcUrl: http://po-concordium:10000
+    # rpcToken is the token used to communicate with the node.
+    rpcToken: rpcadmin
+    # accountAddress must hold the address from which to use CCD
+    accountAddress: ""
+    # accountKeySecret is a reference to a kubernetes secret that holds the accountKey
+    accountKeySecret:
+      # name is the name of the kubernetes secret
+      name: ""
+      # key is the reference to the value within the secret
+      key: ""
+
+# concordium holds the configuration for the concordium node
+concordium:
+  # enabled specified wether or not to run a local node
+  enabled: false
+
+  # network denotes which network the concordium node should run on, allowed values are (mainnet | testnet)
+  network: ""
+
+  # collector configures the collector that collects statistics from the node and publishes them to the network dashboard.
+  collector:
+    # enabled specifies if the collector should run or not.
+    enabled: true
+    # nodeName contains the name to report to the network dashboard. https://concordium.com/block-explorers/
+    nodeName: ""
+    # interval describes how often to collect the statistics from the node, in milliseconds
+    interval: 5000
+
+  # persistence holds the configuration for the persistent storage of the node
+  persistence:
+    # enabled specifies if the node should use persistent storage or not.
+    enabled: true
+    # name is the name of the persistent volume claim
+    name: po-concordium-data
+    # storageClass is the name of the storage class to use, if not specified the default storage class will be used.
+    #storageClass:
+    # accessMode is the access mode to use for the persistent volume claim, allowed values are (ReadWriteOnce | ReadWriteMany)
+    accessMode: ReadWriteOnce
+    # size is the size of the persistent volume claim
+    size: 100Gi

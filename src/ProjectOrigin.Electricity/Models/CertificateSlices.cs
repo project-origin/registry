@@ -1,22 +1,12 @@
 using System.Security.Cryptography;
 using Google.Protobuf;
-using NSec.Cryptography;
 using ProjectOrigin.PedersenCommitment;
 
 namespace ProjectOrigin.Electricity.Models;
 
-internal record AllocationSlice(Commitment Commitment, PublicKey Owner, Register.V1.Uuid AllocationId, Register.V1.FederatedStreamId ProductionCertificateId, Register.V1.FederatedStreamId ConsumptionCertificateId) : CertificateSlice(Commitment, Owner);
+public record AllocationSlice(Commitment Commitment, Electricity.V1.PublicKey Owner, Common.V1.Uuid AllocationId, Common.V1.FederatedStreamId ProductionCertificateId, Common.V1.FederatedStreamId ConsumptionCertificateId) : CertificateSlice(Commitment, Owner);
 
-internal record CertificateSlice(Commitment Commitment, PublicKey Owner)
+public record CertificateSlice(Commitment Commitment, Electricity.V1.PublicKey Owner)
 {
-    public V1.SliceId Id
-    {
-        get
-        {
-            return new V1.SliceId
-            {
-                Hash = ByteString.CopyFrom(SHA256.HashData(Commitment.C))
-            };
-        }
-    }
+    public ByteString Hash => ByteString.CopyFrom(SHA256.HashData(Commitment.C));
 }

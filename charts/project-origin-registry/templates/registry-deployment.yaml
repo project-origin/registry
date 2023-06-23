@@ -1,0 +1,46 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: registry-{{ .Release.Name }}-deployment
+  labels:
+    app: registry-{{ .Release.Name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: registry-{{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: registry-{{ .Release.Name }}
+    spec:
+      containers:
+        - name: registry-{{ .Release.Name }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+          env:
+            - name: REGISTRYNAME
+              value: {{ .Release.Name }}
+            {{- range .Values.verifiers }}
+            - name: VERIFIERS__{{ .type }}
+              value: http://registry-{{ $.Release.Name }}-verifier-{{ .name }}:80
+            {{- end }}
+            - name: VERIFIABLEEVENTSTORE__BATCHSIZEEXPONENT
+              value: {{ .Values.verifiableEventStore.batchSizeExponent | quote }}
+            - name: VERIFIABLEEVENTSTORE__EVENTSTORE__TYPE
+              value: {{ .Values.verifiableEventStore.eventStore.type }}
+            - name: IMMUTABLELOG__TYPE
+              value: {{ .Values.immutableRecord.type }}
+            {{- if eq .Values.immutableRecord.type "concordium" }}
+            - name: IMMUTABLELOG__CONCORDIUM__ADDRESS
+              value: {{ .Values.immutableRecord.concordium.rpcUrl }}
+            - name: IMMUTABLELOG__CONCORDIUM__AUTHENTICATIONTOKEN
+              value: {{ .Values.immutableRecord.concordium.rpcToken }}
+            - name: IMMUTABLELOG__CONCORDIUM__ACCOUNTADDRESS
+              value: {{ required "When type is concordium, accountAddress must be set" .Values.immutableRecord.concordium.accountAddress }}
+            - name: IMMUTABLELOG__CONCORDIUM__ACCOUNTKEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ required "When type is concordium, accountKeySecret.name must be set" .Values.immutableRecord.concordium.accountKeySecret.name }}
+                  key: {{ required "When type is concordium, accountKeySecret.key must be set" .Values.immutableRecord.concordium.accountKeySecret.key }}
+            {{- end }}

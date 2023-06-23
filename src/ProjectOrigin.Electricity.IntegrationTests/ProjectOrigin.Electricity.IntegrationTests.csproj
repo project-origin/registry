@@ -2,15 +2,16 @@
 
   <PropertyGroup>
     <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
     <PackageReference Include="Moq" Version="4.17.2" />
     <PackageReference Include="NSec.Cryptography" Version="22.4.0" />
     <PackageReference Include="AutoFixture" Version="4.17.0" />
+    <PackageReference Include="FluentAssertions" Version="6.11.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -20,13 +21,18 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ProjectOrigin.Electricity\ProjectOrigin.Electricity.csproj" />
+    <ProjectReference Include="..\ProjectOrigin.TestUtils\ProjectOrigin.TestUtils.csproj" />
     <ProjectReference Include="..\ProjectOrigin.Electricity.Server\ProjectOrigin.Electricity.Server.csproj" />
-    <ProjectReference Include="..\ProjectOrigin.Electricity.Client\ProjectOrigin.Electricity.Client.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.23.2" />
+    <PackageReference Include="Grpc.Tools" Version="2.54.0" />
+    <Protobuf Include="..\Protos\verifier.proto" GrpcServices="Client" />
+  </ItemGroup>
+
 
 </Project>

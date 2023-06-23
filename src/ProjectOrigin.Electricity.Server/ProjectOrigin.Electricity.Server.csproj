@@ -2,10 +2,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ProjectOrigin.Electricity\ProjectOrigin.Electricity.csproj" />
-    <ProjectReference Include="..\ProjectOrigin.Register.CommandProcessor\ProjectOrigin.Register.CommandProcessor.csproj" />
-    <ProjectReference Include="..\ProjectOrigin.Register.StepProcessor\ProjectOrigin.Register.StepProcessor.csproj" />
-    <ProjectReference Include="..\ProjectOrigin.PedersenCommitment\ProjectOrigin.PedersenCommitment.csproj" />
-    <ProjectReference Include="..\ProjectOrigin.VerifiableEventStore\ProjectOrigin.VerifiableEventStore.csproj" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.49.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="..\Protos\verifier.proto" GrpcServices="Server" Access="Internal" />
   </ItemGroup>
 
 </Project>

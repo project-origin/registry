@@ -10,4 +10,17 @@
       <None Include="$(RustRootDirectory)/target/**/debug/*rust_ffi.*" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
   </Target>
+
+  <Target Name="CargoBuildRelease" BeforeTargets="PreBuildEvent" Condition=" '$(Configuration)' == 'Release' ">
+    <Exec Command="cargo build --release --target aarch64-unknown-linux-gnu" WorkingDirectory="$(RustRootDirectory)" />
+    <Exec Command="cargo build --release --target x86_64-unknown-linux-gnu" WorkingDirectory="$(RustRootDirectory)" />
+    <Exec Command="cargo build --release --target x86_64-pc-windows-gnu" WorkingDirectory="$(RustRootDirectory)" />
+  </Target>
+
+  <ItemGroup Condition=" '$(Configuration)' == 'Release' ">
+    <None Include="$(RustRootDirectory)/target/aarch64-unknown-linux-gnu/release/librust_ffi.so" Pack="true" PackagePath="runtimes/linux-arm64/native" />
+    <None Include="$(RustRootDirectory)/target/x86_64-unknown-linux-gnu/release/librust_ffi.so" Pack="true" PackagePath="runtimes/linux-x64/native" />
+    <None Include="$(RustRootDirectory)/target/x86_64-pc-windows-gnu/release/rust_ffi.dll" Pack="true" PackagePath="runtimes/win-x64/native" />
+  </ItemGroup>
+
 </Project>

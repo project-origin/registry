@@ -1,5 +1,6 @@
 using System.Text;
 using ProjectOrigin.PedersenCommitment.Ristretto;
+using Xunit;
 
 namespace ProjectOrigin.PedersenCommitment.Tests;
 public class RangeProofTests

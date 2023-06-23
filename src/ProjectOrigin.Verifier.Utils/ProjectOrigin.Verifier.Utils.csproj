@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.1" />
+    <PackageReference Include="Google.Protobuf" Version="3.23.2" />
+    <PackageReference Include="Grpc.Tools" Version="2.54.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.53.0" />
+    <Protobuf Include="..\Protos\common.proto" GrpcServices="None" />
+    <Protobuf Include="..\Protos\registry.proto" GrpcServices="Client" />
+  </ItemGroup>
+
+</Project>

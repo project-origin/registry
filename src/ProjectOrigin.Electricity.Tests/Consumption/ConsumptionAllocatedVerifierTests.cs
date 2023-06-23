@@ -1,93 +1,127 @@
-using NSec.Cryptography;
+using System;
+using System.Threading.Tasks;
+using Moq;
 using ProjectOrigin.Electricity.Consumption.Verifiers;
+using ProjectOrigin.Electricity.Production;
+using ProjectOrigin.HierarchicalDeterministicKeys;
+using ProjectOrigin.Verifier.Utils.Interfaces;
+using Xunit;
 
 namespace ProjectOrigin.Electricity.Tests;
 
-public class ConsumptionAllocatedVerifierTests : AbstractVerifierTests
+public class ConsumptionAllocatedVerifierTests
 {
-    private ConsumptionAllocatedVerifier Verifier { get => new ConsumptionAllocatedVerifier(); }
+    private ConsumptionAllocatedVerifier _verifier;
+    private ProductionCertificate? _otherCertificate;
+
+    public ConsumptionAllocatedVerifierTests()
+    {
+        var modelLoaderMock = new Mock<IRemoteModelLoader>();
+        modelLoaderMock.Setup(obj => obj.GetModel<ProductionCertificate>(It.IsAny<Common.V1.FederatedStreamId>()))
+            .Returns(() => Task.FromResult(_otherCertificate));
+
+        _verifier = new ConsumptionAllocatedVerifier(modelLoaderMock.Object);
+    }
 
     [Fact]
     public async Task Verifier_AllocateCertificate_Valid()
     {
-        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
-        var allocationId = prodCert.Allocated(consCert, prodParams, consParams, ownerKey);
+        var allocationId = prodCert.Allocated(consCert, prodParams, consParams);
+        _otherCertificate = prodCert;
 
-        var request = FakeRegister.CreateConsumptionAllocationRequest(allocationId, prodCert, consCert, prodParams, consParams, ownerKey);
-        var result = await Verifier.Verify(request);
+        var @event = FakeRegister.CreateAllocationEvent(allocationId, prodCert.Id, consCert.Id, prodParams, consParams);
+        var transaction = FakeRegister.SignTransaction(@event.ConsumptionCertificateId, @event, ownerKey);
 
-        AssertValid(result);
+        var result = await _verifier.Verify(transaction, consCert, @event);
+
+        result.AssertValid();
     }
 
     [Fact]
     public async Task Verifier_CertNotFound_Invalid()
     {
-        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
-        var allocationId = prodCert.Allocated(consCert, prodParams, consParams, ownerKey);
+        var allocationId = prodCert.Allocated(consCert, prodParams, consParams);
+        _otherCertificate = prodCert;
 
-        var request = FakeRegister.CreateConsumptionAllocationRequest(allocationId, prodCert, consCert, prodParams, consParams, ownerKey, exists: false);
-        var result = await Verifier.Verify(request);
+        var @event = FakeRegister.CreateAllocationEvent(allocationId, prodCert.Id, consCert.Id, prodParams, consParams);
+        var transaction = FakeRegister.SignTransaction(@event.ConsumptionCertificateId, @event, ownerKey);
 
-        AssertInvalid(result, "Certificate does not exist");
+        var result = await _verifier.Verify(transaction, null, @event);
+
+        result.AssertInvalid("Certificate does not exist");
     }
 
     [Fact]
     public async Task Verifier_SliceNotFound_Invalid()
     {
-        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
-        var allocationId = prodCert.Allocated(consCert, prodParams, consParams, ownerKey);
+        var allocationId = prodCert.Allocated(consCert, prodParams, consParams);
+        _otherCertificate = prodCert;
 
-        var request = FakeRegister.CreateConsumptionAllocationRequest(allocationId, prodCert, consCert, prodParams, prodParams, ownerKey);
-        var result = await Verifier.Verify(request);
+        var @event = FakeRegister.CreateAllocationEvent(allocationId, prodCert.Id, consCert.Id, prodParams, prodParams);
+        var transaction = FakeRegister.SignTransaction(@event.ConsumptionCertificateId, @event, ownerKey);
 
-        AssertInvalid(result, "Slice not found");
+        var result = await _verifier.Verify(transaction, consCert, @event);
+
+        result.AssertInvalid("Slice not found");
     }
 
     [Fact]
     public async Task Verifier_InvalidSignatureForSlice_Invalid()
     {
-        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
-        var otherKey = Key.Create(SignatureAlgorithm.Ed25519);
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
+        var otherKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
-        var allocationId = prodCert.Allocated(consCert, prodParams, consParams, ownerKey);
+        var allocationId = prodCert.Allocated(consCert, prodParams, consParams);
+        _otherCertificate = prodCert;
 
-        var request = FakeRegister.CreateConsumptionAllocationRequest(allocationId, prodCert, consCert, prodParams, consParams, otherKey);
-        var result = await Verifier.Verify(request);
+        var @event = FakeRegister.CreateAllocationEvent(allocationId, prodCert.Id, consCert.Id, prodParams, consParams);
+        var transaction = FakeRegister.SignTransaction(@event.ConsumptionCertificateId, @event, otherKey);
 
-        AssertInvalid(result, "Invalid signature for slice");
+        var result = await _verifier.Verify(transaction, consCert, @event);
+
+        result.AssertInvalid("Invalid signature for slice");
     }
 
     [Fact]
     public async Task Verifier_ProductionNotFound_Invalid()
     {
-        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
-        var allocationId = prodCert.Allocated(consCert, prodParams, consParams, ownerKey);
+        var allocationId = prodCert.Allocated(consCert, prodParams, consParams);
+        _otherCertificate = null;
 
-        var request = FakeRegister.CreateConsumptionAllocationRequest(allocationId, prodCert, consCert, prodParams, consParams, ownerKey, otherExists: false);
-        var result = await Verifier.Verify(request);
+        var @event = FakeRegister.CreateAllocationEvent(allocationId, prodCert.Id, consCert.Id, prodParams, consParams);
+        var transaction = FakeRegister.SignTransaction(@event.ConsumptionCertificateId, @event, ownerKey);
 
-        AssertInvalid(result, "ProductionCertificate does not exist");
+        var result = await _verifier.Verify(transaction, consCert, @event);
+
+        result.AssertInvalid("ProductionCertificate does not exist");
     }
 
     [Fact]
     public async Task Verifier_ProdNotAllocated_Invalid()
     {
-        var ownerKey = Key.Create(SignatureAlgorithm.Ed25519);
+        var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
         var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
+        _otherCertificate = prodCert;
 
-        var request = FakeRegister.CreateConsumptionAllocationRequest(Guid.NewGuid(), prodCert, consCert, prodParams, consParams, ownerKey);
-        var result = await Verifier.Verify(request);
+        var @event = FakeRegister.CreateAllocationEvent(Guid.NewGuid(), prodCert.Id, consCert.Id, prodParams, consParams);
+        var transaction = FakeRegister.SignTransaction(@event.ConsumptionCertificateId, @event, ownerKey);
 
-        AssertInvalid(result, "Production not allocated");
+        var result = await _verifier.Verify(transaction, consCert, @event);
+
+        result.AssertInvalid("Production not allocated");
     }
 }

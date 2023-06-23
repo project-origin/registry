@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+import "registry.proto";
+
+package ProjectOrigin.Verifier.v1;
+
+service VerifierService {
+    rpc VerifyTransaction(VerifyTransactionRequest) returns (VerifyTransactionResponse);
+}
+
+message VerifyTransactionRequest {
+    ProjectOrigin.Registry.v1.Transaction transaction = 1;
+    repeated ProjectOrigin.Registry.v1.Transaction stream = 2;
+}
+
+message VerifyTransactionResponse {
+    bool valid = 1;
+    // If the transaction is not valid, this will contain the reason why
+    string error_message = 2;
+}
