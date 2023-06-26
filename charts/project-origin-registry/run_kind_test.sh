@@ -56,7 +56,7 @@ verifiers:
     type: ProjectOrigin.Electricity.v1
     image:
       repository: ghcr.io/project-origin/electricity-server
-      tag: 0.2.0-rc.13
+      tag: 0.2.0-rc.14
     issuers:
       - area: $example_area
         publicKey: $PublicKeyBase64
