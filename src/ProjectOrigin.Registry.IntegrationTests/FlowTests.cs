@@ -8,7 +8,6 @@ using Google.Protobuf;
 using System;
 using System.Security.Cryptography;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
-using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
 using ProjectOrigin.PedersenCommitment;
 using Google.Protobuf.WellKnownTypes;
 using FluentAssertions;

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "common.proto";
 
-package ProjectOrigin.Registry.v1;
+package project_origin.registry.v1;
 
 service RegistryService {
     rpc SendTransactions (SendTransactionsRequest) returns (SubmitTransactionResponse);
@@ -20,7 +20,7 @@ message SubmitTransactionResponse {}
 
 message GetStreamTransactionsRequest {
     // The id of the transaction to get stream of transactions from.
-    ProjectOrigin.Common.v1.Uuid stream_id = 1;
+    project_origin.common.v1.Uuid stream_id = 1;
 }
 
 message GetStreamTransactionsResponse {
@@ -59,7 +59,7 @@ message GetTransactionProofResponse {
 
 message TransactionHeader {
     // The target stream for which this transaction is intended
-    ProjectOrigin.Common.v1.FederatedStreamId federated_stream_id = 1;
+    project_origin.common.v1.FederatedStreamId federated_stream_id = 1;
 
     // The type of the payload, determines how the payload should be
     // deserialized and validated.
