@@ -19,7 +19,7 @@ verifiableEventStore:
 verifiers:
     # name is the name of the verifier
   - name: electricity-v1
-    type: ProjectOrigin.Electricity.v1
+    type: project_origin.electricity.v1
     # image is the image to use for the verifier
     image:
       # repository is the repository to pull the image from

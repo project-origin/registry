@@ -13,7 +13,7 @@ The minumum configuration required locally is the following values file:
 # defines the verifiers for the registry
 verifiers:
   - name: electricity-v1
-    type: ProjectOrigin.Electricity.v1
+    type: project_origin.electricity.v1
     image:
       repository: ghcr.io/project-origin/electricity-server
       tag: 0.2.0-rc.1

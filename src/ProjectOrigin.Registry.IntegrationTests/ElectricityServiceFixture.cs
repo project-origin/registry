@@ -39,9 +39,9 @@ public class ElectricityServiceFixture : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        // var log = await _container.GetLogsAsync();
-        // Console.WriteLine("CONTAINERLOG: " + log.Stdout);
-        // Console.WriteLine("CONTAINERERR: " + log.Stderr);
+        var log = await _container.GetLogsAsync();
+        Console.WriteLine("CONTAINERLOG: " + log.Stdout);
+        Console.WriteLine("CONTAINERERR: " + log.Stderr);
         await _container.StopAsync();
     }
 }

@@ -1,4 +1,3 @@
-using Google.Protobuf;
 using ProjectOrigin.Electricity.Consumption;
 using ProjectOrigin.Electricity.Extensions;
 using ProjectOrigin.Electricity.V1;

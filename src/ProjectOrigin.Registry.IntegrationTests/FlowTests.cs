@@ -29,7 +29,7 @@ public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityService
         _verifierFixture = verifierFixture;
         grpcFixture.ConfigureHostConfiguration(new Dictionary<string, string?>()
         {
-            {$"Verifiers:ProjectOrigin.Electricity.v1", _verifierFixture.Url},
+            {$"Verifiers:project_origin.electricity.v1", _verifierFixture.Url},
             {"RegistryName", RegistryName}
         });
     }
