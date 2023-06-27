@@ -20,6 +20,41 @@ jobs:
         id: output-version
         run: echo "version=${GITHUB_REF#refs/*/v}" >> $GITHUB_OUTPUT
 
+  publish-electricity-nuget:
+    name: Publish Electricity Nuget package
+    needs:
+      - define-version
+    runs-on: ubuntu-20.04
+    env:
+      project: src/ProjectOrigin.Electricity
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup .NET Core SDK 7
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "7.0.203"
+
+      - name: Build
+        shell: bash
+        run: dotnet build --configuration Release ${{ env.project }}
+
+      - name: Pack
+        shell: bash
+        run: dotnet pack --output build --configuration Release --no-restore -p:Version=${{ needs.define-version.outputs.version }} ${{ env.project }}
+
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v3
+        with:
+          name: nuget-packages
+          path: build/*.nupkg
+          retention-days: 1
+
+      - name: Publish
+        shell: bash
+        run: dotnet nuget push build/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+
   publish-hdkeys-nuget:
     name: Publish Hierarchical Deterministic Keys Nuget package
     needs:

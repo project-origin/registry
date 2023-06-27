@@ -2,7 +2,6 @@ using System.Text;
 using Grpc.Net.Client;
 using ProjectOrigin.Electricity.Example;
 using ProjectOrigin.HierarchicalDeterministicKeys;
-using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
 using ProjectOrigin.PedersenCommitment;
 using ProjectOrigin.Registry.V1;
 

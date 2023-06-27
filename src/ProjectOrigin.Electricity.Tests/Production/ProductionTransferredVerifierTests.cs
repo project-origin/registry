@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using AutoFixture;
-using ProjectOrigin.Electricity.Production.Verifiers;
+using ProjectOrigin.Electricity.Server.Verifiers;
 using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.PedersenCommitment;
 using Xunit;
@@ -9,11 +9,11 @@ namespace ProjectOrigin.Electricity.Tests;
 
 public class ProductionTransferredVerifierTests
 {
-    private ProductionTransferredVerifier _verifier;
+    private TransferredEventVerifier _verifier;
 
     public ProductionTransferredVerifierTests()
     {
-        _verifier = new ProductionTransferredVerifier();
+        _verifier = new TransferredEventVerifier();
     }
 
     [Fact]

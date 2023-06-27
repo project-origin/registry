@@ -49,13 +49,4 @@ internal static class ModelToProtoExtensions
             Type = V1.KeyType.Secp256K1
         };
     }
-
-    internal static V1.DateInterval ToProto(this DateInterval model)
-    {
-        return new V1.DateInterval()
-        {
-            Start = Timestamp.FromDateTimeOffset(model.Start),
-            End = Timestamp.FromDateTimeOffset(model.End),
-        };
-    }
 }

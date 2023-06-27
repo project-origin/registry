@@ -42,7 +42,7 @@ public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityService
         var commitmentInfo = new SecretCommitmentInfo(250);
         var certId = Guid.NewGuid();
 
-        ConsumptionIssuedEvent @event = CreateIssuedEvent(owner, commitmentInfo, certId);
+        IssuedEvent @event = CreateIssuedEvent(owner, commitmentInfo, certId);
 
         var transaction = SignTransaction(@event.CertificateId, @event, _verifierFixture.IssuerKey);
 
@@ -82,9 +82,9 @@ public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityService
         }
     }
 
-    private ConsumptionIssuedEvent CreateIssuedEvent(IHDPrivateKey owner, SecretCommitmentInfo commitmentInfo, Guid certId)
+    private IssuedEvent CreateIssuedEvent(IHDPrivateKey owner, SecretCommitmentInfo commitmentInfo, Guid certId)
     {
-        return new Electricity.V1.ConsumptionIssuedEvent
+        return new Electricity.V1.IssuedEvent
         {
             CertificateId = new Common.V1.FederatedStreamId
             {
@@ -94,13 +94,14 @@ public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityService
                     Value = certId.ToString()
                 },
             },
+            Type = Electricity.V1.GranularCertificateType.Consumption,
             Period = new Electricity.V1.DateInterval
             {
                 Start = Timestamp.FromDateTimeOffset(new DateTimeOffset(2023, 1, 1, 12, 0, 0, 0, TimeSpan.Zero)),
                 End = Timestamp.FromDateTimeOffset(new DateTimeOffset(2023, 1, 1, 13, 0, 0, 0, TimeSpan.Zero))
             },
             GridArea = _verifierFixture.IssuerArea,
-            GsrnHash = ByteString.Empty,
+            AssetId = ByteString.Empty,
             QuantityCommitment = new Electricity.V1.Commitment
             {
                 Content = ByteString.CopyFrom(commitmentInfo.Commitment.C),

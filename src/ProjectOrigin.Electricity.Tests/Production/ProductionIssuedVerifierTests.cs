@@ -7,9 +7,9 @@ using Microsoft.Extensions.Options;
 using Moq;
 using ProjectOrigin.Electricity.Extensions;
 using ProjectOrigin.Electricity.Models;
-using ProjectOrigin.Electricity.Production;
-using ProjectOrigin.Electricity.Production.Verifiers;
-using ProjectOrigin.Electricity.Services;
+using ProjectOrigin.Electricity.Server.Options;
+using ProjectOrigin.Electricity.Server.Services;
+using ProjectOrigin.Electricity.Server.Verifiers;
 using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.PedersenCommitment;
@@ -21,7 +21,7 @@ public class ProductionIssuedVerifierTests
 {
     const string IssuerArea = "DK1";
     private IPrivateKey _issuerKey;
-    private ProductionIssuedVerifier _verifier;
+    private IssuedEventVerifier _verifier;
 
     public ProductionIssuedVerifierTests()
     {
@@ -36,7 +36,7 @@ public class ProductionIssuedVerifierTests
         });
         var issuerService = new GridAreaIssuerOptionsService(optionsMock.Object);
 
-        _verifier = new ProductionIssuedVerifier(issuerService);
+        _verifier = new IssuedEventVerifier(issuerService);
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public class ProductionIssuedVerifierTests
         var @event = FakeRegister.CreateProductionIssuedEvent();
         var transaction = FakeRegister.SignTransaction(@event.CertificateId, @event, _issuerKey);
 
-        var result = await _verifier.Verify(transaction, new ProductionCertificate(@event), @event);
+        var result = await _verifier.Verify(transaction, new GranularCertificate(@event), @event);
 
         result.AssertInvalid($"Certificate with id ”{@event.CertificateId.StreamId}” already exists");
     }
@@ -85,16 +85,16 @@ public class ProductionIssuedVerifierTests
         result.AssertInvalid("Invalid range proof for Quantity commitment");
     }
 
-    [Fact]
-    public async Task ProductionIssuedVerifier_InvalidPublicParameters_Fail()
-    {
-        var @event = FakeRegister.CreateProductionIssuedEvent(publicQuantityCommitmentOverride: new SecretCommitmentInfo(695956), publicQuantity: true);
-        var transaction = FakeRegister.SignTransaction(@event.CertificateId, @event, _issuerKey);
+    // [Fact]
+    // public async Task ProductionIssuedVerifier_InvalidPublicParameters_Fail()
+    // {
+    //     var @event = FakeRegister.CreateProductionIssuedEvent(publicQuantityCommitmentOverride: new SecretCommitmentInfo(695956), publicQuantity: true);
+    //     var transaction = FakeRegister.SignTransaction(@event.CertificateId, @event, _issuerKey);
 
-        var result = await _verifier.Verify(transaction, null, @event);
+    //     var result = await _verifier.Verify(transaction, null, @event);
 
-        result.AssertInvalid("Private and public quantity proof does not match");
-    }
+    //     result.AssertInvalid("Private and public quantity proof does not match");
+    // }
 
     [Fact]
     public async Task ProductionIssuedVerifier_InvalidOwner_Fail()

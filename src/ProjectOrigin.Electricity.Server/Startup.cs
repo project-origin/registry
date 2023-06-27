@@ -4,16 +4,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ProjectOrigin.Electricity.Consumption;
-using ProjectOrigin.Electricity.Consumption.Verifiers;
-using ProjectOrigin.Electricity.Interfaces;
-using ProjectOrigin.Electricity.Models;
-using ProjectOrigin.Electricity.Production;
-using ProjectOrigin.Electricity.Production.Verifiers;
-using ProjectOrigin.Electricity.Services;
-using ProjectOrigin.Verifier.Utils;
-using ProjectOrigin.Verifier.Utils.Interfaces;
-using ProjectOrigin.Verifier.Utils.Services;
+using ProjectOrigin.Electricity.Server.Interfaces;
+using ProjectOrigin.Electricity.Server.Options;
+using ProjectOrigin.Electricity.Server.Services;
+using ProjectOrigin.Electricity.Server.Verifiers;
 
 namespace ProjectOrigin.Electricity.Server;
 
@@ -23,19 +17,14 @@ public class Startup
     {
         services.AddGrpc();
 
-        services.AddSingleton<IProtoDeserializer>(new ProtoDeserializer(Assembly.GetAssembly(typeof(V1.ConsumptionIssuedEvent))
+        services.AddSingleton<IProtoDeserializer>(new ProtoDeserializer(Assembly.GetAssembly(typeof(V1.IssuedEvent))
             ?? throw new Exception("Could not find assembly")));
 
-        services.AddTransient<IEventVerifier<V1.ConsumptionIssuedEvent>, ConsumptionIssuedVerifier>();
-        services.AddTransient<IEventVerifier<ConsumptionCertificate, V1.AllocatedEvent>, ConsumptionAllocatedVerifier>();
-        services.AddTransient<IEventVerifier<ConsumptionCertificate, V1.ClaimedEvent>, ConsumptionClaimedVerifier>();
-        services.AddTransient<IEventVerifier<ConsumptionCertificate, V1.SlicedEvent>, ConsumptionSlicedVerifier>();
-
-        services.AddTransient<IEventVerifier<V1.ProductionIssuedEvent>, ProductionIssuedVerifier>();
-        services.AddTransient<IEventVerifier<ProductionCertificate, V1.AllocatedEvent>, ProductionAllocatedVerifier>();
-        services.AddTransient<IEventVerifier<ProductionCertificate, V1.ClaimedEvent>, ProductionClaimedVerifier>();
-        services.AddTransient<IEventVerifier<ProductionCertificate, V1.SlicedEvent>, ProductionSlicedVerifier>();
-        services.AddTransient<IEventVerifier<ProductionCertificate, V1.TransferredEvent>, ProductionTransferredVerifier>();
+        services.AddTransient<IEventVerifier<V1.IssuedEvent>, IssuedEventVerifier>();
+        services.AddTransient<IEventVerifier<V1.AllocatedEvent>, AllocatedEventVerifier>();
+        services.AddTransient<IEventVerifier<V1.ClaimedEvent>, ClaimedEventVerifier>();
+        services.AddTransient<IEventVerifier<V1.SlicedEvent>, SlicedEventVerifier>();
+        services.AddTransient<IEventVerifier<V1.TransferredEvent>, TransferredEventVerifier>();
 
         services.AddTransient<IVerifierDispatcher, VerifierDispatcher>();
         services.AddTransient<IRemoteModelLoader, GrpcRemoteModelLoader>();

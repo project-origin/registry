@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using AutoFixture;
 using Microsoft.Extensions.Options;
 using Moq;
-using ProjectOrigin.Electricity.Consumption;
-using ProjectOrigin.Electricity.Consumption.Verifiers;
 using ProjectOrigin.Electricity.Models;
-using ProjectOrigin.Electricity.Services;
+using ProjectOrigin.Electricity.Server.Options;
+using ProjectOrigin.Electricity.Server.Services;
+using ProjectOrigin.Electricity.Server.Verifiers;
 using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using Xunit;
@@ -19,7 +19,7 @@ public class ConsumptionIssuedVerifierTests
 {
     const string IssuerArea = "DK1";
     private IPrivateKey _issuerKey;
-    private ConsumptionIssuedVerifier _verifier;
+    private IssuedEventVerifier _verifier;
 
     public ConsumptionIssuedVerifierTests()
     {
@@ -34,7 +34,7 @@ public class ConsumptionIssuedVerifierTests
         });
         var issuerService = new GridAreaIssuerOptionsService(optionsMock.Object);
 
-        _verifier = new ConsumptionIssuedVerifier(issuerService);
+        _verifier = new IssuedEventVerifier(issuerService);
     }
 
     [Fact]
@@ -53,7 +53,7 @@ public class ConsumptionIssuedVerifierTests
     {
         var @event = FakeRegister.CreateConsumptionIssuedEvent();
         var transaction = FakeRegister.SignTransaction(@event.CertificateId, @event, _issuerKey);
-        var certificate = new ConsumptionCertificate(@event);
+        var certificate = new GranularCertificate(@event);
 
         var result = await _verifier.Verify(transaction, certificate, @event);
 

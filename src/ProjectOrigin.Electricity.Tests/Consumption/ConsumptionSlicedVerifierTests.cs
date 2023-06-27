@@ -2,7 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
 using Google.Protobuf;
-using ProjectOrigin.Electricity.Consumption.Verifiers;
+using ProjectOrigin.Electricity.Server.Verifiers;
 using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.PedersenCommitment;
 using Xunit;
@@ -11,11 +11,11 @@ namespace ProjectOrigin.Electricity.Tests;
 
 public class ConsumptionSlicedVerifierTests
 {
-    private ConsumptionSlicedVerifier _verifier;
+    private SlicedEventVerifier _verifier;
 
     public ConsumptionSlicedVerifierTests()
     {
-        _verifier = new ConsumptionSlicedVerifier();
+        _verifier = new SlicedEventVerifier();
     }
 
     [Fact]

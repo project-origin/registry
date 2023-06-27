@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ProjectOrigin.Electricity\ProjectOrigin.Electricity.csproj" />
+    <ProjectReference Include="..\ProjectOrigin.Electricity.Server\ProjectOrigin.Electricity.Server.csproj" />
   </ItemGroup>
 
 </Project>

@@ -5,25 +5,15 @@ import "common.proto";
 
 package project_origin.electricity.v1;
 
-message ConsumptionIssuedEvent {
+message IssuedEvent {
     project_origin.common.v1.FederatedStreamId certificate_id = 1;
-    DateInterval period = 2;
-    string grid_area = 3;
-    bytes gsrn_hash = 4;
-    Commitment quantity_commitment = 5;
-    PublicKey owner_public_key = 6;
-}
-
-message ProductionIssuedEvent {
-    project_origin.common.v1.FederatedStreamId certificate_id = 1;
-    DateInterval period = 2;
-    string grid_area = 3;
-    string fuel_code = 4;
-    string tech_code = 5;
-    bytes gsrn_hash = 6;
-    Commitment quantity_commitment = 7;
-    CommitmentPublication quantity_publication = 8;
-    PublicKey owner_public_key = 9;
+    GranularCertificateType type = 2;
+    DateInterval period = 3;
+    string grid_area = 4;
+    bytes asset_id = 5;
+    Commitment quantity_commitment = 6;
+    PublicKey owner_public_key = 7;
+    repeated Attribute Attributes = 8;
 }
 
 message TransferredEvent{
@@ -56,6 +46,17 @@ message AllocatedEvent {
 message ClaimedEvent {
     project_origin.common.v1.FederatedStreamId  certificate_id = 1;
     project_origin.common.v1.Uuid allocation_id = 2;
+}
+
+enum GranularCertificateType {
+    INVALID = 0;
+    CONSUMPTION = 1;
+    PRODUCTION = 2;
+}
+
+message Attribute {
+    string Key = 1;
+    string Value = 2;
 }
 
 message DateInterval {
