@@ -45,7 +45,7 @@ public class Helper
         var @event = new Electricity.V1.IssuedEvent
         {
             CertificateId = certId,
-            Type = Electricity.V1.GranularCertificateType.Consumption,
+            Type = Electricity.V1.GranularCertificateType.Production,
             Period = new Electricity.V1.DateInterval
             {
                 Start = Timestamp.FromDateTimeOffset(Start),

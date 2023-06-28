@@ -41,7 +41,7 @@ public class AllocatedEventVerifier : IEventVerifier<V1.AllocatedEvent>
             if (otherCertificate.Type != V1.GranularCertificateType.Consumption)
                 return new VerificationResult.Invalid("ConsumptionCertificate is not a consumption certificate");
 
-            if (otherCertificate.Period != certificate.Period)
+            if (!otherCertificate.Period.Equals(certificate.Period))
                 return new VerificationResult.Invalid("Certificates are not in the same period");
 
             if (otherCertificate.GridArea != certificate.GridArea)

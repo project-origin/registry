@@ -2,14 +2,22 @@ using System;
 using System.Security.Cryptography;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
-using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.PedersenCommitment;
 
 namespace ProjectOrigin.Electricity.Tests;
 
-internal static class ModelToProtoExtensions
+public static class ProtoExtensions
 {
+    internal static V1.DateInterval AddHours(this V1.DateInterval interval, int hours)
+    {
+        return new V1.DateInterval()
+        {
+            Start = Timestamp.FromDateTimeOffset(interval.Start.ToDateTimeOffset().AddHours(hours)),
+            End = Timestamp.FromDateTimeOffset(interval.End.ToDateTimeOffset().AddHours(hours))
+        };
+    }
+
     internal static ByteString ToSliceId(this SecretCommitmentInfo @params)
     {
         return ByteString.CopyFrom(SHA256.HashData(@params.Commitment.C));
