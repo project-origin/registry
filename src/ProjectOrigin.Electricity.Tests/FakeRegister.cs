@@ -131,7 +131,7 @@ internal static class FakeRegister
             Type = V1.GranularCertificateType.Consumption,
             Period = periodOverride ?? _defaultPeriod,
             GridArea = gridAreaOverride ?? "DK1",
-            AssetId = ByteString.CopyFrom(gsrnHash),
+            AssetIdHash = ByteString.CopyFrom(gsrnHash),
             QuantityCommitment = quantityCommitmentOverride ?? quantityCommmitment,
             OwnerPublicKey = owner,
         };
@@ -158,7 +158,7 @@ internal static class FakeRegister
             Type = V1.GranularCertificateType.Production,
             Period = periodOverride ?? _defaultPeriod,
             GridArea = gridAreaOverride ?? "DK1",
-            AssetId = ByteString.CopyFrom(gsrnHash),
+            AssetIdHash = ByteString.CopyFrom(gsrnHash),
             QuantityCommitment = quantityCommitmentOverride ?? quantityCommmitment,
             OwnerPublicKey = owner,
         };

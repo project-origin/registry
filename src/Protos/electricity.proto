@@ -10,7 +10,7 @@ message IssuedEvent {
     GranularCertificateType type = 2;
     DateInterval period = 3;
     string grid_area = 4;
-    bytes asset_id = 5;
+    bytes asset_id_hash = 5;
     Commitment quantity_commitment = 6;
     PublicKey owner_public_key = 7;
     repeated Attribute Attributes = 8;

@@ -29,7 +29,7 @@ public class Helper
                 End = Timestamp.FromDateTimeOffset(Start.AddHours(1))
             },
             GridArea = _area,
-            AssetId = ByteString.Empty,
+            AssetIdHash = ByteString.Empty,
             QuantityCommitment = CommitmentToProto(certId, commitmentInfo),
             OwnerPublicKey = new Electricity.V1.PublicKey
             {
@@ -52,7 +52,7 @@ public class Helper
                 End = Timestamp.FromDateTimeOffset(Start.AddHours(1))
             },
             GridArea = _area,
-            AssetId = ByteString.Empty,
+            AssetIdHash = ByteString.Empty,
             QuantityCommitment = CommitmentToProto(certId, commitmentInfo),
             OwnerPublicKey = new Electricity.V1.PublicKey
             {

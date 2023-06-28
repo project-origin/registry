@@ -70,7 +70,7 @@ public class FlowTests : GrpcTestBase<Startup>
                 End = Timestamp.FromDateTimeOffset(new DateTimeOffset(2023, 1, 1, 13, 0, 0, 0, TimeSpan.Zero))
             },
             GridArea = Area,
-            AssetId = ByteString.Empty,
+            AssetIdHash = ByteString.Empty,
             QuantityCommitment = new Electricity.V1.Commitment
             {
                 Content = ByteString.CopyFrom(commitmentInfo.Commitment.C),

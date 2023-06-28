@@ -49,7 +49,7 @@ public class ConsumptionCertificateApplyTests
             Type = V1.GranularCertificateType.Consumption,
             Period = period,
             GridArea = area,
-            AssetId = ByteString.CopyFrom(gsrnHash),
+            AssetIdHash = ByteString.CopyFrom(gsrnHash),
             QuantityCommitment = quantity.ToProtoCommitment(certId.StreamId.Value),
             OwnerPublicKey = ownerKey.PublicKey.ToProto(),
         };
@@ -89,7 +89,7 @@ public class ConsumptionCertificateApplyTests
             Type = V1.GranularCertificateType.Consumption,
             Period = period,
             GridArea = area,
-            AssetId = ByteString.CopyFrom(gsrnHash),
+            AssetIdHash = ByteString.CopyFrom(gsrnHash),
             QuantityCommitment = quantity.ToProtoCommitment(streamId.ToString()),
             OwnerPublicKey = ownerKey.PublicKey.ToProto(),
         };
