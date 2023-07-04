@@ -2,12 +2,10 @@ using System;
 using System.Security.Cryptography;
 using AutoFixture;
 using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
 using NSec.Cryptography;
-using ProjectOrigin.Electricity.Consumption;
 using ProjectOrigin.Electricity.Models;
-using ProjectOrigin.Electricity.Production;
 using ProjectOrigin.HierarchicalDeterministicKeys;
-using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.PedersenCommitment;
 
@@ -17,9 +15,11 @@ internal static class FakeRegister
 {
     const string Registry = "OurReg";
 
-    private static DateInterval _defaultPeriod = new DateInterval(
-            new DateTimeOffset(2022, 09, 25, 12, 0, 0, TimeSpan.Zero),
-            new DateTimeOffset(2022, 09, 25, 13, 0, 0, TimeSpan.Zero));
+    private static V1.DateInterval _defaultPeriod = new V1.DateInterval()
+    {
+        Start = Timestamp.FromDateTimeOffset(new DateTimeOffset(2022, 09, 25, 12, 0, 0, TimeSpan.Zero)),
+        End = Timestamp.FromDateTimeOffset(new DateTimeOffset(2022, 09, 25, 13, 0, 0, TimeSpan.Zero))
+    };
 
     public static Registry.V1.Transaction SignTransaction(Common.V1.FederatedStreamId id, IMessage @event, IPrivateKey signerKey)
     {
@@ -42,7 +42,7 @@ internal static class FakeRegister
     }
 
 
-    internal static (ConsumptionCertificate certificate, SecretCommitmentInfo parameters) ConsumptionIssued(IPublicKey ownerKey, uint quantity, string area = "DK1", DateInterval? periodOverride = null)
+    internal static (GranularCertificate certificate, SecretCommitmentInfo parameters) ConsumptionIssued(IPublicKey ownerKey, uint quantity, string area = "DK1", V1.DateInterval? periodOverride = null)
     {
         var id = CreateFederatedId();
         var quantityCommitmentParameters = new SecretCommitmentInfo(quantity);
@@ -54,12 +54,12 @@ internal static class FakeRegister
                 area,
                 periodOverride);
 
-        var cert = new ConsumptionCertificate(@event);
+        var cert = new GranularCertificate(@event);
 
         return (cert, quantityCommitmentParameters);
     }
 
-    internal static (ProductionCertificate certificate, SecretCommitmentInfo parameters) ProductionIssued(IPublicKey ownerKey, uint quantity, string area = "DK1", DateInterval? periodOverride = null)
+    internal static (GranularCertificate certificate, SecretCommitmentInfo parameters) ProductionIssued(IPublicKey ownerKey, uint quantity, string area = "DK1", V1.DateInterval? periodOverride = null)
     {
         var id = CreateFederatedId();
         var gsrnHash = SHA256.HashData(BitConverter.GetBytes(new Fixture().Create<ulong>()));
@@ -73,12 +73,12 @@ internal static class FakeRegister
                 area,
                 periodOverride);
 
-        var cert = new ProductionCertificate(@event);
+        var cert = new GranularCertificate(@event);
 
         return (cert, quantityCommitmentParameters);
     }
 
-    internal static Guid Allocated(this ProductionCertificate prodCert, ConsumptionCertificate consCert, SecretCommitmentInfo produtionParameters, SecretCommitmentInfo sourceParameters, Guid? allocationIdOverride = null)
+    internal static Guid Allocated(this GranularCertificate prodCert, GranularCertificate consCert, SecretCommitmentInfo produtionParameters, SecretCommitmentInfo sourceParameters, Guid? allocationIdOverride = null)
     {
         var allocationId = allocationIdOverride ?? Guid.NewGuid();
 
@@ -88,7 +88,7 @@ internal static class FakeRegister
         return allocationId;
     }
 
-    internal static Guid Allocated(this ConsumptionCertificate consCert, Guid allocationId, ProductionCertificate prodCert, SecretCommitmentInfo produtionParameters, SecretCommitmentInfo sourceParameters)
+    internal static Guid Allocated(this GranularCertificate consCert, Guid allocationId, GranularCertificate prodCert, SecretCommitmentInfo produtionParameters, SecretCommitmentInfo sourceParameters)
     {
         var @event = CreateAllocationEvent(allocationId, prodCert.Id, consCert.Id, produtionParameters, sourceParameters);
         consCert.Apply(@event);
@@ -96,7 +96,7 @@ internal static class FakeRegister
         return allocationId;
     }
 
-    internal static void Claimed(this ProductionCertificate certificate, Guid allocationId)
+    internal static void Claimed(this GranularCertificate certificate, Guid allocationId)
     {
         var @event = CreateClaimedEvent(allocationId, certificate.Id);
         certificate.Apply(@event);
@@ -113,11 +113,11 @@ internal static class FakeRegister
         };
     }
 
-    internal static V1.ConsumptionIssuedEvent CreateConsumptionIssuedEvent(
+    internal static V1.IssuedEvent CreateConsumptionIssuedEvent(
         V1.Commitment? quantityCommitmentOverride = null,
         V1.PublicKey? ownerKeyOverride = null,
         string? gridAreaOverride = null,
-        DateInterval? periodOverride = null
+        V1.DateInterval? periodOverride = null
         )
     {
         var id = CreateFederatedId();
@@ -125,24 +125,25 @@ internal static class FakeRegister
         var gsrnHash = SHA256.HashData(BitConverter.GetBytes(5700000000000001));
         var quantityCommmitment = new SecretCommitmentInfo(150).ToProtoCommitment(id.StreamId.Value);
 
-        return new V1.ConsumptionIssuedEvent()
+        return new V1.IssuedEvent()
         {
             CertificateId = id,
-            Period = (periodOverride ?? _defaultPeriod).ToProto(),
+            Type = V1.GranularCertificateType.Consumption,
+            Period = periodOverride ?? _defaultPeriod,
             GridArea = gridAreaOverride ?? "DK1",
-            GsrnHash = ByteString.CopyFrom(gsrnHash),
+            AssetIdHash = ByteString.CopyFrom(gsrnHash),
             QuantityCommitment = quantityCommitmentOverride ?? quantityCommmitment,
             OwnerPublicKey = owner,
         };
     }
 
-    internal static V1.ProductionIssuedEvent CreateProductionIssuedEvent(
+    internal static V1.IssuedEvent CreateProductionIssuedEvent(
         V1.Commitment? quantityCommitmentOverride = null,
         V1.PublicKey? ownerKeyOverride = null,
         bool publicQuantity = false,
         SecretCommitmentInfo? publicQuantityCommitmentOverride = null,
         string? gridAreaOverride = null,
-        DateInterval? periodOverride = null
+        V1.DateInterval? periodOverride = null
         )
     {
         var id = CreateFederatedId();
@@ -151,27 +152,29 @@ internal static class FakeRegister
         var quantityCommmitmentParams = new SecretCommitmentInfo(150);
         var quantityCommmitment = quantityCommmitmentParams.ToProtoCommitment(id.StreamId.Value);
 
-        var @event = new V1.ProductionIssuedEvent()
+        var @event = new V1.IssuedEvent()
         {
             CertificateId = id,
-            Period = (periodOverride ?? _defaultPeriod).ToProto(),
+            Type = V1.GranularCertificateType.Production,
+            Period = periodOverride ?? _defaultPeriod,
             GridArea = gridAreaOverride ?? "DK1",
-            FuelCode = "F01050100",
-            TechCode = "T020002",
-            GsrnHash = ByteString.CopyFrom(gsrnHash),
+            AssetIdHash = ByteString.CopyFrom(gsrnHash),
             QuantityCommitment = quantityCommitmentOverride ?? quantityCommmitment,
             OwnerPublicKey = owner,
-            QuantityPublication = publicQuantity ? (publicQuantityCommitmentOverride ?? quantityCommmitmentParams).ToProto() : null
         };
+
+        @event.Attributes.Add(new V1.Attribute { Key = "FuelCode", Value = "F01050100" });
+        @event.Attributes.Add(new V1.Attribute { Key = "TechCode", Value = "T020002" });
+        // QuantityPublication = publicQuantity ? (publicQuantityCommitmentOverride ?? quantityCommmitmentParams).ToProto() : null
 
         return @event;
     }
 
     internal static V1.TransferredEvent CreateTransferEvent(
-    ProductionCertificate certificate,
+    GranularCertificate certificate,
     SecretCommitmentInfo sourceSliceParameters,
     V1.PublicKey newOwner
-)
+    )
     {
         return new V1.TransferredEvent
         {

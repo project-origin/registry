@@ -17,18 +17,19 @@ public class Helper
         _area = area;
     }
 
-    public Electricity.V1.ConsumptionIssuedEvent CreateConsumptionIssuedEvent(FederatedStreamId certId, SecretCommitmentInfo commitmentInfo, IPublicKey ownerKey)
+    public Electricity.V1.IssuedEvent CreateConsumptionIssuedEvent(FederatedStreamId certId, SecretCommitmentInfo commitmentInfo, IPublicKey ownerKey)
     {
-        var @event = new Electricity.V1.ConsumptionIssuedEvent
+        var @event = new Electricity.V1.IssuedEvent
         {
             CertificateId = certId,
+            Type = Electricity.V1.GranularCertificateType.Consumption,
             Period = new Electricity.V1.DateInterval
             {
                 Start = Timestamp.FromDateTimeOffset(Start),
                 End = Timestamp.FromDateTimeOffset(Start.AddHours(1))
             },
             GridArea = _area,
-            GsrnHash = ByteString.Empty,
+            AssetIdHash = ByteString.Empty,
             QuantityCommitment = CommitmentToProto(certId, commitmentInfo),
             OwnerPublicKey = new Electricity.V1.PublicKey
             {
@@ -39,26 +40,37 @@ public class Helper
         return @event;
     }
 
-    public Electricity.V1.ProductionIssuedEvent CreateProductionIssuedEvent(FederatedStreamId certId, SecretCommitmentInfo commitmentInfo, IPublicKey ownerKey)
+    public Electricity.V1.IssuedEvent CreateProductionIssuedEvent(FederatedStreamId certId, SecretCommitmentInfo commitmentInfo, IPublicKey ownerKey)
     {
-        var @event = new Electricity.V1.ProductionIssuedEvent
+        var @event = new Electricity.V1.IssuedEvent
         {
             CertificateId = certId,
+            Type = Electricity.V1.GranularCertificateType.Production,
             Period = new Electricity.V1.DateInterval
             {
                 Start = Timestamp.FromDateTimeOffset(Start),
                 End = Timestamp.FromDateTimeOffset(Start.AddHours(1))
             },
             GridArea = _area,
-            TechCode = "T010101",
-            FuelCode = "F010101",
-            GsrnHash = ByteString.Empty,
+            AssetIdHash = ByteString.Empty,
             QuantityCommitment = CommitmentToProto(certId, commitmentInfo),
             OwnerPublicKey = new Electricity.V1.PublicKey
             {
                 Content = ByteString.CopyFrom(ownerKey.Export())
             }
         };
+
+        @event.Attributes.Add(new V1.Attribute
+        {
+            Key = "TechCode",
+            Value = "T010101"
+        });
+
+        @event.Attributes.Add(new V1.Attribute
+        {
+            Key = "FuelCode",
+            Value = "F010101"
+        });
 
         return @event;
     }

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package ProjectOrigin.Common.v1;
+package project_origin.common.v1;
 
 message FederatedStreamId {
     string registry = 1;

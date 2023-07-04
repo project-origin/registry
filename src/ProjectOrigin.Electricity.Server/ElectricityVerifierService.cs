@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
 using Grpc.Core;
-using ProjectOrigin.Verifier.Utils;
+using ProjectOrigin.Electricity.Server.Interfaces;
 using ProjectOrigin.Verifier.V1;
 
-namespace ProjectOrigin.Electricity;
+namespace ProjectOrigin.Electricity.Server;
 
 internal class ElectricityVerifierService : ProjectOrigin.Verifier.V1.VerifierService.VerifierServiceBase
 {

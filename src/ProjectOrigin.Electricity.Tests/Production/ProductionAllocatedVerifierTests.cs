@@ -3,27 +3,26 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
 using Moq;
-using ProjectOrigin.Electricity.Consumption;
 using ProjectOrigin.Electricity.Models;
-using ProjectOrigin.Electricity.Production.Verifiers;
+using ProjectOrigin.Electricity.Server.Interfaces;
+using ProjectOrigin.Electricity.Server.Verifiers;
 using ProjectOrigin.HierarchicalDeterministicKeys;
-using ProjectOrigin.Verifier.Utils.Interfaces;
 using Xunit;
 
 namespace ProjectOrigin.Electricity.Tests;
 
 public class ProductionAllocatedVerifierTests
 {
-    private ProductionAllocatedVerifier _verifier;
-    private ConsumptionCertificate? _otherCertificate;
+    private AllocatedEventVerifier _verifier;
+    private GranularCertificate? _otherCertificate;
 
     public ProductionAllocatedVerifierTests()
     {
         var modelLoaderMock = new Mock<IRemoteModelLoader>();
-        modelLoaderMock.Setup(obj => obj.GetModel<ConsumptionCertificate>(It.IsAny<Common.V1.FederatedStreamId>()))
+        modelLoaderMock.Setup(obj => obj.GetModel<GranularCertificate>(It.IsAny<Common.V1.FederatedStreamId>()))
             .Returns(() => Task.FromResult(_otherCertificate));
 
-        _verifier = new ProductionAllocatedVerifier(modelLoaderMock.Object);
+        _verifier = new AllocatedEventVerifier(modelLoaderMock.Object);
     }
 
     [Fact]
@@ -31,7 +30,7 @@ public class ProductionAllocatedVerifierTests
     {
         var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
-        var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250);
+        var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250, periodOverride: consCert.Period.Clone());
         _otherCertificate = consCert;
 
         var @event = FakeRegister.CreateAllocationEvent(Guid.NewGuid(), prodCert.Id, consCert.Id, prodParams, consParams);
@@ -112,8 +111,7 @@ public class ProductionAllocatedVerifierTests
     {
         var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var (consCert, consParams) = FakeRegister.ConsumptionIssued(ownerKey.PublicKey, 250);
-        var hourLater = new DateInterval(consCert.Period.Start, consCert.Period.End.AddHours(1));
-        var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250, periodOverride: hourLater);
+        var (prodCert, prodParams) = FakeRegister.ProductionIssued(ownerKey.PublicKey, 250, periodOverride: consCert.Period.AddHours(1));
         _otherCertificate = consCert;
 
         var @event = FakeRegister.CreateAllocationEvent(Guid.NewGuid(), prodCert.Id, consCert.Id, prodParams, consParams);

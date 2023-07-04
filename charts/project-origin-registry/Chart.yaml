@@ -3,7 +3,7 @@ name: project-origin-registry
 description: A helm chart for deploying the Project Origin Registry, includes the registry, verifiers and concordium node.
 type: application
 version: 0.2.0
-appVersion: "0.2.0-rc.13"
+appVersion: "0.2.0-rc.17"
 
 annotations:
   artifacthub.io/containsSecurityUpdates: "false"

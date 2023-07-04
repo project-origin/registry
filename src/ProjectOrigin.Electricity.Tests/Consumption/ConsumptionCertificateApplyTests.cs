@@ -1,13 +1,13 @@
 using System.Security.Cryptography;
 using Google.Protobuf;
 using ProjectOrigin.Electricity.Extensions;
-using ProjectOrigin.Electricity.Consumption;
 using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.PedersenCommitment;
 using Xunit;
 using System;
 using AutoFixture;
 using ProjectOrigin.HierarchicalDeterministicKeys;
+using Google.Protobuf.WellKnownTypes;
 
 namespace ProjectOrigin.Electricity.Tests;
 
@@ -30,28 +30,31 @@ public class ConsumptionCertificateApplyTests
         };
     }
 
-    private (ConsumptionCertificate, SecretCommitmentInfo) Create()
+    private (GranularCertificate, SecretCommitmentInfo) Create()
     {
         var area = _fixture.Create<string>();
-        var period = new DateInterval(
-            new DateTimeOffset(2022, 09, 25, 12, 0, 0, TimeSpan.Zero),
-            new DateTimeOffset(2022, 09, 25, 13, 0, 0, TimeSpan.Zero));
+        var period = new V1.DateInterval
+        {
+            Start = Timestamp.FromDateTimeOffset(new DateTimeOffset(2022, 09, 25, 12, 0, 0, TimeSpan.Zero)),
+            End = Timestamp.FromDateTimeOffset(new DateTimeOffset(2022, 09, 25, 13, 0, 0, TimeSpan.Zero))
+        };
         var gsrnHash = SHA256.HashData(BitConverter.GetBytes(new Fixture().Create<ulong>()));
         var quantity = new SecretCommitmentInfo(_fixture.Create<uint>());
         var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
         var certId = CreateId();
 
-        var @event = new V1.ConsumptionIssuedEvent()
+        var @event = new V1.IssuedEvent()
         {
             CertificateId = certId,
-            Period = period.ToProto(),
+            Type = V1.GranularCertificateType.Consumption,
+            Period = period,
             GridArea = area,
-            GsrnHash = ByteString.CopyFrom(gsrnHash),
+            AssetIdHash = ByteString.CopyFrom(gsrnHash),
             QuantityCommitment = quantity.ToProtoCommitment(certId.StreamId.Value),
             OwnerPublicKey = ownerKey.PublicKey.ToProto(),
         };
 
-        var cert = new ConsumptionCertificate(@event);
+        var cert = new GranularCertificate(@event);
 
         return (cert, quantity);
     }
@@ -63,15 +66,17 @@ public class ConsumptionCertificateApplyTests
         var registry = _fixture.Create<string>();
         var streamId = Guid.NewGuid();
         var area = _fixture.Create<string>();
-        var period = new DateInterval(
-            new DateTimeOffset(2022, 09, 25, 12, 0, 0, TimeSpan.Zero),
-            new DateTimeOffset(2022, 09, 25, 13, 0, 0, TimeSpan.Zero));
+        var period = new V1.DateInterval
+        {
+            Start = Timestamp.FromDateTimeOffset(new DateTimeOffset(2022, 09, 25, 12, 0, 0, TimeSpan.Zero)),
+            End = Timestamp.FromDateTimeOffset(new DateTimeOffset(2022, 09, 25, 13, 0, 0, TimeSpan.Zero))
+        };
         var gsrnHash = SHA256.HashData(BitConverter.GetBytes(_fixture.Create<ulong>()));
         var quantity = new SecretCommitmentInfo(_fixture.Create<uint>());
         var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
 
 
-        var @event = new V1.ConsumptionIssuedEvent()
+        var @event = new V1.IssuedEvent()
         {
             CertificateId = new Common.V1.FederatedStreamId
             {
@@ -81,14 +86,15 @@ public class ConsumptionCertificateApplyTests
                     Value = streamId.ToString()
                 }
             },
-            Period = period.ToProto(),
+            Type = V1.GranularCertificateType.Consumption,
+            Period = period,
             GridArea = area,
-            GsrnHash = ByteString.CopyFrom(gsrnHash),
+            AssetIdHash = ByteString.CopyFrom(gsrnHash),
             QuantityCommitment = quantity.ToProtoCommitment(streamId.ToString()),
             OwnerPublicKey = ownerKey.PublicKey.ToProto(),
         };
 
-        var cert = new ConsumptionCertificate(@event);
+        var cert = new GranularCertificate(@event);
 
         Assert.Equal(registry, cert.Id.Registry);
         Assert.Equal(streamId, cert.Id.StreamId.ToModel());

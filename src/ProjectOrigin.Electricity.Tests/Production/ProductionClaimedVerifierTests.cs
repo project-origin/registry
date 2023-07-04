@@ -1,26 +1,26 @@
 using System;
 using System.Threading.Tasks;
 using Moq;
-using ProjectOrigin.Electricity.Consumption;
-using ProjectOrigin.Electricity.Production.Verifiers;
+using ProjectOrigin.Electricity.Models;
+using ProjectOrigin.Electricity.Server.Interfaces;
+using ProjectOrigin.Electricity.Server.Verifiers;
 using ProjectOrigin.HierarchicalDeterministicKeys;
-using ProjectOrigin.Verifier.Utils.Interfaces;
 using Xunit;
 
 namespace ProjectOrigin.Electricity.Tests;
 
 public class ProductionClaimedVerifierTests
 {
-    private ProductionClaimedVerifier _verifier;
-    private ConsumptionCertificate? _otherCertificate;
+    private ClaimedEventVerifier _verifier;
+    private GranularCertificate? _otherCertificate;
 
     public ProductionClaimedVerifierTests()
     {
         var modelLoaderMock = new Mock<IRemoteModelLoader>();
-        modelLoaderMock.Setup(obj => obj.GetModel<ConsumptionCertificate>(It.IsAny<Common.V1.FederatedStreamId>()))
+        modelLoaderMock.Setup(obj => obj.GetModel<GranularCertificate>(It.IsAny<Common.V1.FederatedStreamId>()))
             .Returns(() => Task.FromResult(_otherCertificate));
 
-        _verifier = new ProductionClaimedVerifier(modelLoaderMock.Object);
+        _verifier = new ClaimedEventVerifier(modelLoaderMock.Object);
     }
 
     [Fact]

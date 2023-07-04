@@ -53,10 +53,10 @@ PublicKeyBase64=$(echo "$PrivateKey" | openssl pkey -pubout | base64 -w 0)
 cat << EOF > "${override_values_filename}"
 verifiers:
   - name: electricity-v1
-    type: ProjectOrigin.Electricity.v1
+    type: project_origin.electricity.v1
     image:
       repository: ghcr.io/project-origin/electricity-server
-      tag: 0.2.0-rc.13
+      tag: 0.2.0-rc.17
     issuers:
       - area: $example_area
         publicKey: $PublicKeyBase64

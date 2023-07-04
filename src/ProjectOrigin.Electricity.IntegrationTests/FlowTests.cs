@@ -4,10 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using ProjectOrigin.Electricity.Server;
-using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
-using ProjectOrigin.Verifier.Utils.Interfaces;
-using ProjectOrigin.Verifier.Utils.Services;
 using ProjectOrigin.Verifier.V1;
 using Xunit.Abstractions;
 using Google.Protobuf;
@@ -19,6 +16,8 @@ using Xunit;
 using ProjectOrigin.TestUtils;
 using System.Text;
 using ProjectOrigin.HierarchicalDeterministicKeys;
+using ProjectOrigin.Electricity.Server.Interfaces;
+using ProjectOrigin.Electricity.Server.Services;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
@@ -54,7 +53,7 @@ public class FlowTests : GrpcTestBase<Startup>
         var commitmentInfo = new SecretCommitmentInfo(250);
         var certId = Guid.NewGuid().ToString();
 
-        var @event = new Electricity.V1.ConsumptionIssuedEvent
+        var @event = new Electricity.V1.IssuedEvent
         {
             CertificateId = new Common.V1.FederatedStreamId
             {
@@ -64,13 +63,14 @@ public class FlowTests : GrpcTestBase<Startup>
                     Value = certId
                 },
             },
+            Type = Electricity.V1.GranularCertificateType.Consumption,
             Period = new Electricity.V1.DateInterval
             {
                 Start = Timestamp.FromDateTimeOffset(new DateTimeOffset(2023, 1, 1, 12, 0, 0, 0, TimeSpan.Zero)),
                 End = Timestamp.FromDateTimeOffset(new DateTimeOffset(2023, 1, 1, 13, 0, 0, 0, TimeSpan.Zero))
             },
             GridArea = Area,
-            GsrnHash = ByteString.Empty,
+            AssetIdHash = ByteString.Empty,
             QuantityCommitment = new Electricity.V1.Commitment
             {
                 Content = ByteString.CopyFrom(commitmentInfo.Commitment.C),

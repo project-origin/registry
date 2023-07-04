@@ -3,31 +3,21 @@ syntax = "proto3";
 import "google/protobuf/timestamp.proto";
 import "common.proto";
 
-package ProjectOrigin.Electricity.v1;
+package project_origin.electricity.v1;
 
-message ConsumptionIssuedEvent {
-    ProjectOrigin.Common.v1.FederatedStreamId certificate_id = 1;
-    DateInterval period = 2;
-    string grid_area = 3;
-    bytes gsrn_hash = 4;
-    Commitment quantity_commitment = 5;
-    PublicKey owner_public_key = 6;
-}
-
-message ProductionIssuedEvent {
-    ProjectOrigin.Common.v1.FederatedStreamId certificate_id = 1;
-    DateInterval period = 2;
-    string grid_area = 3;
-    string fuel_code = 4;
-    string tech_code = 5;
-    bytes gsrn_hash = 6;
-    Commitment quantity_commitment = 7;
-    CommitmentPublication quantity_publication = 8;
-    PublicKey owner_public_key = 9;
+message IssuedEvent {
+    project_origin.common.v1.FederatedStreamId certificate_id = 1;
+    GranularCertificateType type = 2;
+    DateInterval period = 3;
+    string grid_area = 4;
+    bytes asset_id_hash = 5;
+    Commitment quantity_commitment = 6;
+    PublicKey owner_public_key = 7;
+    repeated Attribute Attributes = 8;
 }
 
 message TransferredEvent{
-    ProjectOrigin.Common.v1.FederatedStreamId certificate_id = 1;
+    project_origin.common.v1.FederatedStreamId certificate_id = 1;
     bytes source_slice_hash = 2;
     PublicKey new_owner = 3;
 }
@@ -38,24 +28,35 @@ message SlicedEvent{
         PublicKey new_owner = 2;
     }
 
-    ProjectOrigin.Common.v1.FederatedStreamId certificate_id = 1;
+    project_origin.common.v1.FederatedStreamId certificate_id = 1;
     bytes source_slice_hash = 2;
     repeated Slice new_slices = 3;
     bytes sum_proof = 4;
 }
 
 message AllocatedEvent {
-    ProjectOrigin.Common.v1.Uuid allocation_id = 1;
-    ProjectOrigin.Common.v1.FederatedStreamId  production_certificate_id = 2;
-    ProjectOrigin.Common.v1.FederatedStreamId  consumption_certificate_id = 3;
+    project_origin.common.v1.Uuid allocation_id = 1;
+    project_origin.common.v1.FederatedStreamId  production_certificate_id = 2;
+    project_origin.common.v1.FederatedStreamId  consumption_certificate_id = 3;
     bytes production_source_slice_hash = 4;
     bytes consumption_source_slice_hash = 5;
     bytes equality_proof = 6;
 }
 
 message ClaimedEvent {
-    ProjectOrigin.Common.v1.FederatedStreamId  certificate_id = 1;
-    ProjectOrigin.Common.v1.Uuid allocation_id = 2;
+    project_origin.common.v1.FederatedStreamId  certificate_id = 1;
+    project_origin.common.v1.Uuid allocation_id = 2;
+}
+
+enum GranularCertificateType {
+    INVALID = 0;
+    CONSUMPTION = 1;
+    PRODUCTION = 2;
+}
+
+message Attribute {
+    string Key = 1;
+    string Value = 2;
 }
 
 message DateInterval {

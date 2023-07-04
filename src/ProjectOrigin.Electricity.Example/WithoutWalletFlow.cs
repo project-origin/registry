@@ -2,7 +2,6 @@ using System.Text;
 using Grpc.Net.Client;
 using ProjectOrigin.Electricity.Example;
 using ProjectOrigin.HierarchicalDeterministicKeys;
-using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
 using ProjectOrigin.PedersenCommitment;
 using ProjectOrigin.Registry.V1;
 
@@ -59,7 +58,7 @@ public class WithoutWalletFlow
         var consCertId = helper.ToCertId(consRegistryName, Guid.NewGuid());
         var consCommitmentInfo = new SecretCommitmentInfo(250);
         {
-            Console.WriteLine($"Issuing consumption GC");
+            Console.WriteLine($"Issuing consumption Granular Certificate");
             var consumptionIssued = helper.CreateConsumptionIssuedEvent(consCertId, consCommitmentInfo, ownerKey.PublicKey);
 
             // Sign the event as a transaction

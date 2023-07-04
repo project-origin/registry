@@ -2,15 +2,15 @@ syntax = "proto3";
 
 import "registry.proto";
 
-package ProjectOrigin.Verifier.v1;
+package project_origin.verifier.v1;
 
 service VerifierService {
     rpc VerifyTransaction(VerifyTransactionRequest) returns (VerifyTransactionResponse);
 }
 
 message VerifyTransactionRequest {
-    ProjectOrigin.Registry.v1.Transaction transaction = 1;
-    repeated ProjectOrigin.Registry.v1.Transaction stream = 2;
+    project_origin.registry.v1.Transaction transaction = 1;
+    repeated project_origin.registry.v1.Transaction stream = 2;
 }
 
 message VerifyTransactionResponse {
