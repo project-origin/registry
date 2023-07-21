@@ -20,13 +20,6 @@
                 ],
                 "src": "obj/api",
                 "dest": "api"
-            },
-            {
-                "files": [
-                    "**/*.md",
-                    "toc.yml",
-                    "**/toc.yml"
-                ]
             }
         ],
         "resource": [
