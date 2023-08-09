@@ -1,20 +1,11 @@
 # Creating a Release
 
-To create a new release a developer needs to create and push a git tag in semver format.
+To create a new release a developer needs to do this from the GitHub portal.
 
-Two formats are currently supported by the automated workflow
+GitHub has written a [guide](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository#creating-a-release) on the subject.
 
-- v1.2.3 - this is used to create a production release
-- v1.2.3-alpha.4 - this is used to create alpha/prereleases so they can be tested and used before they are made generally available.
+The new tag should be in one of the following formats:
+- `v1.2.3` - this is used to create a production release
+- `v1.2.3-rc.4` - this is used to create release-candidates so they can be tested and used before they are made generally available, when doing this, remember to set the `Pre-release` flag to `true` in the GitHub portal.
 
-
-To create a tag and push it, do the following.
-
-```bash
-git tag v0.0.0-alpha.0
-git push --tags
-```
-
-## Beware
-
-Once pushed the workflow will automatically trigger, and nuget packages cannot be deleted when released.
+Once the release is `publishes` a workflow will start, and build and publish the release and all packages tied to it.
