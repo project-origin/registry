@@ -37,3 +37,14 @@ jobs:
 
       - name: Verify chart
         run: make verify-chart
+
+  verify-docfx-build:
+    runs-on: ubuntu-latest
+    name: Test docfx build
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build Documentation
+        uses: nunit/docfx-action@v2.8.0 # docfx 2.70.0
+        with:
+          args: ./doc/docfx.json
