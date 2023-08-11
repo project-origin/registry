@@ -53,4 +53,4 @@ jobs:
         run: dotnet tool install --global docfx --version 2.70.0
 
       - name: Build Documentation
-        run: docfx build ./doc/docfx.json
+        run: docfx build doc/docfx.json
