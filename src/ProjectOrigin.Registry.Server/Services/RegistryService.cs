@@ -8,11 +8,15 @@ using System;
 using ProjectOrigin.VerifiableEventStore.Services.TransactionStatusCache;
 using System.Security.Cryptography;
 using Google.Protobuf;
+using System.Diagnostics.Metrics;
 
 namespace ProjectOrigin.Registry.Server;
 
 public class RegistryService : V1.RegistryService.RegistryServiceBase
 {
+    public static Meter Meter = new("Registry.RegistryService");
+    public static Counter<long> TransactionsSubmitted = Meter.CreateCounter<long>("TransactionsSubmitted");
+
     private IEventStore _eventStore;
     private IBus _bus;
     private ITransactionStatusService _transactionStatusService;
@@ -26,8 +30,12 @@ public class RegistryService : V1.RegistryService.RegistryServiceBase
 
     public override async Task<SubmitTransactionResponse> SendTransactions(SendTransactionsRequest request, ServerCallContext context)
     {
-        var jobs = request.Transactions.Select(transaction => TransactionJob.Create(transaction));
-        await _bus.PublishBatch(jobs);
+        var jobs = request.Transactions.Select(TransactionJob.Create).ToList();
+
+        foreach (var j in jobs)
+        {
+            await _bus.Publish(j);
+        }
 
         request.Transactions.AsParallel().ForAll(async transaction =>
         {
@@ -37,6 +45,8 @@ public class RegistryService : V1.RegistryService.RegistryServiceBase
                 new VerifiableEventStore.Models.TransactionStatusRecord(VerifiableEventStore.Models.TransactionStatus.Pending)
                 );
         });
+
+        TransactionsSubmitted.Add(request.Transactions.Count);
 
         return new SubmitTransactionResponse();
     }

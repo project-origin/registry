@@ -38,24 +38,19 @@ public class TransactionProcessor : IJobConsumer<TransactionJob>
 
     public async Task Run(JobContext<TransactionJob> context)
     {
-        await ProcessTransaction(context.Job.ToTransaction());
-        await context.NotifyCompleted();
-    }
-
-    private async Task ProcessTransaction(V1.Transaction transaction)
-    {
+        V1.Transaction transaction = context.Job.ToTransaction();
         var transactionHash = Convert.ToBase64String(SHA256.HashData(transaction.ToByteArray()));
-
         try
         {
-            _logger.LogInformation($"Processing transaction {transactionHash}");
+            _logger.LogDebug($"Processing transaction {transactionHash}");
 
             if (transaction.Header.FederatedStreamId.Registry != _options.RegistryName)
                 throw new InvalidTransactionException("Invalid registry for transaction");
 
             var streamId = Guid.Parse(transaction.Header.FederatedStreamId.StreamId.Value);
             var stream = (await _eventStore.GetEventsForEventStream(streamId))
-                .Select(x => V1.Transaction.Parser.ParseFrom(x.Content));
+                .Select(x => V1.Transaction.Parser.ParseFrom(x.Content))
+                .ToList();
 
             var result = await _verifier.VerifyTransaction(transaction, stream);
 
@@ -67,7 +62,8 @@ public class TransactionProcessor : IJobConsumer<TransactionJob>
             var verifiableEvent = new VerifiableEvent(eventId, transactionHash, transaction.ToByteArray());
             await _eventStore.Store(verifiableEvent);
 
-            _logger.LogInformation($"Completed transaction {transactionHash}");
+            await context.NotifyCompleted();
+            _logger.LogDebug($"Transaction processed {transactionHash}");
         }
         catch (InvalidTransactionException ex)
         {
