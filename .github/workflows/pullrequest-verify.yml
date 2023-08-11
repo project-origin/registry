@@ -50,7 +50,7 @@ jobs:
           dotnet-version: "7.0.203"
 
       - name: Install docfx
-        run: dotnet tool install --global docfx --version 2.70.0
+        run: dotnet tool install --global docfx --version 2.67.5
 
       - name: Build Documentation
         run: docfx build doc/docfx.json
