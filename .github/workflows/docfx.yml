@@ -37,7 +37,6 @@ jobs:
       - name: Build Documentation
         run: docfx build ./doc/docfx.json
 
-
       - name: Setup Pages
         uses: actions/configure-pages@v2
 
