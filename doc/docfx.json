@@ -1,17 +1,4 @@
 {
-    "metadata": [
-        {
-            "src": [
-                {
-                    "files": [
-                        "**/ProjectOrigin.Electricity.Client.csproj"
-                    ],
-                    "src": "../src"
-                }
-            ],
-            "dest": "obj/api"
-        }
-    ],
     "build": {
         "content": [
             {

@@ -7,7 +7,7 @@ image:
   tag:
 
 service:
-  type: ClusterIp
+  type: ClusterIP
   nodePort:
 
 verifiableEventStore:

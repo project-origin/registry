@@ -26,10 +26,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Build Documentation
-        uses: MartinSchmidt/docfx-action@v2.59.4
+      - name: Setup .NET Core SDK 7
+        uses: actions/setup-dotnet@v3
         with:
-          args: ./doc/docfx.json
+          dotnet-version: "7.0.203"
+
+      - name: Install docfx
+        run: dotnet tool install --global docfx --version 2.70.0
+
+      - name: Build Documentation
+        run: docfx build ./doc/docfx.json
 
       - name: Setup Pages
         uses: actions/configure-pages@v2

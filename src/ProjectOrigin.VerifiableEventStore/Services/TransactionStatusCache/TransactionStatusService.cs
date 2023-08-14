@@ -31,14 +31,14 @@ public class TransactionStatusService : ITransactionStatusService
         }
         else
         {
-            var a = _eventStore.GetTransactionStatus(transactionId);
-            return new TransactionStatusRecord(TransactionStatus.Unknown);
+            var status = await _eventStore.GetTransactionStatus(transactionId);
+            return new TransactionStatusRecord(status);
         }
     }
 
     public Task SetTransactionStatus(string transactionId, TransactionStatusRecord record)
     {
-        _logger.LogInformation($"Setting transaction status for {transactionId} to {record.NewStatus}");
+        _logger.LogTrace($"Setting transaction status for {transactionId} to {record.NewStatus}");
         return _cache.SetStringAsync(transactionId, JsonSerializer.Serialize(record), new DistributedCacheEntryOptions
         {
             AbsoluteExpirationRelativeToNow = CacheTime

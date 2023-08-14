@@ -26,6 +26,10 @@ public class ElectricityServiceFixture : IAsyncLifetime
                 .WithImage(ElectricityVerifierImage)
                 .WithPortBinding(GrpcPort, true)
                 .WithEnvironment($"Issuers__{IssuerArea}", Convert.ToBase64String(Encoding.UTF8.GetBytes(IssuerKey.PublicKey.ExportPkixText())))
+                .WithWaitStrategy(
+                    Wait.ForUnixContainer()
+                        .UntilPortIsAvailable(GrpcPort)
+                    )
                 .Build();
     }
 
@@ -33,8 +37,6 @@ public class ElectricityServiceFixture : IAsyncLifetime
     {
         await _container.StartAsync()
             .ConfigureAwait(false);
-
-        await Task.Delay(5000);
     }
 
     public async Task DisposeAsync()
