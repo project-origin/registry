@@ -160,7 +160,7 @@ jobs:
     needs:
       - define-version
     env:
-      CHART_FOLDER: charts/project-origin-wallet
+      CHART_FOLDER: charts/project-origin-registry
       HELM_REGISTRY_REPOSITORY: project-origin/helm-registry
 
     steps:
