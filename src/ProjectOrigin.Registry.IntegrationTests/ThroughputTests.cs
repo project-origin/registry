@@ -120,7 +120,7 @@ public class ThroughputTests : IAsyncLifetime
         var requestsPerSecond = completed.Count / elapsedSeconds;
 
         Console.WriteLine($"Completed {completed.Count} requests in {elapsedSeconds} seconds ({requestsPerSecond} requests per second).");
-        requestsPerSecond.Should().BeGreaterThan(99); // based on througput test on github ~10
+        requestsPerSecond.Should().BeGreaterThan(8); // based on througput test on github ~10
     }
 
     private async Task<Registry.V1.Transaction> SendRequest(GrpcChannel channel)

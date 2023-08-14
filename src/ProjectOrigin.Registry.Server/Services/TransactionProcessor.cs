@@ -62,13 +62,11 @@ public class TransactionProcessor : IJobConsumer<TransactionJob>
             var verifiableEvent = new VerifiableEvent(eventId, transactionHash, transaction.ToByteArray());
             await _eventStore.Store(verifiableEvent);
 
-            await context.NotifyCompleted();
             _logger.LogTrace($"Transaction processed {transactionHash}");
         }
         catch (InvalidTransactionException ex)
         {
             _logger.LogWarning(ex, $"Invalid transaction {transactionHash} - {ex.Message}");
-
             await _transactionStatusService.SetTransactionStatus(
                 transactionHash,
                 new TransactionStatusRecord(
@@ -77,7 +75,7 @@ public class TransactionProcessor : IJobConsumer<TransactionJob>
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Unknown exction for transaction {transactionHash} -  {ex.Message}");
+            _logger.LogError(ex, $"Unknown exception for transaction {transactionHash} -  {ex.Message}");
             throw;
         }
     }
