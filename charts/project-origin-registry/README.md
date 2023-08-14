@@ -16,7 +16,7 @@ verifiers:
     type: project_origin.electricity.v1
     image:
       repository: ghcr.io/project-origin/electricity-server
-      tag: 0.2.0-rc.1
+      tag: 0.2.0-rc.17
     issuers:
         # the name of the grid area, here Narnia is used
       - area: Narnia

@@ -1,15 +1,12 @@
-name: Create Release
+name: Create new release
 
 on:
-  push:
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+' # support v1.2.3
-      - 'v[0-9]+.[0-9]+.[0-9]+-rc.[0-9]+' #supports release candidate versions v1.2.3-rc.4
+  release:
+    types: [published]
 
 jobs:
-
   define-version:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       version: ${{ steps.output-version.outputs.version }}
 
@@ -18,7 +15,7 @@ jobs:
 
       - name: Set env
         id: output-version
-        run: echo "version=${GITHUB_REF#refs/*/v}" >> $GITHUB_OUTPUT
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
   publish-hdkeys-nuget:
     name: Publish Hierarchical Deterministic Keys Nuget package
@@ -44,12 +41,9 @@ jobs:
         shell: bash
         run: dotnet pack --output build --configuration Release --no-restore -p:Version=${{ needs.define-version.outputs.version }} ${{ env.project }}
 
-      - name: 'Upload Artifact'
-        uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v3
         with:
-          name: nuget-packages
           path: build/*.nupkg
-          retention-days: 1
 
       - name: Publish
         shell: bash
@@ -98,23 +92,21 @@ jobs:
         shell: bash
         run: dotnet pack --output build --configuration Release --no-restore -p:Version=${{ needs.define-version.outputs.version }} ${{ env.project }}
 
-      - name: 'Upload Artifact'
-        uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v3
         with:
-          name: nuget-packages
           path: build/*.nupkg
-          retention-days: 1
 
       - name: Publish
         shell: bash
         run: dotnet nuget push build/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
 
-  publish-electricity-container:
+  publish-electricity-server-container:
     name: Publish Electricity Server container
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs:
       - define-version
     env:
+      name: electricity-server
       project: src/ProjectOrigin.Electricity.Server
 
     steps:
@@ -133,14 +125,15 @@ jobs:
           context: ./src
           file: ${{ env.project }}/Dockerfile
           push: true
-          tags: ghcr.io/project-origin/electricity-server:${{ needs.define-version.outputs.version }}
+          tags: ghcr.io/project-origin/${{ env.name }}:${{ needs.define-version.outputs.version }}
 
-  publish-registry-container:
+  publish-registry-server-container:
     name: Publish Registry Server container
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs:
       - define-version
     env:
+      name: registry-server
       project: src/ProjectOrigin.Registry.Server
 
     steps:
@@ -157,27 +150,58 @@ jobs:
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
           context: ./src
-          file: ${{ env.project }}/Dockerfile
+            file: ${{ env.project }}/Dockerfile
           push: true
-          tags: ghcr.io/project-origin/registry-server:${{ needs.define-version.outputs.version }}
+          tags: ghcr.io/project-origin/${{ env.name }}:${{ needs.define-version.outputs.version }}
 
-  create-release:
-    name: Create GitHub Release
-    runs-on: ubuntu-latest
+  publish-chart:
+    name: Publish helm chart
+    runs-on: ubuntu-22.04
     needs:
-      - publish-hdkeys-nuget
-      - publish-pedersen-nuget
-      - publish-electricity-container
-      - publish-registry-container
-    steps:
-      - name: Download all workflow run artifacts
-        uses: actions/download-artifact@v3
-        with:
-          path: artifacts
+      - define-version
+      - publish-server-container
+    env:
+      CHART_FOLDER: charts/project-origin-wallet
+      HELM_REGISTRY_REPOSITORY: project-origin/helm-registry
 
-      - name: Release
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          path: this
+
+      - uses: actions/checkout@v3
+        with:
+          repository: ${{ env.HELM_REGISTRY_REPOSITORY }}
+          path: helm-registry
+          ssh-key: ${{ secrets.HELM_REGISTRY_TOKEN }}
+
+      - name: Get chart name
+        id: variables
+        run: |
+          echo "name=$(yq .name < this/${{ env.CHART_FOLDER }}/Chart.yaml)" >> $GITHUB_OUTPUT
+
+      - name: Package and generate index
+        run: |
+          helm package this/${{ env.CHART_FOLDER }} --version ${{ needs.define-version.outputs.version }} --app-version "${{ needs.define-version.outputs.version }}" --destination helm-releases
+          helm repo index helm-releases --merge helm-registry/index.yaml --url https://github.com/${{ github.repository }}/releases/download/v${{ needs.define-version.outputs.version }}/
+          cp helm-releases/index.yaml helm-registry/index.yaml
+
+      - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           draft: "${{ contains( env.GITHUB_REF, '-rc.') }}"
           generate_release_notes: true
-          files: artifacts/**
+          files: helm-releases/${{ steps.variables.outputs.name }}-${{ needs.define-version.outputs.version }}.tgz
+
+      - uses: actions/upload-artifact@v3
+        with:
+          path: helm-releases/${{ steps.variables.outputs.name }}-${{ needs.define-version.outputs.version }}.tgz
+
+      - name: Commit index changes
+        run: |
+          cd helm-registry
+          git config --local user.name github-actions
+          git config --local user.email github-actions@github.com
+          git add index.yaml
+          git commit -m "Update index.yaml for ${{ steps.variables.outputs.name }}-${{ needs.define-version.outputs.version }}"
+          git push
