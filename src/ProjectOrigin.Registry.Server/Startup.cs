@@ -60,6 +60,8 @@ public class Startup
             x.AddConsumer<TransactionProcessor>(cfg =>
             {
                 cfg.Options<JobOptions<TransactionJob>>(options => options
+                    // Currently set to 1 as to ensure transactions on the same certificate are not processed in parallel.
+                    // This will be solved in the future by using methods like RabbitMQ consistent hash exchange.
                     .SetConcurrentJobLimit(1));
             });
 

@@ -63,7 +63,6 @@ public class ThroughputTests : IAsyncLifetime
                     )
                 .Build();
         });
-
     }
 
     private GrpcChannel CreateRegistryChannel()
@@ -71,7 +70,7 @@ public class ThroughputTests : IAsyncLifetime
         return GrpcChannel.ForAddress($"http://{_registryContainer.Value.IpAddress}:{GrpcPort}");
     }
 
-    [Fact(Skip = "Manual test")]
+    [Fact]
     public async Task TestThroughput()
     {
         int concurrency = 10;
@@ -120,6 +119,8 @@ public class ThroughputTests : IAsyncLifetime
 
         var elapsedSeconds = stopwatch.Elapsed.TotalSeconds;
         var requestsPerSecond = completed.Count / elapsedSeconds;
+
+        Assert.True(requestsPerSecond > 5);
 
         Console.WriteLine($"Completed {completed.Count} requests in {elapsedSeconds} seconds ({requestsPerSecond} requests per second).");
     }
