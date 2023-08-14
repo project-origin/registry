@@ -1,4 +1,7 @@
 changelog:
+  exclude:
+    labels:
+      - ci # exclude ci, not part of the product.
   categories:
     - title: Breaking changes
       labels:
