@@ -159,7 +159,6 @@ jobs:
     runs-on: ubuntu-22.04
     needs:
       - define-version
-      - publish-server-container
     env:
       CHART_FOLDER: charts/project-origin-wallet
       HELM_REGISTRY_REPOSITORY: project-origin/helm-registry
