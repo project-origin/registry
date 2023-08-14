@@ -150,7 +150,7 @@ jobs:
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
           context: ./src
-            file: ${{ env.project }}/Dockerfile
+          file: ${{ env.project }}/Dockerfile
           push: true
           tags: ghcr.io/project-origin/${{ env.name }}:${{ needs.define-version.outputs.version }}
 
