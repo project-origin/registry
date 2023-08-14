@@ -38,7 +38,7 @@ public class TransactionStatusService : ITransactionStatusService
 
     public Task SetTransactionStatus(string transactionId, TransactionStatusRecord record)
     {
-        _logger.LogDebug($"Setting transaction status for {transactionId} to {record.NewStatus}");
+        _logger.LogTrace($"Setting transaction status for {transactionId} to {record.NewStatus}");
         return _cache.SetStringAsync(transactionId, JsonSerializer.Serialize(record), new DistributedCacheEntryOptions
         {
             AbsoluteExpirationRelativeToNow = CacheTime

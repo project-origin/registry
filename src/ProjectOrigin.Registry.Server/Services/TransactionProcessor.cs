@@ -42,7 +42,7 @@ public class TransactionProcessor : IJobConsumer<TransactionJob>
         var transactionHash = Convert.ToBase64String(SHA256.HashData(transaction.ToByteArray()));
         try
         {
-            _logger.LogDebug($"Processing transaction {transactionHash}");
+            _logger.LogTrace($"Processing transaction {transactionHash}");
 
             if (transaction.Header.FederatedStreamId.Registry != _options.RegistryName)
                 throw new InvalidTransactionException("Invalid registry for transaction");
@@ -63,7 +63,7 @@ public class TransactionProcessor : IJobConsumer<TransactionJob>
             await _eventStore.Store(verifiableEvent);
 
             await context.NotifyCompleted();
-            _logger.LogDebug($"Transaction processed {transactionHash}");
+            _logger.LogTrace($"Transaction processed {transactionHash}");
         }
         catch (InvalidTransactionException ex)
         {

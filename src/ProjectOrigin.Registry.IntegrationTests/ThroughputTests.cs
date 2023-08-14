@@ -12,6 +12,7 @@ using System.Text;
 using Grpc.Net.Client;
 using DotNet.Testcontainers.Images;
 using System.Collections.Concurrent;
+using FluentAssertions;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
@@ -91,7 +92,6 @@ public class ThroughputTests : IAsyncLifetime
                 {
                     if (queued.Count < concurrentRequests)
                     {
-                        Console.WriteLine("sending request");
                         queued.Enqueue(await SendRequest(channel).ConfigureAwait(false));
                     }
                     else
@@ -105,7 +105,6 @@ public class ThroughputTests : IAsyncLifetime
                             }
                             else
                             {
-                                Console.WriteLine($"re-queueing request {completed.Count}");
                                 queued.Enqueue(transaction);
                                 await Task.Delay(25).ConfigureAwait(false);
                             }
@@ -120,9 +119,8 @@ public class ThroughputTests : IAsyncLifetime
         var elapsedSeconds = stopwatch.Elapsed.TotalSeconds;
         var requestsPerSecond = completed.Count / elapsedSeconds;
 
-        Assert.True(requestsPerSecond > 5);
-
         Console.WriteLine($"Completed {completed.Count} requests in {elapsedSeconds} seconds ({requestsPerSecond} requests per second).");
+        requestsPerSecond.Should().BeGreaterThan(99); // based on througput test on github ~10
     }
 
     private async Task<Registry.V1.Transaction> SendRequest(GrpcChannel channel)

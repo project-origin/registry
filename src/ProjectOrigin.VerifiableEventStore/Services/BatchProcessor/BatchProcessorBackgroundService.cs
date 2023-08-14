@@ -33,11 +33,11 @@ public class BatchProcessorBackgroundService : BackgroundService
         while (!stoppingToken.IsCancellationRequested &&
                await timer.WaitForNextTickAsync(stoppingToken))
         {
-            _logger.LogInformation("Executing BatchProcesser");
+            _logger.LogTrace("Executing BatchProcesser");
 
             await processer.Execute(stoppingToken);
 
-            _logger.LogInformation("Executed BatchProcesser");
+            _logger.LogTrace("Executed BatchProcesser");
         }
     }
 }
