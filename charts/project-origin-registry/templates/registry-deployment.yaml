@@ -20,7 +20,7 @@ spec:
           image: {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
           env:
             - name: REGISTRYNAME
-              value: {{ .Release.Name }}
+              value: {{ .Values.registryName | default .Release.Name }}
             {{- range .Values.verifiers }}
             - name: VERIFIERS__{{ .type }}
               value: http://registry-{{ $.Release.Name }}-verifier-{{ .name }}:80
