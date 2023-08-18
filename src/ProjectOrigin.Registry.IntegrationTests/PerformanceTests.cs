@@ -17,7 +17,7 @@ using System.Collections.Generic;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
-public class ThroughputTests : IAsyncLifetime, IClassFixture<ContainerImageFixture>
+public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixture>
 {
     private const string ElectricityVerifierImage = "ghcr.io/project-origin/electricity-server:0.2.0-rc.17";
     private const string RegistryImage = "ghcr.io/project-origin/registry-server:0.2.0-rc.17";
@@ -29,7 +29,7 @@ public class ThroughputTests : IAsyncLifetime, IClassFixture<ContainerImageFixtu
     private readonly Lazy<IContainer> _registryContainer;
     private readonly IPrivateKey _issuerKey;
 
-    public ThroughputTests(ContainerImageFixture imageFixture)
+    public PerformanceTests(ContainerImageFixture imageFixture)
     {
         _issuerKey = Algorithms.Ed25519.GenerateNewPrivateKey();
 

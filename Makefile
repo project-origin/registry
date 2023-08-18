@@ -52,7 +52,7 @@ format:
 
 ## Run all tests except Concordium integration
 test:
-	dotnet test $(src_path)  --filter 'FullyQualifiedName!~ConcordiumIntegrationTests&FullyQualifiedName!~ThroughputTests'
+	dotnet test $(src_path)  --filter 'FullyQualifiedName!~ConcordiumIntegrationTests&FullyQualifiedName!~PerformanceTests'
 
 ## Run all Unit-tests
 unit-test:
@@ -73,6 +73,6 @@ doc-serve: build
 concordium-tests:
 	dotnet test $(src_path)/ProjectOrigin.VerifiableEventStore.ConcordiumIntegrationTests
 
-## Run throughput tests, takes a long time.
-verify-throughput:
-	dotnet test $(src_path)  --filter 'FullyQualifiedName~ThroughputTests'
+## Run performance tests, takes a long time.
+verify-performance:
+	dotnet test $(src_path)  --filter 'FullyQualifiedName~PerformanceTests'
