@@ -34,7 +34,7 @@ public class TransactionDispatcher : ITransactionDispatcher
         };
         request.Stream.AddRange(stream);
 
-        return await client.VerifyTransactionAsync(request);
+        return await client.VerifyTransactionAsync(request).ConfigureAwait(false);
     }
 
     public VerifierService.VerifierServiceClient GetClient(string family)

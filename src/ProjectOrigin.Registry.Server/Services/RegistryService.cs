@@ -30,21 +30,19 @@ public class RegistryService : V1.RegistryService.RegistryServiceBase
 
     public override async Task<SubmitTransactionResponse> SendTransactions(SendTransactionsRequest request, ServerCallContext context)
     {
-        var jobs = request.Transactions.Select(TransactionJob.Create).ToList();
-
-        foreach (var j in jobs)
+        foreach (var transaction in request.Transactions)
         {
-            await _bus.Publish(j);
-        }
-
-        request.Transactions.AsParallel().ForAll(async transaction =>
-        {
+            var message = VerifyTransaction.Create(transaction);
             var transactionHash = Convert.ToBase64String(SHA256.HashData(transaction.ToByteArray()));
+
             await _transactionStatusService.SetTransactionStatus(
                 transactionHash,
                 new VerifiableEventStore.Models.TransactionStatusRecord(VerifiableEventStore.Models.TransactionStatus.Pending)
-                );
-        });
+                )
+                .ConfigureAwait(false);
+
+            await _bus.Publish(message).ConfigureAwait(false); // Should be reworked to Send() to a specific exchange once it is implemented
+        }
 
         TransactionsSubmitted.Add(request.Transactions.Count);
 
@@ -53,7 +51,7 @@ public class RegistryService : V1.RegistryService.RegistryServiceBase
 
     public override async Task<GetTransactionStatusResponse> GetTransactionStatus(GetTransactionStatusRequest request, ServerCallContext context)
     {
-        var state = await _transactionStatusService.GetTransactionStatus(request.Id);
+        var state = await _transactionStatusService.GetTransactionStatus(request.Id).ConfigureAwait(false);
         return new GetTransactionStatusResponse
         {
             Status = (V1.TransactionState)state.NewStatus,
@@ -64,7 +62,7 @@ public class RegistryService : V1.RegistryService.RegistryServiceBase
     public async override Task<GetStreamTransactionsResponse> GetStreamTransactions(V1.GetStreamTransactionsRequest request, ServerCallContext context)
     {
         var streamId = Guid.Parse(request.StreamId.Value);
-        var verifiableEvents = await _eventStore.GetEventsForEventStream(streamId);
+        var verifiableEvents = await _eventStore.GetEventsForEventStream(streamId).ConfigureAwait(false);
         var transactions = verifiableEvents.Select(x => V1.Transaction.Parser.ParseFrom(x.Content));
 
         var response = new GetStreamTransactionsResponse();
