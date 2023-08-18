@@ -64,13 +64,13 @@ verifiers:
       - name: ${registry_a_name}
         address: http://registry-${registry_a_name}:80
       - name: ${registry_b_name}
-        address: http://registry-${registry_b_name}:80
+        address: http://registry-${registry_b_name}-postfix:80
 EOF
 
 # install two registries
 helm install ${registry_a_name} charts/project-origin-registry --set service.nodePort=$registry_a_nodeport,service.type=NodePort -f "${override_values_filename}" --wait >/dev/null 2>&1
 echo "Registry A installed"
-helm install ${registry_b_name} charts/project-origin-registry --set service.nodePort=$registry_b_nodeport,service.type=NodePort -f "${override_values_filename}" --wait >/dev/null 2>&1
+helm install ${registry_b_name}-postfix charts/project-origin-registry --set registryName=$registry_b_name,service.nodePort=$registry_b_nodeport,service.type=NodePort -f "${override_values_filename}" --wait >/dev/null 2>&1
 echo "Registry B installed"
 
 # wait for cluster to be ready
