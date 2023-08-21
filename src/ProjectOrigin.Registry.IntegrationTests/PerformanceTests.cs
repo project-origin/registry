@@ -10,13 +10,14 @@ using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
 using System.Text;
 using Grpc.Net.Client;
-using DotNet.Testcontainers.Images;
 using System.Collections.Concurrent;
 using FluentAssertions;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
-public class ThroughputTests : IAsyncLifetime
+public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixture>
 {
     private const string ElectricityVerifierImage = "ghcr.io/project-origin/electricity-server:0.2.0-rc.17";
     private const string RegistryImage = "ghcr.io/project-origin/registry-server:0.2.0-rc.17";
@@ -24,12 +25,11 @@ public class ThroughputTests : IAsyncLifetime
     private const string IssuerArea = "Narnia";
     private const string RegistryName = "TheRegistry";
 
-    private readonly IFutureDockerImage _registryImage;
     private readonly IContainer _verifierContainer;
     private readonly Lazy<IContainer> _registryContainer;
     private readonly IPrivateKey _issuerKey;
 
-    public ThroughputTests()
+    public PerformanceTests(ContainerImageFixture imageFixture)
     {
         _issuerKey = Algorithms.Ed25519.GenerateNewPrivateKey();
 
@@ -43,16 +43,11 @@ public class ThroughputTests : IAsyncLifetime
                     )
                 .Build();
 
-        _registryImage = new ImageFromDockerfileBuilder()
-            .WithDockerfileDirectory(CommonDirectoryPath.GetSolutionDirectory(), string.Empty)
-            .WithDockerfile("ProjectOrigin.Registry.Server/Dockerfile")
-            .Build();
-
         _registryContainer = new Lazy<IContainer>(() =>
         {
             var verifierUrl = $"http://{_verifierContainer.IpAddress}:{GrpcPort}";
             return new ContainerBuilder()
-                .WithImage(_registryImage)
+                .WithImage(imageFixture.Image)
                 .WithPortBinding(GrpcPort, true)
                 .WithEnvironment("Verifiers__project_origin.electricity.v1", verifierUrl)
                 .WithEnvironment("RegistryName", RegistryName)
@@ -100,7 +95,6 @@ public class ThroughputTests : IAsyncLifetime
                         {
                             if (await IsCommitted(channel, transaction))
                             {
-                                Console.WriteLine($"completed request {completed.Count}");
                                 completed.Add(transaction);
                             }
                             else
@@ -120,7 +114,90 @@ public class ThroughputTests : IAsyncLifetime
         var requestsPerSecond = completed.Count / elapsedSeconds;
 
         Console.WriteLine($"Completed {completed.Count} requests in {elapsedSeconds} seconds ({requestsPerSecond} requests per second).");
-        requestsPerSecond.Should().BeGreaterThan(8); // based on througput test on github ~10
+        requestsPerSecond.Should().BeGreaterThan(60); // based on througput test on github ~60
+    }
+
+    [Fact]
+    public async Task TestLatencySequential()
+    {
+        Console.WriteLine($"-- Starting sequential test --");
+
+        int count = 10;
+
+        using var channel = CreateRegistryChannel();
+
+        List<long> measurements = new List<long>();
+        var stopwatch = new Stopwatch();
+
+        foreach (var i in Enumerable.Range(0, count))
+        {
+            stopwatch.Restart();
+            var transaction = await SendRequest(channel).ConfigureAwait(false);
+            while (!await IsCommitted(channel, transaction).ConfigureAwait(false))
+            {
+                await Task.Delay(25).ConfigureAwait(false);
+            }
+
+            stopwatch.Stop();
+            measurements.Add(stopwatch.ElapsedMilliseconds);
+        }
+
+        var ms95th = measurements.OrderBy(x => x).ElementAt((int)(count * 0.95));
+        Console.WriteLine($"Unit: Millisecond delay from published to committed");
+        Console.WriteLine("Max:  " + measurements.Max());
+        Console.WriteLine("95th: " + ms95th);
+        Console.WriteLine("Mean: " + Math.Round(measurements.Average()));
+        Console.WriteLine("Min:  " + measurements.Min());
+        Console.WriteLine($"-- Finished sequential test --");
+
+        ms95th.Should().BeLessThan(6000);
+    }
+
+    [Fact]
+    public async Task TestLatencyParallel()
+    {
+        Console.WriteLine($"-- Starting parallel test --");
+        int count = 100;
+
+        using var channel = CreateRegistryChannel();
+
+        List<long> measurements = new List<long>();
+
+        ConcurrentQueue<(Stopwatch stopwatch, Registry.V1.Transaction transaction)> queued = new();
+
+        for (int i = 0; i < count; i++)
+        {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            var transaction = await SendRequest(channel).ConfigureAwait(false);
+
+            queued.Enqueue((stopwatch, transaction));
+        }
+
+        while (queued.TryDequeue(out var item))
+        {
+            if (await IsCommitted(channel, item.transaction).ConfigureAwait(false))
+            {
+                item.stopwatch.Stop();
+                measurements.Add(item.stopwatch.ElapsedMilliseconds);
+            }
+            else
+            {
+                queued.Enqueue(item);
+                await Task.Delay(25).ConfigureAwait(false);
+            }
+        }
+
+        var ms95th = measurements.OrderBy(x => x).ElementAt((int)(count * 0.95));
+        Console.WriteLine($"Number of transactions: {count}");
+        Console.WriteLine($"Unit: Milliseconds test start to transaction committed");
+        Console.WriteLine("Max:  " + measurements.Max());
+        Console.WriteLine("95th: " + ms95th);
+        Console.WriteLine("Mean: " + measurements.Average());
+        Console.WriteLine("Min:  " + measurements.Min());
+        Console.WriteLine($"-- Finished parallel test --");
+
+        ms95th.Should().BeLessThan(5000);
     }
 
     private async Task<Registry.V1.Transaction> SendRequest(GrpcChannel channel)
@@ -143,7 +220,7 @@ public class ThroughputTests : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        await Task.WhenAll(_registryImage.CreateAsync(), _verifierContainer.StartAsync())
+        await _verifierContainer.StartAsync()
             .ConfigureAwait(false);
 
         await _registryContainer.Value.StartAsync()
@@ -157,6 +234,5 @@ public class ThroughputTests : IAsyncLifetime
             await _registryContainer.Value.StopAsync();
         }
         await _verifierContainer.StopAsync();
-        await _registryImage.DeleteAsync();
     }
 }

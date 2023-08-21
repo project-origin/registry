@@ -57,23 +57,12 @@ public class Startup
         services.AddSingleton<IEventStore, MemoryEventStore>();
         services.AddMassTransit(x =>
         {
-            x.AddConsumer<TransactionProcessor>(cfg =>
-            {
-                cfg.Options<JobOptions<TransactionJob>>(options => options
-                    // Currently set to 1 as to ensure transactions on the same certificate are not processed in parallel.
-                    // This will be solved in the future by using methods like RabbitMQ consistent hash exchange.
-                    .SetConcurrentJobLimit(1));
-            });
+            x.AddConsumer<VerifyTransactionConsumer, VerifyTransactionConsumerDefinition>();
 
             x.SetKebabCaseEndpointNameFormatter();
             x.UsingInMemory((context, cfg) =>
             {
-                cfg.UseDelayedMessageScheduler();
-                cfg.ServiceInstance(instance =>
-                {
-                    instance.ConfigureJobServiceEndpoints();
-                    instance.ConfigureEndpoints(context);
-                });
+                cfg.ConfigureEndpoints(context);
             });
         });
     }

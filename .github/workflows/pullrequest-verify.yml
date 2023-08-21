@@ -58,11 +58,11 @@ jobs:
       - name: Build Documentation
         run: docfx build doc/docfx.json
 
-  verify-throughput:
-    name: Verify throughput
+  verify-performance:
+    name: Verify performance
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
 
-      - name: Verify throughput
-        run: make verify-throughput
+      - name: Verify performance
+        run: make verify-performance
