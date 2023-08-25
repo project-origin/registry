@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using ProjectOrigin.VerifiableEventStore.Models;
 using ProjectOrigin.VerifiableEventStore.Services.EventStore;
+using ProjectOrigin.VerifiableEventStore.Services.EventStore.Memory;
 
 namespace ProjectOrigin.VerifiableEventStore.Tests;
 
@@ -10,8 +11,12 @@ public class MemoryEventStoreTests : AbstractEventStoreTests<MemoryEventStore>
 
     public MemoryEventStoreTests()
     {
-        var options = new VerifiableEventStoreOptions() { BatchSizeExponent = BatchExponent };
-        _memoryEventStore = new MemoryEventStore(Options.Create(options));
+        var calculator = new BlockSizeCalculator(Options.Create(new VerifiableEventStoreOptions()
+        {
+            MaxExponent = MaxBatchExponent,
+        }));
+
+        _memoryEventStore = new MemoryEventStore(calculator);
     }
 
     protected override MemoryEventStore EventStore => _memoryEventStore;

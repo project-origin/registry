@@ -2,7 +2,8 @@ using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector;
+using ProjectOrigin.VerifiableEventStore.Services.BatchPublisher;
+using ProjectOrigin.VerifiableEventStore.Services.BatchPublisher.Log;
 using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector.Concordium;
 
 static class Configurator
@@ -19,11 +20,11 @@ static class Configurator
                     .Bind(immutableLogSection.GetRequiredSection("Concordium"))
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
-                builder.Services.AddTransient<IBlockchainConnector, ConcordiumConnector>();
+                builder.Services.AddTransient<IBatchPublisher, ConcordiumPublisher>();
                 break;
 
             case "log":
-                builder.Services.AddSingleton<IBlockchainConnector, LogBlockchainConnector>();
+                builder.Services.AddSingleton<IBatchPublisher, LogBatchPublisher>();
                 break;
 
             default:

@@ -10,8 +10,10 @@ using ProjectOrigin.Registry.Server.Models;
 using ProjectOrigin.Registry.Server.Services;
 using ProjectOrigin.VerifiableEventStore.Models;
 using ProjectOrigin.VerifiableEventStore.Services.BatchProcessor;
-using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector;
+using ProjectOrigin.VerifiableEventStore.Services.BatchPublisher;
+using ProjectOrigin.VerifiableEventStore.Services.BatchPublisher.Log;
 using ProjectOrigin.VerifiableEventStore.Services.EventStore;
+using ProjectOrigin.VerifiableEventStore.Services.EventStore.Memory;
 using ProjectOrigin.VerifiableEventStore.Services.TransactionStatusCache;
 
 namespace ProjectOrigin.Registry.Server;
@@ -51,9 +53,11 @@ public class Startup
             configuration.GetSection("VerifiableEventStore").Bind(settings);
         });
 
+        services.AddTransient<BlockSizeCalculator>();
+
         // Memory only section
         services.AddDistributedMemoryCache();
-        services.AddTransient<IBlockchainConnector, LogBlockchainConnector>();
+        services.AddTransient<IBatchPublisher, LogBatchPublisher>();
         services.AddSingleton<IEventStore, MemoryEventStore>();
         services.AddMassTransit(x =>
         {

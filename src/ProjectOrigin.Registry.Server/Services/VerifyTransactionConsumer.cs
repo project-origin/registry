@@ -39,7 +39,7 @@ public class VerifyTransactionConsumer : IConsumer<VerifyTransaction>
     public async Task Consume(ConsumeContext<VerifyTransaction> context)
     {
         V1.Transaction transaction = context.Message.ToTransaction();
-        var transactionHash = Convert.ToBase64String(SHA256.HashData(transaction.ToByteArray()));
+        var transactionHash = new TransactionHash(SHA256.HashData(transaction.ToByteArray()));
         try
         {
             _logger.LogTrace($"Processing transaction {transactionHash}");
@@ -49,7 +49,7 @@ public class VerifyTransactionConsumer : IConsumer<VerifyTransaction>
 
             var streamId = Guid.Parse(transaction.Header.FederatedStreamId.StreamId.Value);
             var stream = (await _eventStore.GetEventsForEventStream(streamId).ConfigureAwait(false))
-                .Select(x => V1.Transaction.Parser.ParseFrom(x.Content))
+                .Select(x => V1.Transaction.Parser.ParseFrom(x.Payload))
                 .ToList();
 
             var result = await _verifier.VerifyTransaction(transaction, stream).ConfigureAwait(false);
@@ -58,8 +58,7 @@ public class VerifyTransactionConsumer : IConsumer<VerifyTransaction>
                 throw new InvalidTransactionException(result.ErrorMessage);
 
             var nextEventIndex = stream.Count();
-            var eventId = new VerifiableEventStore.Models.EventId(streamId, nextEventIndex);
-            var verifiableEvent = new VerifiableEvent(eventId, transactionHash, transaction.ToByteArray());
+            var verifiableEvent = new VerifiableEvent { TransactionHash = transactionHash, StreamId = streamId, StreamIndex = nextEventIndex, Payload = transaction.ToByteArray() };
             await _eventStore.Store(verifiableEvent).ConfigureAwait(false);
 
             _logger.LogTrace($"Transaction processed {transactionHash}");

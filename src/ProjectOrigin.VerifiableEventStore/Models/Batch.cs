@@ -1,8 +1,26 @@
-using System;
+using System.Linq;
+using System.Security.Cryptography;
+using Google.Protobuf;
 
 namespace ProjectOrigin.VerifiableEventStore.Models;
 
-public record Batch(Guid Id, Guid PreviousBatchId, string BlockId, string TransactionId)
+public sealed record BatchHash(byte[] Data)
 {
-    public bool IsFinalized => !string.IsNullOrEmpty(TransactionId);
+    public static BatchHash FromHeader(ImmutableLog.V1.BlockHeader batchHeader) => new(SHA256.HashData(batchHeader.ToByteArray()));
+
+    public bool Equals(BatchHash? right)
+    {
+        if (right is null)
+            return false;
+
+        if (Data == null || right.Data == null)
+        {
+            return Data == right.Data;
+        }
+        return Data.SequenceEqual(right.Data);
+    }
+    public override int GetHashCode()
+    {
+        return Data.Sum(b => b);
+    }
 }

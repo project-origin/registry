@@ -1,6 +1,8 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using ProjectOrigin.VerifiableEventStore.Extensions;
+using ProjectOrigin.VerifiableEventStore.Models;
 using ProjectOrigin.VerifiableEventStore.Services.EventStore;
 
 namespace ProjectOrigin.VerifiableEventStore.Services.EventProver;
@@ -14,20 +16,20 @@ public class EventProverService : IEventProver
         _eventStore = eventStore;
     }
 
-    public async Task<MerkleProof?> GetMerkleProof(string transactionId)
+    public async Task<MerkleProof?> GetMerkleProof(TransactionHash transactionHash)
     {
-        var batch = await _eventStore.GetBatchFromTransactionId(transactionId);
+        var batch = await _eventStore.GetBatchFromTransactionHash(transactionHash);
         if (batch is null)
         {
             return null;
         }
 
-        var events = await _eventStore.GetEventsForBatch(batch.Id);
+        var events = await _eventStore.GetEventsForBatch(BatchHash.FromHeader(batch.Header));
 
-        var eventObj = events.Single(e => e.TransactionId == transactionId);
-        var leafIndex = events.TakeWhile(x => !x.Equals(eventObj)).Count();
-        var hashes = events.GetRequiredHashes(e => e.Content, leafIndex);
+        var eventObj = events.Single(e => e.TransactionHash == transactionHash);
+        var leafIndex = events.IndexOf(eventObj);
+        var hashes = events.GetRequiredHashes(e => e.Payload, leafIndex);
 
-        return new MerkleProof(transactionId, eventObj.Content, batch.BlockId, batch.TransactionId, leafIndex, hashes);
+        return new MerkleProof(transactionHash, eventObj.Payload, leafIndex, hashes);
     }
 }

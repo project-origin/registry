@@ -22,7 +22,7 @@ public class ConcordiumTests
             AccountAddress = FakeAccount,
             AccountKey = FakePrivateKey
         });
-        var connector = new ConcordiumConnector(optionsMock.Object);
+        var connector = new ConcordiumPublisher(optionsMock.Object);
 
         Assert.NotNull(connector);
     }
@@ -39,6 +39,6 @@ public class ConcordiumTests
             AccountKey = "invalidkey"
         });
 
-        Assert.ThrowsAny<ArgumentException>(() => new ConcordiumConnector(optionsMock.Object));
+        Assert.ThrowsAny<ArgumentException>(() => new ConcordiumPublisher(optionsMock.Object));
     }
 }

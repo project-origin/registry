@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using NBitcoin;
 using ProjectOrigin.VerifiableEventStore.Models;
 
 namespace ProjectOrigin.VerifiableEventStore.Services.EventStore;
@@ -9,17 +10,12 @@ public interface IEventStore
 {
     Task Store(VerifiableEvent @event);
 
-    Task<Batch?> GetBatch(Guid batchId);
-    Task<Batch?> GetBatchFromEventId(EventId eventId);
-    Task<Batch?> GetBatchFromTransactionId(string transactionId);
+    Task<ImmutableLog.V1.Block?> GetBatchFromTransactionHash(TransactionHash transactionHash);
+    Task<IList<VerifiableEvent>> GetEventsForBatch(BatchHash batchHash);
 
-    Task<IEnumerable<VerifiableEvent>> GetEventsForEventStream(Guid streamId);
+    Task<IList<VerifiableEvent>> GetEventsForEventStream(Guid streamId);
+    Task<TransactionStatus> GetTransactionStatus(TransactionHash transactionHash);
 
-    Task<IEnumerable<VerifiableEvent>> GetEventsForBatch(Guid batchId);
-
-    Task<bool> TryGetNextBatchForFinalization(out Batch batch);
-
-    Task FinalizeBatch(Guid batchId, string blockId, string transactionHash);
-
-    Task<TransactionStatus> GetTransactionStatus(string transactionId);
+    Task<(ImmutableLog.V1.BlockHeader, IList<TransactionHash>)> CreateNextBatch();
+    Task FinalizeBatch(BatchHash hash, ImmutableLog.V1.BlockPublication publication);
 }

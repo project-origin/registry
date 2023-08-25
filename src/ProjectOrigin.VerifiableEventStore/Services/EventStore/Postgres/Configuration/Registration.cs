@@ -10,8 +10,6 @@ public static class Registration
     {
         var options = new PostgresqlEventStoreOptions
         {
-            BatchExponent = 10,
-            CreateSchema = true,
             ConnectionString = configuration.GetConnectionString("EventStore") ?? string.Empty
         };
         services.AddSingleton(options);

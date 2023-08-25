@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package project_origin.immutable_log.v1;
+
+message BlockHeader {
+    // SHA-256 hash of the previous batch header.
+    bytes previous_header_hash = 1;
+
+    // SHA-256 hash of the previous publication.
+    bytes previous_publication_hash = 2;
+
+    // SHA-256 hash of the merkle root of the transactions in the batch.
+    bytes merkle_root_hash = 3;
+
+    // Timestamp of when the batch was created.
+    google.protobuf.Timestamp created_at = 4;
+}
+
+message Block {
+    // The header of the batch.
+    BlockHeader header = 1;
+
+    // The publication of the batch.
+    BlockPublication publication = 2;
+}
+
+// A publication of a batch.
+message BlockPublication {
+    // Contains the type of the publication.
+    oneof immutable_log_type {
+        // Should only be used for testing.
+        LogEntry log_entry = 1;
+        Concordium concordium = 2;
+    }
+
+    message LogEntry {
+        // SHA-256 hash of the batch header.
+        bytes batch_header_hash = 1;
+    }
+
+    message Concordium {
+        // The hash of the transaction on the Concordium blockchain.
+        bytes transaction_hash = 1;
+    }
+}

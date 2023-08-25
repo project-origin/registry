@@ -1,33 +1,36 @@
-using System;
 using System.Threading.Tasks;
-using DotNet.Testcontainers.Builders;
-using DotNet.Testcontainers.Configurations;
-using DotNet.Testcontainers.Containers;
+using ProjectOrigin.WalletSystem.Server.Database;
+using Testcontainers.PostgreSql;
 
-namespace ProjectOrigin.VerifiableEventStore.Tests
+namespace ProjectOrigin.VerifiableEventStore.Tests;
+
+public class PostgresDatabaseFixture : IAsyncLifetime
 {
-    public sealed class DatabaseFixture : IDisposable, IAsyncLifetime
+    public string ConnectionString => _postgreSqlContainer.GetConnectionString();
+
+    private PostgreSqlContainer _postgreSqlContainer;
+
+    public PostgresDatabaseFixture()
     {
-        public TestcontainerDatabase Database { get; } = new TestcontainersBuilder<PostgreSqlTestcontainer>()
-            .WithDatabase(new PostgreSqlTestcontainerConfiguration
-            {
-                Database = "db",
-                Username = "postgres",
-                Password = "postgres",
-            })
+        _postgreSqlContainer = new PostgreSqlBuilder()
+            .WithImage("postgres:15")
             .Build();
+    }
 
-        public DatabaseFixture()
-        {
-        }
+    public async Task InitializeAsync()
+    {
+        await _postgreSqlContainer.StartAsync();
+        await ResetDatabase();
+    }
 
-        public void Dispose()
-        {
-            Database.DisposeAsync().AsTask().Dispose();
-        }
+    public async Task ResetDatabase()
+    {
+        await _postgreSqlContainer.ExecScriptAsync("DROP SCHEMA public CASCADE;CREATE SCHEMA public;GRANT ALL ON SCHEMA public TO postgres;GRANT ALL ON SCHEMA public TO public;");
+        DatabaseUpgrader.Upgrade(_postgreSqlContainer.GetConnectionString());
+    }
 
-        public Task InitializeAsync() => Database.StartAsync();
-
-        public Task DisposeAsync() => Database.CleanUpAsync();
+    public Task DisposeAsync()
+    {
+        return _postgreSqlContainer.StopAsync();
     }
 }

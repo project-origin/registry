@@ -1,9 +1,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector;
+using ProjectOrigin.VerifiableEventStore.Services.BatchPublisher;
 using ProjectOrigin.VerifiableEventStore.Services.EventStore;
 using ProjectOrigin.VerifiableEventStore.Services.TransactionStatusCache;
 
@@ -13,29 +14,31 @@ public class BatchProcessorBackgroundService : BackgroundService
 {
     private readonly TimeSpan _period = TimeSpan.FromSeconds(5);
     private readonly ILogger<BatchProcessorBackgroundService> _logger;
-    private readonly IEventStore _eventStore;
-    private readonly IBlockchainConnector _blockchainConnector;
-    private readonly ITransactionStatusService _statusService;
+    private readonly IServiceProvider _serviceProvider;
 
-    public BatchProcessorBackgroundService(ILogger<BatchProcessorBackgroundService> logger, IEventStore eventStore, IBlockchainConnector blockchainConnector, ITransactionStatusService statusService)
+    public BatchProcessorBackgroundService(ILogger<BatchProcessorBackgroundService> logger, IServiceProvider serviceProvider)
     {
         _logger = logger;
-        _eventStore = eventStore;
-        _blockchainConnector = blockchainConnector;
-        _statusService = statusService;
+        _serviceProvider = serviceProvider;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        var processor = new BatchProcessorJob(
+            _serviceProvider.GetRequiredService<ILogger<BatchProcessorJob>>(),
+            _serviceProvider.GetRequiredService<IBatchPublisher>(),
+            _serviceProvider.GetRequiredService<IEventStore>(),
+            _serviceProvider.GetRequiredService<ITransactionStatusService>()
+            );
+
         using var timer = new PeriodicTimer(_period);
-        var processer = new BatchProcessorJob(_blockchainConnector, _eventStore, _statusService);
 
         while (!stoppingToken.IsCancellationRequested &&
                await timer.WaitForNextTickAsync(stoppingToken))
         {
             _logger.LogTrace("Executing BatchProcesser");
 
-            await processer.Execute(stoppingToken);
+            await processor.Execute(stoppingToken);
 
             _logger.LogTrace("Executed BatchProcesser");
         }
