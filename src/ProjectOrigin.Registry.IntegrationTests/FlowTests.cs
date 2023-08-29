@@ -26,12 +26,12 @@ public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityService
         _postgresDatabaseFixture = postgresDatabaseFixture;
         grpcFixture.ConfigureHostConfiguration(new Dictionary<string, string?>()
         {
+            {"RegistryName", RegistryName},
             {$"Verifiers:project_origin.electricity.v1", _verifierFixture.Url},
             {$"ImmutableLog:type", "log"},
-            {"persistance:type", "postgresql"},
             {"BlockFinalizer:Interval", "00:00:05"},
-            {"persistance:postgresql:ConnectionString", _postgresDatabaseFixture.ConnectionString},
-            {"RegistryName", RegistryName}
+            {"Persistance:type", "postgresql"},
+            {"Persistance:postgresql:ConnectionString", _postgresDatabaseFixture.ConnectionString},
         });
     }
 

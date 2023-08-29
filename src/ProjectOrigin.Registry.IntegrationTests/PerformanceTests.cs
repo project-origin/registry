@@ -14,10 +14,11 @@ using System.Collections.Concurrent;
 using FluentAssertions;
 using System.Linq;
 using System.Collections.Generic;
+using ProjectOrigin.TestUtils;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
-public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixture>
+public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixture>, IClassFixture<PostgresDatabaseFixture>
 {
     private const string ElectricityVerifierImage = "ghcr.io/project-origin/electricity-server:0.2.0-rc.17";
     private const string RegistryImage = "ghcr.io/project-origin/registry-server:0.2.0-rc.17";
@@ -28,10 +29,12 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
     private readonly IContainer _verifierContainer;
     private readonly Lazy<IContainer> _registryContainer;
     private readonly IPrivateKey _issuerKey;
+    private readonly PostgresDatabaseFixture _postgresDatabaseFixture;
 
-    public PerformanceTests(ContainerImageFixture imageFixture)
+    public PerformanceTests(ContainerImageFixture imageFixture, PostgresDatabaseFixture postgresDatabaseFixture)
     {
         _issuerKey = Algorithms.Ed25519.GenerateNewPrivateKey();
+        _postgresDatabaseFixture = postgresDatabaseFixture;
 
         _verifierContainer = new ContainerBuilder()
                 .WithImage(ElectricityVerifierImage)
@@ -49,9 +52,12 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
             return new ContainerBuilder()
                 .WithImage(imageFixture.Image)
                 .WithPortBinding(GrpcPort, true)
-                .WithEnvironment("Verifiers__project_origin.electricity.v1", verifierUrl)
                 .WithEnvironment("RegistryName", RegistryName)
-                .WithEnvironment("IMMUTABLELOG__TYPE", "log")
+                .WithEnvironment("Verifiers__project_origin.electricity.v1", verifierUrl)
+                .WithEnvironment("ImmutableLog__type", "log")
+                .WithEnvironment("BlockFinalizer__Interval", "00:00:05")
+                .WithEnvironment("Persistance__type", "postgresql")
+                .WithEnvironment("Persistance__postgresql__ConnectionString:", postgresDatabaseFixture.ConnectionString)
                 .WithWaitStrategy(
                     Wait.ForUnixContainer()
                         .UntilPortIsAvailable(GrpcPort)
