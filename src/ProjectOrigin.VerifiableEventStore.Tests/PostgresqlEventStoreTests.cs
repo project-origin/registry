@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using ProjectOrigin.TestUtils;
 using ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres;
 using Xunit;
 

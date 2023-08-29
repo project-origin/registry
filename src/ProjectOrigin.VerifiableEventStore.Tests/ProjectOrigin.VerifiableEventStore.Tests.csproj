@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ProjectOrigin.VerifiableEventStore\ProjectOrigin.VerifiableEventStore.csproj" />
+    <ProjectReference Include="..\ProjectOrigin.TestUtils\ProjectOrigin.TestUtils.csproj" />
   </ItemGroup>
 
 </Project>

@@ -45,11 +45,11 @@ public class WithoutWalletFlow
 
         // Create channel and client
         var prodChannel = GrpcChannel.ForAddress(prodRegistryAddress);
-        //var prodClient = new ProjectOrigin.Registry.V1.RegistryService.RegistryServiceClient(prodChannel);
+        var prodClient = new ProjectOrigin.Registry.V1.RegistryService.RegistryServiceClient(prodChannel);
 
         // Create channel and client
         var consChannel = GrpcChannel.ForAddress(consRegistryAddress);
-        //var consClient = new ProjectOrigin.Registry.V1.RegistryService.RegistryServiceClient(consChannel);
+        var consClient = new ProjectOrigin.Registry.V1.RegistryService.RegistryServiceClient(consChannel);
 
         // Instanciate helper with registry and area info
         var helper = new Helper(area);
@@ -67,7 +67,7 @@ public class WithoutWalletFlow
             var signedTransaction = helper.SignTransaction(consumptionIssued.CertificateId, consumptionIssued, issuerKey);
 
             // Send transaction to registry, and wait for committed state
-            await SendTransactionAndWait(consChannel, helper, signedTransaction);
+            await SendTransactionAndWait(consClient, helper, signedTransaction);
         }
 
 
@@ -83,7 +83,7 @@ public class WithoutWalletFlow
             var signedTransaction = helper.SignTransaction(productionIssued.CertificateId, productionIssued, issuerKey);
 
             // Send transaction to registry, and wait for committed state
-            await SendTransactionAndWait(prodChannel, helper, signedTransaction);
+            await SendTransactionAndWait(prodClient, helper, signedTransaction);
         }
 
 
@@ -100,7 +100,7 @@ public class WithoutWalletFlow
             var signedTransaction = helper.SignTransaction(productionSliceEvent.CertificateId, productionSliceEvent, ownerKey);
 
             // Send transaction to registry, and wait for committed state
-            await SendTransactionAndWait(prodChannel, helper, signedTransaction);
+            await SendTransactionAndWait(prodClient, helper, signedTransaction);
         }
 
 
@@ -116,7 +116,7 @@ public class WithoutWalletFlow
             var prodAllocationSignedTransaction = helper.SignTransaction(allocatedEvent.ProductionCertificateId, allocatedEvent, ownerKey);
 
             // Send transaction to registry, and wait for committed state
-            await SendTransactionAndWait(prodChannel, helper, prodAllocationSignedTransaction);
+            await SendTransactionAndWait(prodClient, helper, prodAllocationSignedTransaction);
 
             // ------------------ allocate consumption ------------------
             Console.WriteLine($"Allocating Consumption Granular Certificate");
@@ -125,7 +125,7 @@ public class WithoutWalletFlow
             var consAllocationSignedTransaction = helper.SignTransaction(allocatedEvent.ConsumptionCertificateId, allocatedEvent, ownerKey);
 
             // Send transaction to registry, and wait for committed state
-            await SendTransactionAndWait(consChannel, helper, consAllocationSignedTransaction);
+            await SendTransactionAndWait(consClient, helper, consAllocationSignedTransaction);
         }
 
 
@@ -138,7 +138,7 @@ public class WithoutWalletFlow
             var signedTransaction = helper.SignTransaction(productionClaimEvent.CertificateId, productionClaimEvent, ownerKey);
 
             // Send transaction to registry, and wait for committed state
-            await SendTransactionAndWait(prodChannel, helper, signedTransaction);
+            await SendTransactionAndWait(prodClient, helper, signedTransaction);
         }
 
         // ------------------  claim consumption ------------------
@@ -150,15 +150,14 @@ public class WithoutWalletFlow
             var signedTransaction = helper.SignTransaction(consumptionClaimEvent.CertificateId, consumptionClaimEvent, ownerKey);
 
             // Send transaction to registry, and wait for committed state
-            await SendTransactionAndWait(consChannel, helper, signedTransaction);
+            await SendTransactionAndWait(consClient, helper, signedTransaction);
         }
 
         return 0;
     }
 
-    private static async Task SendTransactionAndWait(GrpcChannel channel, Helper helper, Transaction singedTransaction)
+    private static async Task SendTransactionAndWait(RegistryService.RegistryServiceClient client, Helper helper, Transaction singedTransaction)
     {
-        var client = new ProjectOrigin.Registry.V1.RegistryService.RegistryServiceClient(channel);
         var consClaimRequest = new ProjectOrigin.Registry.V1.SendTransactionsRequest();
         consClaimRequest.Transactions.Add(singedTransaction);
         await client.SendTransactionsAsync(consClaimRequest);
