@@ -52,7 +52,6 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
                 .WithEnvironment("Verifiers__project_origin.electricity.v1", verifierUrl)
                 .WithEnvironment("RegistryName", RegistryName)
                 .WithEnvironment("IMMUTABLELOG__TYPE", "log")
-                .WithEnvironment("VERIFIABLEEVENTSTORE__BATCHSIZEEXPONENT", "0")
                 .WithWaitStrategy(
                     Wait.ForUnixContainer()
                         .UntilPortIsAvailable(GrpcPort)

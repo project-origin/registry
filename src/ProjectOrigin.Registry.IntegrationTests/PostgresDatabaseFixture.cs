@@ -6,7 +6,7 @@ using ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres;
 using Testcontainers.PostgreSql;
 using Xunit;
 
-namespace ProjectOrigin.VerifiableEventStore.Tests;
+namespace ProjectOrigin.Electricity.IntegrationTests;
 
 public class PostgresDatabaseFixture : IAsyncLifetime
 {

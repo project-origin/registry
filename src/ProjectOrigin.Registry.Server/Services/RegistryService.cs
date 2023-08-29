@@ -1,7 +1,6 @@
 using Grpc.Core;
 using MassTransit;
 using ProjectOrigin.Registry.V1;
-using ProjectOrigin.VerifiableEventStore.Services.EventStore;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
@@ -10,6 +9,7 @@ using System.Security.Cryptography;
 using Google.Protobuf;
 using System.Diagnostics.Metrics;
 using ProjectOrigin.VerifiableEventStore.Models;
+using ProjectOrigin.VerifiableEventStore.Services.Repository;
 
 namespace ProjectOrigin.Registry.Server;
 
@@ -18,11 +18,11 @@ public class RegistryService : V1.RegistryService.RegistryServiceBase
     public static Meter Meter = new("Registry.RegistryService");
     public static Counter<long> TransactionsSubmitted = Meter.CreateCounter<long>("TransactionsSubmitted");
 
-    private IEventStore _eventStore;
+    private ITransactionRepository _eventStore;
     private IBus _bus;
     private ITransactionStatusService _transactionStatusService;
 
-    public RegistryService(IEventStore eventStore, IBus bus, ITransactionStatusService transactionStatusService)
+    public RegistryService(ITransactionRepository eventStore, IBus bus, ITransactionStatusService transactionStatusService)
     {
         _eventStore = eventStore;
         _bus = bus;
@@ -64,7 +64,7 @@ public class RegistryService : V1.RegistryService.RegistryServiceBase
     public async override Task<GetStreamTransactionsResponse> GetStreamTransactions(V1.GetStreamTransactionsRequest request, ServerCallContext context)
     {
         var streamId = Guid.Parse(request.StreamId.Value);
-        var verifiableEvents = await _eventStore.GetEventsForEventStream(streamId).ConfigureAwait(false);
+        var verifiableEvents = await _eventStore.GetStreamTransactionsForStream(streamId).ConfigureAwait(false);
         var transactions = verifiableEvents.Select(x => V1.Transaction.Parser.ParseFrom(x.Payload));
 
         var response = new GetStreamTransactionsResponse();

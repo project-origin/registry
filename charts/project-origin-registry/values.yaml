@@ -3,20 +3,52 @@
 # Enables one to override the name of the registry
 registryName:
 
+# image holds the configuration for the image to use for the registry
 image:
   # repository is the repository to pull the image from
   repository: ghcr.io/project-origin/registry-server
-  # tag is the tag to pull
+  # tag is the tag to pull defaults to the chart version
   tag:
 
+# service holds the configuration for the service
 service:
+  # type is the type of service to create, allowed values are (ClusterIP | NodePort | LoadBalancer)
   type: ClusterIP
+  # nodePort is the port to expose the service on if type is NodePort
   nodePort:
 
-verifiableEventStore:
-  batchSizeExponent: 0
-  eventStore:
-    type: inMemory
+# blockFinalizer holds the configuration for the block finalizer
+blockFinalizer:
+  # interval is the interval at which to run the block finalizer, defaults to 30 seconds allowed values are between 00:00:01 and 01:00:00
+  interval: 00:00:30
+
+persistance:
+  # cloudNativePG determines if the database is created as a cloud native postgresql instance
+  cloudNativePG:
+
+    # enabled determines if the cloud native postgresql instance is enabled
+    enabled: false
+
+    # name defines the name of the cloud native postgresql instance
+    name: cnpg-registry-db
+
+    # owner defines the owner of the database
+    owner: app
+
+    # database defines the name of the database to create
+    database: registry-database
+
+    # replicas defines the number of database instances to run
+    replicas: 3
+
+    # storage defines the storage configuration for the database
+    size: 10Gi
+
+  # inMemory determines if the database is created as an in memory database
+  inMemory:
+
+    # enabled determines if the in memory database is enabled
+    enabled: false
 
 # verifiers defines the local verifiers
 verifiers:

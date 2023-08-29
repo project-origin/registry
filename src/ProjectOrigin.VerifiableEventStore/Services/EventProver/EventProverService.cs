@@ -1,30 +1,29 @@
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using ProjectOrigin.VerifiableEventStore.Extensions;
 using ProjectOrigin.VerifiableEventStore.Models;
-using ProjectOrigin.VerifiableEventStore.Services.EventStore;
+using ProjectOrigin.VerifiableEventStore.Services.Repository;
 
 namespace ProjectOrigin.VerifiableEventStore.Services.EventProver;
 
 public class EventProverService : IEventProver
 {
-    private IEventStore _eventStore;
+    private ITransactionRepository _eventStore;
 
-    public EventProverService(IEventStore eventStore)
+    public EventProverService(ITransactionRepository eventStore)
     {
         _eventStore = eventStore;
     }
 
     public async Task<MerkleProof?> GetMerkleProof(TransactionHash transactionHash)
     {
-        var batch = await _eventStore.GetBatchFromTransactionHash(transactionHash);
-        if (batch is null)
+        var block = await _eventStore.GetBlockFromTransactionHash(transactionHash);
+        if (block is null)
         {
             return null;
         }
 
-        var events = await _eventStore.GetEventsForBatch(BatchHash.FromHeader(batch.Header));
+        var events = await _eventStore.GetStreamTransactionsForBlock(BlockHash.FromHeader(block.Header));
 
         var eventObj = events.Single(e => e.TransactionHash == transactionHash);
         var leafIndex = events.IndexOf(eventObj);

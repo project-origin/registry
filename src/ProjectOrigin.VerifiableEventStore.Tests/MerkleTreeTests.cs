@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using AutoFixture;
 using FluentAssertions;
 using ProjectOrigin.VerifiableEventStore.Extensions;
 using ProjectOrigin.VerifiableEventStore.Models;
 using ProjectOrigin.VerifiableEventStore.Services.EventProver;
+using Xunit;
 
 namespace ProjectOrigin.VerifiableEventStore.Tests;
 
@@ -109,7 +111,7 @@ public class MerkleTreeTests
     [InlineData(1 << 10, 5, 10)]
     public void GetRequiredHashes_ValidateNumberOfHashesReturned(int numberOfEvents, int leafIndex, int numberOfHashes)
     {
-        var events = new Fixture().CreateMany<VerifiableEvent>(numberOfEvents).ToList();
+        var events = new Fixture().CreateMany<StreamTransaction>(numberOfEvents).ToList();
         var hashes = events.GetRequiredHashes(x => x.Payload, leafIndex);
 
         Assert.Equal(numberOfHashes, hashes.Count());
@@ -139,7 +141,7 @@ public class MerkleTreeTests
     [InlineData(32, 31)]
     public void GetRequiredHashes_ValidateHashesCorrect(int numberOfEvents, int leafIndex)
     {
-        var events = new Fixture().CreateMany<VerifiableEvent>(numberOfEvents).ToList();
+        var events = new Fixture().CreateMany<StreamTransaction>(numberOfEvents).ToList();
         var hashes = events.GetRequiredHashes(x => x.Payload, leafIndex);
 
         MerkleProof merkleProof = new(events[leafIndex].TransactionHash, events[leafIndex].Payload, leafIndex, hashes);

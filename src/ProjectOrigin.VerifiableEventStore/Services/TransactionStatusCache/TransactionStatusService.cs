@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using ProjectOrigin.VerifiableEventStore.Models;
-using ProjectOrigin.VerifiableEventStore.Services.EventStore;
+using ProjectOrigin.VerifiableEventStore.Services.Repository;
 
 namespace ProjectOrigin.VerifiableEventStore.Services.TransactionStatusCache;
 
@@ -15,9 +15,9 @@ public class TransactionStatusService : ITransactionStatusService
 
     private ILogger<TransactionStatusService> _logger;
     private IDistributedCache _cache;
-    private IEventStore _eventStore;
+    private ITransactionRepository _eventStore;
 
-    public TransactionStatusService(ILogger<TransactionStatusService> logger, IDistributedCache cache, IEventStore eventStore)
+    public TransactionStatusService(ILogger<TransactionStatusService> logger, IDistributedCache cache, ITransactionRepository eventStore)
     {
         _logger = logger;
         _cache = cache;

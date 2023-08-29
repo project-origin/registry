@@ -1,6 +1,8 @@
 using System;
 using Microsoft.Extensions.Options;
+using Moq;
 using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector.Concordium;
+using Xunit;
 
 namespace ProjectOrigin.VerifiableEventStore.Tests;
 

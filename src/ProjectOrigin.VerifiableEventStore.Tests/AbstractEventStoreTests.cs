@@ -1,32 +1,33 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Intrinsics.Arm;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using AutoFixture;
 using FluentAssertions;
 using Google.Protobuf;
 using ProjectOrigin.VerifiableEventStore.Extensions;
 using ProjectOrigin.VerifiableEventStore.Models;
 using ProjectOrigin.VerifiableEventStore.Services.EventStore;
+using ProjectOrigin.VerifiableEventStore.Services.Repository;
+using Xunit;
 
 namespace ProjectOrigin.VerifiableEventStore.Tests;
 
-public abstract class AbstractEventStoreTests<T> where T : IEventStore
+public abstract class AbstractEventStoreTests<T> where T : ITransactionRepository
 {
-    protected const int MaxBatchExponent = 10;
     protected Fixture _fixture;
-    protected abstract T EventStore { get; }
+    protected abstract T Repository { get; }
 
     public AbstractEventStoreTests()
     {
         _fixture = new Fixture();
     }
 
-    private VerifiableEvent CreateFakeEvent(Guid stream, int index)
+    private StreamTransaction CreateFakeEvent(Guid stream, int index)
     {
         var transaction = _fixture.Create<byte[]>();
-        return new VerifiableEvent { TransactionHash = new TransactionHash(SHA256.HashData(transaction)), StreamId = stream, StreamIndex = index, Payload = transaction };
+        return new StreamTransaction { TransactionHash = new TransactionHash(SHA256.HashData(transaction)), StreamId = stream, StreamIndex = index, Payload = transaction };
     }
 
     [Fact]
@@ -34,9 +35,9 @@ public abstract class AbstractEventStoreTests<T> where T : IEventStore
     {
         var @event = CreateFakeEvent(Guid.NewGuid(), 0);
 
-        await EventStore.Store(@event);
+        await Repository.Store(@event);
 
-        var eventStream = await EventStore.GetEventsForEventStream(@event.StreamId);
+        var eventStream = await Repository.GetStreamTransactionsForStream(@event.StreamId);
         var fromDatabase = eventStream.First();
 
         fromDatabase.Should().BeEquivalentTo(@event);
@@ -47,16 +48,16 @@ public abstract class AbstractEventStoreTests<T> where T : IEventStore
     {
         const int NUMBER_OF_EVENTS = 150;
 
-        List<VerifiableEvent> events = new();
+        List<StreamTransaction> events = new();
         for (var i = 0; i < NUMBER_OF_EVENTS; i++)
         {
             var @event = CreateFakeEvent(Guid.NewGuid(), 0);
             events.Add(@event);
-            await EventStore.Store(@event);
+            await Repository.Store(@event);
         }
 
         var firstEvent = events.First();
-        var eventStream = await EventStore.GetEventsForEventStream(firstEvent.StreamId);
+        var eventStream = await Repository.GetStreamTransactionsForStream(firstEvent.StreamId);
 
         eventStream.Should().ContainSingle();
         eventStream.Should().ContainEquivalentOf(firstEvent);
@@ -71,10 +72,10 @@ public abstract class AbstractEventStoreTests<T> where T : IEventStore
         for (var i = 0; i < NUMBER_OF_EVENTS; i++)
         {
             var @event = CreateFakeEvent(streamId, i);
-            await EventStore.Store(@event);
+            await Repository.Store(@event);
         }
 
-        var events = await EventStore.GetEventsForEventStream(streamId);
+        var events = await Repository.GetStreamTransactionsForStream(streamId);
         Assert.NotEmpty(events);
         Assert.Equal(NUMBER_OF_EVENTS, events.Count());
     }
@@ -84,10 +85,10 @@ public abstract class AbstractEventStoreTests<T> where T : IEventStore
     {
         var streamId = Guid.NewGuid();
 
-        await EventStore.Store(CreateFakeEvent(streamId, 0));
+        await Repository.Store(CreateFakeEvent(streamId, 0));
         var @event = CreateFakeEvent(streamId, 3);
 
-        async Task act() => await EventStore.Store(@event);
+        async Task act() => await Repository.Store(@event);
         await Assert.ThrowsAnyAsync<OutOfOrderException>(act);
     }
 
@@ -98,7 +99,7 @@ public abstract class AbstractEventStoreTests<T> where T : IEventStore
 
         var @event = CreateFakeEvent(streamId, 99);
 
-        async Task act() => await EventStore.Store(@event);
+        async Task act() => await Repository.Store(@event);
         await Assert.ThrowsAnyAsync<OutOfOrderException>(act);
     }
 
@@ -107,66 +108,147 @@ public abstract class AbstractEventStoreTests<T> where T : IEventStore
     {
         var @event = CreateFakeEvent(Guid.NewGuid(), 0);
 
-        await EventStore.Store(@event);
+        await Repository.Store(@event);
 
-        var eventStream = await EventStore.GetEventsForEventStream(@event.StreamId);
+        var eventStream = await Repository.GetStreamTransactionsForStream(@event.StreamId);
         Assert.NotEmpty(eventStream);
     }
 
     [Fact]
-    public async Task GetBatchFromTransactionHash_NoneExistingBatch_ReturnNull()
+    public async Task GetBlockFromTransactionHash_NoneExistingBlock_ReturnNull()
     {
         var transactionHash = new Fixture().Create<TransactionHash>();
-        var batchResult = await EventStore.GetBatchFromTransactionHash(transactionHash);
+        var block = await Repository.GetBlockFromTransactionHash(transactionHash);
 
-        Assert.Null(batchResult);
-    }
-
-    [Theory]
-    [InlineData(10, 10)]
-    [InlineData(16, 16)]
-    [InlineData(18, 18)]
-    [InlineData(34, 34)]
-    [InlineData(68, 68)]
-    [InlineData(128, 128)]
-    [InlineData((1 << MaxBatchExponent) + 10, 1 << MaxBatchExponent)]
-    public async Task Can_Get_Batches_For_Finalization(int numberOfTransaction, int numberInBlock)
-    {
-        var sentTransactions = new List<VerifiableEvent>();
-
-        for (var i = 0; i < numberOfTransaction; i++)
-        {
-            var @event = CreateFakeEvent(Guid.NewGuid(), 0);
-            sentTransactions.Add(@event);
-            await EventStore.Store(@event);
-        }
-
-        var (header, transactions) = await EventStore.CreateNextBatch();
-        var root = sentTransactions.CalculateMerkleRoot(x => x.Payload);
-
-        transactions.Should().HaveCount(numberInBlock);
-        header.PreviousHeaderHash.ToArray().Should().BeEquivalentTo(new byte[32]);
+        Assert.Null(block);
     }
 
     [Fact]
-    public async Task Can_FinalizeBatch()
+    public async Task CreateNextBlock_NoTransaction_NullBlock()
+    {
+        // Given
+
+        // When
+        var newBlock = await Repository.CreateNextBlock();
+
+        // Then
+        newBlock.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task CreateNextBlock_NoNewTransactions_NullBlock()
+    {
+        // Given
+        await Repository.Store(CreateFakeEvent(Guid.NewGuid(), 0));
+        var block1 = await Repository.CreateNextBlock();
+        block1.Should().NotBeNull();
+        block1!.TransactionHashes.Should().HaveCount(1);
+        await Repository.FinalizeBlock(BlockHash.FromHeader(block1!.Header), new ImmutableLog.V1.BlockPublication());
+
+        // When
+        var newBlock = await Repository.CreateNextBlock();
+
+        // Then
+        newBlock.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task CreateNextBlock_NotFinalized_ThrowsException()
+    {
+        // Given
+        await Repository.Store(CreateFakeEvent(Guid.NewGuid(), 0));
+        var block1 = await Repository.CreateNextBlock();
+        block1.Should().NotBeNull();
+        block1!.TransactionHashes.Should().HaveCount(1);
+
+        // When
+        async Task act() => await Repository.CreateNextBlock();
+
+        // Then
+        var ex = await Assert.ThrowsAnyAsync<InvalidOperationException>(act);
+        ex.Message.Should().BeEquivalentTo("Previous block has not been published");
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(3)]
+    [InlineData(8)]
+    [InlineData(32)]
+    [InlineData(150)]
+    [InlineData(1024)]
+    public async Task Can_Create_Next_Block_For_Finalization(int numberOfTransaction)
+    {
+        // Given
+        var transactions = Enumerable.Range(0, numberOfTransaction)
+            .Select(i =>
+            {
+                var @event = CreateFakeEvent(Guid.NewGuid(), 0);
+                Repository.Store(@event).Wait();
+                return @event;
+            }).ToList();
+
+        // When
+        var newBlock = await Repository.CreateNextBlock();
+
+        // Then
+        newBlock.Should().NotBeNull();
+        newBlock!.TransactionHashes.Should().HaveCount(numberOfTransaction);
+        newBlock!.Header.PreviousHeaderHash.ToArray().Should().BeEquivalentTo(new byte[32]);
+        newBlock!.Header.MerkleRootHash.Should().BeEquivalentTo(transactions.CalculateMerkleRoot(x => x.Payload));
+    }
+
+    [Fact]
+    public async Task Can_FinalizeBlock()
     {
         for (var i = 0; i < 100; i++)
         {
             var @event = CreateFakeEvent(Guid.NewGuid(), 0);
-            await EventStore.Store(@event);
+            await Repository.Store(@event);
         }
 
-        var (header, _) = await EventStore.CreateNextBatch();
+        var newBlock = await Repository.CreateNextBlock();
+
+        newBlock.Should().NotBeNull();
 
         var publication = new ImmutableLog.V1.BlockPublication
         {
             LogEntry = new ImmutableLog.V1.BlockPublication.Types.LogEntry
             {
-                BatchHeaderHash = ByteString.CopyFrom(SHA256.HashData(header.ToByteArray())),
+                BlockHeaderHash = ByteString.CopyFrom(SHA256.HashData(newBlock!.Header.ToByteArray())),
             }
         };
 
-        await EventStore.FinalizeBatch(BatchHash.FromHeader(header), publication);
+        await Repository.FinalizeBlock(BlockHash.FromHeader(newBlock!.Header), publication);
+    }
+
+    [Fact]
+    public async Task CanCreateSeriesOfBlocks()
+    {
+        await Repository.Store(CreateFakeEvent(Guid.NewGuid(), 0));
+        var block1 = await Repository.CreateNextBlock();
+        block1.Should().NotBeNull();
+        block1!.Header.PreviousHeaderHash.Should().BeEquivalentTo(new byte[32]);
+        block1!.Header.PreviousPublicationHash.Should().BeEquivalentTo(new byte[32]);
+        block1!.TransactionHashes.Should().HaveCount(1);
+        var pub1 = new ImmutableLog.V1.BlockPublication();
+        await Repository.FinalizeBlock(BlockHash.FromHeader(block1!.Header), pub1);
+
+        await Repository.Store(CreateFakeEvent(Guid.NewGuid(), 0));
+        var block2 = await Repository.CreateNextBlock();
+        block2.Should().NotBeNull();
+        block2!.Header.PreviousHeaderHash.Should().BeEquivalentTo(SHA256.HashData(block1!.Header.ToByteArray()));
+        block2!.Header.PreviousPublicationHash.Should().BeEquivalentTo(SHA256.HashData(pub1.ToByteArray()));
+        block2!.TransactionHashes.Should().HaveCount(1);
+        var pub2 = new ImmutableLog.V1.BlockPublication();
+        await Repository.FinalizeBlock(BlockHash.FromHeader(block2!.Header), pub2);
+
+        await Repository.Store(CreateFakeEvent(Guid.NewGuid(), 0));
+        var block3 = await Repository.CreateNextBlock();
+        block3.Should().NotBeNull();
+        block3!.Header.PreviousHeaderHash.Should().BeEquivalentTo(SHA256.HashData(block2!.Header.ToByteArray()));
+        block3!.Header.PreviousPublicationHash.Should().BeEquivalentTo(SHA256.HashData(pub2.ToByteArray()));
+        block3!.TransactionHashes.Should().HaveCount(1);
+        var pub3 = new ImmutableLog.V1.BlockPublication();
+        await Repository.FinalizeBlock(BlockHash.FromHeader(block3!.Header), pub3);
     }
 }
