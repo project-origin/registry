@@ -18,7 +18,7 @@ using ProjectOrigin.TestUtils;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
-public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixture>, IClassFixture<PostgresDatabaseFixture>
+public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixture>//, IClassFixture<PostgresDatabaseFixture>
 {
     private const string ElectricityVerifierImage = "ghcr.io/project-origin/electricity-server:0.2.0-rc.17";
     private const string RegistryImage = "ghcr.io/project-origin/registry-server:0.2.0-rc.17";
@@ -29,12 +29,12 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
     private readonly IContainer _verifierContainer;
     private readonly Lazy<IContainer> _registryContainer;
     private readonly IPrivateKey _issuerKey;
-    private readonly PostgresDatabaseFixture _postgresDatabaseFixture;
+    //private readonly PostgresDatabaseFixture _postgresDatabaseFixture;
 
-    public PerformanceTests(ContainerImageFixture imageFixture, PostgresDatabaseFixture postgresDatabaseFixture)
+    public PerformanceTests(ContainerImageFixture imageFixture)//, PostgresDatabaseFixture postgresDatabaseFixture)
     {
         _issuerKey = Algorithms.Ed25519.GenerateNewPrivateKey();
-        _postgresDatabaseFixture = postgresDatabaseFixture;
+        //_postgresDatabaseFixture = postgresDatabaseFixture;
 
         _verifierContainer = new ContainerBuilder()
                 .WithImage(ElectricityVerifierImage)
@@ -52,12 +52,13 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
             return new ContainerBuilder()
                 .WithImage(imageFixture.Image)
                 .WithPortBinding(GrpcPort, true)
+                .WithCommand("--serve")
                 .WithEnvironment("RegistryName", RegistryName)
                 .WithEnvironment("Verifiers__project_origin.electricity.v1", verifierUrl)
                 .WithEnvironment("ImmutableLog__type", "log")
                 .WithEnvironment("BlockFinalizer__Interval", "00:00:05")
-                .WithEnvironment("Persistance__type", "postgresql")
-                .WithEnvironment("Persistance__postgresql__ConnectionString:", postgresDatabaseFixture.ConnectionString)
+                .WithEnvironment("Persistance__type", "in_memory")
+                //.WithEnvironment("Persistance__postgresql__ConnectionString", postgresDatabaseFixture.ConnectionString)
                 .WithWaitStrategy(
                     Wait.ForUnixContainer()
                         .UntilPortIsAvailable(GrpcPort)
@@ -74,6 +75,8 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
     [Fact]
     public async Task TestThroughput()
     {
+        Console.WriteLine($"-- Starting throughput test --");
+
         int concurrency = 10;
         int concurrentRequests = 500;
         var tasks = new Task[concurrency];
@@ -118,7 +121,9 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
         var elapsedSeconds = stopwatch.Elapsed.TotalSeconds;
         var requestsPerSecond = completed.Count / elapsedSeconds;
 
-        Console.WriteLine($"Completed {completed.Count} requests in {elapsedSeconds} seconds ({requestsPerSecond} requests per second).");
+        Console.WriteLine($"Completed {completed.Count} transactions in {elapsedSeconds} seconds ({requestsPerSecond} requests per second).");
+        Console.WriteLine($"-- Finished throughput test --");
+
         requestsPerSecond.Should().BeGreaterThan(60); // based on througput test on github ~60
     }
 
