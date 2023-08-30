@@ -43,29 +43,29 @@ public class PostgresDatabaseFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        await _postgreSqlContainer.StartAsync().ConfigureAwait(false);
-        await Task.Delay(5000);
-        await ResetDatabase().ConfigureAwait(false);
-    }
-
-    public async Task ResetDatabase()
-    {
         try
         {
-            await _postgreSqlContainer.ExecScriptAsync("DROP SCHEMA public CASCADE;CREATE SCHEMA public;GRANT ALL ON SCHEMA public TO postgres;GRANT ALL ON SCHEMA public TO public;").ConfigureAwait(false);
-            var mockLogger = new Mock<ILogger<PostgresqlUpgrader>>();
-            var upgrader = new PostgresqlUpgrader(mockLogger.Object, Options.Create(new PostgresqlEventStoreOptions
-            {
-                ConnectionString = _postgreSqlContainer.GetConnectionString()
-            }));
-            upgrader.Upgrade();
+            await _postgreSqlContainer.StartAsync().ConfigureAwait(false);
+            await Task.Delay(5000);
+            await ResetDatabase().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             var log = await _postgreSqlContainer.GetLogsAsync();
-            Console.WriteLine($"Failed to reset database \n {ex.Message} \n\n {ex.StackTrace} \n\nContainerStatus {_postgreSqlContainer.State} \n-----------stdout---------\n {log.Stdout}\n----------stderr------\n {log.Stderr}\n--------------\n");
+            Console.WriteLine($"Failed init db \n {ex.Message} \n\n {ex.StackTrace} \n\nContainerStatus {_postgreSqlContainer.State} \n-----------stdout---------\n {log.Stdout}\n----------stderr------\n {log.Stderr}\n--------------\n");
             throw;
         }
+    }
+
+    public async Task ResetDatabase()
+    {
+        await _postgreSqlContainer.ExecScriptAsync("DROP SCHEMA public CASCADE;CREATE SCHEMA public;GRANT ALL ON SCHEMA public TO postgres;GRANT ALL ON SCHEMA public TO public;").ConfigureAwait(false);
+        var mockLogger = new Mock<ILogger<PostgresqlUpgrader>>();
+        var upgrader = new PostgresqlUpgrader(mockLogger.Object, Options.Create(new PostgresqlEventStoreOptions
+        {
+            ConnectionString = _postgreSqlContainer.GetConnectionString()
+        }));
+        upgrader.Upgrade();
     }
 
     public async Task DisposeAsync()
