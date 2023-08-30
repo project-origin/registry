@@ -234,23 +234,37 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
 
     public async Task InitializeAsync()
     {
-        await _verifierContainer.StartAsync()
-            .ConfigureAwait(false);
+        try
+        {
 
-        await _registryContainer.Value.StartAsync()
-            .ConfigureAwait(false);
+            await _verifierContainer.StartAsync()
+                .ConfigureAwait(false);
 
-        await _postgresDatabaseFixture.ResetDatabase();
+            await _registryContainer.Value.StartAsync()
+                .ConfigureAwait(false);
+
+            await _postgresDatabaseFixture.ResetDatabase();
+        }
+        catch (Exception)
+        {
+            await WriteRegistryContainerLog();
+            throw;
+        }
     }
 
     public async Task DisposeAsync()
     {
         if (_registryContainer.IsValueCreated)
         {
-            var log = await _registryContainer.Value.GetLogsAsync();
-            _outputHelper.WriteLine($"-------Container stdout------\n{log.Stdout}\n-------Container stderr------\n{log.Stderr}\n\n----------");
+            await WriteRegistryContainerLog();
             await _registryContainer.Value.StopAsync();
         }
         await _verifierContainer.StopAsync();
+    }
+
+    private async Task WriteRegistryContainerLog()
+    {
+        var log = await _registryContainer.Value.GetLogsAsync();
+        _outputHelper.WriteLine($"-------Container stdout------\n{log.Stdout}\n-------Container stderr------\n{log.Stderr}\n\n----------");
     }
 }

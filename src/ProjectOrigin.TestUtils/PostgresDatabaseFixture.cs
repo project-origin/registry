@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -38,8 +39,11 @@ public class PostgresDatabaseFixture : IAsyncLifetime
         upgrader.Upgrade();
     }
 
-    public Task DisposeAsync()
+    public async Task DisposeAsync()
     {
-        return _postgreSqlContainer.StopAsync();
+        var log = await _postgreSqlContainer.GetLogsAsync();
+        Console.WriteLine($"-------Container stdout------\n{log.Stdout}\n-------Container stderr------\n{log.Stderr}\n\n----------");
+
+        await _postgreSqlContainer.StopAsync();
     }
 }
