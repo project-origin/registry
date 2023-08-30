@@ -8,10 +8,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.VerifiableEve
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.VerifiableEventStore.ConcordiumIntegrationTests", "ProjectOrigin.VerifiableEventStore.ConcordiumIntegrationTests\ProjectOrigin.VerifiableEventStore.ConcordiumIntegrationTests.csproj", "{B5DAEBAB-6196-469E-9A45-A989907D3A3D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.PedersenCommitment", "ProjectOrigin.PedersenCommitment\ProjectOrigin.PedersenCommitment.csproj", "{0A0F1082-9AF8-4A64-8494-4C9C87291421}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.PedersenCommitment.Tests", "ProjectOrigin.PedersenCommitment.Tests\ProjectOrigin.PedersenCommitment.Tests.csproj", "{FDA069D8-E8FE-465E-A11E-77BC15E4EB2A}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.Registry.Server", "ProjectOrigin.Registry.Server\ProjectOrigin.Registry.Server.csproj", "{EC541F55-C0A9-4694-A902-B41026E9AC73}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectOrigin.Registry.IntegrationTests", "ProjectOrigin.Registry.IntegrationTests\ProjectOrigin.Registry.IntegrationTests.csproj", "{0C7EF78A-5D77-4B04-BDC4-EBE2C5F179AA}"
@@ -53,14 +49,6 @@ Global
 		{B5DAEBAB-6196-469E-9A45-A989907D3A3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5DAEBAB-6196-469E-9A45-A989907D3A3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5DAEBAB-6196-469E-9A45-A989907D3A3D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0A0F1082-9AF8-4A64-8494-4C9C87291421}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0A0F1082-9AF8-4A64-8494-4C9C87291421}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0A0F1082-9AF8-4A64-8494-4C9C87291421}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0A0F1082-9AF8-4A64-8494-4C9C87291421}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FDA069D8-E8FE-465E-A11E-77BC15E4EB2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FDA069D8-E8FE-465E-A11E-77BC15E4EB2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FDA069D8-E8FE-465E-A11E-77BC15E4EB2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FDA069D8-E8FE-465E-A11E-77BC15E4EB2A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EC541F55-C0A9-4694-A902-B41026E9AC73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EC541F55-C0A9-4694-A902-B41026E9AC73}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC541F55-C0A9-4694-A902-B41026E9AC73}.Release|Any CPU.ActiveCfg = Release|Any CPU
