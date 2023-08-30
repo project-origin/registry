@@ -57,7 +57,7 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
                 .WithEnvironment("ImmutableLog__type", "log")
                 .WithEnvironment("BlockFinalizer__Interval", "00:00:05")
                 .WithEnvironment("Persistance__type", "postgresql")
-                .WithEnvironment("Persistance__postgresql__ConnectionString", postgresDatabaseFixture.ConnectionString)
+                .WithEnvironment("Persistance__postgresql__ConnectionString", _postgresDatabaseFixture.ConnectionString)
                 .WithWaitStrategy(
                     Wait.ForUnixContainer()
                         .UntilPortIsAvailable(GrpcPort)
@@ -234,6 +234,8 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
 
         await _registryContainer.Value.StartAsync()
             .ConfigureAwait(false);
+
+        await _postgresDatabaseFixture.ResetDatabase();
     }
 
     public async Task DisposeAsync()
