@@ -10,7 +10,7 @@ using ProjectOrigin.VerifiableEventStore.Extensions;
 using ProjectOrigin.VerifiableEventStore.Models;
 using ProjectOrigin.VerifiableEventStore.Services.Repository;
 
-namespace ProjectOrigin.VerifiableEventStore.Services.EventStore.Memory;
+namespace ProjectOrigin.VerifiableEventStore.Services.EventStore.InMemory;
 
 public class InMemoryRepository : ITransactionRepository
 {

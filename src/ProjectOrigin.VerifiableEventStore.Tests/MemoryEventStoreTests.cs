@@ -1,4 +1,4 @@
-using ProjectOrigin.VerifiableEventStore.Services.EventStore.Memory;
+using ProjectOrigin.VerifiableEventStore.Services.EventStore.InMemory;
 
 namespace ProjectOrigin.VerifiableEventStore.Tests;
 

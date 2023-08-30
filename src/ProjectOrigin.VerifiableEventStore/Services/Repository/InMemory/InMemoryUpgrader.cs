@@ -1,6 +1,6 @@
 using ProjectOrigin.VerifiableEventStore.Services.Repository;
 
-namespace ProjectOrigin.VerifiableEventStore.Services.EventStore.Memory;
+namespace ProjectOrigin.VerifiableEventStore.Services.EventStore.InMemory;
 
 public class InMemoryUpgrader : IRepositoryUpgrader
 {

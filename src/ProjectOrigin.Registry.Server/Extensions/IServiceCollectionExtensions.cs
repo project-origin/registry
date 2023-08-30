@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector.Concordium;
 using ProjectOrigin.VerifiableEventStore.Services.BlockPublisher;
 using ProjectOrigin.VerifiableEventStore.Services.BlockPublisher.Log;
-using ProjectOrigin.VerifiableEventStore.Services.EventStore.Memory;
+using ProjectOrigin.VerifiableEventStore.Services.EventStore.InMemory;
 using ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres;
 using ProjectOrigin.VerifiableEventStore.Services.Repository;
 

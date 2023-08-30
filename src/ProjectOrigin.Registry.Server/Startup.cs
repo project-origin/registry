@@ -1,4 +1,3 @@
-using System;
 using MassTransit;
 using MassTransit.Monitoring;
 using Microsoft.AspNetCore.Builder;
@@ -11,13 +10,7 @@ using ProjectOrigin.Registry.Server.Interfaces;
 using ProjectOrigin.Registry.Server.Models;
 using ProjectOrigin.Registry.Server.Services;
 using ProjectOrigin.VerifiableEventStore.Models;
-using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector.Concordium;
 using ProjectOrigin.VerifiableEventStore.Services.BlockFinalizer;
-using ProjectOrigin.VerifiableEventStore.Services.BlockPublisher;
-using ProjectOrigin.VerifiableEventStore.Services.BlockPublisher.Log;
-using ProjectOrigin.VerifiableEventStore.Services.EventStore.Memory;
-using ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres;
-using ProjectOrigin.VerifiableEventStore.Services.Repository;
 using ProjectOrigin.VerifiableEventStore.Services.TransactionStatusCache;
 
 namespace ProjectOrigin.Registry.Server;
