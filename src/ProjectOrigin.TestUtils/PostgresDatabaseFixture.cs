@@ -36,9 +36,8 @@ public class PostgresDatabaseFixture : IAsyncLifetime
     public PostgresDatabaseFixture()
     {
         _postgreSqlContainer = new PostgreSqlBuilder()
-            .WithImage("postgres:15.4")
+            .WithImage("postgres:15.3")
             .Build();
-
     }
 
     public async Task InitializeAsync()
@@ -46,7 +45,6 @@ public class PostgresDatabaseFixture : IAsyncLifetime
         try
         {
             await _postgreSqlContainer.StartAsync().ConfigureAwait(false);
-            await Task.Delay(5000);
             await ResetDatabase().ConfigureAwait(false);
         }
         catch (Exception ex)
