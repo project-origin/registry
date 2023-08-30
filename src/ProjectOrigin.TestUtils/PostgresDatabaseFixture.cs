@@ -49,11 +49,10 @@ public class PostgresDatabaseFixture : IAsyncLifetime
 
     public async Task ResetDatabase()
     {
-        var dataSource = NpgsqlDataSource.Create(_postgreSqlContainer.GetConnectionString());
-        using var connection = await dataSource.OpenConnectionAsync();
-
-        await connection.ExecuteAsync("TRUNCATE blocks, transactions");
-        //await _postgreSqlContainer.ExecScriptAsync("TRUNCATE blocks, transactions");
+        //var dataSource = NpgsqlDataSource.Create(_postgreSqlContainer.GetConnectionString());
+        //using var connection = await dataSource.OpenConnectionAsync();
+        //await connection.ExecuteAsync("TRUNCATE blocks, transactions");
+        await _postgreSqlContainer.ExecScriptAsync("TRUNCATE blocks, transactions");
     }
 
     private void UpgradeDB()
