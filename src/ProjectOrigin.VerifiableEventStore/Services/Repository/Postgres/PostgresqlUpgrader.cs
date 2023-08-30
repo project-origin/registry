@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using DbUp;
 using DbUp.Engine;
+using DbUp.Engine.Output;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ProjectOrigin.VerifiableEventStore.Services.Repository;
@@ -58,8 +59,33 @@ public class PostgresqlUpgrader : IRepositoryUpgrader
         return DeployChanges.To
                     .PostgresqlDatabase(connectionString)
                     .WithScriptsEmbeddedInAssembly(typeof(PostgresqlUpgrader).Assembly)
-                    .LogToAutodetectedLog()
+                    .LogTo(new LoggerWrapper(_logger))
                     .WithExecutionTimeout(TimeSpan.FromMinutes(5))
                     .Build();
+    }
+
+    private class LoggerWrapper : IUpgradeLog
+    {
+        private ILogger _logger;
+
+        public LoggerWrapper(ILogger logger)
+        {
+            _logger = logger;
+        }
+
+        public void WriteError(string format, params object[] args)
+        {
+            _logger.LogError(format, args);
+        }
+
+        public void WriteInformation(string format, params object[] args)
+        {
+            _logger.LogInformation(format, args);
+        }
+
+        public void WriteWarning(string format, params object[] args)
+        {
+            _logger.LogWarning(format, args);
+        }
     }
 }

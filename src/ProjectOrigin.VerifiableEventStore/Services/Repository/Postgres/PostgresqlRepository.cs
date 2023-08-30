@@ -143,7 +143,7 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
             if (previousBlock is not null && previousBlock.Publication is null)
                 throw new InvalidOperationException("Previous block has not been published");
 
-            var fromTransaction = (previousBlock?.FromTransaction ?? 0) + 1;
+            var fromTransaction = (previousBlock?.ToTransaction ?? 0) + 1;
             var maxTransactionId = await connection.QuerySingleOrDefaultAsync<long?>("SELECT MAX(id) FROM transactions");
 
             if (maxTransactionId is null || maxTransactionId.Value < fromTransaction)
@@ -153,7 +153,7 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
 
             var transactions = (await connection.QueryAsync<StreamTransaction>(
                 "SELECT transaction_hash, stream_id, stream_index, payload FROM transactions WHERE @fromTransaction <= id AND id <= @toTransaction ORDER BY ID ASC",
-                new { fromTransaction, toTransaction })).AsList();
+                new { fromTransaction, toTransaction })).ToList();
 
             var merkleRootHash = transactions.CalculateMerkleRoot(x => x.Payload);
             var previousHeaderHash = previousBlock?.BlockHash ?? new byte[32];
@@ -181,7 +181,7 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
 
             await transaction.CommitAsync();
 
-            return new(blockHeader, transactions.Select(x => x.TransactionHash).AsList());
+            return new(blockHeader, transactions.Select(x => x.TransactionHash).ToList());
         }
         catch
         {

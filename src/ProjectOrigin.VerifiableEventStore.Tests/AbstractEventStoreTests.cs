@@ -224,30 +224,53 @@ public abstract class AbstractEventStoreTests<T> where T : ITransactionRepositor
     [Fact]
     public async Task CanCreateSeriesOfBlocks()
     {
-        await Repository.Store(CreateFakeEvent(Guid.NewGuid(), 0));
+        var transactionList1 = new List<StreamTransaction>();
+        for (var i = 0; i < 10; i++)
+        {
+            var @event = CreateFakeEvent(Guid.NewGuid(), 0);
+            transactionList1.Add(@event);
+            await Repository.Store(@event);
+        }
         var block1 = await Repository.CreateNextBlock();
         block1.Should().NotBeNull();
         block1!.Header.PreviousHeaderHash.Should().BeEquivalentTo(new byte[32]);
         block1!.Header.PreviousPublicationHash.Should().BeEquivalentTo(new byte[32]);
-        block1!.TransactionHashes.Should().HaveCount(1);
+        block1!.TransactionHashes.Should().HaveCount(transactionList1.Count());
+        block1!.TransactionHashes.Should().ContainInOrder(transactionList1.Select(x => x.TransactionHash));
         var pub1 = new ImmutableLog.V1.BlockPublication();
         await Repository.FinalizeBlock(BlockHash.FromHeader(block1!.Header), pub1);
 
-        await Repository.Store(CreateFakeEvent(Guid.NewGuid(), 0));
+
+        var transactionList2 = new List<StreamTransaction>();
+        for (var i = 0; i < 10; i++)
+        {
+            var @event = CreateFakeEvent(Guid.NewGuid(), 0);
+            transactionList2.Add(@event);
+            await Repository.Store(@event);
+        }
         var block2 = await Repository.CreateNextBlock();
         block2.Should().NotBeNull();
         block2!.Header.PreviousHeaderHash.Should().BeEquivalentTo(SHA256.HashData(block1!.Header.ToByteArray()));
         block2!.Header.PreviousPublicationHash.Should().BeEquivalentTo(SHA256.HashData(pub1.ToByteArray()));
-        block2!.TransactionHashes.Should().HaveCount(1);
+        block2!.TransactionHashes.Should().HaveCount(transactionList2.Count());
+        block2!.TransactionHashes.Should().ContainInOrder(transactionList2.Select(x => x.TransactionHash));
         var pub2 = new ImmutableLog.V1.BlockPublication();
         await Repository.FinalizeBlock(BlockHash.FromHeader(block2!.Header), pub2);
 
-        await Repository.Store(CreateFakeEvent(Guid.NewGuid(), 0));
+
+        var transactionList3 = new List<StreamTransaction>();
+        for (var i = 0; i < 10; i++)
+        {
+            var @event = CreateFakeEvent(Guid.NewGuid(), 0);
+            transactionList3.Add(@event);
+            await Repository.Store(@event);
+        }
         var block3 = await Repository.CreateNextBlock();
         block3.Should().NotBeNull();
         block3!.Header.PreviousHeaderHash.Should().BeEquivalentTo(SHA256.HashData(block2!.Header.ToByteArray()));
         block3!.Header.PreviousPublicationHash.Should().BeEquivalentTo(SHA256.HashData(pub2.ToByteArray()));
-        block3!.TransactionHashes.Should().HaveCount(1);
+        block3!.TransactionHashes.Should().HaveCount(transactionList3.Count());
+        block3!.TransactionHashes.Should().ContainInOrder(transactionList3.Select(x => x.TransactionHash));
         var pub3 = new ImmutableLog.V1.BlockPublication();
         await Repository.FinalizeBlock(BlockHash.FromHeader(block3!.Header), pub3);
     }

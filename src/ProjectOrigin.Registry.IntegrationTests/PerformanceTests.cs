@@ -15,6 +15,7 @@ using FluentAssertions;
 using System.Linq;
 using System.Collections.Generic;
 using ProjectOrigin.TestUtils;
+using Xunit.Abstractions;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
@@ -29,11 +30,13 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
     private readonly Lazy<IContainer> _registryContainer;
     private readonly IPrivateKey _issuerKey;
     private readonly PostgresDatabaseFixture _postgresDatabaseFixture;
+    private readonly ITestOutputHelper _outputHelper;
 
-    public PerformanceTests(ContainerImageFixture imageFixture, PostgresDatabaseFixture postgresDatabaseFixture)
+    public PerformanceTests(ContainerImageFixture imageFixture, PostgresDatabaseFixture postgresDatabaseFixture, ITestOutputHelper outputHelper)
     {
         _issuerKey = Algorithms.Ed25519.GenerateNewPrivateKey();
         _postgresDatabaseFixture = postgresDatabaseFixture;
+        _outputHelper = outputHelper;
 
         _verifierContainer = new ContainerBuilder()
                 .WithImage(ElectricityVerifierImage)
@@ -55,9 +58,11 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
                 .WithEnvironment("RegistryName", RegistryName)
                 .WithEnvironment("Verifiers__project_origin.electricity.v1", verifierUrl)
                 .WithEnvironment("ImmutableLog__type", "log")
-                .WithEnvironment("BlockFinalizer__Interval", "00:00:05")
+                .WithEnvironment("BlockFinalizer__Interval", "00:00:02")
                 .WithEnvironment("Persistance__type", "postgresql")
                 .WithEnvironment("Persistance__postgresql__ConnectionString", _postgresDatabaseFixture.ConnectionString)
+                .WithEnvironment("Logging__LogLevel__Default", "Debug")
+                .WithEnvironment("Logging__LogLevel__Grpc.AspNetCore", "Information")
                 .WithWaitStrategy(
                     Wait.ForUnixContainer()
                         .UntilPortIsAvailable(GrpcPort)
@@ -242,6 +247,8 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
     {
         if (_registryContainer.IsValueCreated)
         {
+            var log = await _registryContainer.Value.GetLogsAsync();
+            _outputHelper.WriteLine($"-------Container stdout------\n{log.Stdout}\n-------Container stderr------\n{log.Stderr}\n\n----------");
             await _registryContainer.Value.StopAsync();
         }
         await _verifierContainer.StopAsync();

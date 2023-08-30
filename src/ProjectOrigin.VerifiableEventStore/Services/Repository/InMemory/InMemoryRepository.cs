@@ -33,15 +33,13 @@ public class InMemoryRepository : ITransactionRepository
             if (previousBlock is not null && previousBlock.Publication is null)
                 throw new InvalidOperationException("Previous block has not been published");
 
-            var fromTransaction = (previousBlock?.FromTransaction ?? -1) + 1; //-1 since we are 0 indexed
-            var toTransaction = _events.Count;
-
-            if (toTransaction <= fromTransaction)
+            var fromTransaction = (previousBlock?.ToTransaction ?? -1) + 1; //-1 since we are 0 indexed
+            if (_events.Count <= fromTransaction)
                 return Task.FromResult<ITransactionRepository.NewBlock?>(null);
 
-            toTransaction = fromTransaction + (int)_blockSizeCalculator.CalculateBlockLength(toTransaction - fromTransaction) - 1;
+            var numberOfTransactions = (int)_blockSizeCalculator.CalculateBlockLength(_events.Count - fromTransaction);
 
-            var transactions = _events.Skip(fromTransaction).Take(toTransaction - fromTransaction + 1).ToList();
+            var transactions = _events.Skip(fromTransaction).Take(numberOfTransactions).ToList();
 
             var merkleRootHash = transactions.CalculateMerkleRoot(x => x.Payload);
             var previousHeaderHash = previousBlock is not null ? SHA256.HashData(previousBlock.Header.ToByteArray()) : new byte[32];
@@ -56,7 +54,7 @@ public class InMemoryRepository : ITransactionRepository
             };
 
             var blockHash = BlockHash.FromHeader(blockHeader);
-            _blocks[blockHash] = new BlockRecord(blockHeader, null, fromTransaction, toTransaction);
+            _blocks[blockHash] = new BlockRecord(blockHeader, null, fromTransaction, fromTransaction + numberOfTransactions - 1);
 
             IList<TransactionHash> transactionHashes = transactions.Select(x => x.TransactionHash).ToList();
 

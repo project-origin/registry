@@ -42,7 +42,7 @@ public class VerifyTransactionConsumer : IConsumer<VerifyTransaction>
         var transactionHash = new TransactionHash(SHA256.HashData(transaction.ToByteArray()));
         try
         {
-            _logger.LogInformation($"Processing transaction {transactionHash}");
+            _logger.LogDebug($"Processing transaction {transactionHash}");
 
             if (transaction.Header.FederatedStreamId.Registry != _options.RegistryName)
                 throw new InvalidTransactionException("Invalid registry for transaction");
@@ -61,7 +61,7 @@ public class VerifyTransactionConsumer : IConsumer<VerifyTransaction>
             var verifiableEvent = new StreamTransaction { TransactionHash = transactionHash, StreamId = streamId, StreamIndex = nextEventIndex, Payload = transaction.ToByteArray() };
             await _eventStore.Store(verifiableEvent).ConfigureAwait(false);
 
-            _logger.LogInformation($"Transaction processed {transactionHash}");
+            _logger.LogDebug($"Transaction processed {transactionHash}");
         }
         catch (InvalidTransactionException ex)
         {
