@@ -128,7 +128,7 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
         Console.WriteLine($"Completed {completed.Count} transactions in {elapsedSeconds} seconds ({requestsPerSecond} requests per second).");
         Console.WriteLine($"-- Finished throughput test --");
 
-        requestsPerSecond.Should().BeGreaterThan(60); // based on througput test on github ~60
+        requestsPerSecond.Should().BeGreaterThan(35); // based on througput test on github ~40
     }
 
     [Fact]
