@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using ProjectOrigin.TestUtils;
@@ -26,13 +25,11 @@ public class PostgresqlEventStoreTests : AbstractEventStoreTests<PostgresqlRepos
 
     public async Task InitializeAsync()
     {
-        Console.WriteLine($"Initializing database test. {DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fff")}");
         await _postgresFixture.ResetDatabase().ConfigureAwait(false);
     }
 
     public Task DisposeAsync()
     {
-        Console.WriteLine($"Disposing database test. {DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fff")}");
         return Task.CompletedTask;
     }
 }
