@@ -18,10 +18,9 @@ using ProjectOrigin.TestUtils;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
-public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixture>//, IClassFixture<PostgresDatabaseFixture>
+public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixture>, IClassFixture<PostgresDatabaseFixture>
 {
     private const string ElectricityVerifierImage = "ghcr.io/project-origin/electricity-server:0.2.0-rc.17";
-    private const string RegistryImage = "ghcr.io/project-origin/registry-server:0.2.0-rc.17";
     private const int GrpcPort = 80;
     private const string IssuerArea = "Narnia";
     private const string RegistryName = "TheRegistry";
@@ -29,12 +28,12 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
     private readonly IContainer _verifierContainer;
     private readonly Lazy<IContainer> _registryContainer;
     private readonly IPrivateKey _issuerKey;
-    //private readonly PostgresDatabaseFixture _postgresDatabaseFixture;
+    private readonly PostgresDatabaseFixture _postgresDatabaseFixture;
 
-    public PerformanceTests(ContainerImageFixture imageFixture)//, PostgresDatabaseFixture postgresDatabaseFixture)
+    public PerformanceTests(ContainerImageFixture imageFixture, PostgresDatabaseFixture postgresDatabaseFixture)
     {
         _issuerKey = Algorithms.Ed25519.GenerateNewPrivateKey();
-        //_postgresDatabaseFixture = postgresDatabaseFixture;
+        _postgresDatabaseFixture = postgresDatabaseFixture;
 
         _verifierContainer = new ContainerBuilder()
                 .WithImage(ElectricityVerifierImage)
@@ -57,8 +56,8 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
                 .WithEnvironment("Verifiers__project_origin.electricity.v1", verifierUrl)
                 .WithEnvironment("ImmutableLog__type", "log")
                 .WithEnvironment("BlockFinalizer__Interval", "00:00:05")
-                .WithEnvironment("Persistance__type", "in_memory")
-                //.WithEnvironment("Persistance__postgresql__ConnectionString", postgresDatabaseFixture.ConnectionString)
+                .WithEnvironment("Persistance__type", "postgresql")
+                .WithEnvironment("Persistance__postgresql__ConnectionString", postgresDatabaseFixture.ConnectionString)
                 .WithWaitStrategy(
                     Wait.ForUnixContainer()
                         .UntilPortIsAvailable(GrpcPort)
