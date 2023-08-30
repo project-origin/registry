@@ -25,7 +25,7 @@ public class PostgresqlEventStoreTests : AbstractEventStoreTests<PostgresqlRepos
 
     public async Task InitializeAsync()
     {
-        await _postgresFixture.ResetDatabase().ConfigureAwait(false);
+        await _postgresFixture.ResetDatabase();
     }
 
     public Task DisposeAsync()

@@ -36,43 +36,29 @@ public class PostgresDatabaseFixture : IAsyncLifetime
     public PostgresDatabaseFixture()
     {
         _postgreSqlContainer = new PostgreSqlBuilder()
-            .WithImage("postgres:15.3")
+            .WithImage("postgres:15")
             .Build();
     }
 
     public async Task InitializeAsync()
     {
-        try
-        {
-            await _postgreSqlContainer.StartAsync().ConfigureAwait(false);
-            await ResetDatabase().ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            var log = await _postgreSqlContainer.GetLogsAsync();
-            Console.WriteLine($"Failed init db \n {ex.Message} \n\n {ex.StackTrace} \n\nContainerStatus {_postgreSqlContainer.State} \n-----------stdout---------\n {log.Stdout}\n----------stderr------\n {log.Stderr}\n--------------\n");
-            throw;
-        }
+        await _postgreSqlContainer.StartAsync().ConfigureAwait(false);
+        UpgradeDB();
     }
 
     public async Task ResetDatabase()
     {
-        try
+        await _postgreSqlContainer.ExecScriptAsync("TRUNCATE blocks, transactions");
+    }
+
+    private void UpgradeDB()
+    {
+        var mockLogger = new Mock<ILogger<PostgresqlUpgrader>>();
+        var upgrader = new PostgresqlUpgrader(mockLogger.Object, Options.Create(new PostgresqlEventStoreOptions
         {
-            //await _postgreSqlContainer.ExecScriptAsync("DROP SCHEMA public CASCADE;CREATE SCHEMA public;GRANT ALL ON SCHEMA public TO postgres;GRANT ALL ON SCHEMA public TO public;").ConfigureAwait(false);
-            var mockLogger = new Mock<ILogger<PostgresqlUpgrader>>();
-            var upgrader = new PostgresqlUpgrader(mockLogger.Object, Options.Create(new PostgresqlEventStoreOptions
-            {
-                ConnectionString = _postgreSqlContainer.GetConnectionString()
-            }));
-            upgrader.Upgrade();
-        }
-        catch (Exception ex)
-        {
-            var log = await _postgreSqlContainer.GetLogsAsync();
-            Console.WriteLine($"Failed ResetDatabase \n {ex.Message} \n\n {ex.StackTrace} \n\nContainerStatus {_postgreSqlContainer.State} \n-----------stdout---------\n {log.Stdout}\n----------stderr------\n {log.Stderr}\n--------------\n");
-            throw;
-        }
+            ConnectionString = _postgreSqlContainer.GetConnectionString()
+        }));
+        upgrader.Upgrade();
     }
 
     public async Task DisposeAsync()
