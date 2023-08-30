@@ -234,6 +234,7 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
 
     public async Task InitializeAsync()
     {
+        Console.WriteLine($"Initializing performance test. {DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fff")}");
         try
         {
 
@@ -254,6 +255,8 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
 
     public async Task DisposeAsync()
     {
+        Console.WriteLine($"disposing performance test. {DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fff")}");
+
         if (_registryContainer.IsValueCreated)
         {
             await WriteRegistryContainerLog();

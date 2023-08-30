@@ -24,6 +24,8 @@ public class PostgresDatabaseFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
+        Console.WriteLine($"Initializing database. {DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fff")}");
+
         await _postgreSqlContainer.StartAsync();
         await ResetDatabase();
     }
@@ -41,6 +43,8 @@ public class PostgresDatabaseFixture : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
+        Console.WriteLine($"Disposing database. {DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fff")}");
+
         var log = await _postgreSqlContainer.GetLogsAsync();
         Console.WriteLine($"-------Container stdout------\n{log.Stdout}\n-------Container stderr------\n{log.Stderr}\n\n----------");
 
