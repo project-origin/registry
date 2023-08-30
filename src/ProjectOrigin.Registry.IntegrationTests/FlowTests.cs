@@ -31,7 +31,7 @@ public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityService
             {$"ImmutableLog:type", "log"},
             {"BlockFinalizer:Interval", "00:00:05"},
             {"Persistance:type", "postgresql"},
-            {"Persistance:postgresql:ConnectionString", _postgresDatabaseFixture.ConnectionString},
+            {"Persistance:postgresql:ConnectionString", _postgresDatabaseFixture.HostConnectionString},
         });
     }
 

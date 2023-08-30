@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -11,7 +13,23 @@ namespace ProjectOrigin.TestUtils;
 
 public class PostgresDatabaseFixture : IAsyncLifetime
 {
-    public string ConnectionString => _postgreSqlContainer.GetConnectionString();
+    public string HostConnectionString => _postgreSqlContainer.GetConnectionString();
+
+    public string NeightborConnectionString
+    {
+        get
+        {
+            var properties = new Dictionary<string, string>
+            {
+                { "Host", _postgreSqlContainer.IpAddress },
+                { "Port", PostgreSqlBuilder.PostgreSqlPort.ToString() },
+                { "Database", "postgres" },
+                { "Username", "postgres" },
+                { "Password", "postgres" }
+            };
+            return string.Join(";", properties.Select(property => string.Join("=", property.Key, property.Value)));
+        }
+    }
 
     private PostgreSqlContainer _postgreSqlContainer;
 
@@ -20,12 +38,11 @@ public class PostgresDatabaseFixture : IAsyncLifetime
         _postgreSqlContainer = new PostgreSqlBuilder()
             .WithImage("postgres:15")
             .Build();
+
     }
 
     public async Task InitializeAsync()
     {
-        Console.WriteLine($"Initializing database. {DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fff")}");
-
         await _postgreSqlContainer.StartAsync();
         await ResetDatabase();
     }
@@ -41,13 +58,8 @@ public class PostgresDatabaseFixture : IAsyncLifetime
         upgrader.Upgrade();
     }
 
-    public async Task DisposeAsync()
+    public Task DisposeAsync()
     {
-        Console.WriteLine($"Disposing database. {DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fff")}");
-
-        var log = await _postgreSqlContainer.GetLogsAsync();
-        Console.WriteLine($"-------Container stdout------\n{log.Stdout}\n-------Container stderr------\n{log.Stderr}\n\n----------");
-
-        await _postgreSqlContainer.StopAsync();
+        return _postgreSqlContainer.StopAsync();
     }
 }

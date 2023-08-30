@@ -19,7 +19,7 @@ public class PostgresqlEventStoreTests : AbstractEventStoreTests<PostgresqlRepos
         _postgresFixture = postgresFixture;
         var storeOptions = new PostgresqlEventStoreOptions
         {
-            ConnectionString = postgresFixture.ConnectionString,
+            ConnectionString = postgresFixture.HostConnectionString,
         };
         _eventStore = new PostgresqlRepository(Options.Create(storeOptions));
     }

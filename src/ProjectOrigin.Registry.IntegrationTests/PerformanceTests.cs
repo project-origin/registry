@@ -60,7 +60,7 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
                 .WithEnvironment("ImmutableLog__type", "log")
                 .WithEnvironment("BlockFinalizer__Interval", "00:00:02")
                 .WithEnvironment("Persistance__type", "postgresql")
-                .WithEnvironment("Persistance__postgresql__ConnectionString", _postgresDatabaseFixture.ConnectionString)
+                .WithEnvironment("Persistance__postgresql__ConnectionString", _postgresDatabaseFixture.NeightborConnectionString)
                 .WithEnvironment("Logging__LogLevel__Default", "Debug")
                 .WithEnvironment("Logging__LogLevel__Grpc.AspNetCore", "Information")
                 .WithWaitStrategy(
@@ -234,7 +234,6 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
 
     public async Task InitializeAsync()
     {
-        Console.WriteLine($"Initializing performance test. {DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fff")}");
         try
         {
 
@@ -255,8 +254,6 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
 
     public async Task DisposeAsync()
     {
-        Console.WriteLine($"disposing performance test. {DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fff")}");
-
         if (_registryContainer.IsValueCreated)
         {
             await WriteRegistryContainerLog();
