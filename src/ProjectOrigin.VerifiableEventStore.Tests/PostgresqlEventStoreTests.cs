@@ -24,11 +24,10 @@ public class PostgresqlEventStoreTests : AbstractEventStoreTests<PostgresqlRepos
         _eventStore = new PostgresqlRepository(Options.Create(storeOptions));
     }
 
-    public Task InitializeAsync()
+    public async Task InitializeAsync()
     {
         Console.WriteLine($"Initializing database test. {DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fff")}");
-        return _postgresFixture.ResetDatabase();
-
+        await _postgresFixture.ResetDatabase().ConfigureAwait(false);
     }
 
     public Task DisposeAsync()

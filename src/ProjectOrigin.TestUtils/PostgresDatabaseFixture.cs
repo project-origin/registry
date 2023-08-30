@@ -43,13 +43,13 @@ public class PostgresDatabaseFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        await _postgreSqlContainer.StartAsync();
-        await ResetDatabase();
+        await _postgreSqlContainer.StartAsync().ConfigureAwait(false);
+        await ResetDatabase().ConfigureAwait(false);
     }
 
     public async Task ResetDatabase()
     {
-        await _postgreSqlContainer.ExecScriptAsync("DROP SCHEMA public CASCADE;CREATE SCHEMA public;GRANT ALL ON SCHEMA public TO postgres;GRANT ALL ON SCHEMA public TO public;");
+        await _postgreSqlContainer.ExecScriptAsync("DROP SCHEMA public CASCADE;CREATE SCHEMA public;GRANT ALL ON SCHEMA public TO postgres;GRANT ALL ON SCHEMA public TO public;").ConfigureAwait(false);
         var mockLogger = new Mock<ILogger<PostgresqlUpgrader>>();
         var upgrader = new PostgresqlUpgrader(mockLogger.Object, Options.Create(new PostgresqlEventStoreOptions
         {
@@ -58,8 +58,8 @@ public class PostgresDatabaseFixture : IAsyncLifetime
         upgrader.Upgrade();
     }
 
-    public Task DisposeAsync()
+    public async Task DisposeAsync()
     {
-        return _postgreSqlContainer.StopAsync();
+        await _postgreSqlContainer.StopAsync().ConfigureAwait(false);
     }
 }
