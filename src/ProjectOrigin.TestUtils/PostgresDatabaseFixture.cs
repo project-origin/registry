@@ -36,7 +36,7 @@ public class PostgresDatabaseFixture : IAsyncLifetime
     public PostgresDatabaseFixture()
     {
         _postgreSqlContainer = new PostgreSqlBuilder()
-            .WithImage("postgres:15")
+            .WithImage("postgres:15.4")
             .Build();
 
     }
@@ -59,13 +59,22 @@ public class PostgresDatabaseFixture : IAsyncLifetime
 
     public async Task ResetDatabase()
     {
-        await _postgreSqlContainer.ExecScriptAsync("DROP SCHEMA public CASCADE;CREATE SCHEMA public;GRANT ALL ON SCHEMA public TO postgres;GRANT ALL ON SCHEMA public TO public;").ConfigureAwait(false);
-        var mockLogger = new Mock<ILogger<PostgresqlUpgrader>>();
-        var upgrader = new PostgresqlUpgrader(mockLogger.Object, Options.Create(new PostgresqlEventStoreOptions
+        try
         {
-            ConnectionString = _postgreSqlContainer.GetConnectionString()
-        }));
-        upgrader.Upgrade();
+            await _postgreSqlContainer.ExecScriptAsync("DROP SCHEMA public CASCADE;CREATE SCHEMA public;GRANT ALL ON SCHEMA public TO postgres;GRANT ALL ON SCHEMA public TO public;").ConfigureAwait(false);
+            var mockLogger = new Mock<ILogger<PostgresqlUpgrader>>();
+            var upgrader = new PostgresqlUpgrader(mockLogger.Object, Options.Create(new PostgresqlEventStoreOptions
+            {
+                ConnectionString = _postgreSqlContainer.GetConnectionString()
+            }));
+            upgrader.Upgrade();
+        }
+        catch (Exception ex)
+        {
+            var log = await _postgreSqlContainer.GetLogsAsync();
+            Console.WriteLine($"Failed ResetDatabase \n {ex.Message} \n\n {ex.StackTrace} \n\nContainerStatus {_postgreSqlContainer.State} \n-----------stdout---------\n {log.Stdout}\n----------stderr------\n {log.Stderr}\n--------------\n");
+            throw;
+        }
     }
 
     public async Task DisposeAsync()
