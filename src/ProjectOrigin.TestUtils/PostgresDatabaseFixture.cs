@@ -44,6 +44,7 @@ public class PostgresDatabaseFixture : IAsyncLifetime
     public async Task InitializeAsync()
     {
         await _postgreSqlContainer.StartAsync().ConfigureAwait(false);
+        await Task.Delay(5000);
         await ResetDatabase().ConfigureAwait(false);
     }
 
@@ -58,7 +59,6 @@ public class PostgresDatabaseFixture : IAsyncLifetime
                 ConnectionString = _postgreSqlContainer.GetConnectionString()
             }));
             upgrader.Upgrade();
-
         }
         catch (Exception ex)
         {
