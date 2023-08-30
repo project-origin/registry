@@ -1,4 +1,4 @@
-name: Create new release
+name: Build release artifacts
 
 on:
   release:
@@ -32,57 +32,6 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: "7.0.203"
-
-      - name: Build
-        shell: bash
-        run: dotnet build --configuration Release ${{ env.project }}
-
-      - name: Pack
-        shell: bash
-        run: dotnet pack --output build --configuration Release --no-restore -p:Version=${{ needs.define-version.outputs.version }} ${{ env.project }}
-
-      - uses: actions/upload-artifact@v3
-        with:
-          path: build/*.nupkg
-
-      - name: Publish
-        shell: bash
-        run: dotnet nuget push build/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
-
-  publish-pedersen-nuget:
-    name: Publish PedersenCommitment Nuget package
-    needs:
-      - define-version
-    runs-on: ubuntu-20.04
-    env:
-      project: src/ProjectOrigin.PedersenCommitment
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup .NET Core SDK 7
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: "7.0.203"
-
-      - name: Update apt-get
-        run: |
-          sudo apt-get update
-
-      - name: Install windows cross-compile
-        run: |
-          sudo apt-get install gcc-mingw-w64 -y
-          rustup target add x86_64-pc-windows-gnu
-
-      - name: Install aarch64-linux cross-compile
-        run: |
-          sudo apt-get install gcc-aarch64-linux-gnu -y
-          rustup target add aarch64-unknown-linux-gnu
-          mkdir .cargo
-          cat << EOF > .cargo/config.toml
-          [target.aarch64-unknown-linux-gnu]
-          linker = "aarch64-linux-gnu-gcc"
-          EOF
 
       - name: Build
         shell: bash
