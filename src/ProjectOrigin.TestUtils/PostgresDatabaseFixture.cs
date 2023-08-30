@@ -43,12 +43,16 @@ public class PostgresDatabaseFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
+        Console.WriteLine($"Initializing database. {DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fff")}");
+
         await _postgreSqlContainer.StartAsync().ConfigureAwait(false);
         await ResetDatabase().ConfigureAwait(false);
     }
 
     public async Task ResetDatabase()
     {
+        Console.WriteLine($"Resetting database. {DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fff")}");
+
         await _postgreSqlContainer.ExecScriptAsync("DROP SCHEMA public CASCADE;CREATE SCHEMA public;GRANT ALL ON SCHEMA public TO postgres;GRANT ALL ON SCHEMA public TO public;").ConfigureAwait(false);
         var mockLogger = new Mock<ILogger<PostgresqlUpgrader>>();
         var upgrader = new PostgresqlUpgrader(mockLogger.Object, Options.Create(new PostgresqlEventStoreOptions
@@ -56,10 +60,15 @@ public class PostgresDatabaseFixture : IAsyncLifetime
             ConnectionString = _postgreSqlContainer.GetConnectionString()
         }));
         upgrader.Upgrade();
+
+        Console.WriteLine($"Database reset. {DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fff")}");
+
     }
 
     public async Task DisposeAsync()
     {
+        Console.WriteLine($"Disposing database. {DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fff")}");
+
         await _postgreSqlContainer.StopAsync().ConfigureAwait(false);
     }
 }
