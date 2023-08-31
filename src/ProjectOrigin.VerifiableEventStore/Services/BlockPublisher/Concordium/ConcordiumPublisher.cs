@@ -7,7 +7,6 @@ using Concordium.Sdk.Client;
 using Concordium.Sdk.Crypto;
 using Concordium.Sdk.Types;
 using Concordium.Sdk.Transactions;
-using Concordium.Sdk.Wallets;
 using ConcordiumV2 = Concordium.Grpc.V2;
 using Microsoft.Extensions.Logging;
 using Google.Protobuf;
@@ -86,11 +85,20 @@ public class ConcordiumPublisher : IBlockPublisher, IDisposable
         var sender = AccountAddress.From(_options.Value.AccountAddress);
         var sequenceNumber = (await _concordiumClient.GetNextAccountSequenceNumberAsync(sender)).Item1;
         var expire = Expiry.AtMinutesFromNow(10);
-        var signer = WalletAccount.FromWalletKeyExportFormat(_options.Value.AccountKey);
+        var signer = GetSigner();
+
         var preparedTransaction = transaction.Prepare(sender, sequenceNumber, expire);
         var signedTransaction = preparedTransaction.Sign(signer);
 
         return await _concordiumClient.SendAccountTransactionAsync(signedTransaction);
+    }
+
+    private ITransactionSigner GetSigner()
+    {
+        var ed25519TransactionSigner = Ed25519SignKey.From(_options.Value.AccountKey);
+        var signer = new TransactionSigner();
+        signer.AddSignerEntry(new AccountCredentialIndex(0), new AccountKeyIndex(0), ed25519TransactionSigner);
+        return signer;
     }
 
     public void Dispose()
