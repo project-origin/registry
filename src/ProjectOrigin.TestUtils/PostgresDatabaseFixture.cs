@@ -16,7 +16,7 @@ public class PostgresDatabaseFixture : IAsyncLifetime
 {
     public string HostConnectionString => _postgreSqlContainer.GetConnectionString();
 
-    public string NeightborConnectionString
+    public string ContainerConnectionString
     {
         get
         {
@@ -44,7 +44,12 @@ public class PostgresDatabaseFixture : IAsyncLifetime
     public async Task InitializeAsync()
     {
         await _postgreSqlContainer.StartAsync().ConfigureAwait(false);
-        UpgradeDB();
+        var mockLogger = new Mock<ILogger<PostgresqlUpgrader>>();
+        var upgrader = new PostgresqlUpgrader(mockLogger.Object, Options.Create(new PostgresqlEventStoreOptions
+        {
+            ConnectionString = _postgreSqlContainer.GetConnectionString()
+        }));
+        upgrader.Upgrade();
     }
 
     public async Task ResetDatabase()
@@ -52,16 +57,6 @@ public class PostgresDatabaseFixture : IAsyncLifetime
         var dataSource = NpgsqlDataSource.Create(_postgreSqlContainer.GetConnectionString());
         using var connection = await dataSource.OpenConnectionAsync();
         await connection.ExecuteAsync("TRUNCATE blocks, transactions");
-    }
-
-    private void UpgradeDB()
-    {
-        var mockLogger = new Mock<ILogger<PostgresqlUpgrader>>();
-        var upgrader = new PostgresqlUpgrader(mockLogger.Object, Options.Create(new PostgresqlEventStoreOptions
-        {
-            ConnectionString = _postgreSqlContainer.GetConnectionString()
-        }));
-        upgrader.Upgrade();
     }
 
     public async Task DisposeAsync()

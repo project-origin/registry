@@ -60,7 +60,7 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
                 .WithEnvironment("ImmutableLog__type", "log")
                 .WithEnvironment("BlockFinalizer__Interval", "00:00:02")
                 .WithEnvironment("Persistance__type", "postgresql")
-                .WithEnvironment("Persistance__postgresql__ConnectionString", _postgresDatabaseFixture.NeightborConnectionString)
+                .WithEnvironment("Persistance__postgresql__ConnectionString", _postgresDatabaseFixture.ContainerConnectionString)
                 .WithEnvironment("Logging__LogLevel__Default", "Debug")
                 .WithEnvironment("Logging__LogLevel__Grpc.AspNetCore", "Information")
                 .WithWaitStrategy(
