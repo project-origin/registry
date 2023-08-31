@@ -15,9 +15,9 @@ namespace ProjectOrigin.VerifiableEventStore.Services.EventStore.InMemory;
 public class InMemoryRepository : ITransactionRepository
 {
     private readonly BlockSizeCalculator _blockSizeCalculator;
-    private object lockObject = new();
+    private object _lockObject = new();
     private List<StreamTransaction> _events = new();
-    private ConcurrentDictionary<BlockHash, BlockRecord> _blocks = new();
+    private Dictionary<BlockHash, BlockRecord> _blocks = new();
 
     public InMemoryRepository()
     {
@@ -26,7 +26,7 @@ public class InMemoryRepository : ITransactionRepository
 
     public Task<ITransactionRepository.NewBlock?> CreateNextBlock()
     {
-        lock (lockObject)
+        lock (_lockObject)
         {
             var previousBlock = _blocks.Values.OrderByDescending(x => x.ToTransaction).FirstOrDefault();
 
@@ -64,7 +64,7 @@ public class InMemoryRepository : ITransactionRepository
 
     public Task FinalizeBlock(BlockHash hash, ImmutableLog.V1.BlockPublication publication)
     {
-        lock (lockObject)
+        lock (_lockObject)
         {
             if (_blocks.TryGetValue(hash, out var block) && block.Publication is null)
             {
@@ -80,7 +80,7 @@ public class InMemoryRepository : ITransactionRepository
 
     public Task<ImmutableLog.V1.Block?> GetBlockFromTransactionHash(TransactionHash transactionHash)
     {
-        lock (lockObject)
+        lock (_lockObject)
         {
             var e = _events.SingleOrDefault(x => x.TransactionHash == transactionHash);
 
@@ -106,7 +106,7 @@ public class InMemoryRepository : ITransactionRepository
 
     public Task<IList<StreamTransaction>> GetStreamTransactionsForBlock(BlockHash blockHash)
     {
-        lock (lockObject)
+        lock (_lockObject)
         {
             var block = _blocks[blockHash];
 
@@ -118,7 +118,7 @@ public class InMemoryRepository : ITransactionRepository
 
     public Task<IList<StreamTransaction>> GetStreamTransactionsForStream(Guid streamId)
     {
-        lock (lockObject)
+        lock (_lockObject)
         {
             var events = _events.Where(x => x.StreamId == streamId);
 
@@ -128,7 +128,7 @@ public class InMemoryRepository : ITransactionRepository
 
     public Task<TransactionStatus> GetTransactionStatus(TransactionHash transactionHash)
     {
-        lock (lockObject)
+        lock (_lockObject)
         {
             var e = _events.SingleOrDefault(x => x.TransactionHash == transactionHash);
 
@@ -148,7 +148,7 @@ public class InMemoryRepository : ITransactionRepository
 
     public Task Store(StreamTransaction @event)
     {
-        lock (lockObject)
+        lock (_lockObject)
         {
             var nextExpectedIndex = _events.Where(x => x.StreamId == @event.StreamId).Select(x => x.StreamIndex).DefaultIfEmpty(-1).Max() + 1;
             if (nextExpectedIndex != @event.StreamIndex)

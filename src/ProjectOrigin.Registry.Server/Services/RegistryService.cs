@@ -10,6 +10,7 @@ using Google.Protobuf;
 using System.Diagnostics.Metrics;
 using ProjectOrigin.VerifiableEventStore.Models;
 using ProjectOrigin.VerifiableEventStore.Services.Repository;
+using ProjectOrigin.Registry.Server.Extensions;
 
 namespace ProjectOrigin.Registry.Server;
 
@@ -18,13 +19,13 @@ public class RegistryService : V1.RegistryService.RegistryServiceBase
     public static Meter Meter = new("Registry.RegistryService");
     public static Counter<long> TransactionsSubmitted = Meter.CreateCounter<long>("TransactionsSubmitted");
 
-    private ITransactionRepository _eventStore;
+    private ITransactionRepository _transactionRepository;
     private IBus _bus;
     private ITransactionStatusService _transactionStatusService;
 
     public RegistryService(ITransactionRepository eventStore, IBus bus, ITransactionStatusService transactionStatusService)
     {
-        _eventStore = eventStore;
+        _transactionRepository = eventStore;
         _bus = bus;
         _transactionStatusService = transactionStatusService;
     }
@@ -34,7 +35,7 @@ public class RegistryService : V1.RegistryService.RegistryServiceBase
         foreach (var transaction in request.Transactions)
         {
             var message = VerifyTransaction.Create(transaction);
-            var transactionHash = new TransactionHash(SHA256.HashData(transaction.ToByteArray()));
+            var transactionHash = transaction.GetTransactionHash();
 
             await _transactionStatusService.SetTransactionStatus(
                 transactionHash,
@@ -64,7 +65,7 @@ public class RegistryService : V1.RegistryService.RegistryServiceBase
     public async override Task<GetStreamTransactionsResponse> GetStreamTransactions(V1.GetStreamTransactionsRequest request, ServerCallContext context)
     {
         var streamId = Guid.Parse(request.StreamId.Value);
-        var verifiableEvents = await _eventStore.GetStreamTransactionsForStream(streamId).ConfigureAwait(false);
+        var verifiableEvents = await _transactionRepository.GetStreamTransactionsForStream(streamId).ConfigureAwait(false);
         var transactions = verifiableEvents.Select(x => V1.Transaction.Parser.ParseFrom(x.Payload));
 
         var response = new GetStreamTransactionsResponse();

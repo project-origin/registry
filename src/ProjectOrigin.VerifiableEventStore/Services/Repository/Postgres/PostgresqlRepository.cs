@@ -59,7 +59,7 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
         if (id == null)
             return null;
 
-        var block = await connection.QuerySingleOrDefaultAsync<DBBlock>(
+        var block = await connection.QuerySingleOrDefaultAsync<BlockRecord>(
             "SELECT * FROM blocks WHERE from_transaction <= @id AND @id <= to_transaction",
             new { id });
 
@@ -137,7 +137,7 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
             // create table lock on blocks table to prevent concurrent block creation
             await connection.ExecuteAsync("LOCK TABLE blocks IN EXCLUSIVE MODE");
 
-            var previousBlock = await connection.QuerySingleOrDefaultAsync<DBBlock>(
+            var previousBlock = await connection.QuerySingleOrDefaultAsync<BlockRecord>(
                 "SELECT * FROM blocks ORDER BY to_transaction DESC LIMIT 1");
 
             if (previousBlock is not null && previousBlock.Publication is null)
@@ -210,7 +210,7 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
               new { transactionHash = transactionHash.Data });
     }
 
-    private record DBBlock
+    internal record BlockRecord
     {
         public required byte[] BlockHash { get; init; }
         public required byte[] PreviousHeaderHash { get; init; }

@@ -7,6 +7,7 @@ using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ProjectOrigin.Registry.Server.Exceptions;
+using ProjectOrigin.Registry.Server.Extensions;
 using ProjectOrigin.Registry.Server.Interfaces;
 using ProjectOrigin.Registry.Server.Models;
 using ProjectOrigin.VerifiableEventStore.Models;
@@ -18,19 +19,19 @@ namespace ProjectOrigin.Registry.Server.Services;
 public class VerifyTransactionConsumer : IConsumer<VerifyTransaction>
 {
     private TransactionProcessorOptions _options;
-    private ITransactionRepository _eventStore;
+    private ITransactionRepository _transactionRepository;
     private ITransactionDispatcher _verifier;
     private ITransactionStatusService _transactionStatusService;
     private ILogger<VerifyTransactionConsumer> _logger;
 
     public VerifyTransactionConsumer(IOptions<TransactionProcessorOptions> options,
-                                ITransactionRepository localEventStore,
+                                ITransactionRepository transactionRepository,
                                 ITransactionDispatcher verifier,
                                 ITransactionStatusService transactionStatusService,
                                 ILogger<VerifyTransactionConsumer> logger)
     {
         _options = options.Value;
-        _eventStore = localEventStore;
+        _transactionRepository = transactionRepository;
         _verifier = verifier;
         _transactionStatusService = transactionStatusService;
         _logger = logger;
@@ -39,7 +40,7 @@ public class VerifyTransactionConsumer : IConsumer<VerifyTransaction>
     public async Task Consume(ConsumeContext<VerifyTransaction> context)
     {
         V1.Transaction transaction = context.Message.ToTransaction();
-        var transactionHash = new TransactionHash(SHA256.HashData(transaction.ToByteArray()));
+        var transactionHash = transaction.GetTransactionHash();
         try
         {
             _logger.LogDebug($"Processing transaction {transactionHash}");
@@ -48,7 +49,7 @@ public class VerifyTransactionConsumer : IConsumer<VerifyTransaction>
                 throw new InvalidTransactionException("Invalid registry for transaction");
 
             var streamId = Guid.Parse(transaction.Header.FederatedStreamId.StreamId.Value);
-            var stream = (await _eventStore.GetStreamTransactionsForStream(streamId).ConfigureAwait(false))
+            var stream = (await _transactionRepository.GetStreamTransactionsForStream(streamId).ConfigureAwait(false))
                 .Select(x => V1.Transaction.Parser.ParseFrom(x.Payload))
                 .ToList();
 
@@ -59,7 +60,7 @@ public class VerifyTransactionConsumer : IConsumer<VerifyTransaction>
 
             var nextEventIndex = stream.Count();
             var verifiableEvent = new StreamTransaction { TransactionHash = transactionHash, StreamId = streamId, StreamIndex = nextEventIndex, Payload = transaction.ToByteArray() };
-            await _eventStore.Store(verifiableEvent).ConfigureAwait(false);
+            await _transactionRepository.Store(verifiableEvent).ConfigureAwait(false);
 
             _logger.LogDebug($"Transaction processed {transactionHash}");
         }

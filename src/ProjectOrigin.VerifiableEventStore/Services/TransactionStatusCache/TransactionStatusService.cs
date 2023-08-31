@@ -15,13 +15,13 @@ public class TransactionStatusService : ITransactionStatusService
 
     private ILogger<TransactionStatusService> _logger;
     private IDistributedCache _cache;
-    private ITransactionRepository _eventStore;
+    private ITransactionRepository _transactionRepository;
 
     public TransactionStatusService(ILogger<TransactionStatusService> logger, IDistributedCache cache, ITransactionRepository eventStore)
     {
         _logger = logger;
         _cache = cache;
-        _eventStore = eventStore;
+        _transactionRepository = eventStore;
     }
 
     public async Task<TransactionStatusRecord> GetTransactionStatus(TransactionHash transactionHash)
@@ -35,7 +35,7 @@ public class TransactionStatusService : ITransactionStatusService
         }
         else
         {
-            var status = await _eventStore.GetTransactionStatus(transactionHash);
+            var status = await _transactionRepository.GetTransactionStatus(transactionHash);
             var statusRecord = new TransactionStatusRecord(status);
 
             if (status != TransactionStatus.Unknown)

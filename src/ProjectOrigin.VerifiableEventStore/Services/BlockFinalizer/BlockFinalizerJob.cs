@@ -20,7 +20,7 @@ public sealed class BlockFinalizerJob
 
     private readonly ILogger<BlockFinalizerJob> _logger;
     private readonly IBlockPublisher _publisher;
-    private readonly ITransactionRepository _eventStore;
+    private readonly ITransactionRepository _transactionRepository;
     private readonly ITransactionStatusService _statusService;
 
     public BlockFinalizerJob(
@@ -31,7 +31,7 @@ public sealed class BlockFinalizerJob
     {
         _logger = logger;
         _publisher = blockchainConnector;
-        _eventStore = eventStore;
+        _transactionRepository = eventStore;
         _statusService = statusService;
     }
 
@@ -40,7 +40,7 @@ public sealed class BlockFinalizerJob
         Stopwatch sw = new();
         sw.Start();
 
-        var newBlock = await _eventStore.CreateNextBlock();
+        var newBlock = await _transactionRepository.CreateNextBlock();
         if (newBlock is null)
         {
             _logger.LogInformation("No transactions to put in block");
@@ -48,7 +48,7 @@ public sealed class BlockFinalizerJob
         }
 
         var publication = await _publisher.PublishBlock(newBlock.Header);
-        await _eventStore.FinalizeBlock(BlockHash.FromHeader(newBlock.Header), publication);
+        await _transactionRepository.FinalizeBlock(BlockHash.FromHeader(newBlock.Header), publication);
 
         foreach (var transactionHash in newBlock.TransactionHashes)
         {

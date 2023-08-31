@@ -8,10 +8,10 @@ namespace ProjectOrigin.VerifiableEventStore.Tests;
 
 public class PostgresqlEventStoreTests : AbstractEventStoreTests<PostgresqlRepository>, IClassFixture<PostgresDatabaseFixture>, IAsyncLifetime
 {
-    private readonly PostgresqlRepository _eventStore;
+    private readonly PostgresqlRepository _transactionRepository;
     private readonly PostgresDatabaseFixture _postgresFixture;
 
-    protected override PostgresqlRepository Repository => _eventStore;
+    protected override PostgresqlRepository Repository => _transactionRepository;
 
     public PostgresqlEventStoreTests(PostgresDatabaseFixture postgresFixture)
     {
@@ -20,7 +20,7 @@ public class PostgresqlEventStoreTests : AbstractEventStoreTests<PostgresqlRepos
         {
             ConnectionString = postgresFixture.HostConnectionString,
         };
-        _eventStore = new PostgresqlRepository(Options.Create(storeOptions));
+        _transactionRepository = new PostgresqlRepository(Options.Create(storeOptions));
     }
 
     public async Task InitializeAsync()
