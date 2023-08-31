@@ -19,6 +19,7 @@ public sealed record BlockHash(byte[] Data)
         }
         return Data.SequenceEqual(right.Data);
     }
+
     public override int GetHashCode()
     {
         return Data.Sum(b => b);
