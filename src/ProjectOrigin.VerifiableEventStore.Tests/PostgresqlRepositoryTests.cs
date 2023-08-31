@@ -6,14 +6,14 @@ using Xunit;
 
 namespace ProjectOrigin.VerifiableEventStore.Tests;
 
-public class PostgresqlEventStoreTests : AbstractEventStoreTests<PostgresqlRepository>, IClassFixture<PostgresDatabaseFixture>, IAsyncLifetime
+public class PostgresqlRepositoryTests : AbstractTransactionRepositoryTests<PostgresqlRepository>, IClassFixture<PostgresDatabaseFixture>, IAsyncLifetime
 {
     private readonly PostgresqlRepository _transactionRepository;
     private readonly PostgresDatabaseFixture _postgresFixture;
 
     protected override PostgresqlRepository Repository => _transactionRepository;
 
-    public PostgresqlEventStoreTests(PostgresDatabaseFixture postgresFixture)
+    public PostgresqlRepositoryTests(PostgresDatabaseFixture postgresFixture)
     {
         _postgresFixture = postgresFixture;
         var storeOptions = new PostgresqlEventStoreOptions

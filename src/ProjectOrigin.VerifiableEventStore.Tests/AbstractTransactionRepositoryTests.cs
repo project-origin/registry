@@ -14,12 +14,12 @@ using Xunit;
 
 namespace ProjectOrigin.VerifiableEventStore.Tests;
 
-public abstract class AbstractEventStoreTests<T> where T : ITransactionRepository
+public abstract class AbstractTransactionRepositoryTests<T> where T : ITransactionRepository
 {
     protected Fixture _fixture;
     protected abstract T Repository { get; }
 
-    public AbstractEventStoreTests()
+    public AbstractTransactionRepositoryTests()
     {
         _fixture = new Fixture();
     }

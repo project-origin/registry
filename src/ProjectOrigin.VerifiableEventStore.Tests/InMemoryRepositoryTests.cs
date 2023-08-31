@@ -2,11 +2,11 @@ using ProjectOrigin.VerifiableEventStore.Services.EventStore.InMemory;
 
 namespace ProjectOrigin.VerifiableEventStore.Tests;
 
-public class MemoryEventStoreTests : AbstractEventStoreTests<InMemoryRepository>
+public class InMemoryRepositoryTests : AbstractTransactionRepositoryTests<InMemoryRepository>
 {
     private InMemoryRepository _memoryEventStore;
 
-    public MemoryEventStoreTests()
+    public InMemoryRepositoryTests()
     {
         _memoryEventStore = new InMemoryRepository();
     }
