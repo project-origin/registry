@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Dapper;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using Npgsql;
 using ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres;
 using Testcontainers.PostgreSql;
 using Xunit;
@@ -47,7 +49,9 @@ public class PostgresDatabaseFixture : IAsyncLifetime
 
     public async Task ResetDatabase()
     {
-        await _postgreSqlContainer.ExecScriptAsync("TRUNCATE blocks, transactions");
+        var dataSource = NpgsqlDataSource.Create(_postgreSqlContainer.GetConnectionString());
+        using var connection = await dataSource.OpenConnectionAsync();
+        await connection.ExecuteAsync("TRUNCATE blocks, transactions");
     }
 
     private void UpgradeDB()
