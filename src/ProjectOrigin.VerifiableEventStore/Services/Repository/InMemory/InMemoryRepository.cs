@@ -78,7 +78,7 @@ public class InMemoryRepository : ITransactionRepository
         }
     }
 
-    public Task<ImmutableLog.V1.Block?> GetBlockFromTransactionHash(TransactionHash transactionHash)
+    public Task<ImmutableLog.V1.Block?> GetBlock(TransactionHash transactionHash)
     {
         lock (_lockObject)
         {

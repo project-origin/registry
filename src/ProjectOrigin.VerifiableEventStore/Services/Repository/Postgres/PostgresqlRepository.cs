@@ -51,7 +51,7 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
         }
     }
 
-    public async Task<ImmutableLog.V1.Block?> GetBlockFromTransactionHash(TransactionHash transactionHash)
+    public async Task<ImmutableLog.V1.Block?> GetBlock(TransactionHash transactionHash)
     {
         using var connection = _dataSource.CreateConnection();
 

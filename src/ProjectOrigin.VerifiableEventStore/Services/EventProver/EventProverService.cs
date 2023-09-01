@@ -17,7 +17,7 @@ public class EventProverService : IEventProver
 
     public async Task<MerkleProof?> GetMerkleProof(TransactionHash transactionHash)
     {
-        var block = await _transactionRepository.GetBlockFromTransactionHash(transactionHash);
+        var block = await _transactionRepository.GetBlock(transactionHash);
         if (block is null)
         {
             return null;

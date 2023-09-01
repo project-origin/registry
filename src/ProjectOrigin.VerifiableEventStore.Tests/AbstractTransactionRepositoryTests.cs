@@ -118,7 +118,7 @@ public abstract class AbstractTransactionRepositoryTests<T> where T : ITransacti
     public async Task GetBlockFromTransactionHash_NoneExistingBlock_ReturnNull()
     {
         var transactionHash = new Fixture().Create<TransactionHash>();
-        var block = await Repository.GetBlockFromTransactionHash(transactionHash);
+        var block = await Repository.GetBlock(transactionHash);
 
         Assert.Null(block);
     }

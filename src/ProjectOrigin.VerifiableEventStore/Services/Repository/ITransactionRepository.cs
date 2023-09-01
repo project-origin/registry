@@ -9,7 +9,7 @@ public interface ITransactionRepository
 {
     Task Store(StreamTransaction @event);
 
-    Task<ImmutableLog.V1.Block?> GetBlockFromTransactionHash(TransactionHash transactionHash);
+    Task<ImmutableLog.V1.Block?> GetBlock(TransactionHash transactionHash);
     Task<TransactionStatus> GetTransactionStatus(TransactionHash transactionHash);
     Task<IList<StreamTransaction>> GetStreamTransactionsForBlock(BlockHash blockHash);
     Task<IList<StreamTransaction>> GetStreamTransactionsForStream(Guid streamId);
