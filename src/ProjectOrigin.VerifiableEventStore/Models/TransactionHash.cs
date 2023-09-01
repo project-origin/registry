@@ -15,6 +15,7 @@ public sealed record TransactionHash(byte[] Data)
         }
         return Data.SequenceEqual(right.Data);
     }
+
     public override int GetHashCode()
     {
         return Data.Sum(b => b);

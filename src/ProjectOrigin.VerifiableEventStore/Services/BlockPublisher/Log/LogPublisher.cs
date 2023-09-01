@@ -6,8 +6,8 @@ using ProjectOrigin.VerifiableEventStore.Models;
 
 namespace ProjectOrigin.VerifiableEventStore.Services.BlockPublisher.Log;
 
-/// The implementation can be used locally to see the output in the log instead of
-/// having to send it to
+/// The implementation can be used locally to see the output in the log, but it is not recommended for production use.
+/// There is no real immutability guarantee, as the log file is not tamper evident.
 public class LogPublisher : IBlockPublisher
 {
     private ILogger<LogPublisher> _logger;
