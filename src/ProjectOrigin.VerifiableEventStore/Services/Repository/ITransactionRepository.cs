@@ -16,6 +16,4 @@ public interface ITransactionRepository
 
     Task<NewBlock?> CreateNextBlock();
     Task FinalizeBlock(BlockHash hash, ImmutableLog.V1.BlockPublication publication);
-
-    public record NewBlock(ImmutableLog.V1.BlockHeader Header, IList<TransactionHash> TransactionHashes);
 }

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -24,7 +23,7 @@ public class InMemoryRepository : ITransactionRepository
         _blockSizeCalculator = new BlockSizeCalculator();
     }
 
-    public Task<ITransactionRepository.NewBlock?> CreateNextBlock()
+    public Task<NewBlock?> CreateNextBlock()
     {
         lock (_lockObject)
         {
@@ -35,7 +34,7 @@ public class InMemoryRepository : ITransactionRepository
 
             var fromTransaction = (previousBlock?.ToTransaction ?? -1) + 1; //-1 since we are 0 indexed
             if (_events.Count <= fromTransaction)
-                return Task.FromResult<ITransactionRepository.NewBlock?>(null);
+                return Task.FromResult<NewBlock?>(null);
 
             var numberOfTransactions = (int)_blockSizeCalculator.CalculateBlockLength(_events.Count - fromTransaction);
 
@@ -56,9 +55,7 @@ public class InMemoryRepository : ITransactionRepository
             var blockHash = BlockHash.FromHeader(blockHeader);
             _blocks[blockHash] = new BlockRecord(blockHeader, null, fromTransaction, fromTransaction + numberOfTransactions - 1);
 
-            IList<TransactionHash> transactionHashes = transactions.Select(x => x.TransactionHash).ToList();
-
-            return Task.FromResult<ITransactionRepository.NewBlock?>(new(blockHeader, transactionHashes));
+            return Task.FromResult<NewBlock?>(new(blockHeader, transactions.Select(x => x.TransactionHash).ToList()));
         }
     }
 
@@ -159,6 +156,7 @@ public class InMemoryRepository : ITransactionRepository
 
         return Task.CompletedTask;
     }
+
 
     private record BlockRecord(ImmutableLog.V1.BlockHeader Header, ImmutableLog.V1.BlockPublication? Publication, int FromTransaction, int ToTransaction);
 }

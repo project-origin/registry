@@ -59,7 +59,7 @@ public class BlockFinalizerJobTests
 
         var transactions = _fixture.Create<List<TransactionHash>>();
 
-        _repository.Setup(obj => obj.CreateNextBlock()).ReturnsAsync(new ITransactionRepository.NewBlock(header, transactions));
+        _repository.Setup(obj => obj.CreateNextBlock()).ReturnsAsync(new NewBlock(header, transactions));
         _blockPublisher.Setup(obj => obj.PublishBlock(It.IsAny<ImmutableLog.V1.BlockHeader>())).Returns(Task.FromResult(publication));
 
         // When
@@ -76,7 +76,7 @@ public class BlockFinalizerJobTests
     public async Task NoNewBlocks()
     {
         // Given
-        ITransactionRepository.NewBlock? a = null;
+        NewBlock? a = null;
         _repository.Setup(obj => obj.CreateNextBlock()).ReturnsAsync(a);
 
         // When

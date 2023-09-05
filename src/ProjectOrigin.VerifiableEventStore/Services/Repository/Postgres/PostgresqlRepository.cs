@@ -126,7 +126,7 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
         return TransactionStatus.Pending;
     }
 
-    public async Task<ITransactionRepository.NewBlock?> CreateNextBlock()
+    public async Task<NewBlock?> CreateNextBlock()
     {
         using var connection = _dataSource.CreateConnection();
         await connection.OpenAsync();
