@@ -1,0 +1,107 @@
+version: 2
+updates:
+- package-ecosystem: "nuget"
+  directory: "/src/ProjectOrigin.Electricity"
+  schedule:
+    interval: "daily"
+  groups:
+    nuget:
+      patterns:
+        - "*"
+- package-ecosystem: "nuget"
+  directory: "/src/ProjectOrigin.Electricity.Example"
+  schedule:
+    interval: "daily"
+  groups:
+    nuget:
+      patterns:
+        - "*"
+- package-ecosystem: "nuget"
+  directory: "/src/ProjectOrigin.Electricity.IntegrationTests"
+  schedule:
+    interval: "daily"
+  groups:
+    nuget:
+      patterns:
+        - "*"
+- package-ecosystem: "nuget"
+  directory: "/src/ProjectOrigin.Electricity.Server"
+  schedule:
+    interval: "daily"
+  groups:
+    nuget:
+      patterns:
+        - "*"
+- package-ecosystem: "nuget"
+  directory: "/src/ProjectOrigin.Electricity.Tests"
+  schedule:
+    interval: "daily"
+  groups:
+    nuget:
+      patterns:
+        - "*"
+- package-ecosystem: "nuget"
+  directory: "/src/ProjectOrigin.HierarchicalDeterministicKeys"
+  schedule:
+    interval: "daily"
+  groups:
+    nuget:
+      patterns:
+        - "*"
+- package-ecosystem: "nuget"
+  directory: "/src/ProjectOrigin.HierarchicalDeterministicKeys.Tests"
+  schedule:
+    interval: "daily"
+  groups:
+    nuget:
+      patterns:
+        - "*"
+
+- package-ecosystem: "nuget"
+  directory: "/src/ProjectOrigin.Registry.IntegrationTests"
+  schedule:
+    interval: "daily"
+  groups:
+    nuget:
+      patterns:
+        - "*"
+- package-ecosystem: "nuget"
+  directory: "/src/ProjectOrigin.Registry.Server"
+  schedule:
+    interval: "daily"
+  groups:
+    nuget:
+      patterns:
+        - "*"
+- package-ecosystem: "nuget"
+  directory: "/src/ProjectOrigin.TestUtils"
+  schedule:
+    interval: "daily"
+  groups:
+    nuget:
+      patterns:
+        - "*"
+- package-ecosystem: "nuget"
+  directory: "/src/ProjectOrigin.VerifiableEventStore"
+  schedule:
+    interval: "daily"
+  groups:
+    nuget:
+      patterns:
+        - "*"
+- package-ecosystem: "nuget"
+  directory: "/src/ProjectOrigin.VerifiableEventStore.ConcordiumIntegrationTests"
+  schedule:
+    interval: "daily"
+  groups:
+    nuget:
+      patterns:
+        - "*"
+- package-ecosystem: "nuget"
+  directory: "/src/ProjectOrigin.VerifiableEventStore.Tests"
+  schedule:
+    interval: "daily"
+  groups:
+    nuget:
+      patterns:
+        - "*"
