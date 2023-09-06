@@ -10,7 +10,6 @@ using Xunit.Abstractions;
 using Google.Protobuf;
 using FluentAssertions;
 using System.Security.Cryptography;
-using ProjectOrigin.PedersenCommitment;
 using Xunit;
 using ProjectOrigin.TestUtils;
 using System.Text;
@@ -45,22 +44,58 @@ public class ExceptionTest : GrpcTestBase<Startup>
     }
 
     [Fact]
-    public async Task UnknownPayloadType_ReturnsUnexpectedError()
+    public async Task NoVerifierForType_ReturnInvalid()
     {
         var client = new VerifierService.VerifierServiceClient(_grpcFixture.Channel);
 
-        var request = CreateInvalidSignedEvent(_issuerKey);
+        IMessage @event = new Common.V1.Uuid();
+        var request = CreateInvalidSignedEvent(_issuerKey, @event, @event.Descriptor.FullName);
 
         var result = await client.VerifyTransactionAsync(request);
 
-        result.ErrorMessage.Should().Be("Unexpected error while verifying transaction");
+        result.ErrorMessage.Should().Be($"No verifier implemented for payload type ”{@event.Descriptor.FullName}”");
         result.Valid.Should().BeFalse();
     }
 
-    private VerifyTransactionRequest CreateInvalidSignedEvent(IPrivateKey signerKey)
+    [Fact]
+    public async Task InvalidData_ReturnInvalid()
     {
-        IMessage @event = new V1.IssuedEvent();
+        var client = new VerifierService.VerifierServiceClient(_grpcFixture.Channel);
 
+        IMessage @event = new Common.V1.Uuid
+        {
+            Value = Guid.NewGuid().ToString()
+        };
+
+        var otherTypeName = V1.AllocatedEvent.Descriptor.FullName;
+        var request = CreateInvalidSignedEvent(_issuerKey, @event, otherTypeName);
+
+        var result = await client.VerifyTransactionAsync(request);
+
+        result.ErrorMessage.Should().Be("Could not deserialize invalid payload of type ”project_origin.electricity.v1.AllocatedEvent”");
+        result.Valid.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task UnknownType_ReturnInvalid()
+    {
+        var client = new VerifierService.VerifierServiceClient(_grpcFixture.Channel);
+
+        IMessage @event = new Common.V1.Uuid
+        {
+            Value = Guid.NewGuid().ToString()
+        };
+
+        var request = CreateInvalidSignedEvent(_issuerKey, @event, "SomeRandomName");
+
+        var result = await client.VerifyTransactionAsync(request);
+
+        result.ErrorMessage.Should().Be("Could not deserialize unknown type ”SomeRandomName”");
+        result.Valid.Should().BeFalse();
+    }
+
+    private VerifyTransactionRequest CreateInvalidSignedEvent(IPrivateKey signerKey, IMessage @event, string type)
+    {
         var header = new Registry.V1.TransactionHeader()
         {
             FederatedStreamId = new Common.V1.FederatedStreamId()
@@ -71,7 +106,7 @@ public class ExceptionTest : GrpcTestBase<Startup>
                     Value = Guid.NewGuid().ToString()
                 }
             },
-            PayloadType = "SomeUnknownType",
+            PayloadType = type,
             PayloadSha512 = ByteString.CopyFrom(SHA512.HashData(@event.ToByteArray())),
             Nonce = Guid.NewGuid().ToString(),
         };

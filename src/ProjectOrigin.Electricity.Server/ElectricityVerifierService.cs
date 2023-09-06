@@ -1,7 +1,7 @@
-using System;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
+using ProjectOrigin.Electricity.Server.Exceptions;
 using ProjectOrigin.Electricity.Server.Interfaces;
 using ProjectOrigin.Verifier.V1;
 
@@ -37,14 +37,14 @@ internal class ElectricityVerifierService : VerifierService.VerifierServiceBase
 
             return response;
         }
-        catch (Exception ex)
+        catch (InvalidPayloadException ex)
         {
-            _logger.LogError(ex, "Error while verifying transaction");
+            _logger.LogError(ex, "Invalid payload while verifying transaction");
 
             return new VerifyTransactionResponse
             {
                 Valid = false,
-                ErrorMessage = "Unexpected error while verifying transaction"
+                ErrorMessage = ex.Message
             };
         }
     }
