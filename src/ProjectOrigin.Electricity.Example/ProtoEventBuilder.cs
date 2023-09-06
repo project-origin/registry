@@ -10,15 +10,11 @@ using ProjectOrigin.PedersenCommitment;
 
 namespace ProjectOrigin.Electricity.Example;
 
-public class Helper
+public class ProtoEventBuilder
 {
-    static DateTimeOffset Start = new DateTimeOffset(2023, 1, 1, 12, 0, 0, 0, TimeSpan.Zero);
-    private string _area;
-
-    public Helper(string area)
-    {
-        _area = area;
-    }
+    public required string GridArea { get; init; }
+    public required DateTimeOffset Start { get; init; }
+    public required DateTimeOffset End { get; init; }
 
     public Electricity.V1.IssuedEvent CreateConsumptionIssuedEvent(FederatedStreamId certId, SecretCommitmentInfo commitmentInfo, IPublicKey ownerKey)
     {
@@ -29,9 +25,9 @@ public class Helper
             Period = new Electricity.V1.DateInterval
             {
                 Start = Timestamp.FromDateTimeOffset(Start),
-                End = Timestamp.FromDateTimeOffset(Start.AddHours(1))
+                End = Timestamp.FromDateTimeOffset(End)
             },
-            GridArea = _area,
+            GridArea = GridArea,
             AssetIdHash = ByteString.Empty,
             QuantityCommitment = CommitmentToProto(certId, commitmentInfo),
             OwnerPublicKey = new Electricity.V1.PublicKey
@@ -52,9 +48,9 @@ public class Helper
             Period = new Electricity.V1.DateInterval
             {
                 Start = Timestamp.FromDateTimeOffset(Start),
-                End = Timestamp.FromDateTimeOffset(Start.AddHours(1))
+                End = Timestamp.FromDateTimeOffset(End)
             },
-            GridArea = _area,
+            GridArea = GridArea,
             AssetIdHash = ByteString.Empty,
             QuantityCommitment = CommitmentToProto(certId, commitmentInfo),
             OwnerPublicKey = new Electricity.V1.PublicKey
@@ -106,7 +102,7 @@ public class Helper
         return @event;
     }
 
-    internal Electricity.V1.AllocatedEvent CreateAllocatedEvent(Guid allocationId, FederatedStreamId prodCertId, FederatedStreamId consCertId, SecretCommitmentInfo prodComtInfo, SecretCommitmentInfo consComtInfo)
+    public Electricity.V1.AllocatedEvent CreateAllocatedEvent(Guid allocationId, FederatedStreamId prodCertId, FederatedStreamId consCertId, SecretCommitmentInfo prodComtInfo, SecretCommitmentInfo consComtInfo)
     {
         var equalityProof = SecretCommitmentInfo.CreateEqualityProof(prodComtInfo, consComtInfo, allocationId.ToString());
 
@@ -121,7 +117,6 @@ public class Helper
         };
     }
 
-
     public Electricity.V1.ClaimedEvent CreateClaimEvent(Guid allocationId, FederatedStreamId certificateId)
     {
         return new Electricity.V1.ClaimedEvent
@@ -130,7 +125,6 @@ public class Helper
             CertificateId = certificateId
         };
     }
-
 
     public FederatedStreamId ToCertId(string registry, Guid certId)
     {
@@ -141,60 +135,6 @@ public class Helper
             {
                 Value = certId.ToString()
             },
-        };
-    }
-
-    public Registry.V1.Transaction SignTransaction(Common.V1.FederatedStreamId streamId, IMessage @event, IPrivateKey signerKey)
-    {
-        var header = new Registry.V1.TransactionHeader()
-        {
-            FederatedStreamId = streamId,
-            PayloadType = @event.Descriptor.FullName,
-            PayloadSha512 = ByteString.CopyFrom(SHA512.HashData(@event.ToByteArray())),
-            Nonce = Guid.NewGuid().ToString(),
-        };
-
-        var transaction = new Registry.V1.Transaction()
-        {
-            Header = header,
-            HeaderSignature = ByteString.CopyFrom(signerKey.Sign(header.ToByteArray())),
-            Payload = @event.ToByteString()
-        };
-
-        return transaction;
-    }
-
-    public async Task<Registry.V1.GetTransactionStatusResponse> WaitForCommittedOrTimeout(
-        Registry.V1.RegistryService.RegistryServiceClient client,
-        Registry.V1.Transaction signedTransaction,
-        TimeSpan timeout)
-    {
-        var began = DateTimeOffset.UtcNow;
-        var getTransactionStatus = async () => await client.GetTransactionStatusAsync(this.CreateStatusRequest(signedTransaction));
-
-        while (true)
-        {
-            var result = await getTransactionStatus();
-
-            if (result.Status == ProjectOrigin.Registry.V1.TransactionState.Committed)
-                return result;
-            else if (result.Status == ProjectOrigin.Registry.V1.TransactionState.Failed)
-                throw new Exception($"Transaction failed ”{result.Status}” with message ”{result.Message}”");
-
-            await Task.Delay(1000);
-
-            if (began + timeout < DateTimeOffset.UtcNow)
-            {
-                throw new TimeoutException($"Transaction timed out ”{result.Status}” with message ”{result.Message}”");
-            }
-        }
-    }
-
-    private Registry.V1.GetTransactionStatusRequest CreateStatusRequest(Registry.V1.Transaction signedTransaction)
-    {
-        return new ProjectOrigin.Registry.V1.GetTransactionStatusRequest()
-        {
-            Id = Convert.ToBase64String(SHA256.HashData(signedTransaction.ToByteArray()))
         };
     }
 
@@ -211,5 +151,4 @@ public class Helper
     {
         return ByteString.CopyFrom(SHA256.HashData(commitment.C));
     }
-
 }

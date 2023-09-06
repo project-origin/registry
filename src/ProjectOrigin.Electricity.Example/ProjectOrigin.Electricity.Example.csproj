@@ -6,15 +6,23 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <Target Name="Updating grpc references" BeforeTargets="PreBuildEvent">
+    <Exec Command="dotnet dotnet-grpc refresh -p $(ProjectDir)" />
+  </Target>
+
   <ItemGroup>
     <PackageReference Include="ProjectOrigin.PedersenCommitment" Version="1.0.3" />
     <PackageReference Include="ProjectOrigin.HierarchicalDeterministicKeys" Version="0.2.0-rc.16" />
     <PackageReference Include="Google.Protobuf" Version="3.23.2" />
     <PackageReference Include="Grpc.Tools" Version="2.54.0" />
     <PackageReference Include="Grpc.Net.Client" Version="2.54.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.32.2" />
     <Protobuf Include="..\Protos\common.proto" GrpcServices="None" />
     <Protobuf Include="..\Protos\electricity.proto" GrpcServices="None" />
     <Protobuf Include="..\Protos\registry.proto" GrpcServices="Client" />
+    <Protobuf Include="../Protos/wallet.proto" Link="Protos\wallet.proto" GrpcServices="Client">
+      <SourceUrl>https://raw.githubusercontent.com/project-origin/wallet/v0.2.0-rc.13/src/Protos/wallet.proto</SourceUrl>
+    </Protobuf>
   </ItemGroup>
 
 </Project>
