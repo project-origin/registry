@@ -2,7 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ProjectOrigin.Electricity\ProjectOrigin.Electricity.csproj" />
-    <PackageReference Include="ProjectOrigin.PedersenCommitment" Version="0.2.0-rc.16" />
+    <PackageReference Include="ProjectOrigin.PedersenCommitment" Version="1.0.3" />
     <PackageReference Include="ProjectOrigin.HierarchicalDeterministicKeys" Version="0.2.0-rc.16" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.49.0" />
   </ItemGroup>
