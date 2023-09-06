@@ -15,19 +15,46 @@ public class Program
         switch (command)
         {
             case "WithoutWalletFlow":
-                if (args.Length < 7)
                 {
-                    Console.Error.WriteLine("Insufficient arguments for 'WithoutWalletFlow'");
-                    return 1;
+
+                    if (args.Length < 7)
+                    {
+                        Console.Error.WriteLine("Insufficient arguments for 'WithoutWalletFlow'");
+                        return 1;
+                    }
+
+                    var flow = new WithoutWalletFlow
+                    {
+                        Area = args[1],
+                        IssuerKey = args[2],
+                        ProdRegistryName = args[3],
+                        ProdRegistryAddress = args[4],
+                        ConsRegistryName = args[5],
+                        ConsRegistryAddress = args[6],
+                    };
+                    return await flow.Run();
                 }
-                string area = args[1];
-                string signerKey = args[2];
-                string prodRegistryName = args[3];
-                string prodRegistryAddress = args[4];
-                string consRegistryName = args[5];
-                string consRegistryAddress = args[6];
-                var flow2 = new WithoutWalletFlow(area, signerKey, prodRegistryName, prodRegistryAddress, consRegistryName, consRegistryAddress);
-                return await flow2.Run();
+
+            case "WithWalletFlow":
+                {
+
+                    if (args.Length < 8)
+                    {
+                        Console.Error.WriteLine("Insufficient arguments for 'WithWalletFlow'");
+                        return 1;
+                    }
+                    var flow = new WithWalletFlow
+                    {
+                        Area = args[1],
+                        IssuerKey = args[2],
+                        ProdRegistryName = args[3],
+                        ProdRegistryAddress = args[4],
+                        ConsRegistryName = args[5],
+                        ConsRegistryAddress = args[6],
+                        WalletAddress = args[7],
+                    };
+                    return await flow.Run();
+                }
 
             default:
                 Console.Error.WriteLine("Invalid command");
@@ -40,8 +67,7 @@ public class Program
     {
         Console.WriteLine("Usage: programName [command] [args]");
         Console.WriteLine("Available commands:");
-        Console.WriteLine("  GeneratePrivateKey");
-        Console.WriteLine("  DerivePublicKey [Base58PrivateKey]");
         Console.WriteLine("  WithoutWalletFlow [Area] [SignerKey] [ProdRegistryName] [ProdRegistryAddress] [ConsRegistryName] [ConsRegistryAddress]");
+        Console.WriteLine("  WithWalletFlow [Area] [SignerKey] [ProdRegistryName] [ProdRegistryAddress] [ConsRegistryName] [ConsRegistryAddress] [WalletAddress]");
     }
 }
