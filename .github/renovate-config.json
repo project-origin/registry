@@ -1,5 +1,4 @@
 {
-    "autodiscover": true,
     "repositories": [
         "project-origin/registry"
     ]
