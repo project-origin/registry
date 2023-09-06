@@ -210,7 +210,7 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
               new { transactionHash = transactionHash.Data });
     }
 
-    internal record BlockRecord
+    private record BlockRecord
     {
         public required byte[] BlockHash { get; init; }
         public required byte[] PreviousHeaderHash { get; init; }
