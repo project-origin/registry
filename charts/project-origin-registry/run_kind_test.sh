@@ -34,6 +34,7 @@ wallet_nodeport=32082
 
 # build docker image
 docker build -f src/ProjectOrigin.Registry.Server/Dockerfile -t ghcr.io/project-origin/registry-server:test src/
+docker build -f src/ProjectOrigin.Electricity.Server/Dockerfile -t ghcr.io/project-origin/electricity-server:test src/
 
 # create kind configuration
 cat << EOF > "$kind_filename"
@@ -56,6 +57,7 @@ kind create cluster -n helm-test --config "$kind_filename"
 
 # load docker image into cluster
 kind load -n helm-test docker-image ghcr.io/project-origin/registry-server:test
+kind load -n helm-test docker-image ghcr.io/project-origin/electricity-server:test
 
 # install cnpg-operator
 helm install cnpg-operator cloudnative-pg --repo https://cloudnative-pg.io/charts --version 0.18.0 --namespace cnpg --create-namespace --wait
@@ -72,7 +74,7 @@ verifiers:
     type: project_origin.electricity.v1
     image:
       repository: ghcr.io/project-origin/electricity-server
-      tag: 0.2.0
+      tag: test
     issuers:
       - area: $example_area
         publicKey: $PublicKeyBase64

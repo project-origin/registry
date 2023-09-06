@@ -49,7 +49,7 @@ public class PostgresDatabaseFixture : IAsyncLifetime
         {
             ConnectionString = _postgreSqlContainer.GetConnectionString()
         }));
-        upgrader.Upgrade();
+        await upgrader.Upgrade();
     }
 
     public async Task ResetDatabase()

@@ -3,38 +3,48 @@ using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ProjectOrigin.Registry.Server;
 using ProjectOrigin.Registry.Server.Extensions;
 using ProjectOrigin.VerifiableEventStore.Services.Repository;
+using Serilog;
 
-if (args.Contains("--migrate"))
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+var configuration = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json", optional: false)
+    .AddJsonFile($"appsettings.{environment}.json", optional: true)
+    .AddEnvironmentVariables()
+    .AddCommandLine(args)
+    .Build();
+
+Log.Logger = configuration.GetSeriLogger();
+
+try
 {
-    Console.WriteLine("Starting repository migration.");
-    var configuration = new ConfigurationBuilder()
-        .AddJsonFile("appsettings.json", optional: false)
-        .AddEnvironmentVariables()
-        .AddCommandLine(args)
-        .Build();
-    configuration.GetRepositoryUpgrader().Upgrade();
-    Console.WriteLine("Repository migrated successfully.");
+    if (args.Contains("--migrate"))
+    {
+        Log.Information("Starting repository migration.");
+        await configuration.GetRepositoryUpgrader(Log.Logger).Upgrade();
+        Log.Information("Repository migrated successfully.");
+    }
+
+    if (args.Contains("--serve"))
+    {
+        Log.Information("Starting server.");
+        WebApplication app = configuration.BuildApp();
+
+        var upgrader = app.Services.GetRequiredService<IRepositoryUpgrader>();
+        if (await upgrader.IsUpgradeRequired())
+            throw new SystemException("Repository is not up to date. Please run with --migrate first.");
+
+        await app.RunAsync();
+        Log.Information("Server stopped.");
+    }
 }
-
-if (args.Contains("--serve"))
+catch (Exception ex)
 {
-    Console.WriteLine("Starting server.");
-
-    var builder = WebApplication.CreateBuilder(args);
-
-    var startup = new Startup(builder.Configuration);
-    startup.ConfigureServices(builder.Services);
-
-    var app = builder.Build();
-    startup.Configure(app, builder.Environment);
-
-    var upgrader = app.Services.GetRequiredService<IRepositoryUpgrader>();
-    if (upgrader.IsUpgradeRequired())
-        throw new SystemException("Repository is not up to date. Please run with --migrate first.");
-
-    app.Run();
-    Console.WriteLine("Server stopped.");
+    Log.Fatal(ex, "Host terminated unexpectedly");
+    Environment.ExitCode = -1;
+}
+finally
+{
+    Log.CloseAndFlush();
 }

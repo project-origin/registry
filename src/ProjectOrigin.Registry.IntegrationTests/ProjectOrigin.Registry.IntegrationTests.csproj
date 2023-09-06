@@ -20,7 +20,7 @@
     </PackageReference>
     <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
     <PackageReference Include="Testcontainers" Version="3.2.0" />
-    <PackageReference Include="ProjectOrigin.PedersenCommitment" Version="0.2.0-rc.16" />
+    <PackageReference Include="ProjectOrigin.PedersenCommitment" Version="1.0.3" />
   </ItemGroup>
 
   <ItemGroup>

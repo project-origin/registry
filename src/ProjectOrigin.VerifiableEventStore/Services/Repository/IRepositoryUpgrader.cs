@@ -1,8 +1,9 @@
+using System.Threading.Tasks;
 
 namespace ProjectOrigin.VerifiableEventStore.Services.Repository;
 
 public interface IRepositoryUpgrader
 {
-    void Upgrade();
-    bool IsUpgradeRequired();
+    Task Upgrade();
+    Task<bool> IsUpgradeRequired();
 }
