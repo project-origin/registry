@@ -1,33 +1,34 @@
 using System.Linq;
 using System.Threading.Tasks;
 using ProjectOrigin.VerifiableEventStore.Extensions;
-using ProjectOrigin.VerifiableEventStore.Services.EventStore;
+using ProjectOrigin.VerifiableEventStore.Models;
+using ProjectOrigin.VerifiableEventStore.Services.Repository;
 
 namespace ProjectOrigin.VerifiableEventStore.Services.EventProver;
 
 public class EventProverService : IEventProver
 {
-    private IEventStore _eventStore;
+    private ITransactionRepository _transactionRepository;
 
-    public EventProverService(IEventStore eventStore)
+    public EventProverService(ITransactionRepository eventStore)
     {
-        _eventStore = eventStore;
+        _transactionRepository = eventStore;
     }
 
-    public async Task<MerkleProof?> GetMerkleProof(string transactionId)
+    public async Task<MerkleProof?> GetMerkleProof(TransactionHash transactionHash)
     {
-        var batch = await _eventStore.GetBatchFromTransactionId(transactionId);
-        if (batch is null)
+        var block = await _transactionRepository.GetBlock(transactionHash);
+        if (block is null)
         {
             return null;
         }
 
-        var events = await _eventStore.GetEventsForBatch(batch.Id);
+        var events = await _transactionRepository.GetStreamTransactionsForBlock(BlockHash.FromHeader(block.Header));
 
-        var eventObj = events.Single(e => e.TransactionId == transactionId);
-        var leafIndex = events.TakeWhile(x => !x.Equals(eventObj)).Count();
-        var hashes = events.GetRequiredHashes(e => e.Content, leafIndex);
+        var eventObj = events.Single(e => e.TransactionHash == transactionHash);
+        var leafIndex = events.IndexOf(eventObj);
+        var hashes = events.GetRequiredHashes(e => e.Payload, leafIndex);
 
-        return new MerkleProof(transactionId, eventObj.Content, batch.BlockId, batch.TransactionId, leafIndex, hashes);
+        return new MerkleProof(transactionHash, eventObj.Payload, leafIndex, hashes);
     }
 }

@@ -5,6 +5,6 @@ namespace ProjectOrigin.VerifiableEventStore.Services.TransactionStatusCache;
 
 public interface ITransactionStatusService
 {
-    Task SetTransactionStatus(string transactionId, TransactionStatusRecord record);
-    Task<TransactionStatusRecord> GetTransactionStatus(string transactionId);
+    Task SetTransactionStatus(TransactionHash transactionHash, TransactionStatusRecord record);
+    Task<TransactionStatusRecord> GetTransactionStatus(TransactionHash transactionHash);
 }

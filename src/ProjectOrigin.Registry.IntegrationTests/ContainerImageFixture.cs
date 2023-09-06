@@ -18,12 +18,12 @@ public class ContainerImageFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        await _image.CreateAsync();
+        await _image.CreateAsync().ConfigureAwait(false);
     }
 
     public async Task DisposeAsync()
     {
-        await _image.DeleteAsync();
-        await _image.DisposeAsync();
+        await _image.DeleteAsync().ConfigureAwait(false);
+        await _image.DisposeAsync().ConfigureAwait(false);
     }
 }

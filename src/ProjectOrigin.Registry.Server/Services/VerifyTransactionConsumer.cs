@@ -7,10 +7,11 @@ using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ProjectOrigin.Registry.Server.Exceptions;
+using ProjectOrigin.Registry.Server.Extensions;
 using ProjectOrigin.Registry.Server.Interfaces;
 using ProjectOrigin.Registry.Server.Models;
 using ProjectOrigin.VerifiableEventStore.Models;
-using ProjectOrigin.VerifiableEventStore.Services.EventStore;
+using ProjectOrigin.VerifiableEventStore.Services.Repository;
 using ProjectOrigin.VerifiableEventStore.Services.TransactionStatusCache;
 
 namespace ProjectOrigin.Registry.Server.Services;
@@ -18,19 +19,19 @@ namespace ProjectOrigin.Registry.Server.Services;
 public class VerifyTransactionConsumer : IConsumer<VerifyTransaction>
 {
     private TransactionProcessorOptions _options;
-    private IEventStore _eventStore;
+    private ITransactionRepository _transactionRepository;
     private ITransactionDispatcher _verifier;
     private ITransactionStatusService _transactionStatusService;
     private ILogger<VerifyTransactionConsumer> _logger;
 
     public VerifyTransactionConsumer(IOptions<TransactionProcessorOptions> options,
-                                IEventStore localEventStore,
+                                ITransactionRepository transactionRepository,
                                 ITransactionDispatcher verifier,
                                 ITransactionStatusService transactionStatusService,
                                 ILogger<VerifyTransactionConsumer> logger)
     {
         _options = options.Value;
-        _eventStore = localEventStore;
+        _transactionRepository = transactionRepository;
         _verifier = verifier;
         _transactionStatusService = transactionStatusService;
         _logger = logger;
@@ -39,17 +40,17 @@ public class VerifyTransactionConsumer : IConsumer<VerifyTransaction>
     public async Task Consume(ConsumeContext<VerifyTransaction> context)
     {
         V1.Transaction transaction = context.Message.ToTransaction();
-        var transactionHash = Convert.ToBase64String(SHA256.HashData(transaction.ToByteArray()));
+        var transactionHash = transaction.GetTransactionHash();
         try
         {
-            _logger.LogTrace($"Processing transaction {transactionHash}");
+            _logger.LogDebug($"Processing transaction {transactionHash}");
 
             if (transaction.Header.FederatedStreamId.Registry != _options.RegistryName)
                 throw new InvalidTransactionException("Invalid registry for transaction");
 
             var streamId = Guid.Parse(transaction.Header.FederatedStreamId.StreamId.Value);
-            var stream = (await _eventStore.GetEventsForEventStream(streamId).ConfigureAwait(false))
-                .Select(x => V1.Transaction.Parser.ParseFrom(x.Content))
+            var stream = (await _transactionRepository.GetStreamTransactionsForStream(streamId).ConfigureAwait(false))
+                .Select(x => V1.Transaction.Parser.ParseFrom(x.Payload))
                 .ToList();
 
             var result = await _verifier.VerifyTransaction(transaction, stream).ConfigureAwait(false);
@@ -58,11 +59,10 @@ public class VerifyTransactionConsumer : IConsumer<VerifyTransaction>
                 throw new InvalidTransactionException(result.ErrorMessage);
 
             var nextEventIndex = stream.Count();
-            var eventId = new VerifiableEventStore.Models.EventId(streamId, nextEventIndex);
-            var verifiableEvent = new VerifiableEvent(eventId, transactionHash, transaction.ToByteArray());
-            await _eventStore.Store(verifiableEvent).ConfigureAwait(false);
+            var verifiableEvent = new StreamTransaction { TransactionHash = transactionHash, StreamId = streamId, StreamIndex = nextEventIndex, Payload = transaction.ToByteArray() };
+            await _transactionRepository.Store(verifiableEvent).ConfigureAwait(false);
 
-            _logger.LogTrace($"Transaction processed {transactionHash}");
+            _logger.LogDebug($"Transaction processed {transactionHash}");
         }
         catch (InvalidTransactionException ex)
         {

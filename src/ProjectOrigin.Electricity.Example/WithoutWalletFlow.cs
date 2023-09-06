@@ -1,4 +1,6 @@
+using System;
 using System.Text;
+using System.Threading.Tasks;
 using Grpc.Net.Client;
 using ProjectOrigin.Electricity.Example;
 using ProjectOrigin.HierarchicalDeterministicKeys;

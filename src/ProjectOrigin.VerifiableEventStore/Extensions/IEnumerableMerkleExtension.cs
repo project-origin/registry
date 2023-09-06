@@ -7,75 +7,85 @@ namespace ProjectOrigin.VerifiableEventStore.Extensions;
 
 public static class IEnumerableMerkleExtension
 {
-    public static byte[] CalculateMerkleRoot<T>(this IEnumerable<T> events, Func<T, byte[]> selector)
+    public static byte[] CalculateMerkleRoot<T>(this IList<T> events, Func<T, byte[]> selector)
     {
         if (!events.Any())
         {
             throw new ArgumentException("Can not CalculateMerkleRoot on an empty collection.", nameof(events));
         }
-        if (!IsPowerOfTwo(events.Count()))
+
+        var balancedCount = GetBalancedNodeCount(events);
+
+        return RecursiveShaNodes(events.Select(selector), balancedCount);
+    }
+
+    public static IEnumerable<byte[]> GetRequiredHashes<T>(this IList<T> events, Func<T, byte[]> selector, int leafIndex)
+    {
+        if (leafIndex > events.Count() - 1)
         {
-            throw new NotSupportedException("CalculateMerkleRoot currently only supported on exponents of 2");
+            throw new ArgumentException("leafIndex can not be greater than the number of events.", nameof(leafIndex));
         }
 
-        return RecursiveShaNodes(events.Select(selector));
+        var balancedCount = GetBalancedNodeCount(events);
+
+        return RecursiveGetRequiredHashes(events.Select(selector), leafIndex, balancedCount);
     }
 
-    public static IEnumerable<byte[]> GetRequiredHashes<T>(this IEnumerable<T> events, Func<T, byte[]> selector, int leafIndex)
+    private static IEnumerable<byte[]> RecursiveGetRequiredHashes(IEnumerable<byte[]> events, int leafIndex, int balancedCount)
     {
-        return RecursiveGetRequiredHashes(events.Select(selector), leafIndex);
-    }
-
-    private static IEnumerable<byte[]> RecursiveGetRequiredHashes(IEnumerable<byte[]> events, int leafIndex)
-    {
-        if (events.Count() == 2)
+        if (balancedCount == 2)
         {
-            yield return SHA256.HashData(events.Skip(1 - leafIndex).First());
+            if (leafIndex == 0 && events.Count() == 2)
+                yield return SHA256.HashData(events.Last());
+            else if (leafIndex == 1)
+                yield return SHA256.HashData(events.First());
         }
         else
         {
-            var i = events.Count() / 2;
-            if (leafIndex >= i)
+            var halfSize = balancedCount / 2;
+            if (leafIndex >= halfSize)
             {
-                yield return RecursiveShaNodes(events.Take(i));
-                foreach (var x in RecursiveGetRequiredHashes(events.Skip(i), leafIndex - i))
+                yield return RecursiveShaNodes(events.Take(halfSize), halfSize);
+                foreach (var x in RecursiveGetRequiredHashes(events.Skip(halfSize), leafIndex - halfSize, halfSize))
                 {
                     yield return x;
                 }
             }
             else
             {
-                foreach (var x in RecursiveGetRequiredHashes(events.Take(i), leafIndex))
+                foreach (var x in RecursiveGetRequiredHashes(events.Take(halfSize), leafIndex, halfSize))
                 {
                     yield return x;
                 }
-                yield return RecursiveShaNodes(events.Skip(i));
+                yield return RecursiveShaNodes(events.Skip(halfSize), halfSize);
             }
         }
     }
 
-    private static byte[] RecursiveShaNodes(IEnumerable<byte[]> nodes)
+    private static byte[] RecursiveShaNodes(IEnumerable<byte[]> nodes, int balancedCount)
     {
         if (nodes.Count() == 1)
         {
-            return SHA256.HashData(nodes.Single());
+            var data = SHA256.HashData(nodes.Single());
+            for (int i = (int)Math.Log(balancedCount, 2); i > 0; i--)
+            {
+                data = SHA256.HashData(data.Concat(data).ToArray());
+            }
+            return data;
         }
-
-        var newList = new List<byte[]>();
-
-        for (var i = 0; i < nodes.Count(); i = i + 2)
+        else
         {
-            var left = SHA256.HashData(nodes.Skip(i).First());
-            var right = SHA256.HashData(nodes.Skip(i + 1).First());
+            var halfSize = balancedCount / 2;
 
-            newList.Add(left.Concat(right).ToArray());
+            var left = RecursiveShaNodes(nodes.Take(halfSize), halfSize);
+            var right = RecursiveShaNodes(nodes.Skip(halfSize).DefaultIfEmpty(nodes.Last()), halfSize);
+
+            return SHA256.HashData(left.Concat(right).ToArray());
         }
-
-        return RecursiveShaNodes(newList);
     }
 
-    private static bool IsPowerOfTwo(int x)
+    private static int GetBalancedNodeCount<T>(IEnumerable<T> enumarble)
     {
-        return (x & (x - 1)) == 0;
+        return (int)Math.Pow(2, Math.Ceiling(Math.Log(enumarble.Count(), 2)));
     }
 }

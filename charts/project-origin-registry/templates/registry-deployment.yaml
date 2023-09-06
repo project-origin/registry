@@ -1,4 +1,7 @@
----
+{{- if not (or (and (not (.Values.persistance.cloudNativePG.enabled)) .Values.persistance.inMemory.enabled) (and .Values.persistance.cloudNativePG.enabled (not (.Values.persistance.inMemory.enabled)))) }}
+{{- fail "Exactly one of persistance.cloudNativePG.enabled or persistance.inMemory.enabled must be true" }}
+{{- end }}
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,23 +18,32 @@ spec:
       labels:
         app: registry-{{ .Release.Name }}
     spec:
+      serviceAccountName: registry-migration-waiter
+      initContainers:
+        - name: wait-for-migration
+          image: groundnuty/k8s-wait-for:v2.0
+          args:
+            - "job"
+            - "po-registry-migrate-job-{{ .Values.image.tag | default .Chart.AppVersion | replace "." "-" }}"
       containers:
-        - name: registry-{{ .Release.Name }}
+        - name: registry
           image: {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+          args:
+            - "--serve"
           env:
-            - name: REGISTRYNAME
+            - name: RegistryName
               value: {{ .Values.registryName | default .Release.Name }}
-            {{- range .Values.verifiers }}
-            - name: VERIFIERS__{{ .type }}
+            - name: BlockFinalizer__Interval
+              value: {{ .Values.blockFinalizer.interval }}
+          {{- range .Values.verifiers }}
+            - name: Verifiers__{{ .type }}
               value: http://registry-{{ $.Release.Name }}-verifier-{{ .name }}:80
-            {{- end }}
-            - name: VERIFIABLEEVENTSTORE__BATCHSIZEEXPONENT
-              value: {{ .Values.verifiableEventStore.batchSizeExponent | quote }}
-            - name: VERIFIABLEEVENTSTORE__EVENTSTORE__TYPE
-              value: {{ .Values.verifiableEventStore.eventStore.type }}
+          {{- end }}
+
+          # immutableLog configuration
             - name: IMMUTABLELOG__TYPE
               value: {{ .Values.immutableRecord.type }}
-            {{- if eq .Values.immutableRecord.type "concordium" }}
+          {{- if eq .Values.immutableRecord.type "concordium" }}
             - name: IMMUTABLELOG__CONCORDIUM__ADDRESS
               value: {{ .Values.immutableRecord.concordium.rpcUrl }}
             - name: IMMUTABLELOG__CONCORDIUM__AUTHENTICATIONTOKEN
@@ -43,4 +55,34 @@ spec:
                 secretKeyRef:
                   name: {{ required "When type is concordium, accountKeySecret.name must be set" .Values.immutableRecord.concordium.accountKeySecret.name }}
                   key: {{ required "When type is concordium, accountKeySecret.key must be set" .Values.immutableRecord.concordium.accountKeySecret.key }}
-            {{- end }}
+          {{- end }}
+
+          # persistance - inMemory
+          {{- if .Values.persistance.inMemory.enabled }}
+            - name: PERSISTANCE__TYPE
+              value: in_memory
+          {{- end }}
+
+          # persistance - cloudNativePG
+          {{- if .Values.persistance.cloudNativePG.enabled }}
+            - name: PERSISTANCE__TYPE
+              value: postgresql
+            - name: DB_HOST
+              value: {{ .Values.persistance.cloudNativePG.name }}-rw
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_DATABASE
+              value: {{ .Values.persistance.cloudNativePG.database }}
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.persistance.cloudNativePG.name }}-app
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.persistance.cloudNativePG.name }}-app
+                  key: password
+            - name: PERSISTANCE__POSTGRESQL__CONNECTIONSTRING
+              value: Host=$(DB_HOST); Port=$(DB_PORT); Database=$(DB_DATABASE); Username=$(DB_USERNAME); Password=$(DB_PASSWORD);
+          {{- end }}

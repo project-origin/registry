@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Google.Protobuf;
+using Microsoft.Extensions.DependencyInjection;
 using ProjectOrigin.Electricity.Server.Interfaces;
 
 namespace ProjectOrigin.Electricity.Server.Services;
@@ -28,8 +29,7 @@ public class VerifierDispatcher : IVerifierDispatcher
         var @event = _protoDeserializer.Deserialize(transaction.Header.PayloadType, transaction.Payload);
         var verifierInterfaceType = typeof(IEventVerifier<>).MakeGenericType(@event.GetType());
 
-        var verifier = _serviceProvider.GetService(verifierInterfaceType)
-            ?? throw new Exception($"Verifier for ”{verifierInterfaceType}” could not be resolved");
+        var verifier = _serviceProvider.GetRequiredService(verifierInterfaceType);
 
         var methodInfo = verifier.GetType().GetMethod(VerifyMethodName)
             ?? throw new Exception($"Could not find ”{VerifyMethodName}” method");
