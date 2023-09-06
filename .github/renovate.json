@@ -1,0 +1,10 @@
+{
+    "packageRules": [
+        {
+            "matchPackagePatterns": [
+                ".*"
+            ],
+            "groupName": "everything"
+        }
+    ]
+}

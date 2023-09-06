@@ -1,10 +1,6 @@
 {
-    "packageRules": [
-        {
-            "matchPackagePatterns": [
-                ".*"
-            ],
-            "groupName": "everything"
-        }
+    "autodiscover": true,
+    "repositories": [
+        "project-origin/registry"
     ]
 }
