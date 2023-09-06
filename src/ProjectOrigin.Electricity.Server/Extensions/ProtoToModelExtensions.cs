@@ -1,5 +1,4 @@
 using System;
-using ProjectOrigin.Electricity.Models;
 using ProjectOrigin.PedersenCommitment;
 
 namespace ProjectOrigin.Electricity.Extensions;

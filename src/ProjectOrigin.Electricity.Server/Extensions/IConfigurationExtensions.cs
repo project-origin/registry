@@ -1,27 +1,16 @@
 using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using ProjectOrigin.VerifiableEventStore.Services.Repository;
+using ProjectOrigin.Electricity.Server;
 using Serilog;
 using Serilog.Enrichers.Span;
 using Serilog.Formatting.Json;
 
-namespace ProjectOrigin.Registry.Server.Extensions;
+namespace ProjectOrigin.Electricity.Extensions;
 
 public static class IConfigurationExtensions
 {
-    public static IRepositoryUpgrader GetRepositoryUpgrader(this IConfiguration configuration, Serilog.ILogger logger)
-    {
-        var services = new ServiceCollection();
-        services.AddLogging();
-        services.AddSerilog(logger);
-        services.ConfigurePersistance(configuration);
-        using var serviceProvider = services.BuildServiceProvider();
-        return serviceProvider.GetRequiredService<IRepositoryUpgrader>();
-    }
-
     public static WebApplication BuildApp(this IConfigurationRoot configuration)
     {
         var builder = WebApplication.CreateBuilder();

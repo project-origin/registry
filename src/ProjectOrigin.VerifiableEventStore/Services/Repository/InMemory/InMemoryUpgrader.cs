@@ -1,15 +1,14 @@
+using System.Threading.Tasks;
 using ProjectOrigin.VerifiableEventStore.Services.Repository;
 
 namespace ProjectOrigin.VerifiableEventStore.Services.EventStore.InMemory;
 
 public class InMemoryUpgrader : IRepositoryUpgrader
 {
-    public bool IsUpgradeRequired()
+    public Task<bool> IsUpgradeRequired()
     {
-        return false;
+        return Task.FromResult(false);
     }
 
-    public void Upgrade()
-    {
-    }
+    public Task Upgrade() => Task.CompletedTask;
 }
