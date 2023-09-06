@@ -13,6 +13,13 @@ namespace ProjectOrigin.Electricity.Server;
 
 public class Startup
 {
+    private readonly IConfiguration _configuration;
+
+    public Startup(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddGrpc();
@@ -36,7 +43,7 @@ public class Startup
             {
                 configuration.Bind(settings);
             })
-            .Validate((option => option.Verify()))
+            .Validate(option => option.Verify())
             .ValidateOnStart();
 
         services.AddOptions<RegistryOptions>()

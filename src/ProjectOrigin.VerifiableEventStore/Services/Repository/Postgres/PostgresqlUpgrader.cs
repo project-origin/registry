@@ -1,5 +1,5 @@
 using System;
-using System.Threading;
+using System.Threading.Tasks;
 using DbUp;
 using DbUp.Engine;
 using DbUp.Engine.Output;
@@ -12,7 +12,7 @@ namespace ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres;
 public class PostgresqlUpgrader : IRepositoryUpgrader
 {
     private static TimeSpan _sleepTime = TimeSpan.FromSeconds(5);
-    private static TimeSpan _defaultTimeout = TimeSpan.FromMinutes(5);
+    private static TimeSpan _timeout = TimeSpan.FromMinutes(5);
     private readonly ILogger<PostgresqlUpgrader> _logger;
     private readonly string _connectionString;
 
@@ -22,18 +22,19 @@ public class PostgresqlUpgrader : IRepositoryUpgrader
         _connectionString = options.Value.ConnectionString;
     }
 
-    public bool IsUpgradeRequired()
+    public async Task<bool> IsUpgradeRequired()
     {
         var upgradeEngine = BuildUpgradeEngine(_connectionString);
+        await TryConnectToDatabaseWithRetry(upgradeEngine);
 
         return upgradeEngine.IsUpgradeRequired();
     }
 
-    public void Upgrade()
+    public async Task Upgrade()
     {
         var upgradeEngine = BuildUpgradeEngine(_connectionString);
+        await TryConnectToDatabaseWithRetry(upgradeEngine);
 
-        TryConnectToDatabaseWithRetry(upgradeEngine);
         var databaseUpgradeResult = upgradeEngine.PerformUpgrade();
 
         if (!databaseUpgradeResult.Successful)
@@ -42,14 +43,15 @@ public class PostgresqlUpgrader : IRepositoryUpgrader
         }
     }
 
-    private void TryConnectToDatabaseWithRetry(UpgradeEngine upgradeEngine)
+    private async Task TryConnectToDatabaseWithRetry(UpgradeEngine upgradeEngine)
     {
         var started = DateTime.UtcNow;
         while (!upgradeEngine.TryConnect(out string msg))
         {
             _logger.LogWarning($"Failed to connect to database ({msg}), waiting to retry in {_sleepTime.TotalSeconds} seconds... ");
-            Thread.Sleep(_sleepTime);
-            if (DateTime.UtcNow - started > _defaultTimeout)
+            await Task.Delay(_sleepTime);
+
+            if (DateTime.UtcNow - started > _timeout)
                 throw new TimeoutException($"Could not connect to database ({msg}), exceeded retry limit.");
         }
     }
@@ -60,7 +62,7 @@ public class PostgresqlUpgrader : IRepositoryUpgrader
                     .PostgresqlDatabase(connectionString)
                     .WithScriptsEmbeddedInAssembly(typeof(PostgresqlUpgrader).Assembly)
                     .LogTo(new LoggerWrapper(_logger))
-                    .WithExecutionTimeout(TimeSpan.FromMinutes(5))
+                    .WithExecutionTimeout(_timeout)
                     .Build();
     }
 
