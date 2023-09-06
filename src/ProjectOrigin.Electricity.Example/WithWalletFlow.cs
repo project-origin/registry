@@ -47,7 +47,7 @@ public class WithWalletFlow
         var consClient = new RegistryV1.RegistryService.RegistryServiceClient(consChannel);
 
         // Create channel and client
-        var walletChannel = GrpcChannel.ForAddress("https://localhost:5001");
+        var walletChannel = GrpcChannel.ForAddress(WalletAddress);
         var walletClient = new WalletV1.WalletService.WalletServiceClient(walletChannel);
         var receiveClient = new WalletV1.ReceiveSliceService.ReceiveSliceServiceClient(walletChannel);
 
@@ -67,10 +67,11 @@ public class WithWalletFlow
 
         // ------------------  Issue Consumption ------------------
         // Create a new ConsumptionIssuedEvent, sign it and sent it to the registry.
-        var consCertId = eventBuilder.ToCertId(ConsRegistryName, Guid.NewGuid());
-        var consCommitmentInfo = new SecretCommitmentInfo(250);
         {
             Console.WriteLine($"Issuing consumption Granular Certificate");
+
+            var consCertId = eventBuilder.ToCertId(ConsRegistryName, Guid.NewGuid());
+            var consCommitmentInfo = new SecretCommitmentInfo(250);
 
             // Set next deposit endpoint position
             depositEndpointPosition++;
@@ -93,10 +94,11 @@ public class WithWalletFlow
 
         // ------------------  Issue production ------------------
         // Create a new ProductionIssuedEvent, sign it and sent it to the registry.
-        var prodCertId = eventBuilder.ToCertId(ProdRegistryName, Guid.NewGuid());
-        var prodCommitmentInfo = new SecretCommitmentInfo(350);
         {
             Console.WriteLine($"Issuing Production Granular Certificate");
+
+            var prodCertId = eventBuilder.ToCertId(ProdRegistryName, Guid.NewGuid());
+            var prodCommitmentInfo = new SecretCommitmentInfo(350);
 
             // Set next deposit endpoint position
             depositEndpointPosition++;
@@ -111,14 +113,15 @@ public class WithWalletFlow
             var signedTransaction = issuerKey.SignTransaction(productionIssued.CertificateId, productionIssued);
 
             // Send transaction to registry, and wait for committed state
-            await consClient.SendTransactionAndWait(signedTransaction);
+            await prodClient.SendTransactionAndWait(signedTransaction);
 
             // Send information to wallet using the original publicKey and position
-            await SendInfoToWallet(receiveClient, depositEndpointPosition, depositEndpoint.WalletDepositEndpoint.PublicKey, prodCertId, consCommitmentInfo);
+            await SendInfoToWallet(receiveClient, depositEndpointPosition, depositEndpoint.WalletDepositEndpoint.PublicKey, prodCertId, prodCommitmentInfo);
         }
 
         // ------------------  Query wallet ------------------
         {
+            await Task.Delay(5000);
             Console.WriteLine($"Querying wallet");
 
             var walletInfo = await walletClient.QueryGranularCertificatesAsync(new WalletV1.QueryRequest(), header);

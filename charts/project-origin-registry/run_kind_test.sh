@@ -85,7 +85,7 @@ EOF
 
 # generate values
 cat << EOF > "${wallet_filename}"
-services:
+service:
   type: NodePort
   nodePort: ${wallet_nodeport}
 wallet:
@@ -98,7 +98,7 @@ registries:
 EOF
 
 # install wallet
-helm install my-wallet project-origin-wallet --version 0.2.0-rc.8 -f "${wallet_filename}" --repo https://project-origin.github.io/helm-registry --namespace wallet --create-namespace --wait
+helm install my-wallet project-origin-wallet --version 0.2.0-rc.13 -f "${wallet_filename}" --repo https://project-origin.github.io/helm-registry --namespace wallet --create-namespace --wait
 echo "Wallet installed"
 
 # install two registries
