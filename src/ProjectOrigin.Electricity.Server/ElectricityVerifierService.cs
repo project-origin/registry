@@ -1,34 +1,51 @@
 using System.Threading.Tasks;
 using Grpc.Core;
+using Microsoft.Extensions.Logging;
+using ProjectOrigin.Electricity.Server.Exceptions;
 using ProjectOrigin.Electricity.Server.Interfaces;
 using ProjectOrigin.Verifier.V1;
 
 namespace ProjectOrigin.Electricity.Server;
 
-internal class ElectricityVerifierService : ProjectOrigin.Verifier.V1.VerifierService.VerifierServiceBase
+internal class ElectricityVerifierService : VerifierService.VerifierServiceBase
 {
-    private IVerifierDispatcher _verifierDispatcher;
+    private readonly ILogger<ElectricityVerifierService> _logger;
+    private readonly IVerifierDispatcher _verifierDispatcher;
 
-    public ElectricityVerifierService(IVerifierDispatcher verifierDispatcher)
+    public ElectricityVerifierService(ILogger<ElectricityVerifierService> logger, IVerifierDispatcher verifierDispatcher)
     {
+        _logger = logger;
         _verifierDispatcher = verifierDispatcher;
     }
 
     public override async Task<VerifyTransactionResponse> VerifyTransaction(VerifyTransactionRequest request, ServerCallContext context)
     {
-        var result = await _verifierDispatcher.Verify(request.Transaction, request.Stream);
-
-        var response = new VerifyTransactionResponse
+        try
         {
-            Valid = true
-        };
+            var result = await _verifierDispatcher.Verify(request.Transaction, request.Stream);
 
-        if (result is VerificationResult.Invalid)
-        {
-            response.Valid = false;
-            response.ErrorMessage = ((VerificationResult.Invalid)result).ErrorMessage;
+            var response = new VerifyTransactionResponse
+            {
+                Valid = true
+            };
+
+            if (result is VerificationResult.Invalid)
+            {
+                response.Valid = false;
+                response.ErrorMessage = ((VerificationResult.Invalid)result).ErrorMessage;
+            }
+
+            return response;
         }
+        catch (InvalidPayloadException ex)
+        {
+            _logger.LogError(ex, "Invalid payload while verifying transaction");
 
-        return response;
+            return new VerifyTransactionResponse
+            {
+                Valid = false,
+                ErrorMessage = ex.Message
+            };
+        }
     }
 }
