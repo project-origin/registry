@@ -1,3 +1,5 @@
+**/Dockerfile.tmp
+
 # ignore dotnet code coverage files
 **/coverage.cobertura.xml
 

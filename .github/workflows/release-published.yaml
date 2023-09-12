@@ -50,58 +50,28 @@ jobs:
         run: dotnet nuget push build/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
 
   publish-electricity-server-container:
-    name: Publish Electricity Server container
-    runs-on: ubuntu-22.04
     needs:
       - define-version
-    env:
-      name: electricity-server
-      project: src/ProjectOrigin.Electricity.Server
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Log in to the Container registry
-        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
-        with:
-          context: ./src
-          file: ${{ env.project }}/Dockerfile
-          push: true
-          tags: ghcr.io/project-origin/${{ env.name }}:${{ needs.define-version.outputs.version }}
+    uses: project-origin/.github/.github/workflows/reusable-build-container.yaml@main
+    with:
+      imagename: ghcr.io/project-origin/electricity-server
+      version: ${{ needs.define-version.outputs.version }}
+      context: ./src
+      dockerfile: ./src/ProjectOrigin.Electricity.Server/Dockerfile
+    secrets:
+      pushtoken: ${{ github.token }}
 
   publish-registry-server-container:
-    name: Publish Registry Server container
-    runs-on: ubuntu-22.04
     needs:
       - define-version
-    env:
-      name: registry-server
-      project: src/ProjectOrigin.Registry.Server
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Log in to the Container registry
-        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
-        with:
-          context: ./src
-          file: ${{ env.project }}/Dockerfile
-          push: true
-          tags: ghcr.io/project-origin/${{ env.name }}:${{ needs.define-version.outputs.version }}
+    uses: project-origin/.github/.github/workflows/reusable-build-container.yaml@main
+    with:
+      imagename: ghcr.io/project-origin/registry-server
+      version: ${{ needs.define-version.outputs.version }}
+      context: ./src
+      dockerfile: ./src/ProjectOrigin.Registry.Server/Dockerfile
+    secrets:
+      pushtoken: ${{ github.token }}
 
   publish-chart:
     name: Publish helm chart
