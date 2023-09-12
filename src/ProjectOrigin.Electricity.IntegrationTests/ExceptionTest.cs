@@ -23,8 +23,8 @@ public class ExceptionTest : GrpcTestBase<Startup>
 {
     private IPrivateKey _issuerKey;
 
-    const string Area = "TestArea";
-    const string Registry = "test-registry";
+    private const string Area = "TestArea";
+    private const string Registry = "test-registry";
 
     public ExceptionTest(GrpcTestFixture<Startup> grpcFixture, ITestOutputHelper outputHelper) : base(grpcFixture, outputHelper)
     {

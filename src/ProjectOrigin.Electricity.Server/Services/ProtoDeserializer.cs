@@ -40,9 +40,7 @@ public class ProtoDeserializer : IProtoDeserializer
                 throw new InvalidPayloadException($"Could not deserialize invalid payload of type ”{type}”", ex);
             }
         }
-        else
-        {
-            throw new InvalidPayloadException($"Could not deserialize unknown type ”{type}”");
-        }
+
+        throw new InvalidPayloadException($"Could not deserialize unknown type ”{type}”");
     }
 }
