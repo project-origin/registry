@@ -21,7 +21,7 @@ namespace ProjectOrigin.Electricity.IntegrationTests;
 
 public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixture>, IClassFixture<PostgresDatabaseFixture>
 {
-    private const string ElectricityVerifierImage = "ghcr.io/project-origin/electricity-server:0.2.0-rc.17";
+    private const string ElectricityVerifierImage = "ghcr.io/project-origin/electricity-server:0.2.2";
     private const int GrpcPort = 80;
     private const string IssuerArea = "Narnia";
     private const string RegistryName = "TheRegistry";
