@@ -3,7 +3,7 @@ name: Renovate Self-Hosted
 on:
   push:
     branches:
-      - '*'
+      - '**'
 
 jobs:
   renovate:
