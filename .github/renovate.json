@@ -4,10 +4,14 @@
     ],
     "packageRules": [
         {
-            "matchPackagePatterns": [
+            "groupName": "dotnet",
+            "description": "Dotnet packages",
+            "matchDatasources": [
                 "nuget"
             ],
-            "groupName": "nuget"
+            "matchPackagePatterns": [
+                ".*"
+            ]
         }
     ]
 }
