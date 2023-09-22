@@ -12,20 +12,26 @@ using System.Collections.Generic;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
-public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityServiceFixture>
+public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityServiceFixture>, IClassFixture<PostgresDatabaseFixture>
 {
     protected ElectricityServiceFixture _verifierFixture;
+    private PostgresDatabaseFixture _postgresDatabaseFixture;
     protected const string RegistryName = "SomeRegistry";
 
     protected Registry.V1.RegistryService.RegistryServiceClient Client => new(_grpcFixture.Channel);
 
-    public FlowTests(ElectricityServiceFixture verifierFixture, GrpcTestFixture<Startup> grpcFixture, ITestOutputHelper outputHelper) : base(grpcFixture, outputHelper)
+    public FlowTests(ElectricityServiceFixture verifierFixture, GrpcTestFixture<Startup> grpcFixture, PostgresDatabaseFixture postgresDatabaseFixture, ITestOutputHelper outputHelper) : base(grpcFixture, outputHelper)
     {
         _verifierFixture = verifierFixture;
+        _postgresDatabaseFixture = postgresDatabaseFixture;
         grpcFixture.ConfigureHostConfiguration(new Dictionary<string, string?>()
         {
+            {"RegistryName", RegistryName},
             {$"Verifiers:project_origin.electricity.v1", _verifierFixture.Url},
-            {"RegistryName", RegistryName}
+            {$"ImmutableLog:type", "log"},
+            {"BlockFinalizer:Interval", "00:00:05"},
+            {"Persistance:type", "postgresql"},
+            {"Persistance:postgresql:ConnectionString", _postgresDatabaseFixture.HostConnectionString},
         });
     }
 

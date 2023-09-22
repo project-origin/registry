@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
+using ProjectOrigin.Electricity.Server.Exceptions;
 using ProjectOrigin.Electricity.Server.Interfaces;
 
 namespace ProjectOrigin.Electricity.Server.Services;
@@ -27,7 +29,18 @@ public class ProtoDeserializer : IProtoDeserializer
 
     public IMessage Deserialize(string type, ByteString content)
     {
-        var descriptor = _typeDictionary[type];
-        return descriptor.Parser.ParseFrom(content);
+        if (_typeDictionary.TryGetValue(type, out var descriptor))
+        {
+            try
+            {
+                return descriptor.Parser.ParseFrom(content);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidPayloadException($"Could not deserialize invalid payload of type ”{type}”", ex);
+            }
+        }
+
+        throw new InvalidPayloadException($"Could not deserialize unknown type ”{type}”");
     }
 }

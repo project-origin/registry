@@ -1,0 +1,48 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: po-registry-migrate-job-{{ .Values.image.tag | default .Chart.AppVersion | replace "." "-" }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  backoffLimit: 0
+  parallelism: 1
+  completions: 1
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: po-registry-migrate-job
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          args:
+            - "--migrate"
+          env:
+          # persistance - inMemory
+          {{- if .Values.persistance.inMemory.enabled }}
+            - name: PERSISTANCE__TYPE
+              value: in_memory
+          {{- end }}
+
+          # persistance - cloudNativePG
+          {{- if .Values.persistance.cloudNativePG.enabled }}
+            - name: PERSISTANCE__TYPE
+              value: postgresql
+            - name: DB_HOST
+              value: {{ .Values.persistance.cloudNativePG.name }}-rw
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_DATABASE
+              value: {{ .Values.persistance.cloudNativePG.database }}
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.persistance.cloudNativePG.name }}-app
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.persistance.cloudNativePG.name }}-app
+                  key: password
+            - name: PERSISTANCE__POSTGRESQL__CONNECTIONSTRING
+              value: Host=$(DB_HOST); Port=$(DB_PORT); Database=$(DB_DATABASE); Username=$(DB_USERNAME); Password=$(DB_PASSWORD);
+          {{- end }}

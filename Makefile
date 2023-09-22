@@ -8,7 +8,7 @@ formatting_command := \033[1;34m
 formatting_desc := \033[0;32m
 formatting_none := \033[0m
 
-.PHONY: help verify info lint clean restore build format test unit-test verify-chart doc-serve concordium-tests
+.PHONY: help verify info lint clean build format test unit-test verify-chart doc-serve concordium-tests
 
 .DEFAULT_GOAL := help
 
@@ -33,17 +33,17 @@ lint:
 	@echo "Verifying code formatting..."
 	dotnet format $(src_path) --verify-no-changes
 
-
 ## Does a dotnet clean
 clean:
 	dotnet clean $(src_path)
 
 ## Restores all dotnet projects
 restore:
+	dotnet tool restore --tool-manifest src/.config/dotnet-tools.json
 	dotnet restore $(src_path)
 
 ## Builds all the code
-build:
+build: restore
 	dotnet build $(src_path)
 
 ## Formats files using dotnet format
@@ -59,7 +59,7 @@ unit-test:
 	dotnet test $(src_path) --filter 'FullyQualifiedName!~IntegrationTests'
 
 ## Builds the local container, creates kind cluster and installs chart, and verifies it works
-verify-chart:
+verify-chart: restore
 	@kind version >/dev/null 2>&1 || { echo >&2 "kind not installed! kind is required to use recipe, please install or use devcontainer"; exit 1;}
 	@helm version >/dev/null 2>&1 || { echo >&2 "helm not installed! helm is required to use recipe, please install or use devcontainer"; exit 1;}
 	charts/project-origin-registry/run_kind_test.sh

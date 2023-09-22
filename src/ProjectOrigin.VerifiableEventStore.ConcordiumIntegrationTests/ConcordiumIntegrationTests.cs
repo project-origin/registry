@@ -1,8 +1,11 @@
 using System;
 using System.Threading.Tasks;
+using FluentAssertions;
+using Google.Protobuf;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector;
+using ProjectOrigin.ImmutableLog.V1;
 using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector.Concordium;
 using Xunit;
 
@@ -10,73 +13,42 @@ namespace ProjectOrigin.VerifiableEventStore.ConcordiumIntegrationTests;
 
 public class ConcordiumIntegrationTests
 {
-    const string NodeAddress = "http://testnet-node:10001";
+    const string NodeAddress = "http://testnet-node:20001";
     const string NodeToken = "rpcadmin";
-    const int FiveSeconds = 5000;
+    private readonly ConcordiumPublisher _publisher;
 
-    [Fact]
-    public async Task GetRandomKnownTransaction_Success()
+    public ConcordiumIntegrationTests()
     {
-        var randomKnownTransactionHash = "f8931b7da1f1464453d78e8ab606dee44b3bca00c91170e2fcbcba552da485f4";
-        var knownBlockId = "06a531f87594658eee1aeb369b3e755e5b5bb6a34501aa5d24e2adfa025e7343";
+        Mock<ILogger<ConcordiumPublisher>> logMock = new();
+        var options = Options.Create(new ConcordiumOptions()
+        {
+            Address = NodeAddress,
+            AuthenticationToken = NodeToken,
+            AccountAddress = GetRequiredEnvironmentVariable("AccountAddress"),
+            AccountKey = GetRequiredEnvironmentVariable("AccountKey")
+        });
 
-        var connector = GetConcordiumConnector();
-
-        var block = await connector.GetBlock(new TransactionReference(randomKnownTransactionHash));
-
-        Assert.NotNull(block);
-        Assert.True(block?.Final);
-        Assert.Equal(knownBlockId, block?.BlockId);
-    }
-
-    [Fact]
-    public async Task PublishHelloWorld_Success()
-    {
-        var connector = GetConcordiumConnector();
-
-        var transactionRef = await connector.PublishBytes(System.Text.Encoding.UTF8.GetBytes("Hello world"));
-
-        Assert.NotNull(transactionRef);
+        _publisher = new ConcordiumPublisher(logMock.Object, options);
     }
 
     [Fact]
     public async Task PublishAndWaitForTransaction_Success()
     {
-        var connector = GetConcordiumConnector();
-
-        var transactionRef = await connector.PublishBytes(System.Text.Encoding.UTF8.GetBytes("Hello world"));
-
-        Block? block;
-        var i = 0;
-        do
+        var header = new BlockHeader
         {
-            await Task.Delay(FiveSeconds);
-            block = await connector.GetBlock(transactionRef);
-        }
-        while (block is null && i++ < 10);
+            PreviousHeaderHash = ByteString.CopyFrom(new byte[32]),
+            PreviousPublicationHash = ByteString.CopyFrom(new byte[32]),
+            MerkleRootHash = ByteString.CopyFrom(System.Text.Encoding.UTF8.GetBytes("Hello world")),
+            CreatedAt = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(DateTime.UtcNow)
+        };
 
-        Assert.NotNull(block);
-        Assert.True(block?.Final);
+        var blockPublication = await _publisher.PublishBlock(header);
+
+        blockPublication.Concordium.TransactionHash.Length.Should().BeGreaterThan(0);
+        blockPublication.Concordium.BlockHash.Length.Should().BeGreaterThan(0);
     }
 
-    private ConcordiumConnector GetConcordiumConnector()
-    {
-        var accountAddress = GetEnvironmentVariable("AccountAddress");
-        var accountKey = GetEnvironmentVariable("AccountKey");
-
-        var optionsMock = new Mock<IOptions<ConcordiumOptions>>();
-        optionsMock.Setup(obj => obj.Value).Returns(new ConcordiumOptions()
-        {
-            Address = NodeAddress,
-            AuthenticationToken = NodeToken,
-            AccountAddress = accountAddress,
-            AccountKey = accountKey
-        });
-
-        return new ConcordiumConnector(optionsMock.Object);
-    }
-
-    private string GetEnvironmentVariable(string name)
+    private static string GetRequiredEnvironmentVariable(string name)
     {
         return Environment.GetEnvironmentVariable(name) ?? throw new ArgumentException($"Environment variable ”{name}” does not exist!");
     }

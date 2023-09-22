@@ -1,13 +1,33 @@
+using System;
 using Microsoft.AspNetCore.Builder;
-using ProjectOrigin.Electricity.Server;
+using Microsoft.Extensions.Configuration;
+using ProjectOrigin.Electricity.Extensions;
+using Serilog;
 
-var startup = new Startup();
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+var configuration = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json", optional: false)
+    .AddJsonFile($"appsettings.{environment}.json", optional: true)
+    .AddEnvironmentVariables()
+    .AddCommandLine(args)
+    .Build();
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Logger = configuration.GetSeriLogger();
 
-startup.ConfigureServices(builder.Services);
+try
+{
+    Log.Information("Starting server.");
+    WebApplication app = configuration.BuildApp();
 
-var app = builder.Build();
-startup.Configure(app, builder.Environment);
-
-app.Run();
+    await app.RunAsync();
+    Log.Information("Server stopped.");
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Host terminated unexpectedly");
+    Environment.ExitCode = -1;
+}
+finally
+{
+    Log.CloseAndFlush();
+}
