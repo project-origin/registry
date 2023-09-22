@@ -5,7 +5,6 @@ using Xunit;
 using ProjectOrigin.TestUtils;
 using AutoFixture;
 using Microsoft.Extensions.Options;
-using ProjectOrigin.HierarchicalDeterministicKeys.Implementations;
 using System;
 using System.Text;
 using ProjectOrigin.HierarchicalDeterministicKeys;

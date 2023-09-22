@@ -5,23 +5,29 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry.Metrics;
+using ProjectOrigin.Registry.Server.Extensions;
 using ProjectOrigin.Registry.Server.Interfaces;
 using ProjectOrigin.Registry.Server.Models;
 using ProjectOrigin.Registry.Server.Services;
 using ProjectOrigin.VerifiableEventStore.Models;
-using ProjectOrigin.VerifiableEventStore.Services.BatchProcessor;
-using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector;
-using ProjectOrigin.VerifiableEventStore.Services.EventStore;
+using ProjectOrigin.VerifiableEventStore.Services.BlockFinalizer;
 using ProjectOrigin.VerifiableEventStore.Services.TransactionStatusCache;
 
 namespace ProjectOrigin.Registry.Server;
 
 public class Startup
 {
+    private readonly IConfiguration _configuration;
+
+    public Startup(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddGrpc();
-        services.AddHostedService<BatchProcessorBackgroundService>();
+        services.AddHostedService<BlockFinalizerBackgroundService>();
         services.AddTransient<ITransactionStatusService, TransactionStatusService>();
         services.AddSingleton<ITransactionDispatcher, TransactionDispatcher>();
 
@@ -29,7 +35,7 @@ public class Startup
             .WithMetrics(provider =>
                 provider
                     .AddMeter(InstrumentationOptions.MeterName)
-                    .AddMeter(BatchProcessorJob.Meter.Name)
+                    .AddMeter(BlockFinalizerJob.Meter.Name)
                     .AddMeter(RegistryService.Meter.Name)
                     .AddPrometheusExporter()
             );
@@ -46,15 +52,16 @@ public class Startup
             configuration.Bind(settings);
         });
 
-        services.AddOptions<VerifiableEventStoreOptions>().Configure<IConfiguration>((settings, configuration) =>
+        services.AddOptions<BlockFinalizationOptions>().Configure<IConfiguration>((settings, configuration) =>
         {
-            configuration.GetSection("VerifiableEventStore").Bind(settings);
+            configuration.GetSection("BlockFinalizer").Bind(settings);
         });
+
+        services.ConfigureImmutableLog(_configuration);
+        services.ConfigurePersistance(_configuration);
 
         // Memory only section
         services.AddDistributedMemoryCache();
-        services.AddTransient<IBlockchainConnector, LogBlockchainConnector>();
-        services.AddSingleton<IEventStore, MemoryEventStore>();
         services.AddMassTransit(x =>
         {
             x.AddConsumer<VerifyTransactionConsumer, VerifyTransactionConsumerDefinition>();
@@ -79,4 +86,5 @@ public class Startup
 
         app.UseOpenTelemetryPrometheusScrapingEndpoint();
     }
+
 }
