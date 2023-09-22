@@ -1,0 +1,13 @@
+{
+    "labels": [
+        "dependencies"
+    ],
+    "packageRules": [
+        {
+            "matchPackagePatterns": [
+                "nuget"
+            ],
+            "groupName": "nuget"
+        }
+    ]
+}
