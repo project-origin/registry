@@ -1,9 +1,8 @@
-name: Renovate Self-Hosted
+name: Renovate
 
 on:
-  push:
-    branches:
-      - '**'
+  schedule:
+    - cron: 0 * * * *
 
 jobs:
   renovate:
