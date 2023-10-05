@@ -57,6 +57,12 @@ enum GranularCertificateType {
 message Attribute {
     string Key = 1;
     string Value = 2;
+    AttributeType Type = 3;
+}
+
+enum AttributeType {
+    CLEARTEXT = 0;
+    HASHED = 1;
 }
 
 message DateInterval {
