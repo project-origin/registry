@@ -60,7 +60,7 @@ message Attribute {
     AttributeType Type = 3;
 }
 
-enum AttributeType {
+enum AttributeType {
     CLEARTEXT = 0;
     HASHED = 1;
 }
