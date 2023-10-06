@@ -69,22 +69,20 @@ jobs:
 
   verify-electricity-server-container-build:
     name: Verify electricity container can be built.
-    uses: project-origin/.github/.github/workflows/reusable-build-container.yaml@main
+    uses: project-origin/.github/.github/workflows/reusable-build-push-container-ghcr.yaml@main
     with:
       imagename: ghcr.io/project-origin/electricity-server
       version: test
       context: ./src
       dockerfile: ./src/ProjectOrigin.Electricity.Server/Dockerfile
-    secrets:
-      pushtoken: ''
+      push: false
 
   verify-registry-server-container-build:
     name: Verify registry container can be built.
-    uses: project-origin/.github/.github/workflows/reusable-build-container.yaml@main
+    uses: project-origin/.github/.github/workflows/reusable-build-push-container-ghcr.yaml@main
     with:
       imagename: ghcr.io/project-origin/registry-server
       version: test
       context: ./src
       dockerfile: ./src/ProjectOrigin.Registry.Server/Dockerfile
-    secrets:
-      pushtoken: ''
+      push: false

@@ -52,26 +52,24 @@ jobs:
   publish-electricity-server-container:
     needs:
       - define-version
-    uses: project-origin/.github/.github/workflows/reusable-build-container.yaml@main
+    uses: project-origin/.github/.github/workflows/reusable-build-push-container-ghcr.yaml@main
     with:
       imagename: ghcr.io/project-origin/electricity-server
       version: ${{ needs.define-version.outputs.version }}
       context: ./src
       dockerfile: ./src/ProjectOrigin.Electricity.Server/Dockerfile
-    secrets:
-      pushtoken: ${{ github.token }}
+      push: true
 
   publish-registry-server-container:
     needs:
       - define-version
-    uses: project-origin/.github/.github/workflows/reusable-build-container.yaml@main
+    uses: project-origin/.github/.github/workflows/reusable-build-push-container-ghcr.yaml@main
     with:
       imagename: ghcr.io/project-origin/registry-server
       version: ${{ needs.define-version.outputs.version }}
       context: ./src
       dockerfile: ./src/ProjectOrigin.Registry.Server/Dockerfile
-    secrets:
-      pushtoken: ${{ github.token }}
+      push: true
 
   publish-chart:
     name: Publish helm chart
