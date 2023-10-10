@@ -21,11 +21,11 @@
     <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
     <PackageReference Include="Testcontainers" Version="3.2.0" />
     <PackageReference Include="ProjectOrigin.PedersenCommitment" Version="1.0.3" />
+    <PackageReference Include="ProjectOrigin.HierarchicalDeterministicKeys" Version="0.2.0-rc.16" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ProjectOrigin.TestUtils\ProjectOrigin.TestUtils.csproj" />
-    <ProjectReference Include="..\ProjectOrigin.HierarchicalDeterministicKeys\ProjectOrigin.HierarchicalDeterministicKeys.csproj" />
     <ProjectReference Include="..\ProjectOrigin.Registry.Server\ProjectOrigin.Registry.Server.csproj" />
   </ItemGroup>
 
