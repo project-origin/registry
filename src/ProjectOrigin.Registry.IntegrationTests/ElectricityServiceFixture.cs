@@ -35,11 +35,11 @@ public class ElectricityServiceFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        await _container.StartAsync().ConfigureAwait(false);
+        await _container.StartAsync();
     }
 
     public async Task DisposeAsync()
     {
-        await _container.StopAsync().ConfigureAwait(false);
+        await _container.StopAsync();
     }
 }

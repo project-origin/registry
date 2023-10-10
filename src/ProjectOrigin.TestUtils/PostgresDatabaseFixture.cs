@@ -43,7 +43,7 @@ public class PostgresDatabaseFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        await _postgreSqlContainer.StartAsync().ConfigureAwait(false);
+        await _postgreSqlContainer.StartAsync();
         var mockLogger = new Mock<ILogger<PostgresqlUpgrader>>();
         var upgrader = new PostgresqlUpgrader(mockLogger.Object, Options.Create(new PostgresqlEventStoreOptions
         {
@@ -61,6 +61,6 @@ public class PostgresDatabaseFixture : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        await _postgreSqlContainer.StopAsync().ConfigureAwait(false);
+        await _postgreSqlContainer.StopAsync();
     }
 }

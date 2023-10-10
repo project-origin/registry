@@ -25,14 +25,14 @@ public class ContainerImageFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        await _image.CreateAsync().ConfigureAwait(false);
+        await _image.CreateAsync();
     }
 
     public async Task DisposeAsync()
     {
         File.Delete(_tempDockerPath);
-        await _image.DeleteAsync().ConfigureAwait(false);
-        await _image.DisposeAsync().ConfigureAwait(false);
+        await _image.DeleteAsync();
+        await _image.DisposeAsync();
     }
 
     private static string CreateTempDockerfileWithoutPlatform(string source)
