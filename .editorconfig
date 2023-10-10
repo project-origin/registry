@@ -16,6 +16,9 @@ indent_size = 4
 [*.sh]
 indent_size = 4
 
+[Makefile]
+indent_style = tab
+
 [*.cs]
 indent_size = 4
 
