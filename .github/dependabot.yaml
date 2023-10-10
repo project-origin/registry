@@ -6,4 +6,5 @@ updates:
       interval: "daily"
     groups:
       nuget:
-        patterns: "*"
+        patterns:
+          - "*"
