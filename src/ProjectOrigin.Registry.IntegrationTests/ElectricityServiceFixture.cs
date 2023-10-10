@@ -9,7 +9,7 @@ using Xunit;
 
 public class ElectricityServiceFixture : IAsyncLifetime
 {
-    private const string ElectricityVerifierImage = "ghcr.io/project-origin/electricity-server:0.2.0-rc.17";
+    private const string ElectricityVerifierImage = "ghcr.io/project-origin/electricity-server:0.3.0";
     private const int GrpcPort = 80;
 
     public string IssuerArea => "SomeArea";

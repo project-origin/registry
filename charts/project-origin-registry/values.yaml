@@ -60,7 +60,7 @@ verifiers:
       # repository is the repository to pull the image from
       repository: ghcr.io/project-origin/electricity-server
       # tag is the tag to pull
-      tag: 0.2.0-rc.17
+      tag: 0.3.0
 
     # issuers defines the currently accepted issuers for given areas.
     issuers: []

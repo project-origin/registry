@@ -38,7 +38,7 @@ public class ContainerImageFixture : IAsyncLifetime
     private static string CreateTempDockerfileWithoutPlatform(string source)
     {
         var target = $"{source}.tmp";
-        File.WriteAllText(target, File.ReadAllText(source).Replace("--platform=$BUILDPLATFORM", ""));
+        File.WriteAllText(target, File.ReadAllText(source).Replace(" --platform=$BUILDPLATFORM", ""));
         return target;
     }
 }
