@@ -179,13 +179,13 @@ public abstract class AbstractTransactionRepositoryTests<T> where T : ITransacti
     public async Task Can_Create_Next_Block_For_Finalization(int numberOfTransaction)
     {
         // Given
-        var transactions = Enumerable.Range(0, numberOfTransaction)
-            .Select(i =>
-            {
-                var @event = CreateFakeEvent(Guid.NewGuid(), 0);
-                Repository.Store(@event).Wait();
-                return @event;
-            }).ToList();
+        var transactions = new List<StreamTransaction>();
+        foreach (var i in Enumerable.Range(0, numberOfTransaction))
+        {
+            var @event = CreateFakeEvent(Guid.NewGuid(), 0);
+            await Repository.Store(@event);
+            transactions.Add(@event);
+        }
 
         // When
         var newBlock = await Repository.CreateNextBlock();

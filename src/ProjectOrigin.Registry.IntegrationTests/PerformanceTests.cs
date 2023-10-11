@@ -21,7 +21,7 @@ namespace ProjectOrigin.Electricity.IntegrationTests;
 
 public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixture>, IClassFixture<PostgresDatabaseFixture>
 {
-    private const string ElectricityVerifierImage = "ghcr.io/project-origin/electricity-server:0.2.2";
+    private const string ElectricityVerifierImage = "ghcr.io/project-origin/electricity-server:0.3.0";
     private const int GrpcPort = 80;
     private const string IssuerArea = "Narnia";
     private const string RegistryName = "TheRegistry";
@@ -99,7 +99,7 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
                 {
                     if (queued.Count < concurrentRequests)
                     {
-                        queued.Enqueue(await SendRequest(channel).ConfigureAwait(false));
+                        queued.Enqueue(await SendRequest(channel));
                     }
                     else
                     {
@@ -112,14 +112,14 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
                             else
                             {
                                 queued.Enqueue(transaction);
-                                await Task.Delay(25).ConfigureAwait(false);
+                                await Task.Delay(25);
                             }
                         }
                     }
                 }
             });
         }
-        await Task.Delay(TimeSpan.FromMinutes(5)).ConfigureAwait(false);
+        await Task.Delay(TimeSpan.FromMinutes(5));
         stopwatch.Stop();
 
         var elapsedSeconds = stopwatch.Elapsed.TotalSeconds;
@@ -146,10 +146,10 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
         foreach (var i in Enumerable.Range(0, count))
         {
             stopwatch.Restart();
-            var transaction = await SendRequest(channel).ConfigureAwait(false);
-            while (!await IsCommitted(channel, transaction).ConfigureAwait(false))
+            var transaction = await SendRequest(channel);
+            while (!await IsCommitted(channel, transaction))
             {
-                await Task.Delay(25).ConfigureAwait(false);
+                await Task.Delay(25);
             }
 
             stopwatch.Stop();
@@ -183,14 +183,14 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            var transaction = await SendRequest(channel).ConfigureAwait(false);
+            var transaction = await SendRequest(channel);
 
             queued.Enqueue((stopwatch, transaction));
         }
 
         while (queued.TryDequeue(out var item))
         {
-            if (await IsCommitted(channel, item.transaction).ConfigureAwait(false))
+            if (await IsCommitted(channel, item.transaction))
             {
                 item.stopwatch.Stop();
                 measurements.Add(item.stopwatch.ElapsedMilliseconds);
@@ -198,7 +198,7 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
             else
             {
                 queued.Enqueue(item);
-                await Task.Delay(25).ConfigureAwait(false);
+                await Task.Delay(25);
             }
         }
 
@@ -236,13 +236,8 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
     {
         try
         {
-
-            await _verifierContainer.StartAsync()
-                .ConfigureAwait(false);
-
-            await _registryContainer.Value.StartAsync()
-                .ConfigureAwait(false);
-
+            await _verifierContainer.StartAsync();
+            await _registryContainer.Value.StartAsync();
             await _postgresDatabaseFixture.ResetDatabase();
         }
         catch (Exception)
