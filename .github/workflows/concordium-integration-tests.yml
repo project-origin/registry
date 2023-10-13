@@ -18,9 +18,6 @@ jobs:
       - name: Setup .NET Core SDK from global.json
         uses: actions/setup-dotnet@v3
 
-      - name: Print length of key for debugging
-        run: echo "${{ secrets.AccountKey }}" | wc -c
-
       - name: Run integration tests
         env:
           AccountAddress: ${{ secrets.AccountAddress }}
