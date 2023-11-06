@@ -28,7 +28,7 @@ Any system can be tampered with, but the goal is to make it detectable and hold 
 
 Each registry can hold any number of [GCs](../concept/granular-certificates/readme.md).
 It is up to the issuing body[^ib] to specify which registry to put a GC on
-at the time of issuance with the help of the [Federated Certificate ID](../concept/granular-certificates/federated-certificate-id.md).
+at the time of issuance with the help of the [Federated Certificate ID](../concept/granular-certificates/federated-certifate-id.md).
 
 [^ib]: The issuing body is the entity that has the legal right to issue GCs within a given area.
 
@@ -37,7 +37,7 @@ and reduce the need for distributed transactions.
 
 In practice this makes each registry the authority of what is the truth for the current state of a GCs held within it.
 
-Some transactions like [claim](../granular-certificates/transactions/claim.md)
+Some transactions like [claim](../concept/granular-certificates/transactions/claim.md)
 does span multiple registries, but are performed as a distributed transaction using a saga pattern.
 
 
