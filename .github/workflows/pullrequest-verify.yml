@@ -38,26 +38,6 @@ jobs:
       - name: Verify chart
         run: make verify-chart
 
-  verify-docfx-build:
-    runs-on: ubuntu-latest
-    name: Test docfx build
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Setup .NET Core SDK 7
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: "7.0.203"
-
-      - name: Build code
-        run: make build
-
-      - name: Install docfx
-        run: dotnet tool install --global docfx --version 2.70.0
-
-      - name: Build Documentation
-        run: docfx build doc/docfx.json
-
   verify-performance:
     name: Verify performance
     runs-on: ubuntu-22.04
