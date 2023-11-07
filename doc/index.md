@@ -1,77 +1,59 @@
-# Project-Origin
-## How to run and test the registry
-The registry is currently available as .devcontainer in the repository. This means that you can run the registry in a docker container with all the dependencies installed.
+# Overview
 
-### Prerequisites
-- [Docker](https://docs.docker.com/get-docker/)
-- [VSCode](https://code.visualstudio.com/download)
+This file contains a overview of the registry.
 
-### Steps
-1. Clone the [repository](https://github.com/project-origin/registry/tree/main)
-2. Open the repository in VSCode
-3. Install the [Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension
-4. Open the Command Palette (Ctrl+Shift+P) and select the Remote-Containers: Reopen in Container command.
-5. Check the ports terminal to see which ports are available## What is Project-Origin?
+## Glossary
 
-Project-Origin is a Open Source project to create a **[Federated](https://arxiv.org/pdf/1202.4503.pdf) Registry**
-to handle [**Granular Certificates**](concept/granular-certificates/readme.md)  (GCs). 
-The GCs purpose is to prove the origin and potential conversions of energy, thus supporting the green transition and Power-to-X (PtX).
+- **Transactions**: are request to change data on the registry. A transaction is signed by a valid key.
+- **Stream**: are sequences of transactions for a specific  are state changes that has happened and are persisted when they have been included in a merkle tree.
+- **Event store**: a datastore that stores all the events for the registry.
 
-## Why Project-Origin?
-The GCs purpose is to prove the origin and potential conversions of energy, thus supporting the green transition and power-to-X (PtX).
+## Overview
 
-If one searches for greenwashing, there is no shortages of articles on the internet showing a growing scepticism with [the current system](https://en.energinet.dk/Energy-data/Guarantees-of-origin-el-gas-hydrogen/) for proving the origin of electricity.
+Below is a [system context diagram](https://c4model.com/#SystemContextDiagram)
+showing the landscape of systems the registry interacts with.
 
-Project-Origin was created because there is a need to provide a trustworthy,
-**publicly verifiable** way to prove the origin of the electricity one uses on
-with a high granularity. 
-The project aims to enable extended use of the implementation, to other energy forms than electricity alone. 
-
-## How it Works
-
-To make the data **publicly verifiable**, it is required for data
-to be placed somewhere that everyone can read and validate the data using unique proofs i.e. [merkleproofs](concept/unique-proofs-using-tries-merkleproofs.md).
-
-To solve the apparent privacy issues[^1] that public verifiability would create,
-the data is encrypted using [Pedersen Commitments](concept/pedersen-commitments.md),
-which cannot be decrypted, but only proven.
-
-1. Exposing users' measurement data publicly might result in undesirable and potentially damaging insights into companies' and citizens' usage.
+![C4 system diagram](system_diagram.drawio.svg)
 
 
-To solve the scalability issues arising from the huge amounts of measurement data, the implementation uses a **federated setup**
-instead of a fully distributed setup directly on a distributed ledger.
+### What is the registry?
 
-This is implemented as a layer-2 blockchain, where batches of data for
-each registry is hashed in a merkle-tree, and each root is then written to a ledger.
+In ProjectOrigin a registry is a single node in the federated network.
 
-This ensures immutability, while providing high throughput.
+A Registry main responsibility is to ensure the rules of the network are applied to the data it holds,
+and provide a tamper-evident[^tamper] log of all changes to the data.
 
-2. In Denmark alone we have 3.500.000 electricity meters,
-and with hourly measurements this would create
-30.660.000.000 (30 billion) measurements on a yearly basis. Or in simpler terms, each meter would create 8760 issued certificates per year.
+[^tamper]: Tamper-evident ensures it is possible to detect if the data has been changed, but cannot prevent it.
+Any system can be tampered with, but the goal is to make it detectable and hold the hosting part accountable.
 
-More in-depth information can be found in the [architecture description](architecture/overview.md).
+Each registry can hold any number of [GCs](../concept/granular-certificates/readme.md).
+It is up to the issuing body[^ib] to specify which registry to put a GC on
+at the time of issuance with the help of the [Federated Certificate ID](../concept/granular-certificates/federated-certifate-id.md).
 
-## What The Registry does not do?
-The registry is not a PKI or a **Federated Network** infrastructure such as the following:
-- [Hyperledger Firefly](https://www.hyperledger.org/projects/firefly)
-- [Alchemy Supernode](https://www.alchemy.com/supernode)
-- [Confidential Consortium Framework](https://ccf.microsoft.com/)
+[^ib]: The issuing body is the entity that has the legal right to issue GCs within a given area.
 
-The registry is not exposing external PKI's to the network but merely acts as a validation mechanism that handles **Granular Certificates** (GCs). Preferably with an external eventstore to store the events that are used in state transitions, otherwise a local SQL database can be used with some modifications so that internal consistency is assured. 
+The life-cycle of a single GC always stays within the same registry as to ensure atomic operations on the GC
+and reduce the need for distributed transactions.
+
+In practice this makes each registry the authority of what is the truth for the current state of a GCs held within it.
+
+Some transactions like [claim](../concept/granular-certificates/transactions/claim.md)
+does span multiple registries, but are performed as a distributed transaction using a saga pattern.
 
 
-Project-Origin was created because there is a need to provide a trustworthy,
-**publicly verifiable** way to prove the origin of the electricity one uses on
-with a high granularity. 
-The project aims to enable extended use of the implementation, to other energy forms than electricity alone. 
+### The registry is neither strongly typed nor context-aware
 
-## Work in Progress
+The registry is not context-aware, which means that it does not know anything about the data it stores.
+It is up to the user of the registry to interpret the data. The registry only hashes the data.
+The registry does not know what the data means, or how it should be interpreted, all it does is to verify provide proofs of the data.
 
-The documentation and everything else is a work in progress,
-so mind that everything might not be well documented yet. You can help us by explaining any documentation issues you encounter in the [discussion forum](https://github.com/orgs/project-origin/discussions/categories/documentation-issues).
+The reason why the registry is not strongly typed or context aware is that it allows for greater flexibility and applicability across different use cases and industries.
 
-## Development Status
+For example, a strongly typed registry would require a specific data schema or format for each type of event being stored, which could be limiting for organizations with diverse data structures. A context-aware registry would also require additional configuration and setup to define the specific context for each use case.
 
-Progress can be [tracked in the roadmap](roadmap.md).
+By not being strongly typed or context aware, the registry can be used in a multitude of different contexts without requiring significant customization or configuration. This makes it a more versatile and generic method of implementing traceability.
+
+In addition, the registry provides unique proof of ownership for events added to the event store, and can be used to ease audits from third parties without disclosing the data itself. These benefits remain true regardless of the specific context in which the registry is being used.
+
+Overall, while a strongly typed or context-aware registry may be useful in some specific scenarios, the flexibility and versatility of a more generic registry can make it a more practical solution for many organizations.
+

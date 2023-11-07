@@ -2,9 +2,7 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/dotnet
 {
     "name": "C# (.NET)",
-    "build": {
-        "dockerfile": "Dockerfile"
-    },
+    "image": "mcr.microsoft.com/devcontainers/dotnet:1.0.1-7.0-bullseye",
     // Features to add to the dev container. More info: https://containers.dev/features.
     "features": {
         "ghcr.io/devcontainers/features/docker-in-docker:2": {},

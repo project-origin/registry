@@ -1,8 +1,5 @@
 src_path := src
 
-docfx_config := doc/docfx.json
-docfx_site_dir := doc/_site
-
 formatting_header := \033[1m
 formatting_command := \033[1;34m
 formatting_desc := \033[0;32m
@@ -63,11 +60,6 @@ verify-chart: restore
 	@kind version >/dev/null 2>&1 || { echo >&2 "kind not installed! kind is required to use recipe, please install or use devcontainer"; exit 1;}
 	@helm version >/dev/null 2>&1 || { echo >&2 "helm not installed! helm is required to use recipe, please install or use devcontainer"; exit 1;}
 	charts/project-origin-registry/run_kind_test.sh
-
-## Generate docfx site and serve, navigate to 127.0.0.1:8080
-doc-serve: build
-	docfx build doc/docfx.json
-	docfx serve doc/_site -n 127.0.0.1
 
 ## Run Concordium integration tests, requires access to running node and environment variables
 concordium-tests:
