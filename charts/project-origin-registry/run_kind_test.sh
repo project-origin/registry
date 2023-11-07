@@ -102,7 +102,7 @@ registries:
 EOF
 
 # install wallet
-helm install my-wallet project-origin-wallet --version 0.2.1 -f "${wallet_filename}" --repo https://project-origin.github.io/helm-registry --namespace wallet --create-namespace --wait
+helm install my-wallet project-origin-wallet --version 0.4.0 -f "${wallet_filename}" --repo https://project-origin.github.io/helm-registry --namespace wallet --create-namespace --wait
 echo "Wallet installed"
 
 # install two registries
