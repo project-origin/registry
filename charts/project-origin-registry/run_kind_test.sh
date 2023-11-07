@@ -92,6 +92,8 @@ service:
   nodePort: ${wallet_nodeport}
 wallet:
   externalUrl: http://localhost:${wallet_nodeport}
+messageBroker:
+  type: inMemory
 registries:
   - name: ${registry_a_name}
     address: http://registry-${registry_a_name}.${registry_a_namespace}:80
@@ -100,7 +102,7 @@ registries:
 EOF
 
 # install wallet
-helm install my-wallet project-origin-wallet --version 0.2.0-rc.13 -f "${wallet_filename}" --repo https://project-origin.github.io/helm-registry --namespace wallet --create-namespace --wait
+helm install my-wallet project-origin-wallet --version 0.4.0 -f "${wallet_filename}" --repo https://project-origin.github.io/helm-registry --namespace wallet --create-namespace --wait
 echo "Wallet installed"
 
 # install two registries
