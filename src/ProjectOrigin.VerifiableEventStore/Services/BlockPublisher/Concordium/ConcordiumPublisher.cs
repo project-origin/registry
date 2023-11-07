@@ -30,7 +30,8 @@ public class ConcordiumPublisher : IBlockPublisher, IDisposable
                 Timeout = TimeSpan.FromSeconds(60),
             }
             );
-        var ed25519TransactionSigner = Ed25519SignKey.From(options.Value.AccountKey);
+
+        GetSigner(); // Validate key
     }
 
     public async Task<BlockPublication> PublishBlock(BlockHeader blockHeader)

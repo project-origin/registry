@@ -4,7 +4,7 @@
     <PackageReference Include="protobuf-net" Version="3.2.26" />
     <PackageReference Include="MassTransit" Version="8.1.1" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.1.1" />
-    <PackageReference Include="Grpc.AspNetCore" Version="2.57.0" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.58.0" />
     <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.6.0" />
     <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.6.0-rc.1" />
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.6.0" />

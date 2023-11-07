@@ -11,8 +11,8 @@ public class TransactionHashTypeHandler : SqlMapper.TypeHandler<TransactionHash>
         return new TransactionHash((byte[])value);
     }
 
-    public override void SetValue(IDbDataParameter parameter, TransactionHash value)
+    public override void SetValue(IDbDataParameter parameter, TransactionHash? value)
     {
-        parameter.Value = value.Data;
+        parameter.Value = value?.Data;
     }
 }
