@@ -30,6 +30,8 @@ public class ConcordiumPublisher : IBlockPublisher, IDisposable
                 Timeout = TimeSpan.FromSeconds(60),
             }
             );
+        _logger.LogInformation("key: {key}", options.Value.AccountKey);
+        _logger.LogInformation("keylength: {length}", options.Value.AccountKey.Length);
         var ed25519TransactionSigner = Ed25519SignKey.From(options.Value.AccountKey);
     }
 
