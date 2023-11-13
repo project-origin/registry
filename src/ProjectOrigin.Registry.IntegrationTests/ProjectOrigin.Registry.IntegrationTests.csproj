@@ -19,7 +19,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
-    <PackageReference Include="Testcontainers" Version="3.5.0" />
+    <PackageReference Include="Testcontainers" Version="3.6.0" />
     <PackageReference Include="ProjectOrigin.PedersenCommitment" Version="1.0.3" />
     <PackageReference Include="ProjectOrigin.HierarchicalDeterministicKeys" Version="0.4.0" />
   </ItemGroup>
