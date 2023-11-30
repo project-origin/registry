@@ -1,12 +1,17 @@
 using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using ProjectOrigin.Registry.Server.Models;
 using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector.Concordium;
 using ProjectOrigin.VerifiableEventStore.Services.BlockPublisher;
 using ProjectOrigin.VerifiableEventStore.Services.BlockPublisher.Log;
 using ProjectOrigin.VerifiableEventStore.Services.EventStore.InMemory;
 using ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres;
 using ProjectOrigin.VerifiableEventStore.Services.Repository;
+using ProjectOrigin.VerifiableEventStore.Services.TransactionStatusCache;
+using Serilog;
+using StackExchange.Redis;
 
 namespace ProjectOrigin.Registry.Server.Extensions;
 
@@ -59,6 +64,38 @@ public static class IServiceCollectionExtensions
 
             default:
                 throw new NotSupportedException($"Persistance type ”{type}” not supported");
+        }
+    }
+
+    public static void ConfigureTransactionStatusCache(this IServiceCollection services, IConfiguration configuration)
+    {
+        var cacheOptions = configuration.GetSection("cache").GetValid<CacheOptions>();
+
+        switch (cacheOptions.Type)
+        {
+            case CacheTypes.InMemory:
+                Log.Warning("Using in memory transaction status service - this is not recommended for production use. Mighe result in inconsistent state when multiple instances are running.");
+                services.AddDistributedMemoryCache();
+                services.AddSingleton<ITransactionStatusService, InMemoryTransactionStatusService>();
+                break;
+
+            case CacheTypes.Redis:
+                services.AddSingleton<IConnectionMultiplexer>(services =>
+                {
+                    ConfigurationOptions redisOptions = new ConfigurationOptions()
+                    {
+                        Password = cacheOptions.Redis!.Password,
+                        EndPoints = { cacheOptions.Redis!.ConnectionString }
+                    };
+
+                    var connection = ConnectionMultiplexer.Connect(redisOptions);
+                    return connection;
+                });
+                services.AddTransient<ITransactionStatusService, RedisTransactionStatusService>();
+                break;
+
+            default:
+                throw new NotSupportedException($"Cache type ”{cacheOptions.Type}” not supported");
         }
     }
 }

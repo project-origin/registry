@@ -1,5 +1,8 @@
 **/Dockerfile.tmp
 
+# ignore all sub charts
+charts/*/charts
+
 # ignore dotnet code coverage files
 **/coverage.cobertura.xml
 
