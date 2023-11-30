@@ -1,13 +1,12 @@
 using System;
 using System.Linq;
-using Npgsql.Replication;
 using StackExchange.Redis;
 
 namespace ProjectOrigin.VerifiableEventStore.Models;
 
 public sealed record TransactionHash(byte[] Data)
 {
-    private Lazy<string> _base64String = new(() => Convert.ToBase64String(Data));
+    private readonly Lazy<string> _base64String = new(() => Convert.ToBase64String(Data));
 
     public bool Equals(TransactionHash? right)
     {
