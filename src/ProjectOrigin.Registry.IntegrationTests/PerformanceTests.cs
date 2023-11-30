@@ -69,7 +69,7 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
                 .WithEnvironment("Logging__LogLevel__Grpc.AspNetCore", "Information")
                 .WithEnvironment("Logging__LogLevel__Grpc.AspNetCore", "Information")
                 .WithEnvironment("Cache__Type", "redis")
-                .WithEnvironment("Cache__Redis__ConnectionString", "redisFixture.GetConnectionString()")
+                .WithEnvironment("Cache__Redis__ConnectionString", redisFixture.ContainerConnectionString)
                 .WithWaitStrategy(
                     Wait.ForUnixContainer()
                         .UntilPortIsAvailable(GrpcPort)

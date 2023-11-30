@@ -38,7 +38,7 @@ public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityService
             {"Persistance:type", "postgresql"},
             {"Persistance:postgresql:ConnectionString", _postgresDatabaseFixture.HostConnectionString},
             {"Cache:Type", "redis"},
-            {"Cache:Redis:ConnectionString", redisFixture.GetConnectionString()},
+            {"Cache:Redis:ConnectionString", redisFixture.HostConnectionString},
         });
     }
 

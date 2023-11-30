@@ -13,7 +13,7 @@ public class RedisTransactionStatusServiceTests : AbstractTransactionStatusServi
 
     public RedisTransactionStatusServiceTests(RedisFixture redisFixture)
     {
-        var connection = ConnectionMultiplexer.Connect(redisFixture.GetConnectionString());
+        var connection = ConnectionMultiplexer.Connect(redisFixture.HostConnectionString);
         var logger = new Mock<ILogger<RedisTransactionStatusService>>();
         _service = new RedisTransactionStatusService(logger.Object, connection, _repository);
     }
