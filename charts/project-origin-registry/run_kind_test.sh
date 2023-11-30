@@ -92,6 +92,8 @@ service:
   nodePort: ${wallet_nodeport}
 wallet:
   externalUrl: http://localhost:${wallet_nodeport}
+redis:
+  enabled: true
 messageBroker:
   type: inMemory
 registries:

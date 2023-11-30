@@ -86,3 +86,18 @@ spec:
             - name: PERSISTANCE__POSTGRESQL__CONNECTIONSTRING
               value: Host=$(DB_HOST); Port=$(DB_PORT); Database=$(DB_DATABASE); Username=$(DB_USERNAME); Password=$(DB_PASSWORD);
           {{- end }}
+
+          {{- if .Values.redis.enabled }}
+            - name: cache__type
+              value: "Redis"
+            - name: cache__redis__connectionString
+              value: {{ .Release.Name }}-redis-master
+            - name: cache__redis__password
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-redis
+                  key: redis-password
+          {{- else }}
+            - name: cache__type
+              value: "InMemory"
+          {{- end }}

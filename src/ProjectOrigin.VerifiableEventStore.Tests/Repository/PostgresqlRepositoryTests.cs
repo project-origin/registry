@@ -4,7 +4,7 @@ using ProjectOrigin.TestUtils;
 using ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres;
 using Xunit;
 
-namespace ProjectOrigin.VerifiableEventStore.Tests;
+namespace ProjectOrigin.VerifiableEventStore.Tests.Repository;
 
 public class PostgresqlRepositoryTests : AbstractTransactionRepositoryTests<PostgresqlRepository>, IClassFixture<PostgresDatabaseFixture>, IAsyncLifetime
 {

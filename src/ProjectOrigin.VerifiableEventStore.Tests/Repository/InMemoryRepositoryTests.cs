@@ -1,6 +1,6 @@
 using ProjectOrigin.VerifiableEventStore.Services.EventStore.InMemory;
 
-namespace ProjectOrigin.VerifiableEventStore.Tests;
+namespace ProjectOrigin.VerifiableEventStore.Tests.Repository;
 
 public class InMemoryRepositoryTests : AbstractTransactionRepositoryTests<InMemoryRepository>
 {
