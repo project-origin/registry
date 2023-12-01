@@ -2,11 +2,12 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 using Grpc.Net.Client;
-using ProjectOrigin.Electricity.Example;
 using ProjectOrigin.Electricity.Example.Extensions;
 using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.PedersenCommitment;
 using RegistryV1 = ProjectOrigin.Registry.V1;
+
+namespace ProjectOrigin.Electricity.Example;
 
 public class WithoutWalletFlow
 {

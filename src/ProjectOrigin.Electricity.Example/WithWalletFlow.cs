@@ -9,12 +9,13 @@ using Grpc.Core;
 using Grpc.Net.Client;
 using Microsoft.IdentityModel.Tokens;
 using ProjectOrigin.Common.V1;
-using ProjectOrigin.Electricity.Example;
 using ProjectOrigin.Electricity.Example.Extensions;
 using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.PedersenCommitment;
 using RegistryV1 = ProjectOrigin.Registry.V1;
 using WalletV1 = ProjectOrigin.WalletSystem.V1;
+
+namespace ProjectOrigin.Electricity.Example;
 
 public class WithWalletFlow
 {

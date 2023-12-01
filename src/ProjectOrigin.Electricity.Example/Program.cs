@@ -1,6 +1,8 @@
 using System;
 using System.Threading.Tasks;
 
+namespace ProjectOrigin.Electricity.Example;
+
 public class Program
 {
     static async Task<int> Main(string[] args)
