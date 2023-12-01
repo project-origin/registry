@@ -14,9 +14,9 @@ namespace ProjectOrigin.VerifiableEventStore.Services.EventStore.InMemory;
 public class InMemoryRepository : ITransactionRepository
 {
     private readonly BlockSizeCalculator _blockSizeCalculator;
-    private object _lockObject = new();
-    private List<StreamTransaction> _events = new();
-    private Dictionary<BlockHash, BlockRecord> _blocks = new();
+    private readonly object _lockObject = new();
+    private readonly List<StreamTransaction> _events = new();
+    private readonly Dictionary<BlockHash, BlockRecord> _blocks = new();
 
     public InMemoryRepository()
     {
