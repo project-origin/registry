@@ -49,7 +49,7 @@ format:
 
 ## Run all tests except Concordium integration
 test:
-	dotnet test $(src_path)  --filter 'FullyQualifiedName!~ConcordiumIntegrationTests&FullyQualifiedName!~PerformanceTests'
+	dotnet test $(src_path) --filter 'FullyQualifiedName!~ConcordiumIntegrationTests&FullyQualifiedName!~PerformanceTests'
 
 ## Run all Unit-tests
 unit-test:
