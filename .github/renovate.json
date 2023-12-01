@@ -1,0 +1,23 @@
+{
+    "labels": [
+        "chore"
+    ],
+    "packageRules": [
+        {
+            "groupName": "nuget",
+            "description": "Dotnet nuget packages",
+            "matchDatasources": [
+                "nuget"
+            ],
+            "matchPackagePatterns": [
+                ".*"
+            ]
+        },
+        {
+            "groupName": "Dockerfile updates",
+            "matchFileNames": [
+                "**/Dockerfile"
+            ]
+        }
+    ]
+}
