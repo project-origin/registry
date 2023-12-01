@@ -12,7 +12,7 @@ using ProjectOrigin.VerifiableEventStore.Services.EventStore;
 using ProjectOrigin.VerifiableEventStore.Services.Repository;
 using Xunit;
 
-namespace ProjectOrigin.VerifiableEventStore.Tests;
+namespace ProjectOrigin.VerifiableEventStore.Tests.Repository;
 
 public abstract class AbstractTransactionRepositoryTests<T> where T : ITransactionRepository
 {

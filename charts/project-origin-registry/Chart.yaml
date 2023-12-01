@@ -12,3 +12,9 @@ annotations:
       url: https://github.com/project-origin/registry
   artifacthub.io/prerelease: "true"
   artifacthub.io/operator: "false"
+
+dependencies:
+  - name: redis
+    version: 18.4.0
+    repository: https://charts.bitnami.com/bitnami
+    condition: redis.enabled

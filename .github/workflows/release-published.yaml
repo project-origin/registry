@@ -66,6 +66,8 @@ jobs:
 
       - name: Package and generate index
         run: |
+          helm repo add bitnami-charts https://charts.bitnami.com/bitnami
+          helm dependency build this/${{ env.CHART_FOLDER }}
           helm package this/${{ env.CHART_FOLDER }} --version ${{ needs.define-version.outputs.version }} --app-version "${{ needs.define-version.outputs.version }}" --destination helm-releases
           helm repo index helm-releases --merge helm-registry/index.yaml --url https://github.com/${{ github.repository }}/releases/download/v${{ needs.define-version.outputs.version }}/
           cp helm-releases/index.yaml helm-registry/index.yaml

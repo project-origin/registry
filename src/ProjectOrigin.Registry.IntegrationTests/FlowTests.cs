@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
-public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityServiceFixture>, IClassFixture<PostgresDatabaseFixture>
+public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityServiceFixture>, IClassFixture<PostgresDatabaseFixture>, IClassFixture<RedisFixture>
 {
     protected ElectricityServiceFixture _verifierFixture;
     private PostgresDatabaseFixture _postgresDatabaseFixture;
@@ -20,7 +20,12 @@ public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityService
 
     protected Registry.V1.RegistryService.RegistryServiceClient Client => new(_grpcFixture.Channel);
 
-    public FlowTests(ElectricityServiceFixture verifierFixture, GrpcTestFixture<Startup> grpcFixture, PostgresDatabaseFixture postgresDatabaseFixture, ITestOutputHelper outputHelper) : base(grpcFixture, outputHelper)
+    public FlowTests(
+        ElectricityServiceFixture verifierFixture,
+        GrpcTestFixture<Startup> grpcFixture,
+        PostgresDatabaseFixture postgresDatabaseFixture,
+        RedisFixture redisFixture,
+        ITestOutputHelper outputHelper) : base(grpcFixture, outputHelper)
     {
         _verifierFixture = verifierFixture;
         _postgresDatabaseFixture = postgresDatabaseFixture;
@@ -32,6 +37,8 @@ public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityService
             {"BlockFinalizer:Interval", "00:00:05"},
             {"Persistance:type", "postgresql"},
             {"Persistance:postgresql:ConnectionString", _postgresDatabaseFixture.HostConnectionString},
+            {"Cache:Type", "redis"},
+            {"Cache:Redis:ConnectionString", redisFixture.HostConnectionString},
         });
     }
 

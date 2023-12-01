@@ -11,7 +11,6 @@ using ProjectOrigin.Registry.Server.Models;
 using ProjectOrigin.Registry.Server.Services;
 using ProjectOrigin.VerifiableEventStore.Models;
 using ProjectOrigin.VerifiableEventStore.Services.BlockFinalizer;
-using ProjectOrigin.VerifiableEventStore.Services.TransactionStatusCache;
 
 namespace ProjectOrigin.Registry.Server;
 
@@ -28,7 +27,6 @@ public class Startup
     {
         services.AddGrpc();
         services.AddHostedService<BlockFinalizerBackgroundService>();
-        services.AddTransient<ITransactionStatusService, TransactionStatusService>();
         services.AddSingleton<ITransactionDispatcher, TransactionDispatcher>();
 
         services.AddOpenTelemetry()
@@ -59,9 +57,9 @@ public class Startup
 
         services.ConfigureImmutableLog(_configuration);
         services.ConfigurePersistance(_configuration);
+        services.ConfigureTransactionStatusCache(_configuration);
 
         // Memory only section
-        services.AddDistributedMemoryCache();
         services.AddMassTransit(x =>
         {
             x.AddConsumer<VerifyTransactionConsumer, VerifyTransactionConsumerDefinition>();

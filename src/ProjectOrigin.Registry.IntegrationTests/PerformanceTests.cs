@@ -19,7 +19,7 @@ using Xunit.Abstractions;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
-public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixture>, IClassFixture<PostgresDatabaseFixture>
+public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixture>, IClassFixture<PostgresDatabaseFixture>, IClassFixture<RedisFixture>
 {
     private const string ElectricityVerifierImage = "ghcr.io/project-origin/electricity-server:0.3.0";
     private const int GrpcPort = 80;
@@ -32,7 +32,11 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
     private readonly PostgresDatabaseFixture _postgresDatabaseFixture;
     private readonly ITestOutputHelper _outputHelper;
 
-    public PerformanceTests(ContainerImageFixture imageFixture, PostgresDatabaseFixture postgresDatabaseFixture, ITestOutputHelper outputHelper)
+    public PerformanceTests(
+        ContainerImageFixture imageFixture,
+        PostgresDatabaseFixture postgresDatabaseFixture,
+        RedisFixture redisFixture,
+        ITestOutputHelper outputHelper)
     {
         _issuerKey = Algorithms.Ed25519.GenerateNewPrivateKey();
         _postgresDatabaseFixture = postgresDatabaseFixture;
@@ -63,6 +67,9 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
                 .WithEnvironment("Persistance__postgresql__ConnectionString", _postgresDatabaseFixture.ContainerConnectionString)
                 .WithEnvironment("Logging__LogLevel__Default", "Debug")
                 .WithEnvironment("Logging__LogLevel__Grpc.AspNetCore", "Information")
+                .WithEnvironment("Logging__LogLevel__Grpc.AspNetCore", "Information")
+                .WithEnvironment("Cache__Type", "redis")
+                .WithEnvironment("Cache__Redis__ConnectionString", redisFixture.ContainerConnectionString)
                 .WithWaitStrategy(
                     Wait.ForUnixContainer()
                         .UntilPortIsAvailable(GrpcPort)
