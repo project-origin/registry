@@ -2,13 +2,13 @@
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Moq" Version="4.20.69" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="7.0.13" />
-    <PackageReference Include="xunit" Version="2.6.1" />
-    <PackageReference Include="Grpc.Net.Client" Version="2.58.0" />
-    <PackageReference Include="Testcontainers.PostgreSql" Version="3.5.0" />
-    <PackageReference Include="Testcontainers.Redis" Version="3.5.0" />
+    <PackageReference Include="Moq" Version="4.20.70" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="7.0.14" />
+    <PackageReference Include="xunit" Version="2.6.2" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.59.0" />
+    <PackageReference Include="Testcontainers.PostgreSql" Version="3.6.0" />
+    <PackageReference Include="Testcontainers.Redis" Version="3.6.0" />
   </ItemGroup>
 
   <ItemGroup>
