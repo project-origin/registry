@@ -10,7 +10,7 @@ spec:
     - name: grpc
       protocol: TCP
       port: 80
-      targetPort: 80
+      targetPort: 5001
       {{- if .Values.service.nodePort }}
       nodePort: {{ .Values.service.nodePort }}
       {{- end }}
