@@ -15,10 +15,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup .NET Core SDK 7
+      - name: Setup .NET Core SDK from global.json
         uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: "7.0"
 
       - name: Run integration tests
         env:
