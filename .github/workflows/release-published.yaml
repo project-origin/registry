@@ -11,7 +11,7 @@ jobs:
       version: ${{ steps.output-version.outputs.version }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set env
         id: output-version
@@ -49,11 +49,11 @@ jobs:
       HELM_REGISTRY_REPOSITORY: project-origin/helm-registry
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           path: this
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: ${{ env.HELM_REGISTRY_REPOSITORY }}
           path: helm-registry
