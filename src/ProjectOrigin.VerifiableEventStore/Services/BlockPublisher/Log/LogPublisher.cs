@@ -21,7 +21,7 @@ public class LogPublisher : IBlockPublisher
     {
         var hash = BlockHash.FromHeader(blockHeader);
         var hashBase64 = Convert.ToBase64String(hash.Data);
-        _logger.LogInformation($"Block published - {hashBase64}");
+        _logger.LogInformation("Block published - {hashBase64}", hashBase64);
 
         return Task.FromResult(new ImmutableLog.V1.BlockPublication
         {

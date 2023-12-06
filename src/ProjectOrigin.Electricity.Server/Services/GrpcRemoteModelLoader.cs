@@ -11,9 +11,9 @@ namespace ProjectOrigin.Electricity.Server.Services;
 
 public class GrpcRemoteModelLoader : IRemoteModelLoader
 {
-    private IModelHydrater _modelHydrater;
-    private IProtoDeserializer _protoDeserializer;
-    private RegistryOptions _registryOptions;
+    private readonly IModelHydrater _modelHydrater;
+    private readonly IProtoDeserializer _protoDeserializer;
+    private readonly RegistryOptions _registryOptions;
 
     public GrpcRemoteModelLoader(IModelHydrater modelHydrater, IProtoDeserializer protoDeserializer, IOptions<RegistryOptions> registryOptions)
     {

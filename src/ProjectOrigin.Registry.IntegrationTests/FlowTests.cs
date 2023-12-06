@@ -9,6 +9,7 @@ using FluentAssertions;
 using ProjectOrigin.Electricity.V1;
 using ProjectOrigin.HierarchicalDeterministicKeys;
 using System.Collections.Generic;
+using ProjectOrigin.Registry.IntegrationTests;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 

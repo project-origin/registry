@@ -58,7 +58,7 @@ public class VerifyTransactionConsumer : IConsumer<VerifyTransaction>
             if (!result.Valid)
                 throw new InvalidTransactionException(result.ErrorMessage);
 
-            var nextEventIndex = stream.Count();
+            var nextEventIndex = stream.Count;
             var verifiableEvent = new StreamTransaction { TransactionHash = transactionHash, StreamId = streamId, StreamIndex = nextEventIndex, Payload = transaction.ToByteArray() };
             await _transactionRepository.Store(verifiableEvent).ConfigureAwait(false);
 
@@ -66,7 +66,7 @@ public class VerifyTransactionConsumer : IConsumer<VerifyTransaction>
         }
         catch (InvalidTransactionException ex)
         {
-            _logger.LogWarning(ex, $"Invalid transaction {transactionHash} - {ex.Message}");
+            _logger.LogWarning(ex, "Invalid transaction {transactionHash} - {exceptionMessage}", transactionHash, ex.Message);
             await _transactionStatusService.SetTransactionStatus(
                 transactionHash,
                 new TransactionStatusRecord(
@@ -75,7 +75,7 @@ public class VerifyTransactionConsumer : IConsumer<VerifyTransaction>
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Unknown exception for transaction {transactionHash} -  {ex.Message}");
+            _logger.LogError(ex, "Unknown exception for transaction {transactionHash} -  {exceptionMessage}", transactionHash, ex.Message);
             throw;
         }
     }

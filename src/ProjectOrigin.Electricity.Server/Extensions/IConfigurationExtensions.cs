@@ -21,7 +21,7 @@ public static class IConfigurationExtensions
         builder.Logging.ClearProviders();
         builder.Logging.AddSerilog(Log.Logger);
 
-        var startup = new Startup(builder.Configuration);
+        var startup = new Startup();
         startup.ConfigureServices(builder.Services);
 
         var app = builder.Build();

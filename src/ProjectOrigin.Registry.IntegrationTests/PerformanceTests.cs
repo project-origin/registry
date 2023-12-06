@@ -16,6 +16,7 @@ using System.Linq;
 using System.Collections.Generic;
 using ProjectOrigin.TestUtils;
 using Xunit.Abstractions;
+using ProjectOrigin.Registry.IntegrationTests;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
@@ -232,13 +233,6 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
         return transaction;
     }
 
-    private async Task<bool> IsCommitted(GrpcChannel channel, Registry.V1.Transaction transaction)
-    {
-        var client = new Registry.V1.RegistryService.RegistryServiceClient(channel);
-        var result = await client.GetStatus(transaction);
-        return result.Status == Registry.V1.TransactionState.Committed;
-    }
-
     public async Task InitializeAsync()
     {
         try
@@ -269,4 +263,12 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
         var log = await _registryContainer.Value.GetLogsAsync();
         _outputHelper.WriteLine($"-------Container stdout------\n{log.Stdout}\n-------Container stderr------\n{log.Stderr}\n\n----------");
     }
+
+    private static async Task<bool> IsCommitted(GrpcChannel channel, Registry.V1.Transaction transaction)
+    {
+        var client = new Registry.V1.RegistryService.RegistryServiceClient(channel);
+        var result = await client.GetStatus(transaction);
+        return result.Status == Registry.V1.TransactionState.Committed;
+    }
+
 }

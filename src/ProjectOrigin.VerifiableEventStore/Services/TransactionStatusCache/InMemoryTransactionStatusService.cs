@@ -44,13 +44,13 @@ public class InMemoryTransactionStatusService : ITransactionStatusService
 
     public Task SetTransactionStatus(TransactionHash transactionHash, TransactionStatusRecord newRecord)
     {
-        _logger.LogTrace($"Setting transaction status for {transactionHash} to {newRecord.NewStatus}");
+        _logger.LogTrace("Setting transaction status for {transactionHash} to {newStatus}", transactionHash, newRecord.NewStatus);
 
         var cacheStatus = GetRecord(transactionHash);
 
         if (newRecord.NewStatus < cacheStatus?.NewStatus)
         {
-            _logger.LogWarning($"Transaction {transactionHash} status in cache is {cacheStatus.NewStatus} and is higher than {newRecord.NewStatus}, change aborted.");
+            _logger.LogWarning("Transaction {transactionHash} status in cache is {oldStatus} and is higher than {newStatus}, change aborted.", transactionHash, cacheStatus.NewStatus, newRecord.NewStatus);
             return Task.CompletedTask;
         }
 
@@ -65,7 +65,7 @@ public class InMemoryTransactionStatusService : ITransactionStatusService
             var foundRecord = GetRecord(transactionHash);
             if (foundRecord != cacheRecord)
             {
-                _logger.LogWarning($"Transaction {transactionHash} status was changed in the cache by another process while trying to set it to {newRecord.NewStatus}, change aborted.");
+                _logger.LogWarning("Transaction {transactionHash} status was changed in the cache by another process while trying to set it to {newStatus}, change aborted.", transactionHash, newRecord.NewStatus);
             }
             else
             {

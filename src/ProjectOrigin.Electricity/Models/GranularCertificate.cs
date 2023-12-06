@@ -12,10 +12,10 @@ public class GranularCertificate
     public V1.DateInterval Period => _issued.Period;
     public string GridArea => _issued.GridArea;
 
-    private V1.IssuedEvent _issued;
-    private Dictionary<ByteString, CertificateSlice> _availableSlices = new Dictionary<ByteString, CertificateSlice>();
-    private Dictionary<Common.V1.Uuid, AllocationSlice> _allocationSlices = new Dictionary<Common.V1.Uuid, AllocationSlice>();
-    private Dictionary<Common.V1.Uuid, AllocationSlice> _claimedSlices = new Dictionary<Common.V1.Uuid, AllocationSlice>();
+    private readonly V1.IssuedEvent _issued;
+    private readonly Dictionary<ByteString, CertificateSlice> _availableSlices = new Dictionary<ByteString, CertificateSlice>();
+    private readonly Dictionary<Common.V1.Uuid, AllocationSlice> _allocationSlices = new Dictionary<Common.V1.Uuid, AllocationSlice>();
+    private readonly Dictionary<Common.V1.Uuid, AllocationSlice> _claimedSlices = new Dictionary<Common.V1.Uuid, AllocationSlice>();
 
     public GranularCertificate(V1.IssuedEvent e)
     {

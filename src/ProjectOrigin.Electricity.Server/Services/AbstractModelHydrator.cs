@@ -18,7 +18,7 @@ public abstract class AbstractModelHydrator : IModelHydrater
     {
         object? model = null;
 
-        if (eventStream.Count() > 0)
+        if (eventStream.Any())
         {
             model = Create(eventStream.First());
             foreach (var @event in eventStream.Skip(1))
@@ -34,12 +34,11 @@ public abstract class AbstractModelHydrator : IModelHydrater
     {
         var methodInfo = model.GetType()
                             .GetMethods()
-                            .Where(method =>
+                            .SingleOrDefault(method =>
                                 method.Name == ApplyMethodName
-                                && method.GetParameters().SingleOrDefault(x => x.ParameterType == @event.GetType()) != null)
-                            .SingleOrDefault();
+                                && method.GetParameters().SingleOrDefault(x => x.ParameterType == @event.GetType()) != null);
 
-        if (methodInfo != null)
+        if (methodInfo is not null)
         {
             methodInfo.Invoke(model, new object[] { @event });
         }

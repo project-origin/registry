@@ -10,7 +10,7 @@ namespace ProjectOrigin.Electricity.Server.Verifiers;
 
 public class ClaimedEventVerifier : IEventVerifier<V1.ClaimedEvent>
 {
-    private IRemoteModelLoader _remoteModelLoader;
+    private readonly IRemoteModelLoader _remoteModelLoader;
 
     public ClaimedEventVerifier(IRemoteModelLoader remoteModelLoader)
     {

@@ -10,7 +10,7 @@ namespace ProjectOrigin.Electricity.Server.Services;
 
 public class GridAreaIssuerOptionsService : IGridAreaIssuerService
 {
-    private IssuerOptions _options;
+    private readonly IssuerOptions _options;
 
     public GridAreaIssuerOptionsService(IOptions<IssuerOptions> options)
     {
