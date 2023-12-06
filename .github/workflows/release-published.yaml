@@ -72,7 +72,13 @@ jobs:
           helm repo index helm-releases --merge helm-registry/index.yaml --url https://github.com/${{ github.repository }}/releases/download/v${{ needs.define-version.outputs.version }}/
           cp helm-releases/index.yaml helm-registry/index.yaml
 
-      - uses: actions/upload-artifact@v3
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: helm-releases/${{ steps.variables.outputs.name }}-${{ needs.define-version.outputs.version }}.tgz
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v3
         with:
           path: helm-releases/${{ steps.variables.outputs.name }}-${{ needs.define-version.outputs.version }}.tgz
 
