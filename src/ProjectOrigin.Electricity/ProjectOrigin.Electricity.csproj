@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.25.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.25.1" />
     <PackageReference Include="Grpc.Tools" Version="2.59.0" />
     <Protobuf Include="..\Protos\electricity.proto" GrpcServices="None" />
     <Protobuf Include="..\Protos\common.proto" GrpcServices="None" />

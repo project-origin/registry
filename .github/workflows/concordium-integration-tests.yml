@@ -13,7 +13,7 @@ jobs:
     runs-on: [self-hosted, concordium-testnet]
     environment: testnet
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup .NET Core SDK 7
         uses: actions/setup-dotnet@v3
