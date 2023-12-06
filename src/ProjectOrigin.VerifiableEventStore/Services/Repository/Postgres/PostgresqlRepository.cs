@@ -168,15 +168,17 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
             };
 
             await connection.ExecuteAsync(
-                "INSERT INTO blocks(block_hash, previous_header_hash, previous_publication_hash, merkle_root_hash, from_transaction, to_transaction) VALUES (@blockHash, @previousHeaderHash, @previousPublicationHash, @merkleRootHash, @fromTransaction, @toTransaction)",
-                new
+                "INSERT INTO blocks(block_hash, previous_header_hash, previous_publication_hash, merkle_root_hash, created_at, from_transaction, to_transaction) VALUES (@blockHash, @previousHeaderHash, @previousPublicationHash, @merkleRootHash, @createdAt, @fromTransaction, @toTransaction)",
+                new BlockRecord
                 {
-                    blockHash = SHA256.HashData(blockHeader.ToByteArray()),
-                    previousHeaderHash,
-                    previousPublicationHash,
-                    merkleRootHash,
-                    fromTransaction,
-                    toTransaction
+                    BlockHash = SHA256.HashData(blockHeader.ToByteArray()),
+                    PreviousHeaderHash = previousHeaderHash,
+                    PreviousPublicationHash = previousPublicationHash,
+                    MerkleRootHash = merkleRootHash,
+                    CreatedAt = DateTimeOffset.UtcNow,
+                    FromTransaction = fromTransaction,
+                    ToTransaction = toTransaction,
+                    Publication = null,
                 });
 
             await transaction.CommitAsync();
@@ -219,6 +221,6 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
         public required DateTimeOffset CreatedAt { get; init; }
         public required long FromTransaction { get; init; }
         public required long ToTransaction { get; init; }
-        public required byte[]? Publication { get; init; }
+        public byte[]? Publication { get; init; }
     }
 }

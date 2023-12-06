@@ -8,7 +8,7 @@ namespace ProjectOrigin.Electricity.Server.Verifiers;
 
 public class IssuedEventVerifier : IEventVerifier<V1.IssuedEvent>
 {
-    private IGridAreaIssuerService _gridAreaIssuerService;
+    private readonly IGridAreaIssuerService _gridAreaIssuerService;
 
     public IssuedEventVerifier(IGridAreaIssuerService gridAreaIssuerService)
     {

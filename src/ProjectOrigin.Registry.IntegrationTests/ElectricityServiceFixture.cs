@@ -7,12 +7,15 @@ using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using Xunit;
 
+namespace ProjectOrigin.Electricity.IntegrationTests;
+
 public class ElectricityServiceFixture : IAsyncLifetime
 {
     private const string ElectricityVerifierImage = "ghcr.io/project-origin/electricity-server:0.3.0";
     private const int GrpcPort = 80;
+    private const string Area = "SomeArea";
 
-    public string IssuerArea => "SomeArea";
+    public string IssuerArea => Area;
     public IPrivateKey IssuerKey { get; init; }
     private IContainer _container;
 
@@ -25,7 +28,7 @@ public class ElectricityServiceFixture : IAsyncLifetime
         _container = new ContainerBuilder()
                 .WithImage(ElectricityVerifierImage)
                 .WithPortBinding(GrpcPort, true)
-                .WithEnvironment($"Issuers__{IssuerArea}", Convert.ToBase64String(Encoding.UTF8.GetBytes(IssuerKey.PublicKey.ExportPkixText())))
+                .WithEnvironment($"Issuers__{Area}", Convert.ToBase64String(Encoding.UTF8.GetBytes(IssuerKey.PublicKey.ExportPkixText())))
                 .WithWaitStrategy(
                     Wait.ForUnixContainer()
                         .UntilPortIsAvailable(GrpcPort)

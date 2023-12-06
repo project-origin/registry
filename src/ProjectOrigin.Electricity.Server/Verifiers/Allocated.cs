@@ -10,7 +10,7 @@ namespace ProjectOrigin.Electricity.Server.Verifiers;
 
 public class AllocatedEventVerifier : IEventVerifier<V1.AllocatedEvent>
 {
-    private IRemoteModelLoader _remoteModelLoader;
+    private readonly IRemoteModelLoader _remoteModelLoader;
 
     public AllocatedEventVerifier(IRemoteModelLoader remoteModelLoader)
     {

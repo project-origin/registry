@@ -4,6 +4,8 @@ using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Images;
 using Xunit;
 
+namespace ProjectOrigin.Registry.IntegrationTests;
+
 public class ContainerImageFixture : IAsyncLifetime
 {
     private const string DockerfilePath = "ProjectOrigin.Registry.Server/Dockerfile";
