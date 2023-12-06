@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
@@ -21,7 +20,7 @@
     <Protobuf Include="..\Protos\electricity.proto" GrpcServices="None" />
     <Protobuf Include="..\Protos\registry.proto" GrpcServices="Client" />
     <Protobuf Include="../Protos/wallet.proto" Link="Protos\wallet.proto" GrpcServices="Client">
-      <SourceUrl>https://raw.githubusercontent.com/project-origin/wallet/v0.2.0-rc.13/src/Protos/wallet.proto</SourceUrl>
+      <SourceUrl>https://raw.githubusercontent.com/project-origin/wallet/v0.6.0/src/Protos/wallet.proto</SourceUrl>
     </Protobuf>
   </ItemGroup>
 
