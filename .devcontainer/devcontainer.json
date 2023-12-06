@@ -2,7 +2,9 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/dotnet
 {
     "name": "C# (.NET)",
-    "image": "mcr.microsoft.com/devcontainers/dotnet:1.0.1-7.0-bullseye",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
     // Features to add to the dev container. More info: https://containers.dev/features.
     "features": {
         "ghcr.io/devcontainers/features/docker-in-docker:2": {},
@@ -19,6 +21,7 @@
             "extensions": [
                 "EditorConfig.EditorConfig",
                 "ms-dotnettools.csharp",
+                "ms-dotnettools.csdevkit",
                 "formulahendry.dotnet-test-explorer",
                 "ryanluker.vscode-coverage-gutters",
                 "DotJoshJohnson.xml",
