@@ -11,7 +11,7 @@ namespace ProjectOrigin.Electricity.Server.Services;
 
 public class ProtoDeserializer : IProtoDeserializer
 {
-    private Dictionary<string, MessageDescriptor> _typeDictionary;
+    private readonly Dictionary<string, MessageDescriptor> _typeDictionary;
 
     public ProtoDeserializer(Assembly assembly)
     {

@@ -56,7 +56,7 @@ public sealed class BlockFinalizerJob
         }
 
         sw.Stop();
-        _logger.LogInformation($"Published new block with {newBlock.TransactionHashes.Count()} transactions in {sw.ElapsedMilliseconds}ms");
+        _logger.LogInformation("Published new block with {transactionCount} transactions in {elapsedMilliseconds}ms", newBlock.TransactionHashes.Count(), sw.ElapsedMilliseconds);
         BlockCounter.Add(1);
         TransactionCounter.Add(newBlock.TransactionHashes.Count());
         BlockTime.Record(sw.ElapsedMilliseconds);

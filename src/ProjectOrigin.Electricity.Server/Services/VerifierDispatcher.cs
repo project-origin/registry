@@ -34,7 +34,7 @@ public class VerifierDispatcher : IVerifierDispatcher
 
         if (verifier is null)
         {
-            _logger.LogError($"Could not find verifier for type ”{transaction.Header.PayloadType}”");
+            _logger.LogError("Could not find verifier for type ”{payloadType}”", transaction.Header.PayloadType);
             return new VerificationResult.Invalid($"No verifier implemented for payload type ”{transaction.Header.PayloadType}”");
         }
 

@@ -48,7 +48,7 @@ public class PostgresqlUpgrader : IRepositoryUpgrader
         var started = DateTime.UtcNow;
         while (!upgradeEngine.TryConnect(out string msg))
         {
-            _logger.LogWarning($"Failed to connect to database ({msg}), waiting to retry in {_sleepTime.TotalSeconds} seconds... ");
+            _logger.LogWarning("Failed to connect to database ({msg}), waiting to retry in {sleepSeconds} seconds... ", msg, _sleepTime.TotalSeconds);
             await Task.Delay(_sleepTime);
 
             if (DateTime.UtcNow - started > _timeout)
