@@ -1,12 +1,10 @@
 using System;
 
-namespace ProjectOrigin.VerifiableEventStore.Services.EventStore
+namespace ProjectOrigin.VerifiableEventStore.Services.EventStore;
+
+public class OutOfOrderException : Exception
 {
-    [Serializable]
-    public class OutOfOrderException : Exception
+    public OutOfOrderException(string? message) : base(message)
     {
-        public OutOfOrderException(string? message) : base(message)
-        {
-        }
     }
 }
