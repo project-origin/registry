@@ -22,8 +22,7 @@ namespace ProjectOrigin.Electricity.IntegrationTests;
 public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixture>, IClassFixture<PostgresDatabaseFixture>, IClassFixture<RedisFixture>
 {
     private const string ElectricityVerifierImage = "ghcr.io/project-origin/electricity-server:0.3.0";
-    private const int VerifierGrpcPort = 80;
-    private const int GrpcPort = 5001;
+    private const int GrpcPort = 80;
     private const string IssuerArea = "Narnia";
     private const string RegistryName = "TheRegistry";
 
@@ -45,17 +44,17 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
 
         _verifierContainer = new ContainerBuilder()
                 .WithImage(ElectricityVerifierImage)
-                .WithPortBinding(VerifierGrpcPort, true)
+                .WithPortBinding(GrpcPort, true)
                 .WithEnvironment($"Issuers__{IssuerArea}", Convert.ToBase64String(Encoding.UTF8.GetBytes(_issuerKey.PublicKey.ExportPkixText())))
                 .WithWaitStrategy(
                     Wait.ForUnixContainer()
-                        .UntilPortIsAvailable(VerifierGrpcPort)
+                        .UntilPortIsAvailable(GrpcPort)
                     )
                 .Build();
 
         _registryContainer = new Lazy<IContainer>(() =>
         {
-            var verifierUrl = $"http://{_verifierContainer.IpAddress}:{VerifierGrpcPort}";
+            var verifierUrl = $"http://{_verifierContainer.IpAddress}:{GrpcPort}";
             return new ContainerBuilder()
                 .WithImage(imageFixture.Image)
                 .WithPortBinding(GrpcPort, true)
