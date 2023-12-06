@@ -20,9 +20,7 @@
         "vscode": {
             "extensions": [
                 "EditorConfig.EditorConfig",
-                "ms-dotnettools.csharp",
                 "ms-dotnettools.csdevkit",
-                "formulahendry.dotnet-test-explorer",
                 "ryanluker.vscode-coverage-gutters",
                 "DotJoshJohnson.xml",
                 "zxh404.vscode-proto3",
