@@ -58,7 +58,7 @@ public class VerifyTransactionConsumer : IConsumer<VerifyTransaction>
             if (!result.Valid)
                 throw new InvalidTransactionException(result.ErrorMessage);
 
-            var nextEventIndex = stream.Count();
+            var nextEventIndex = stream.Count;
             var verifiableEvent = new StreamTransaction { TransactionHash = transactionHash, StreamId = streamId, StreamIndex = nextEventIndex, Payload = transaction.ToByteArray() };
             await _transactionRepository.Store(verifiableEvent).ConfigureAwait(false);
 

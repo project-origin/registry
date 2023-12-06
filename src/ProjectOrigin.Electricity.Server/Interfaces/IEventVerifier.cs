@@ -5,7 +5,7 @@ namespace ProjectOrigin.Electricity.Server.Interfaces;
 
 public interface IEventVerifier<TEvent> where TEvent : Google.Protobuf.IMessage
 {
-    public Task<VerificationResult> Verify(Registry.V1.Transaction transaction, GranularCertificate? model, TEvent payload);
+    public Task<VerificationResult> Verify(Registry.V1.Transaction transaction, GranularCertificate? certificate, TEvent payload);
 }
 
 

@@ -15,9 +15,9 @@ public class IssuedEventVerifier : IEventVerifier<V1.IssuedEvent>
         _gridAreaIssuerService = gridAreaIssuerService;
     }
 
-    public Task<VerificationResult> Verify(Transaction transaction, GranularCertificate? model, V1.IssuedEvent payload)
+    public Task<VerificationResult> Verify(Transaction transaction, GranularCertificate? certificate, V1.IssuedEvent payload)
     {
-        if (model is not null)
+        if (certificate is not null)
             return new VerificationResult.Invalid($"Certificate with id ”{payload.CertificateId.StreamId}” already exists");
 
         if (!payload.QuantityCommitment.VerifyCommitment(payload.CertificateId.StreamId.Value))

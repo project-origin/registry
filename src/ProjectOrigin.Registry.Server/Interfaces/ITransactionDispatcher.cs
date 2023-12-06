@@ -5,5 +5,5 @@ namespace ProjectOrigin.Registry.Server.Interfaces;
 
 public interface ITransactionDispatcher
 {
-    Task<Verifier.V1.VerifyTransactionResponse> VerifyTransaction(V1.Transaction request, IEnumerable<V1.Transaction> stream);
+    Task<Verifier.V1.VerifyTransactionResponse> VerifyTransaction(V1.Transaction transaction, IEnumerable<V1.Transaction> stream);
 }

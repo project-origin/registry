@@ -10,12 +10,12 @@ namespace ProjectOrigin.Electricity.Server.Verifiers;
 
 public class SlicedEventVerifier : IEventVerifier<V1.SlicedEvent>
 {
-    public Task<VerificationResult> Verify(Transaction transaction, GranularCertificate? productionCertificate, V1.SlicedEvent payload)
+    public Task<VerificationResult> Verify(Transaction transaction, GranularCertificate? certificate, V1.SlicedEvent payload)
     {
-        if (productionCertificate is null)
+        if (certificate is null)
             return new VerificationResult.Invalid("Certificate does not exist");
 
-        var certificateSlice = productionCertificate.GetCertificateSlice(payload.SourceSliceHash);
+        var certificateSlice = certificate.GetCertificateSlice(payload.SourceSliceHash);
         if (certificateSlice is null)
             return new VerificationResult.Invalid("Slice not found");
 
