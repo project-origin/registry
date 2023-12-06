@@ -11,7 +11,7 @@ public abstract class AbstractModelHydrator : IModelHydrater
 
     public T HydrateModel<T>(IEnumerable<object> eventStream) where T : class
     {
-        return HydrateModel(eventStream) as T ?? throw new Exception();
+        return HydrateModel(eventStream) as T ?? throw new NullReferenceException("Hydrated model is null");
     }
 
     public object? HydrateModel(IEnumerable<object> eventStream)

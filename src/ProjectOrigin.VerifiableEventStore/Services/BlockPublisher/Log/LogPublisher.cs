@@ -10,7 +10,7 @@ namespace ProjectOrigin.VerifiableEventStore.Services.BlockPublisher.Log;
 /// There is no real immutability guarantee, as the log file is not tamper evident.
 public class LogPublisher : IBlockPublisher
 {
-    private ILogger<LogPublisher> _logger;
+    private readonly ILogger<LogPublisher> _logger;
 
     public LogPublisher(ILogger<LogPublisher> logger)
     {

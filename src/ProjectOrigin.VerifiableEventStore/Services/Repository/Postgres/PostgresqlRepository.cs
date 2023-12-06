@@ -18,12 +18,10 @@ namespace ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres;
 
 public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
 {
-    private readonly BlockSizeCalculator _blockSizeCalculator;
     private readonly NpgsqlDataSource _dataSource;
 
     public PostgresqlRepository(IOptions<PostgresqlEventStoreOptions> options)
     {
-        _blockSizeCalculator = new BlockSizeCalculator();
         _dataSource = NpgsqlDataSource.Create(options.Value.ConnectionString);
 
         DefaultTypeMap.MatchNamesWithUnderscores = true;
@@ -149,7 +147,7 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
             if (maxTransactionId is null || maxTransactionId.Value < fromTransaction)
                 return null;
 
-            var toTransaction = fromTransaction + _blockSizeCalculator.CalculateBlockLength(maxTransactionId.Value - fromTransaction + 1) - 1;
+            var toTransaction = fromTransaction + BlockSizeCalculator.CalculateBlockLength(maxTransactionId.Value - fromTransaction + 1) - 1;
 
             var transactions = (await connection.QueryAsync<StreamTransaction>(
                 "SELECT transaction_hash, stream_id, stream_index, payload FROM transactions WHERE @fromTransaction <= id AND id <= @toTransaction ORDER BY ID ASC",
@@ -205,14 +203,14 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
             throw new InvalidOperationException("Block not found or already published or publication does not match");
     }
 
-    private Task<long?> GetTransactionId(IDbConnection connection, TransactionHash transactionHash)
+    private static Task<long?> GetTransactionId(IDbConnection connection, TransactionHash transactionHash)
     {
         return connection.QuerySingleOrDefaultAsync<long?>(
               "SELECT id FROM transactions WHERE transaction_hash = @transactionHash",
               new { transactionHash = transactionHash.Data });
     }
 
-    private record BlockRecord
+    private sealed record BlockRecord
     {
         public required byte[] BlockHash { get; init; }
         public required byte[] PreviousHeaderHash { get; init; }

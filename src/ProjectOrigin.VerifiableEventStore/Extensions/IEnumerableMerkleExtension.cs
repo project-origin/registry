@@ -21,7 +21,7 @@ public static class IEnumerableMerkleExtension
 
     public static IEnumerable<byte[]> GetRequiredHashes<T>(this IList<T> events, Func<T, byte[]> selector, int leafIndex)
     {
-        if (leafIndex > events.Count() - 1)
+        if (leafIndex > events.Count - 1)
         {
             throw new ArgumentException("leafIndex can not be greater than the number of events.", nameof(leafIndex));
         }

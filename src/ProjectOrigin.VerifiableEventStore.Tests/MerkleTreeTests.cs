@@ -165,7 +165,7 @@ public class MerkleTreeTests
 
     private byte[] HashRootFromMerkleProof(IEnumerable<byte[]> hashes, int leafIndex, byte[] leafContent, int balancedCount)
     {
-        if (hashes.Count() == 0)
+        if (!hashes.Any())
         {
             var data = SHA256.HashData(leafContent);
             for (int i = (int)Math.Log(balancedCount, 2); i > 0; i--)
@@ -195,12 +195,12 @@ public class MerkleTreeTests
         }
     }
 
-    private byte[] Sha256(byte[] a)
+    private static byte[] Sha256(byte[] a)
     {
         return SHA256.HashData(a);
     }
 
-    private byte[] Sha256(byte[] a, byte[] b)
+    private static byte[] Sha256(byte[] a, byte[] b)
     {
         return SHA256.HashData(a.Concat(b).ToArray());
     }

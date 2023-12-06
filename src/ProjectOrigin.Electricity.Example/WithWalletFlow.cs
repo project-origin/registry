@@ -11,7 +11,9 @@ using Microsoft.IdentityModel.Tokens;
 using ProjectOrigin.Common.V1;
 using ProjectOrigin.Electricity.Example.Extensions;
 using ProjectOrigin.HierarchicalDeterministicKeys;
+using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.PedersenCommitment;
+using ProjectOrigin.Registry.V1;
 using RegistryV1 = ProjectOrigin.Registry.V1;
 using WalletV1 = ProjectOrigin.WalletSystem.V1;
 
@@ -68,75 +70,75 @@ public class WithWalletFlow
 
         // ------------------  Issue Consumption ------------------
         // Create a new ConsumptionIssuedEvent, sign it and sent it to the registry.
-        {
-            Console.WriteLine($"Issuing consumption Granular Certificate");
-
-            var consCertId = eventBuilder.ToCertId(ConsRegistryName, Guid.NewGuid());
-            var consCommitmentInfo = new SecretCommitmentInfo(250);
-
-            // Set next deposit endpoint position
-            depositEndpointPosition++;
-
-            // Derive next Heriarchical Deterministic Key
-            var haKey = ownerKey.Derive(depositEndpointPosition).GetPublicKey();
-
-            // Create issued event
-            var consumptionIssued = eventBuilder.CreateConsumptionIssuedEvent(consCertId, consCommitmentInfo, haKey);
-
-            // Sign the event as a transaction
-            var signedTransaction = issuerKey.SignTransaction(consumptionIssued.CertificateId, consumptionIssued);
-
-            // Send transaction to registry, and wait for committed state
-            await consClient.SendTransactionAndWait(signedTransaction);
-
-            // Send information to wallet using the original publicKey and position
-            await SendInfoToWallet(receiveClient, depositEndpointPosition, depositEndpoint.WalletDepositEndpoint.PublicKey, consCertId, consCommitmentInfo);
-        }
+        Console.WriteLine($"Issuing consumption Granular Certificate");
+        await NewMethod(issuerKey, consClient, receiveClient, eventBuilder, depositEndpoint, ownerKey, depositEndpointPosition++);
 
         // ------------------  Issue production ------------------
         // Create a new ProductionIssuedEvent, sign it and sent it to the registry.
-        {
-            Console.WriteLine($"Issuing Production Granular Certificate");
-
-            var prodCertId = eventBuilder.ToCertId(ProdRegistryName, Guid.NewGuid());
-            var prodCommitmentInfo = new SecretCommitmentInfo(350);
-
-            // Set next deposit endpoint position
-            depositEndpointPosition++;
-
-            // Derive next Heriarchical Deterministic Key
-            var haKey = ownerKey.Derive(depositEndpointPosition).GetPublicKey();
-
-            // Create issued event
-            var productionIssued = eventBuilder.CreateProductionIssuedEvent(prodCertId, prodCommitmentInfo, haKey);
-
-            // Sign the event as a transaction
-            var signedTransaction = issuerKey.SignTransaction(productionIssued.CertificateId, productionIssued);
-
-            // Send transaction to registry, and wait for committed state
-            await prodClient.SendTransactionAndWait(signedTransaction);
-
-            // Send information to wallet using the original publicKey and position
-            await SendInfoToWallet(receiveClient, depositEndpointPosition, depositEndpoint.WalletDepositEndpoint.PublicKey, prodCertId, prodCommitmentInfo);
-        }
+        Console.WriteLine($"Issuing Production Granular Certificate");
+        await IssueProductionCertificate(issuerKey, prodClient, receiveClient, eventBuilder, depositEndpoint, ownerKey, depositEndpointPosition++);
 
         // ------------------  Query wallet ------------------
-        {
-            await Task.Delay(5000);
-            Console.WriteLine($"Querying wallet");
-
-            var walletInfo = await walletClient.QueryGranularCertificatesAsync(new WalletV1.QueryRequest(), header);
-
-            Console.WriteLine($"Wallet certificates:");
-            Console.WriteLine($"- Registry - StreamId - Type - Quantity");
-            foreach (var cert in walletInfo.GranularCertificates)
-            {
-                Console.WriteLine($"- {cert.FederatedId.Registry} - {cert.FederatedId.StreamId.Value} - {cert.Type} - {cert.Quantity}");
-            }
-            Console.WriteLine($"---------------------------------");
-        }
+        await Task.Delay(5000);
+        Console.WriteLine($"Querying wallet");
+        await PrintWalletContent(walletClient, header);
 
         return 0;
+    }
+
+    private static async Task PrintWalletContent(WalletV1.WalletService.WalletServiceClient walletClient, Metadata header)
+    {
+        var walletInfo = await walletClient.QueryGranularCertificatesAsync(new WalletV1.QueryRequest(), header);
+
+        Console.WriteLine($"Wallet certificates:");
+        Console.WriteLine($"- Registry - StreamId - Type - Quantity");
+        foreach (var cert in walletInfo.GranularCertificates)
+        {
+            Console.WriteLine($"- {cert.FederatedId.Registry} - {cert.FederatedId.StreamId.Value} - {cert.Type} - {cert.Quantity}");
+        }
+        Console.WriteLine($"---------------------------------");
+    }
+
+    private async Task IssueProductionCertificate(IPrivateKey issuerKey, RegistryService.RegistryServiceClient prodClient, WalletV1.ReceiveSliceService.ReceiveSliceServiceClient receiveClient, ProtoEventBuilder eventBuilder, WalletV1.CreateWalletDepositEndpointResponse depositEndpoint, IHDPublicKey ownerKey, int depositEndpointPosition)
+    {
+        var prodCertId = ProtoEventBuilder.ToCertId(ProdRegistryName, Guid.NewGuid());
+        var prodCommitmentInfo = new SecretCommitmentInfo(350);
+
+        // Derive next Heriarchical Deterministic Key
+        var haKey = ownerKey.Derive(depositEndpointPosition).GetPublicKey();
+
+        // Create issued event
+        var productionIssued = eventBuilder.CreateProductionIssuedEvent(prodCertId, prodCommitmentInfo, haKey);
+
+        // Sign the event as a transaction
+        var signedTransaction = issuerKey.SignTransaction(productionIssued.CertificateId, productionIssued);
+
+        // Send transaction to registry, and wait for committed state
+        await prodClient.SendTransactionAndWait(signedTransaction);
+
+        // Send information to wallet using the original publicKey and position
+        await SendInfoToWallet(receiveClient, depositEndpointPosition, depositEndpoint.WalletDepositEndpoint.PublicKey, prodCertId, prodCommitmentInfo);
+    }
+
+    private async Task NewMethod(IPrivateKey issuerKey, RegistryService.RegistryServiceClient consClient, WalletV1.ReceiveSliceService.ReceiveSliceServiceClient receiveClient, ProtoEventBuilder eventBuilder, WalletV1.CreateWalletDepositEndpointResponse depositEndpoint, IHDPublicKey ownerKey, int depositEndpointPosition)
+    {
+        var consCertId = ProtoEventBuilder.ToCertId(ConsRegistryName, Guid.NewGuid());
+        var consCommitmentInfo = new SecretCommitmentInfo(250);
+
+        // Derive next Heriarchical Deterministic Key
+        var haKey = ownerKey.Derive(depositEndpointPosition).GetPublicKey();
+
+        // Create issued event
+        var consumptionIssued = eventBuilder.CreateConsumptionIssuedEvent(consCertId, consCommitmentInfo, haKey);
+
+        // Sign the event as a transaction
+        var signedTransaction = issuerKey.SignTransaction(consumptionIssued.CertificateId, consumptionIssued);
+
+        // Send transaction to registry, and wait for committed state
+        await consClient.SendTransactionAndWait(signedTransaction);
+
+        // Send information to wallet using the original publicKey and position
+        await SendInfoToWallet(receiveClient, depositEndpointPosition, depositEndpoint.WalletDepositEndpoint.PublicKey, consCertId, consCommitmentInfo);
     }
 
     private static async Task SendInfoToWallet(WalletV1.ReceiveSliceService.ReceiveSliceServiceClient walletClient, int position, ByteString publicKey, FederatedStreamId certId, SecretCommitmentInfo consCommitmentInfo)

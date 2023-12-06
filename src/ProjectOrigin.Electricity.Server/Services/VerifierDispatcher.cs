@@ -41,7 +41,6 @@ public class VerifierDispatcher : IVerifierDispatcher
         var methodInfo = verifier.GetType().GetMethod(VerifyMethodName) ??
             throw new NotImplementedException($"Could not find ”{VerifyMethodName}” method for type ”{transaction.Header.PayloadType}”");
 
-        return methodInfo.Invoke(verifier, new object[] { transaction, model!, @event }) as Task<VerificationResult>
-            ?? throw new Exception("Imposible exception, result is wrong type");
+        return (Task<VerificationResult>)methodInfo.Invoke(verifier, new object[] { transaction, model!, @event })!;
     }
 }

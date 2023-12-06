@@ -19,9 +19,9 @@ public class RegistryService : V1.RegistryService.RegistryServiceBase
     public static Meter Meter = new("Registry.RegistryService");
     public static Counter<long> TransactionsSubmitted = Meter.CreateCounter<long>("TransactionsSubmitted");
 
-    private ITransactionRepository _transactionRepository;
-    private IBus _bus;
-    private ITransactionStatusService _transactionStatusService;
+    private readonly ITransactionRepository _transactionRepository;
+    private readonly IBus _bus;
+    private readonly ITransactionStatusService _transactionStatusService;
 
     public RegistryService(ITransactionRepository eventStore, IBus bus, ITransactionStatusService transactionStatusService)
     {

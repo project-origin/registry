@@ -103,7 +103,7 @@ public class FlowTests : GrpcTestBase<Startup>
         return result;
     }
 
-    private Registry.V1.Transaction SignEvent(Common.V1.FederatedStreamId streamId, IMessage @event, IPrivateKey signerKey)
+    private static Registry.V1.Transaction SignEvent(Common.V1.FederatedStreamId streamId, IMessage @event, IPrivateKey signerKey)
     {
         var header = new Registry.V1.TransactionHeader()
         {

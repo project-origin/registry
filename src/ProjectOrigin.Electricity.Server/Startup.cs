@@ -17,8 +17,7 @@ public class Startup
     {
         services.AddGrpc();
 
-        services.AddSingleton<IProtoDeserializer>(new ProtoDeserializer(Assembly.GetAssembly(typeof(V1.IssuedEvent))
-            ?? throw new Exception("Could not find assembly")));
+        services.AddSingleton<IProtoDeserializer>(new ProtoDeserializer(Assembly.GetAssembly(typeof(V1.IssuedEvent))!));
 
         services.AddTransient<IEventVerifier<V1.IssuedEvent>, IssuedEventVerifier>();
         services.AddTransient<IEventVerifier<V1.AllocatedEvent>, AllocatedEventVerifier>();

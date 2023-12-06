@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Grpc.Net.Client;
@@ -30,7 +31,7 @@ public class GrpcRemoteModelLoader : IRemoteModelLoader
         }
         else
         {
-            throw new Exception($"Registry ”{registryName}” not known");
+            throw new KeyNotFoundException($"Registry ”{registryName}” not known");
         }
     }
 
