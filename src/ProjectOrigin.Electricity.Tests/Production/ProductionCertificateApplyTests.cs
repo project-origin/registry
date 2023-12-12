@@ -4,9 +4,7 @@ using AutoFixture;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using ProjectOrigin.Electricity.Extensions;
-using ProjectOrigin.Electricity.Models;
-using ProjectOrigin.Electricity.Server.Verifiers;
-
+using ProjectOrigin.Electricity.Server.Models;
 using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.PedersenCommitment;
 using Xunit;

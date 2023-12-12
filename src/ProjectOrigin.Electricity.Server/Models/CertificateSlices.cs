@@ -1,4 +1,4 @@
-namespace ProjectOrigin.Electricity.Models;
+namespace ProjectOrigin.Electricity.Server.Models;
 
 public record AllocationSlice(
     Electricity.V1.Commitment Commitment,

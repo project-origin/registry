@@ -6,13 +6,12 @@ using AutoFixture;
 using Microsoft.Extensions.Options;
 using Moq;
 using ProjectOrigin.Electricity.Extensions;
-using ProjectOrigin.Electricity.Models;
+using ProjectOrigin.Electricity.Server.Models;
 using ProjectOrigin.Electricity.Server.Options;
 using ProjectOrigin.Electricity.Server.Services;
 using ProjectOrigin.Electricity.Server.Verifiers;
 using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
-using ProjectOrigin.PedersenCommitment;
 using Xunit;
 
 namespace ProjectOrigin.Electricity.Tests;
