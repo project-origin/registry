@@ -66,7 +66,7 @@ public class PostgresqlUpgrader : IRepositoryUpgrader
                     .Build();
     }
 
-    private class LoggerWrapper : IUpgradeLog
+    private sealed class LoggerWrapper : IUpgradeLog
     {
         private readonly ILogger _logger;
 
