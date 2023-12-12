@@ -19,6 +19,7 @@ public class ConcordiumPublisher : IBlockPublisher, IDisposable
     private readonly ILogger<ConcordiumPublisher> _logger;
     private readonly IOptions<ConcordiumOptions> _options;
     private readonly ConcordiumClient _concordiumClient;
+    private bool _disposed = false;
 
     public ConcordiumPublisher(ILogger<ConcordiumPublisher> logger, IOptions<ConcordiumOptions> options)
     {
@@ -101,8 +102,28 @@ public class ConcordiumPublisher : IBlockPublisher, IDisposable
         return signer;
     }
 
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _concordiumClient.Dispose();
+            }
+            _disposed = true;
+        }
+    }
+
     public void Dispose()
     {
-        _concordiumClient.Dispose();
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
+
+    ~ConcordiumPublisher()
+    {
+        Dispose(false);
+    }
+
 }

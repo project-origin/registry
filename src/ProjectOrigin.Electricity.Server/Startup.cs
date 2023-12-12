@@ -1,9 +1,9 @@
-using System;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using ProjectOrigin.Electricity.Server.Interfaces;
 using ProjectOrigin.Electricity.Server.Options;
 using ProjectOrigin.Electricity.Server.Services;
@@ -30,20 +30,20 @@ public class Startup
         services.AddTransient<IModelHydrater, ElectricityModelHydrater>();
         services.AddTransient<IGridAreaIssuerService, GridAreaIssuerOptionsService>();
 
+        services.AddSingleton<IValidateOptions<IssuerOptions>, IssuerOptionsValidator>();
         services.AddOptions<IssuerOptions>()
             .Configure<IConfiguration>((settings, configuration) =>
             {
                 configuration.Bind(settings);
             })
-            .Validate(option => option.Verify())
             .ValidateOnStart();
 
+        services.AddSingleton<IValidateOptions<RegistryOptions>, RegistryOptionsValidator>();
         services.AddOptions<RegistryOptions>()
             .Configure<IConfiguration>((settings, configuration) =>
             {
                 configuration.Bind(settings);
             })
-            .Validate(x => x.Verify())
             .ValidateOnStart();
     }
 

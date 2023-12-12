@@ -16,8 +16,8 @@ namespace ProjectOrigin.Registry.Server;
 
 public class RegistryService : V1.RegistryService.RegistryServiceBase
 {
-    public static Meter Meter = new("Registry.RegistryService");
-    public static Counter<long> TransactionsSubmitted = Meter.CreateCounter<long>("TransactionsSubmitted");
+    public static readonly Meter Meter = new("Registry.RegistryService");
+    public static readonly Counter<long> TransactionsSubmitted = Meter.CreateCounter<long>("TransactionsSubmitted");
 
     private readonly ITransactionRepository _transactionRepository;
     private readonly IBus _bus;

@@ -13,10 +13,10 @@ namespace ProjectOrigin.VerifiableEventStore.Services.BlockFinalizer;
 
 public sealed class BlockFinalizerJob
 {
-    public static Meter Meter = new("Registry.BlockFinalizer");
-    public static Counter<long> BlockCounter = Meter.CreateCounter<long>("block_finalizer.blocks_processed");
-    public static Counter<long> TransactionCounter = Meter.CreateCounter<long>("block_finalizer.transactions_processed");
-    public static Histogram<long> BlockTime = Meter.CreateHistogram<long>("block_finalizer.milliseconds_per_block");
+    public static readonly Meter Meter = new("Registry.BlockFinalizer");
+    public static readonly Counter<long> BlockCounter = Meter.CreateCounter<long>("block_finalizer.blocks_processed");
+    public static readonly Counter<long> TransactionCounter = Meter.CreateCounter<long>("block_finalizer.transactions_processed");
+    public static readonly Histogram<long> BlockTime = Meter.CreateHistogram<long>("block_finalizer.milliseconds_per_block");
 
     private readonly ILogger<BlockFinalizerJob> _logger;
     private readonly IBlockPublisher _publisher;

@@ -2,6 +2,7 @@ using System;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Google.Protobuf;
+using ProjectOrigin.Electricity.Example.Exceptions;
 using ProjectOrigin.Registry.V1;
 
 namespace ProjectOrigin.Electricity.Example.Extensions;
@@ -35,7 +36,7 @@ public static class RegistryServiceClientExtensions
             if (result.Status == TransactionState.Committed)
                 return result;
             else if (result.Status == TransactionState.Failed)
-                throw new Exception($"Transaction failed ”{result.Status}” with message ”{result.Message}”");
+                throw new InvalidTransactionException($"Transaction failed ”{result.Status}” with message ”{result.Message}”");
 
             await Task.Delay(1000);
 

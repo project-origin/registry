@@ -69,7 +69,8 @@ public static class IEnumerableMerkleExtension
             var data = SHA256.HashData(nodes.Single());
             for (int i = (int)Math.Log(balancedCount, 2); i > 0; i--)
             {
-                data = SHA256.HashData(data.Concat(data).ToArray());
+                var doubleData = data.Concat(data);
+                data = SHA256.HashData(doubleData.ToArray());
             }
             return data;
         }
