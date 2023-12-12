@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Moq;
-using ProjectOrigin.Electricity.Models;
+using ProjectOrigin.Electricity.Server.Models;
 using ProjectOrigin.Electricity.Server.Interfaces;
 using ProjectOrigin.Electricity.Server.Verifiers;
 using ProjectOrigin.HierarchicalDeterministicKeys;

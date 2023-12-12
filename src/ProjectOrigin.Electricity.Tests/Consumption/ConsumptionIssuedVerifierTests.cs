@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using AutoFixture;
 using Microsoft.Extensions.Options;
 using Moq;
-using ProjectOrigin.Electricity.Models;
+using ProjectOrigin.Electricity.Server.Models;
 using ProjectOrigin.Electricity.Server.Options;
 using ProjectOrigin.Electricity.Server.Services;
 using ProjectOrigin.Electricity.Server.Verifiers;

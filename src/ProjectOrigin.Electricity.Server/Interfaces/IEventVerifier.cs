@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using ProjectOrigin.Electricity.Models;
+using ProjectOrigin.Electricity.Server.Models;
 
 namespace ProjectOrigin.Electricity.Server.Interfaces;
 

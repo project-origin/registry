@@ -3,7 +3,7 @@ using ProjectOrigin.Electricity.V1;
 using ProjectOrigin.Registry.V1;
 using System.Threading.Tasks;
 using System;
-using ProjectOrigin.Electricity.Models;
+using ProjectOrigin.Electricity.Server.Models;
 using ProjectOrigin.Electricity.Server.Interfaces;
 
 namespace ProjectOrigin.Electricity.Server.Verifiers;

@@ -2,7 +2,7 @@ using ProjectOrigin.Electricity.Extensions;
 using ProjectOrigin.PedersenCommitment;
 using ProjectOrigin.Registry.V1;
 using System.Threading.Tasks;
-using ProjectOrigin.Electricity.Models;
+using ProjectOrigin.Electricity.Server.Models;
 using System;
 using ProjectOrigin.Electricity.Server.Interfaces;
 
