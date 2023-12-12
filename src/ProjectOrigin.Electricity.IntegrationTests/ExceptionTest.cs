@@ -94,7 +94,7 @@ public class ExceptionTest : GrpcTestBase<Startup>
         result.Valid.Should().BeFalse();
     }
 
-    private VerifyTransactionRequest CreateInvalidSignedEvent(IPrivateKey signerKey, IMessage @event, string type)
+    private static VerifyTransactionRequest CreateInvalidSignedEvent(IPrivateKey signerKey, IMessage @event, string type)
     {
         var header = new Registry.V1.TransactionHeader()
         {

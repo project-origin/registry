@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ProjectOrigin.Registry.Server.Exceptions;
 using ProjectOrigin.VerifiableEventStore.Services.Repository;
 using Serilog;
 using Serilog.Enrichers.Span;
@@ -78,7 +79,7 @@ public static class IConfigurationExtensions
                 break;
 
             default:
-                throw new ArgumentOutOfRangeException("LogOutputFormat", "Invalid log output format.");
+                throw new InvalidConfigurationException("Invalid log output format.");
         }
 
         return loggerConfiguration.CreateLogger();

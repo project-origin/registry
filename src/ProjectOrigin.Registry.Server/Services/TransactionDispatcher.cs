@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Grpc.Net.Client;
 using Microsoft.Extensions.Options;
+using ProjectOrigin.Registry.Server.Exceptions;
 using ProjectOrigin.Registry.Server.Interfaces;
 using ProjectOrigin.Registry.Server.Models;
 using ProjectOrigin.Registry.V1;
@@ -24,7 +25,7 @@ public class TransactionDispatcher : ITransactionDispatcher
 
     public async Task<VerifyTransactionResponse> VerifyTransaction(Transaction transaction, IEnumerable<Transaction> stream)
     {
-        var index = transaction.Header.PayloadType.LastIndexOf(".");
+        var index = transaction.Header.PayloadType.LastIndexOf('.');
         var family = transaction.Header.PayloadType.Substring(0, index);
 
         var client = GetClient(family);
@@ -52,7 +53,7 @@ public class TransactionDispatcher : ITransactionDispatcher
         }
         else
         {
-            throw new Exception($"No verifier found for transaction family {family}");
+            throw new InvalidConfigurationException($"No verifier found for transaction family {family}");
         }
     }
 }

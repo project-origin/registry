@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ProjectOrigin.Registry.Server.Exceptions;
 using ProjectOrigin.Registry.Server.Extensions;
 using ProjectOrigin.VerifiableEventStore.Services.Repository;
 using Serilog;
@@ -33,7 +34,7 @@ try
 
         var upgrader = app.Services.GetRequiredService<IRepositoryUpgrader>();
         if (await upgrader.IsUpgradeRequired())
-            throw new SystemException("Repository is not up to date. Please run with --migrate first.");
+            throw new DatabaseStateException("Repository is not up to date. Please run with --migrate first.");
 
         await app.RunAsync();
         Log.Information("Server stopped.");

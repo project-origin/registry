@@ -26,10 +26,6 @@ public class IssuedEventVerifier : IEventVerifier<V1.IssuedEvent>
         if (payload.Type == V1.GranularCertificateType.Invalid)
             return new VerificationResult.Invalid("Invalid certificate type");
 
-        // if (payload.QuantityPublication is not null
-        //     && !payload.QuantityCommitment.VerifyPublication(payload.QuantityPublication))
-        //     return new VerificationResult.Invalid($"Private and public quantity proof does not match");
-
         if (!payload.OwnerPublicKey.TryToModel(out _))
             return new VerificationResult.Invalid("Invalid owner key, not a valid publicKey");
 

@@ -66,7 +66,6 @@ public class ConcordiumPublisher : IBlockPublisher, IDisposable
                     _logger.LogDebug("Block finalized");
                     return status.Finalized.Outcome;
 
-
                 case ConcordiumV2.BlockItemStatus.StatusOneofCase.Received:
                 case ConcordiumV2.BlockItemStatus.StatusOneofCase.Committed:
                     _logger.LogDebug("Block not yet finalized");
@@ -76,7 +75,7 @@ public class ConcordiumPublisher : IBlockPublisher, IDisposable
                     throw new NotSupportedException("Transaction status is None");
 
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new NotImplementedException($"Transaction status is {status.StatusCase}");
             }
         }
     }
@@ -94,7 +93,7 @@ public class ConcordiumPublisher : IBlockPublisher, IDisposable
         return await _concordiumClient.SendAccountTransactionAsync(signedTransaction);
     }
 
-    private ITransactionSigner GetSigner()
+    private TransactionSigner GetSigner()
     {
         var ed25519TransactionSigner = Ed25519SignKey.From(_options.Value.AccountKey);
         var signer = new TransactionSigner();

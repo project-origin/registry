@@ -36,12 +36,12 @@ public class GranularCertificate
         else if (_issued.Type == V1.GranularCertificateType.Consumption)
             AllocateSlice(e.ConsumptionSourceSliceHash, e);
         else
-            throw new NotSupportedException($"Certificate type ”{_issued.Type.ToString()}” is not supported");
+            throw new NotSupportedException($"Certificate type ”{_issued.Type}” is not supported");
     }
 
     public void Apply(V1.ClaimedEvent e)
     {
-        var slice = GetAllocation(e.AllocationId) ?? throw new Exception("Invalid state");
+        var slice = GetAllocation(e.AllocationId) ?? throw new KeyNotFoundException($"allocation not found ”{e.AllocationId}” - Invalid state");
         _allocationSlices.Remove(e.AllocationId);
         _claimedSlices.Add(e.AllocationId, slice);
     }
@@ -62,7 +62,7 @@ public class GranularCertificate
 
     protected CertificateSlice TakeAvailableSlice(ByteString sliceHash)
     {
-        var oldSlice = GetCertificateSlice(sliceHash) ?? throw new Exception("Invalid state");
+        var oldSlice = GetCertificateSlice(sliceHash) ?? throw new KeyNotFoundException($"slice not found ”{sliceHash}” - Invalid state");
         _availableSlices.Remove(sliceHash);
         return oldSlice;
     }

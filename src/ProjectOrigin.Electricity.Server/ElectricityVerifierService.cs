@@ -29,10 +29,10 @@ internal class ElectricityVerifierService : VerifierService.VerifierServiceBase
                 Valid = true
             };
 
-            if (result is VerificationResult.Invalid)
+            if (result is VerificationResult.Invalid invalidResult)
             {
                 response.Valid = false;
-                response.ErrorMessage = ((VerificationResult.Invalid)result).ErrorMessage;
+                response.ErrorMessage = invalidResult.ErrorMessage;
             }
 
             return response;

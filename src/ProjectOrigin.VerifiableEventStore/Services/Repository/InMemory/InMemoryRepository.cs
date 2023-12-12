@@ -13,15 +13,9 @@ namespace ProjectOrigin.VerifiableEventStore.Services.EventStore.InMemory;
 
 public class InMemoryRepository : ITransactionRepository
 {
-    private readonly BlockSizeCalculator _blockSizeCalculator;
     private readonly object _lockObject = new();
     private readonly List<StreamTransaction> _events = new();
     private readonly Dictionary<BlockHash, BlockRecord> _blocks = new();
-
-    public InMemoryRepository()
-    {
-        _blockSizeCalculator = new BlockSizeCalculator();
-    }
 
     public Task<NewBlock?> CreateNextBlock()
     {
@@ -36,7 +30,7 @@ public class InMemoryRepository : ITransactionRepository
             if (_events.Count <= fromTransaction)
                 return Task.FromResult<NewBlock?>(null);
 
-            var numberOfTransactions = (int)_blockSizeCalculator.CalculateBlockLength(_events.Count - fromTransaction);
+            var numberOfTransactions = (int)BlockSizeCalculator.CalculateBlockLength(_events.Count - fromTransaction);
 
             var transactions = _events.Skip(fromTransaction).Take(numberOfTransactions).ToList();
 
@@ -158,5 +152,5 @@ public class InMemoryRepository : ITransactionRepository
     }
 
 
-    private record BlockRecord(ImmutableLog.V1.BlockHeader Header, ImmutableLog.V1.BlockPublication? Publication, int FromTransaction, int ToTransaction);
+    private sealed record BlockRecord(ImmutableLog.V1.BlockHeader Header, ImmutableLog.V1.BlockPublication? Publication, int FromTransaction, int ToTransaction);
 }

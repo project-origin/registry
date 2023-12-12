@@ -9,9 +9,9 @@ public abstract class AbstractModelHydrator : IModelHydrater
 {
     protected const string ApplyMethodName = "Apply";
 
-    public T HydrateModel<T>(IEnumerable<object> eventStream) where T : class
+    public T? HydrateModel<T>(IEnumerable<object> eventStream) where T : class
     {
-        return HydrateModel(eventStream) as T ?? throw new Exception();
+        return HydrateModel(eventStream) as T;
     }
 
     public object? HydrateModel(IEnumerable<object> eventStream)

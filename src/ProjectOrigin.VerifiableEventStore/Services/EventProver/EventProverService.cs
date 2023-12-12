@@ -8,7 +8,7 @@ namespace ProjectOrigin.VerifiableEventStore.Services.EventProver;
 
 public class EventProverService : IEventProver
 {
-    private ITransactionRepository _transactionRepository;
+    private readonly ITransactionRepository _transactionRepository;
 
     public EventProverService(ITransactionRepository eventStore)
     {

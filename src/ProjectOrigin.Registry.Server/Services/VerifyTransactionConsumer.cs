@@ -18,11 +18,11 @@ namespace ProjectOrigin.Registry.Server.Services;
 
 public class VerifyTransactionConsumer : IConsumer<VerifyTransaction>
 {
-    private TransactionProcessorOptions _options;
-    private ITransactionRepository _transactionRepository;
-    private ITransactionDispatcher _verifier;
-    private ITransactionStatusService _transactionStatusService;
-    private ILogger<VerifyTransactionConsumer> _logger;
+    private readonly TransactionProcessorOptions _options;
+    private readonly ITransactionRepository _transactionRepository;
+    private readonly ITransactionDispatcher _verifier;
+    private readonly ITransactionStatusService _transactionStatusService;
+    private readonly ILogger<VerifyTransactionConsumer> _logger;
 
     public VerifyTransactionConsumer(IOptions<TransactionProcessorOptions> options,
                                 ITransactionRepository transactionRepository,
@@ -43,7 +43,7 @@ public class VerifyTransactionConsumer : IConsumer<VerifyTransaction>
         var transactionHash = transaction.GetTransactionHash();
         try
         {
-            _logger.LogDebug($"Processing transaction {transactionHash}");
+            _logger.LogDebug("Processing transaction {transactionHash}", transactionHash);
 
             if (transaction.Header.FederatedStreamId.Registry != _options.RegistryName)
                 throw new InvalidTransactionException("Invalid registry for transaction");
@@ -62,7 +62,7 @@ public class VerifyTransactionConsumer : IConsumer<VerifyTransaction>
             var verifiableEvent = new StreamTransaction { TransactionHash = transactionHash, StreamId = streamId, StreamIndex = nextEventIndex, Payload = transaction.ToByteArray() };
             await _transactionRepository.Store(verifiableEvent).ConfigureAwait(false);
 
-            _logger.LogDebug($"Transaction processed {transactionHash}");
+            _logger.LogDebug("Transaction processed {transactionHash}", transactionHash);
         }
         catch (InvalidTransactionException ex)
         {

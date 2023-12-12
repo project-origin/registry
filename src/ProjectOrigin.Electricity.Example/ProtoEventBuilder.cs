@@ -73,7 +73,7 @@ public class ProtoEventBuilder
         return @event;
     }
 
-    public Electricity.V1.SlicedEvent CreateSliceEvent(FederatedStreamId certId, IPublicKey newOwnerKey, SecretCommitmentInfo sourceSlice, params SecretCommitmentInfo[] slices)
+    public static Electricity.V1.SlicedEvent CreateSliceEvent(FederatedStreamId certId, IPublicKey newOwnerKey, SecretCommitmentInfo sourceSlice, params SecretCommitmentInfo[] slices)
     {
         var sumOfNewSlices = slices.Aggregate((left, right) => left + right);
         var equalityProof = SecretCommitmentInfo.CreateEqualityProof(sourceSlice, sumOfNewSlices, certId.StreamId.Value);
@@ -101,7 +101,7 @@ public class ProtoEventBuilder
         return @event;
     }
 
-    public Electricity.V1.AllocatedEvent CreateAllocatedEvent(Guid allocationId, FederatedStreamId prodCertId, FederatedStreamId consCertId, SecretCommitmentInfo prodComtInfo, SecretCommitmentInfo consComtInfo)
+    public static Electricity.V1.AllocatedEvent CreateAllocatedEvent(Guid allocationId, FederatedStreamId prodCertId, FederatedStreamId consCertId, SecretCommitmentInfo prodComtInfo, SecretCommitmentInfo consComtInfo)
     {
         var equalityProof = SecretCommitmentInfo.CreateEqualityProof(prodComtInfo, consComtInfo, allocationId.ToString());
 
@@ -116,7 +116,7 @@ public class ProtoEventBuilder
         };
     }
 
-    public Electricity.V1.ClaimedEvent CreateClaimEvent(Guid allocationId, FederatedStreamId certificateId)
+    public static Electricity.V1.ClaimedEvent CreateClaimEvent(Guid allocationId, FederatedStreamId certificateId)
     {
         return new Electricity.V1.ClaimedEvent
         {
@@ -125,7 +125,7 @@ public class ProtoEventBuilder
         };
     }
 
-    public FederatedStreamId ToCertId(string registry, Guid certId)
+    public static FederatedStreamId ToCertId(string registry, Guid certId)
     {
         return new Common.V1.FederatedStreamId
         {
@@ -146,7 +146,7 @@ public class ProtoEventBuilder
         };
     }
 
-    private ByteString ToSliceId(PedersenCommitment.Commitment commitment)
+    private static ByteString ToSliceId(PedersenCommitment.Commitment commitment)
     {
         return ByteString.CopyFrom(SHA256.HashData(commitment.C));
     }
