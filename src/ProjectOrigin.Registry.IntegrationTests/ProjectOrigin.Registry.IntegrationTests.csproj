@@ -9,8 +9,8 @@
     <PackageReference Include="Moq" Version="4.20.70" />
     <PackageReference Include="AutoFixture" Version="4.18.1" />
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
-    <PackageReference Include="xunit" Version="2.6.2" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.4">
+    <PackageReference Include="xunit" Version="2.6.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.5">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -31,7 +31,7 @@
 
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.25.1" />
-    <PackageReference Include="Grpc.Tools" Version="2.59.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.60.0" />
     <Protobuf Include="..\Protos\electricity.proto" GrpcServices="None" />
   </ItemGroup>
 
