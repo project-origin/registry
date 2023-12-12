@@ -153,7 +153,7 @@ public class MerkleTreeTests
         Assert.Equal(rootHash, calculatedRoot);
     }
 
-    private byte[] HashRootFromMerkleProof(MerkleProof proof)
+    private static byte[] HashRootFromMerkleProof(MerkleProof proof)
     {
         var balancedTreeNodeCount = (int)Math.Pow(2, proof.Hashes.Count());
         if (proof.LeafIndex >= balancedTreeNodeCount)
@@ -163,7 +163,7 @@ public class MerkleTreeTests
     }
 
 
-    private byte[] HashRootFromMerkleProof(IEnumerable<byte[]> hashes, int leafIndex, byte[] leafContent, int balancedCount)
+    private static byte[] HashRootFromMerkleProof(IEnumerable<byte[]> hashes, int leafIndex, byte[] leafContent, int balancedCount)
     {
         if (!hashes.Any())
         {
