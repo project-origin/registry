@@ -80,9 +80,9 @@ verifiers:
         publicKey: $PublicKeyBase64
     registries:
       - name: ${registry_a_name}
-        address: http://registry-${registry_a_name}.${registry_a_namespace}:80
+        address: http://registry-${registry_a_name}.${registry_a_namespace}:5000
       - name: ${registry_b_name}
-        address: http://registry-${registry_b_name}-postfix.${registry_b_namespace}:80
+        address: http://registry-${registry_b_name}-postfix.${registry_b_namespace}:5000
 EOF
 
 # generate values
@@ -98,9 +98,9 @@ messageBroker:
   type: inMemory
 registries:
   - name: ${registry_a_name}
-    address: http://registry-${registry_a_name}.${registry_a_namespace}:80
+    address: http://registry-${registry_a_name}.${registry_a_namespace}:5000
   - name: ${registry_b_name}
-    address: http://registry-${registry_b_name}-postfix.${registry_b_namespace}:80
+    address: http://registry-${registry_b_name}-postfix.${registry_b_namespace}:5000
 EOF
 
 # install wallet

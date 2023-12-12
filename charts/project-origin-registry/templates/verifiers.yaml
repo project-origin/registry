@@ -38,8 +38,12 @@ spec:
   selector:
     app: registry-{{ $.Release.Name }}-verifier-{{ .name }}
   ports:
-    - name: grpc
+    - name: legacy
       protocol: TCP
       port: 80
-      targetPort: 80
+      targetPort: 5000
+    - name: grpc
+      protocol: TCP
+      port: 5000
+      targetPort: 5000
 {{- end }}
