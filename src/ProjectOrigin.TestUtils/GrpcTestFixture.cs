@@ -38,6 +38,7 @@ namespace ProjectOrigin.TestUtils
         private IHost? _host;
         private HttpMessageHandler? _handler;
         private GrpcChannel? _channel;
+        private bool _disposed = false;
         private Dictionary<string, string?>? _configurationDictionary;
 
         public event LogMessage? LoggedMessage;
@@ -117,12 +118,30 @@ namespace ProjectOrigin.TestUtils
             });
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _channel?.Dispose();
+                    _handler?.Dispose();
+                    _host?.Dispose();
+                    _server?.Dispose();
+                }
+                _disposed = true;
+            }
+        }
+
         public void Dispose()
         {
-            _channel?.Dispose();
-            _handler?.Dispose();
-            _host?.Dispose();
-            _server?.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~GrpcTestFixture()
+        {
+            Dispose(false);
         }
 
         public IDisposable GetTestLogger(ITestOutputHelper outputHelper)
