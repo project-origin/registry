@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using Google.Protobuf;
 
-namespace ProjectOrigin.Electricity.Models;
+namespace ProjectOrigin.Electricity.Server.Models;
 
 public class GranularCertificate
 {

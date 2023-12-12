@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
-    <ProjectReference Include="..\ProjectOrigin.Electricity\ProjectOrigin.Electricity.csproj" />
     <PackageReference Include="ProjectOrigin.PedersenCommitment" Version="1.0.3" />
     <PackageReference Include="ProjectOrigin.HierarchicalDeterministicKeys" Version="0.4.0" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.59.0" />
@@ -13,6 +12,8 @@
   <ItemGroup>
     <Protobuf Include="..\Protos\verifier.proto" GrpcServices="Server" Access="Internal" />
     <Protobuf Include="..\Protos\registry.proto" GrpcServices="Client" Access="Public" />
+    <Protobuf Include="..\Protos\electricity.proto" GrpcServices="None" />
+    <Protobuf Include="..\Protos\common.proto" GrpcServices="None" />
   </ItemGroup>
 
 </Project>

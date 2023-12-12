@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using Google.Protobuf;
 using ProjectOrigin.Electricity.Extensions;
-using ProjectOrigin.Electricity.Models;
+using ProjectOrigin.Electricity.Server.Models;
 using ProjectOrigin.PedersenCommitment;
 using Xunit;
 using System;

@@ -1,5 +1,5 @@
 using System;
-using ProjectOrigin.Electricity.Models;
+using ProjectOrigin.Electricity.Server.Models;
 
 namespace ProjectOrigin.Electricity.Server.Services;
 

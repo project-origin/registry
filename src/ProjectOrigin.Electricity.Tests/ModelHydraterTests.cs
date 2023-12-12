@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using AutoFixture;
 using FluentAssertions;
 using Google.Protobuf;
-using ProjectOrigin.Electricity.Models;
+using ProjectOrigin.Electricity.Server.Models;
 using ProjectOrigin.Electricity.Server.Services;
 using Xunit;
 

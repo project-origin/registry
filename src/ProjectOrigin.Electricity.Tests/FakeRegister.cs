@@ -4,7 +4,7 @@ using AutoFixture;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using NSec.Cryptography;
-using ProjectOrigin.Electricity.Models;
+using ProjectOrigin.Electricity.Server.Models;
 using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.PedersenCommitment;
