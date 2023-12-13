@@ -19,7 +19,7 @@ RUN groupadd -r $USER && useradd -r -g $USER $USER
 USER $USER
 
 WORKDIR /app
-COPY --from=build --chown=$USER /app/publish .
+COPY --chown=root:root --chmod=644 --from=build /app/publish .
 
 EXPOSE 5000
 ENTRYPOINT ["dotnet", "ProjectOrigin.Registry.Server.dll"]
