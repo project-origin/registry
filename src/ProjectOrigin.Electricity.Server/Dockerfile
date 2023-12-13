@@ -14,7 +14,7 @@ RUN dotnet publish ProjectOrigin.Electricity.Server -c Release -o /app/publish
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS production
 
 ENV USER=dotnetuser
-RUN groupadd -r $USER && useradd -r -g $USER $USER
+RUN groupadd -r "$USER" && useradd -r -g "$USER" "$USER"
 USER $USER
 
 WORKDIR /app
