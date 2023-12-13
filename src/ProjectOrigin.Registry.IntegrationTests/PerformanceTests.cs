@@ -46,6 +46,7 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
 
         _verifierContainer = new ContainerBuilder()
                 .WithImage(ElectricityVerifierImage)
+                .WithPortBinding(ElectricityVerifierGrpcPort, true)
                 .WithEnvironment($"Issuers__{IssuerArea}", Convert.ToBase64String(Encoding.UTF8.GetBytes(_issuerKey.PublicKey.ExportPkixText())))
                 .WithWaitStrategy(
                     Wait.ForUnixContainer()

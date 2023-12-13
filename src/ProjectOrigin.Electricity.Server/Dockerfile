@@ -18,7 +18,7 @@ RUN groupadd -r $USER && useradd -r -g $USER $USER
 USER $USER
 
 WORKDIR /app
-COPY --from=build /app/publish .
+COPY --from=build --chown=$USER /app/publish .
 
 EXPOSE 5000
 ENTRYPOINT ["dotnet", "ProjectOrigin.Electricity.Server.dll"]
