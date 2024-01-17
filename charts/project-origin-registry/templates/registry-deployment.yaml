@@ -37,7 +37,7 @@ spec:
               value: {{ .Values.blockFinalizer.interval }}
           {{- range .Values.verifiers }}
             - name: Verifiers__{{ .type }}
-              value: http://registry-{{ $.Release.Name }}-verifier-{{ .name }}:80
+              value: http://registry-{{ $.Release.Name }}-verifier-{{ .name }}:5000
           {{- end }}
 
           # immutableLog configuration

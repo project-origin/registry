@@ -5,13 +5,11 @@ type: application
 version: 0.0.0
 
 annotations:
-  artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/licence: Apache-2.0
+  artifacthub.io/operator: "false"
   artifacthub.io/links: |
     - name: Source Code
       url: https://github.com/project-origin/registry
-  artifacthub.io/prerelease: "true"
-  artifacthub.io/operator: "false"
 
 dependencies:
   - name: redis

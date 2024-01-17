@@ -27,7 +27,7 @@ verifiers:
     # this is because the verifiers will use the external url to communicate with the registries
     registries:
       - name: my-example-registry
-        address: http://my-example-registry:80
+        address: http://my-example-registry:5000
 ```
 
 Once one have generated a key and added it to the values file,
@@ -98,6 +98,6 @@ To run the example one can use the following command:
 EXAMPLE_AREA="Narnia"
 PRIVATE_KEY_BASE64=$(cat narnia.pem | base64 -w 0)
 REGISTRY_NAME="my-example-registry"
-REGISTRY_URL= # the url of the registry, e.g. http://my-example-registry:80
+REGISTRY_URL= # the url of the registry, e.g. http://my-example-registry:5000
 dotnet run --project src/ProjectOrigin.Electricity.Example WithoutWalletFlow $example_area $PrivateKeyBase64 $REGISTRY_NAME $REGISTRY_URL
 ```

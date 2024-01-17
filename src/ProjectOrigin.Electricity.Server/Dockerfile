@@ -1,19 +1,25 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0.1 AS base
-WORKDIR /app
-EXPOSE 80
-EXPOSE 443
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0.101 AS build
 
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0.101 AS dotnet-build
 WORKDIR /src
-COPY . .
-RUN dotnet restore
-RUN dotnet build ProjectOrigin.Electricity.Server -c Release --no-restore -o /app/build
 
-FROM dotnet-build AS dotnet-publish
+COPY ./ProjectOrigin.Electricity.Server ./ProjectOrigin.Electricity.Server
+COPY ./Directory.Build.props ./Directory.Build.props
+COPY ./Protos ./Protos
+
+RUN dotnet restore ProjectOrigin.Electricity.Server
+RUN dotnet build ProjectOrigin.Electricity.Server -c Release --no-restore -o /app/build
 RUN dotnet publish ProjectOrigin.Electricity.Server -c Release -o /app/publish
 
-FROM base AS final
+# ------- production image -------
+FROM mcr.microsoft.com/dotnet/aspnet:8.0.1 AS production
+
+ENV USER=dotnetuser
+RUN groupadd -r "$USER" && useradd -r -g "$USER" "$USER"
+
 WORKDIR /app
-COPY --from=dotnet-publish /app/publish .
-HEALTHCHECK CMD curl --fail http://localhost:5000/health || exit 1
+COPY --chown=root:root --from=build /app/publish .
+RUN chmod -R 655 .
+
+USER $USER
+EXPOSE 5000
 ENTRYPOINT ["dotnet", "ProjectOrigin.Electricity.Server.dll"]

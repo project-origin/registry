@@ -33,7 +33,7 @@ public class ExceptionTest : GrpcTestBase<Startup>
         grpcFixture.ConfigureHostConfiguration(new Dictionary<string, string?>()
         {
             {$"Issuers:{Area}", Convert.ToBase64String(Encoding.UTF8.GetBytes(_issuerKey.PublicKey.ExportPkixText()))},
-            {$"Registries:{Registry}:Address", "http://localhost:80"}
+            {$"Registries:{Registry}:Address", "http://localhost:5000"}
         });
 
         grpcFixture.testServicesConfigure = (services) =>
