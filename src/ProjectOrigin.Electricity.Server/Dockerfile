@@ -15,10 +15,11 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS production
 
 ENV USER=dotnetuser
 RUN groupadd -r "$USER" && useradd -r -g "$USER" "$USER"
-USER $USER
 
 WORKDIR /app
-COPY --chown=root:root --chmod=644 --from=build /app/publish .
+COPY --chown=root:root --from=build /app/publish .
+RUN chmod -R 655 .
 
+USER $USER
 EXPOSE 5000
 ENTRYPOINT ["dotnet", "ProjectOrigin.Electricity.Server.dll"]

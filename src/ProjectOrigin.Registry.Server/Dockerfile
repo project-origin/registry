@@ -19,7 +19,7 @@ RUN groupadd -r "$USER" && useradd -r -g "$USER" "$USER"
 
 WORKDIR /app
 COPY --chown=root:root --from=build /app/publish .
-RUN chmod -R 644 .
+RUN chmod -R 655 .
 
 USER $USER
 EXPOSE 5000
