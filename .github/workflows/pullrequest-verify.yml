@@ -33,6 +33,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup .NET Core SDK from global.json
+        uses: actions/setup-dotnet@v4
+
       - name: Verify chart
         run: make verify-chart
 
@@ -41,6 +44,9 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup .NET Core SDK from global.json
+        uses: actions/setup-dotnet@v4
 
       - name: Verify performance
         run: make verify-performance

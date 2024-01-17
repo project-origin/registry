@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0.101 AS build
 
 WORKDIR /src
 
@@ -11,7 +11,7 @@ RUN dotnet build ProjectOrigin.Electricity.Server -c Release --no-restore -o /ap
 RUN dotnet publish ProjectOrigin.Electricity.Server -c Release -o /app/publish
 
 # ------- production image -------
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS production
+FROM mcr.microsoft.com/dotnet/aspnet:8.0.1 AS production
 
 ENV USER=dotnetuser
 RUN groupadd -r "$USER" && useradd -r -g "$USER" "$USER"
