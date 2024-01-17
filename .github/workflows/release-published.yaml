@@ -78,7 +78,7 @@ jobs:
           files: helm-releases/${{ steps.variables.outputs.name }}-${{ needs.define-version.outputs.version }}.tgz
 
       - name: Upload workflow artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: helm-releases/${{ steps.variables.outputs.name }}-${{ needs.define-version.outputs.version }}.tgz
 
