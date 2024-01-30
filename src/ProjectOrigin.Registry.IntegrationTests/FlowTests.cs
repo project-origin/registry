@@ -9,11 +9,10 @@ using FluentAssertions;
 using ProjectOrigin.Electricity.V1;
 using ProjectOrigin.HierarchicalDeterministicKeys;
 using System.Collections.Generic;
-using ProjectOrigin.Registry.IntegrationTests;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
-public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityServiceFixture>, IClassFixture<PostgresDatabaseFixture>, IClassFixture<RedisFixture>
+public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityServiceFixture>, IClassFixture<PostgresDatabaseFixture>, IClassFixture<RedisFixture>, IClassFixture<RabbitMqFixture>
 {
     protected ElectricityServiceFixture _verifierFixture;
     private PostgresDatabaseFixture _postgresDatabaseFixture;
@@ -26,6 +25,7 @@ public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityService
         GrpcTestFixture<Startup> grpcFixture,
         PostgresDatabaseFixture postgresDatabaseFixture,
         RedisFixture redisFixture,
+        RabbitMqFixture rabbitMqFixture,
         ITestOutputHelper outputHelper) : base(grpcFixture, outputHelper)
     {
         _verifierFixture = verifierFixture;
@@ -40,6 +40,11 @@ public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityService
             {"Persistance:postgresql:ConnectionString", _postgresDatabaseFixture.HostConnectionString},
             {"Cache:Type", "redis"},
             {"Cache:Redis:ConnectionString", redisFixture.HostConnectionString},
+            {"RabbitMq:ConnectionString", rabbitMqFixture.HostConnectionString},
+            {"Process:ServerNumber", "0"},
+            {"Process:Servers", "1"},
+            {"Process:VerifyThreads", "5"},
+            {"Process:Weight", "10"},
         });
     }
 

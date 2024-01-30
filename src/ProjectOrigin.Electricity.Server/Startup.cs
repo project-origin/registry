@@ -45,6 +45,7 @@ public class Startup
                 configuration.Bind(settings);
             })
             .ValidateOnStart();
+
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

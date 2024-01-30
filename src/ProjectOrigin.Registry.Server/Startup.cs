@@ -1,5 +1,3 @@
-using MassTransit;
-using MassTransit.Monitoring;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -32,7 +30,6 @@ public class Startup
         services.AddOpenTelemetry()
             .WithMetrics(provider =>
                 provider
-                    .AddMeter(InstrumentationOptions.MeterName)
                     .AddMeter(BlockFinalizerJob.Meter.Name)
                     .AddMeter(RegistryService.Meter.Name)
                     .AddPrometheusExporter()
@@ -51,25 +48,23 @@ public class Startup
         });
 
         services.AddOptions<BlockFinalizationOptions>().Configure<IConfiguration>((settings, configuration) =>
-        {
-            configuration.GetSection("BlockFinalizer").Bind(settings);
-        });
+            configuration.GetSection("BlockFinalizer").Bind(settings)
+        );
+
+        services.AddOptions<ProcessOptions>().Configure<IConfiguration>((settings, configuration) =>
+            _configuration.GetSection("Process").Bind(settings)
+        );
 
         services.ConfigureImmutableLog(_configuration);
         services.ConfigurePersistance(_configuration);
         services.ConfigureTransactionStatusCache(_configuration);
 
-        // Memory only section
-        services.AddMassTransit(x =>
-        {
-            x.AddConsumer<VerifyTransactionConsumer, VerifyTransactionConsumerDefinition>();
+        services.AddSingleton<IQueueResolver, ConsistentHashRingQueueResolver>();
+        services.AddHostedService<VerifyTransactionManager>();
+        services.AddTransient<VerifyTransactionConsumer>();
 
-            x.SetKebabCaseEndpointNameFormatter();
-            x.UsingInMemory((context, cfg) =>
-            {
-                cfg.ConfigureEndpoints(context);
-            });
-        });
+        services.AddSingleton<IRabbitMqChannelPool>(sp => new RabbitMqChannelPool(_configuration.GetSection("RabbitMq").GetValue<string>("ConnectionString")));
+        services.AddTransient(sp => sp.GetRequiredService<IRabbitMqChannelPool>().GetChannel());
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
