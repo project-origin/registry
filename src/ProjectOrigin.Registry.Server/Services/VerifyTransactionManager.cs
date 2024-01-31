@@ -15,13 +15,13 @@ namespace ProjectOrigin.Registry.Server.Services;
 public class VerifyTransactionManager : IHostedService
 {
     private readonly List<VerifyTransactionWorker> _workers = new List<VerifyTransactionWorker>();
-    private readonly ProcessOptions _options;
+    private readonly TransactionProcessorOptions _options;
     private readonly IRabbitMqChannelPool _channelPool;
     private readonly IServiceProvider _serviceProvider;
     private readonly IQueueResolver _queueResolver;
 
     public VerifyTransactionManager(
-        IOptions<ProcessOptions> options,
+        IOptions<TransactionProcessorOptions> options,
         IRabbitMqChannelPool channelPool,
         IServiceProvider serviceProvider,
         IQueueResolver queueResolver)
@@ -34,7 +34,7 @@ public class VerifyTransactionManager : IHostedService
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        for (int i = 0; i < _options.VerifyThreads; i++)
+        for (int i = 0; i < _options.Threads; i++)
         {
             var logger = _serviceProvider.GetRequiredService<ILogger<VerifyTransactionWorker>>();
             var queueName = _queueResolver.GetQueueName(_options.ServerNumber, i);

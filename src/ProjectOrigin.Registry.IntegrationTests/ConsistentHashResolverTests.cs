@@ -17,14 +17,14 @@ public class ConsistentHashResolverTests
     public void GetQueueInRing_VerifyDistribution()
     {
         Random r = new Random(42); // Seed the random number generator to get consistent results
-        var options = new ProcessOptions
+        var options = new TransactionProcessorOptions
         {
             Servers = 3,
-            VerifyThreads = 5,
+            Threads = 5,
             Weight = 20
         };
         var number = 100000;
-        var expected = number / (options.Servers * options.VerifyThreads);
+        var expected = number / (options.Servers * options.Threads);
         var resolver = new ConsistentHashRingQueueResolver(Options.Create(options));
 
         ConcurrentDictionary<string, int> queueCounts = new ConcurrentDictionary<string, int>();
@@ -43,10 +43,10 @@ public class ConsistentHashResolverTests
     [Fact]
     public void GetQueue_ReturnsConsistentQueue()
     {
-        var options = new ProcessOptions
+        var options = new TransactionProcessorOptions
         {
             Servers = 2,
-            VerifyThreads = 2,
+            Threads = 2,
             Weight = 2
         };
         var resolver = new ConsistentHashRingQueueResolver(Options.Create(options));
@@ -61,17 +61,17 @@ public class ConsistentHashResolverTests
     {
         var totalNumber = 100000;
 
-        var resolverOld = new ConsistentHashRingQueueResolver(Options.Create(new ProcessOptions
+        var resolverOld = new ConsistentHashRingQueueResolver(Options.Create(new TransactionProcessorOptions
         {
             Servers = 10,
-            VerifyThreads = 2,
+            Threads = 2,
             Weight = 20
         }));
 
-        var resolverNew = new ConsistentHashRingQueueResolver(Options.Create(new ProcessOptions
+        var resolverNew = new ConsistentHashRingQueueResolver(Options.Create(new TransactionProcessorOptions
         {
             Servers = 9,
-            VerifyThreads = 2,
+            Threads = 2,
             Weight = 20
         }));
 

@@ -13,9 +13,9 @@ namespace ProjectOrigin.Registry.Server.Services;
 public partial class ConsistentHashRingQueueResolver : IQueueResolver
 {
     private readonly SortedDictionary<uint, string> _ring = new SortedDictionary<uint, string>();
-    private readonly ProcessOptions _options;
+    private readonly TransactionProcessorOptions _options;
 
-    public ConsistentHashRingQueueResolver(IOptions<ProcessOptions> options)
+    public ConsistentHashRingQueueResolver(IOptions<TransactionProcessorOptions> options)
     {
         _options = options.Value;
         PopulateDictionary(options.Value);
@@ -37,11 +37,11 @@ public partial class ConsistentHashRingQueueResolver : IQueueResolver
         return firstNode.Value;
     }
 
-    private void PopulateDictionary(ProcessOptions options)
+    private void PopulateDictionary(TransactionProcessorOptions options)
     {
         for (int server = 0; server < options.Servers; server++)
         {
-            for (int verifier = 0; verifier < options.VerifyThreads; verifier++)
+            for (int verifier = 0; verifier < options.Threads; verifier++)
             {
                 for (int weight = 0; weight < options.Weight; weight++)
                 {
@@ -66,7 +66,7 @@ public partial class ConsistentHashRingQueueResolver : IQueueResolver
                 var verifier = int.Parse(match.Groups[2].Value);
 
                 if (server >= _options.Servers ||
-                    verifier >= _options.VerifyThreads)
+                    verifier >= _options.Threads)
                 {
                     return true;
                 }

@@ -36,25 +36,24 @@ public class Startup
                     .AddPrometheusExporter()
             );
 
-        services.AddOptions<TransactionProcessorOptions>().Configure<IConfiguration>((settings, configuration) =>
+        services.AddOptions<VerifierOptions>().Configure<IConfiguration>((settings, configuration) =>
         {
             configuration.Bind(settings);
         })
         .ValidateDataAnnotations()
         .ValidateOnStart();
 
-        services.AddOptions<VerifierOptions>().Configure<IConfiguration>((settings, configuration) =>
-        {
-            configuration.Bind(settings);
-        });
-
         services.AddOptions<BlockFinalizationOptions>().Configure<IConfiguration>((settings, configuration) =>
             configuration.GetSection("BlockFinalizer").Bind(settings)
-        );
+        )
+        .ValidateDataAnnotations()
+        .ValidateOnStart();
 
-        services.AddOptions<ProcessOptions>().Configure<IConfiguration>((settings, configuration) =>
-            _configuration.GetSection("Process").Bind(settings)
-        );
+        services.AddOptions<TransactionProcessorOptions>().Configure<IConfiguration>((settings, configuration) =>
+            _configuration.GetSection("TransactionProcessor").Bind(settings)
+        )
+        .ValidateDataAnnotations()
+        .ValidateOnStart();
 
         services.AddOptions<RabbitMqOptions>().Configure<IConfiguration>((settings, configuration) =>
             _configuration.GetSection("RabbitMq").Bind(settings)

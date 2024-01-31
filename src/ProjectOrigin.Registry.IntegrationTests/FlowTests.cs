@@ -37,7 +37,11 @@ public class FlowTests :
         _postgresDatabaseFixture = postgresDatabaseFixture;
         grpcFixture.ConfigureHostConfiguration(new Dictionary<string, string?>()
         {
-            {"RegistryName", RegistryName},
+            {"TransactionProcessor:RegistryName", RegistryName},
+            {"TransactionProcessor:ServerNumber", "0"},
+            {"TransactionProcessor:Servers", "1"},
+            {"TransactionProcessor:Threads", "5"},
+            {"TransactionProcessor:Weight", "10"},
             {$"Verifiers:project_origin.electricity.v1", _verifierFixture.Url},
             {$"ImmutableLog:type", "log"},
             {"BlockFinalizer:Interval", "00:00:05"},
@@ -45,10 +49,6 @@ public class FlowTests :
             {"Persistance:postgresql:ConnectionString", _postgresDatabaseFixture.HostConnectionString},
             {"Cache:Type", "redis"},
             {"Cache:Redis:ConnectionString", redisFixture.HostConnectionString},
-            {"Process:ServerNumber", "0"},
-            {"Process:Servers", "1"},
-            {"Process:VerifyThreads", "5"},
-            {"Process:Weight", "10"},
             {"RabbitMq:Hostname", rabbitMqFixture.Hostname},
             {"RabbitMq:AmqpPort", rabbitMqFixture.AmqpPort.ToString()},
             {"RabbitMq:HttpApiPort", rabbitMqFixture.HttpApiPort.ToString()},

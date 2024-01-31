@@ -50,11 +50,11 @@ public class QueueCleanupServiceTests
                 transactions.Add(new Fixture().Create<V1.Transaction>());
             }
 
-            var queueResolver1 = new ConsistentHashRingQueueResolver(Options.Create(new ProcessOptions
+            var queueResolver1 = new ConsistentHashRingQueueResolver(Options.Create(new TransactionProcessorOptions
             {
                 Servers = queuesBefore,
                 ServerNumber = 0,
-                VerifyThreads = threadsBefore,
+                Threads = threadsBefore,
                 Weight = 10,
             }));
 
@@ -69,11 +69,11 @@ public class QueueCleanupServiceTests
                 }
             }
 
-            var queueResolver2 = new ConsistentHashRingQueueResolver(Options.Create(new ProcessOptions
+            var queueResolver2 = new ConsistentHashRingQueueResolver(Options.Create(new TransactionProcessorOptions
             {
                 Servers = queuesAfter,
                 ServerNumber = 0,
-                VerifyThreads = threadsAfter,
+                Threads = threadsAfter,
                 Weight = 10,
             }));
 

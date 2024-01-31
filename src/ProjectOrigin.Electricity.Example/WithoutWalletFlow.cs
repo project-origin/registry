@@ -76,7 +76,7 @@ public class WithoutWalletFlow
 
 
         // ------------------  allocate ------------------
-        Console.WriteLine($"Allocating Production Granular Certificate");
+        Console.WriteLine($"Creating allocation event");
         var allocationId = Guid.NewGuid();
         var allocatedEvent = ProtoEventBuilder.CreateAllocatedEvent(allocationId, prodCertId, consCertId, prodCommitment250, consCommitmentInfo);
 
@@ -93,17 +93,17 @@ public class WithoutWalletFlow
 
         // ------------------  claim production ------------------
         Console.WriteLine($"Claiming Production Granular Certificate");
-        await NewMethod(ownerKey, prodClient, prodCertId, allocationId);
+        await SendClaim(ownerKey, prodClient, prodCertId, allocationId);
 
 
         // ------------------  claim consumption ------------------
         Console.WriteLine($"Claiming Consumption Granular Certificate");
-        await NewMethod(ownerKey, consClient, consCertId, allocationId);
+        await SendClaim(ownerKey, consClient, consCertId, allocationId);
 
         return 0;
     }
 
-    private static async Task NewMethod(IHDPrivateKey ownerKey, RegistryService.RegistryServiceClient prodClient, FederatedStreamId prodCertId, Guid allocationId)
+    private static async Task SendClaim(IHDPrivateKey ownerKey, RegistryService.RegistryServiceClient prodClient, FederatedStreamId prodCertId, Guid allocationId)
     {
         var productionClaimEvent = ProtoEventBuilder.CreateClaimEvent(allocationId, prodCertId);
 

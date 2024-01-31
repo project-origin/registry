@@ -66,7 +66,11 @@ public class PerformanceTests : IAsyncLifetime,
                 .WithImage(imageFixture.Image)
                 .WithPortBinding(GrpcPort, true)
                 .WithCommand("--serve")
-                .WithEnvironment("RegistryName", RegistryName)
+                .WithEnvironment("TransactionProcessor__RegistryName", RegistryName)
+                .WithEnvironment("TransactionProcessor__ServerNumber", "0")
+                .WithEnvironment("TransactionProcessor__Servers", "1")
+                .WithEnvironment("TransactionProcessor__Threads", "5")
+                .WithEnvironment("TransactionProcessor__Weight", "10")
                 .WithEnvironment("Verifiers__project_origin.electricity.v1", verifierUrl)
                 .WithEnvironment("ImmutableLog__type", "log")
                 .WithEnvironment("BlockFinalizer__Interval", "00:00:02")
@@ -77,10 +81,6 @@ public class PerformanceTests : IAsyncLifetime,
                 .WithEnvironment("Logging__LogLevel__Grpc.AspNetCore", "Information")
                 .WithEnvironment("Cache__Type", "redis")
                 .WithEnvironment("Cache__Redis__ConnectionString", redisFixture.ContainerConnectionString)
-                .WithEnvironment("Process__ServerNumber", "0")
-                .WithEnvironment("Process__Servers", "1")
-                .WithEnvironment("Process__VerifyThreads", "5")
-                .WithEnvironment("Process__Weight", "10")
                 .WithEnvironment("RabbitMq__Hostname", rabbitMqFixture.ContainerIp)
                 .WithEnvironment("RabbitMq__AmqpPort", RabbitMqFixture.ContainerAmqpPort.ToString())
                 .WithEnvironment("RabbitMq__HttpApiPort", RabbitMqFixture.ContainerHttpPort.ToString())
@@ -151,7 +151,7 @@ public class PerformanceTests : IAsyncLifetime,
         Console.WriteLine($"Completed {completed.Count} transactions in {elapsedSeconds} seconds ({requestsPerSecond} requests per second).");
         Console.WriteLine($"-- Finished throughput test --");
 
-        requestsPerSecond.Should().BeGreaterThan(30); // based on througput test on github ~35
+        requestsPerSecond.Should().BeGreaterThan(150); // based on througput test on github ~170
     }
 
     [Fact]
@@ -187,7 +187,7 @@ public class PerformanceTests : IAsyncLifetime,
         Console.WriteLine("Min:  " + measurements.Min());
         Console.WriteLine($"-- Finished sequential test --");
 
-        ms95th.Should().BeLessThan(6000);
+        ms95th.Should().BeLessThan(3500);
     }
 
     [Fact]
@@ -234,7 +234,7 @@ public class PerformanceTests : IAsyncLifetime,
         Console.WriteLine("Min:  " + measurements.Min());
         Console.WriteLine($"-- Finished parallel test --");
 
-        ms95th.Should().BeLessThan(5000);
+        ms95th.Should().BeLessThan(2000);
     }
 
     private async Task<Registry.V1.Transaction> SendRequest(GrpcChannel channel)

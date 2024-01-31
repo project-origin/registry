@@ -24,6 +24,7 @@ public sealed class RabbitMqHttpClient : IRabbitMqHttpClient, IDisposable
     public RabbitMqHttpClient(IOptions<RabbitMqOptions> rabbitMqOptions)
     {
         var option = rabbitMqOptions.Value;
+        Console.WriteLine($"{Protocol}://{option.Hostname}:{option.HttpApiPort}");
         _httpClient = new HttpClient()
         {
             BaseAddress = new Uri($"{Protocol}://{option.Hostname}:{option.HttpApiPort}")

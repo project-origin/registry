@@ -4,7 +4,7 @@ namespace ProjectOrigin.Registry.Server.Options;
 
 public record RabbitMqOptions()
 {
-    [Required]
+    [Required(AllowEmptyStrings = false)]
     public required string Hostname { get; init; }
 
     [Required, Range(1, 65535)]
@@ -13,9 +13,9 @@ public record RabbitMqOptions()
     [Required, Range(1, 65535)]
     public required int HttpApiPort { get; init; }
 
-    [Required]
+    [Required(AllowEmptyStrings = false)]
     public required string Username { get; init; }
 
-    [Required]
+    [Required(AllowEmptyStrings = false)]
     public required string Password { get; init; }
 }

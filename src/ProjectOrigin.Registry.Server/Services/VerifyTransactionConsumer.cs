@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 using ProjectOrigin.Registry.Server.Exceptions;
 using ProjectOrigin.Registry.Server.Extensions;
 using ProjectOrigin.Registry.Server.Interfaces;
-using ProjectOrigin.Registry.Server.Models;
+using ProjectOrigin.Registry.Server.Options;
 using ProjectOrigin.VerifiableEventStore.Models;
 using ProjectOrigin.VerifiableEventStore.Services.Repository;
 using ProjectOrigin.VerifiableEventStore.Services.TransactionStatusCache;
