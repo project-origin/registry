@@ -6,6 +6,5 @@ namespace ProjectOrigin.Registry.Server.Interfaces;
 
 public interface IRabbitMqChannel : IDisposable
 {
-    Task PublishToQueue(string queue, byte[] bytes);
-    IModel Channel { get; }
+    IChannel Channel { get; }
 }

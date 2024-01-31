@@ -3,16 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Options;
 using ProjectOrigin.Registry.Server.Interfaces;
 using ProjectOrigin.Registry.Server.Models;
 
 public class ConsistentHashRingQueueResolver : IQueueResolver
 {
+    private const string QueueNamePattern = @"registry_(.+)\.verifier_(.+)";
     private readonly SortedDictionary<uint, string> _ring = new SortedDictionary<uint, string>();
+    private readonly ProcessOptions _options;
 
     public ConsistentHashRingQueueResolver(IOptions<ProcessOptions> options)
     {
+        _options = options.Value;
         PopulateDictionary(options.Value);
     }
 
@@ -57,4 +61,23 @@ public class ConsistentHashRingQueueResolver : IQueueResolver
         }
     }
 
+    public IEnumerable<string> GetInactiveQueues(IEnumerable<string> queues)
+    {
+        return queues.Where(queueName =>
+        {
+            var match = Regex.Match(queueName, QueueNamePattern);
+            if (match.Success)
+            {
+                var server = int.Parse(match.Groups[1].Value);
+                var verifier = int.Parse(match.Groups[2].Value);
+
+                if (server >= _options.Servers ||
+                    verifier >= _options.VerifyThreads)
+                {
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
 }

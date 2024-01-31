@@ -5,7 +5,7 @@ namespace ProjectOrigin.Registry.Server.Extensions;
 
 public static class IQueueResolverExtensions
 {
-    public static string GetQueue(this IQueueResolver queueResolver, Transaction transaction)
+    public static string GetQueueName(this IQueueResolver queueResolver, Transaction transaction)
     {
         var streamId = transaction.Header.FederatedStreamId.StreamId.ToString();
         return queueResolver.GetQueueName(streamId);

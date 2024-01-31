@@ -55,16 +55,22 @@ public class Startup
             _configuration.GetSection("Process").Bind(settings)
         );
 
+        services.AddOptions<RabbitMqOptions>().Configure<IConfiguration>((settings, configuration) =>
+            _configuration.GetSection("RabbitMq").Bind(settings)
+        );
+
         services.ConfigureImmutableLog(_configuration);
         services.ConfigurePersistance(_configuration);
         services.ConfigureTransactionStatusCache(_configuration);
 
         services.AddSingleton<IQueueResolver, ConsistentHashRingQueueResolver>();
-        services.AddHostedService<VerifyTransactionManager>();
+        services.AddSingleton<IRabbitMqChannelPool, RabbitMqChannelPool>();
+        services.AddTransient(sp => sp.GetRequiredService<IRabbitMqChannelPool>().GetChannel());
+        services.AddTransient<IRabbitMqHttpClient, RabbitMqHttpClient>();
         services.AddTransient<VerifyTransactionConsumer>();
 
-        services.AddSingleton<IRabbitMqChannelPool>(sp => new RabbitMqChannelPool(_configuration.GetSection("RabbitMq").GetValue<string>("ConnectionString")));
-        services.AddTransient(sp => sp.GetRequiredService<IRabbitMqChannelPool>().GetChannel());
+        services.AddHostedService<VerifyTransactionManager>();
+        services.AddHostedService<QueueCleanupService>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

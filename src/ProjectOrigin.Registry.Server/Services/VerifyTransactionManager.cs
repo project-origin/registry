@@ -35,12 +35,14 @@ public class VerifyTransactionManager : IHostedService
             var logger = _serviceProvider.GetRequiredService<ILogger<VerifyTransactionWorker>>();
             var queueName = _queueResolver.GetQueueName(_options.ServerNumber, i);
             var transactionVerifier = _serviceProvider.GetRequiredService<VerifyTransactionConsumer>();
+            var queueResolver = _serviceProvider.GetRequiredService<IQueueResolver>();
 
             var worker = new VerifyTransactionWorker(
                 logger,
                 _channelPool.GetChannel(),
                 queueName,
-                transactionVerifier);
+                transactionVerifier,
+                queueResolver);
 
             _workers.Add(worker);
         }

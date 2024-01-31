@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using ProjectOrigin.Registry.Server.Interfaces;
+using ProjectOrigin.Registry.Server.Models;
 using RabbitMQ.Client;
 
 namespace ProjectOrigin.Registry.Server.Services;
@@ -9,19 +11,22 @@ namespace ProjectOrigin.Registry.Server.Services;
 public class RabbitMqChannelPool : IRabbitMqChannelPool
 {
     private readonly Lazy<IConnection> _connection;
-    private readonly ConcurrentBag<IModel> _channels;
-    private readonly ConcurrentBag<IModel> _availableChannels;
+    private readonly ConcurrentBag<IChannel> _channels;
+    private readonly ConcurrentBag<IChannel> _availableChannels;
 
-    public RabbitMqChannelPool(string connectionString)
+    public RabbitMqChannelPool(IOptions<RabbitMqOptions> rabbitMqOptions)
     {
         var factory = new ConnectionFactory()
         {
-            Uri = new Uri(connectionString),
+            HostName = rabbitMqOptions.Value.Hostname,
+            Port = rabbitMqOptions.Value.AmqpPort,
+            UserName = rabbitMqOptions.Value.Username,
+            Password = rabbitMqOptions.Value.Password,
             DispatchConsumersAsync = true,
         };
         _connection = new Lazy<IConnection>(() => factory.CreateConnection());
-        _channels = new ConcurrentBag<IModel>();
-        _availableChannels = new ConcurrentBag<IModel>();
+        _channels = new ConcurrentBag<IChannel>();
+        _availableChannels = new ConcurrentBag<IChannel>();
     }
 
     public void Dispose()
@@ -43,13 +48,13 @@ public class RabbitMqChannelPool : IRabbitMqChannelPool
         }
         else
         {
-            var newChannel = _connection.Value.CreateModel();
+            var newChannel = _connection.Value.CreateChannel();
             _channels.Add(newChannel);
             return new ChannelWrapper(newChannel, this);
         }
     }
 
-    public void ReturnChannel(IModel channel)
+    public void ReturnChannel(IChannel channel)
     {
         _availableChannels.Add(channel);
     }
@@ -57,36 +62,19 @@ public class RabbitMqChannelPool : IRabbitMqChannelPool
     private sealed class ChannelWrapper : IRabbitMqChannel
     {
         private readonly RabbitMqChannelPool _channelPool;
-        private readonly IModel _channel;
+        private readonly IChannel _channel;
 
-        public ChannelWrapper(IModel channel, RabbitMqChannelPool channelPool)
+        public ChannelWrapper(IChannel channel, RabbitMqChannelPool channelPool)
         {
             _channel = channel;
             _channelPool = channelPool;
         }
 
-        public IModel Channel => _channel;
+        public IChannel Channel => _channel;
 
         public void Dispose()
         {
             _channelPool.ReturnChannel(_channel);
-        }
-
-        public Task PublishToQueue(string queue, byte[] bytes)
-        {
-            _channel.BasicPublish(
-                    exchange: "",
-                    routingKey: queue,
-                    mandatory: false,
-                    basicProperties: null,
-                    body: bytes
-                    );
-
-            IBasicProperties props = _channel.CreateBasicProperties();
-            props.Expiration = "60000";
-
-
-            return Task.CompletedTask;
         }
     }
 }

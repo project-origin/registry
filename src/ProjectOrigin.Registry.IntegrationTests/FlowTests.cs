@@ -12,7 +12,12 @@ using System.Collections.Generic;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
-public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityServiceFixture>, IClassFixture<PostgresDatabaseFixture>, IClassFixture<RedisFixture>, IClassFixture<RabbitMqFixture>
+public class FlowTests :
+    GrpcTestBase<Startup>,
+    IClassFixture<ElectricityServiceFixture>,
+    IClassFixture<PostgresDatabaseFixture>,
+    IClassFixture<RedisFixture>,
+    IClassFixture<RabbitMqFixture>
 {
     protected ElectricityServiceFixture _verifierFixture;
     private PostgresDatabaseFixture _postgresDatabaseFixture;
@@ -40,11 +45,15 @@ public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityService
             {"Persistance:postgresql:ConnectionString", _postgresDatabaseFixture.HostConnectionString},
             {"Cache:Type", "redis"},
             {"Cache:Redis:ConnectionString", redisFixture.HostConnectionString},
-            {"RabbitMq:ConnectionString", rabbitMqFixture.HostConnectionString},
             {"Process:ServerNumber", "0"},
             {"Process:Servers", "1"},
             {"Process:VerifyThreads", "5"},
             {"Process:Weight", "10"},
+            {"RabbitMq:Hostname", rabbitMqFixture.Hostname},
+            {"RabbitMq:AmqpPort", rabbitMqFixture.AmqpPort.ToString()},
+            {"RabbitMq:HttpApiPort", rabbitMqFixture.HttpApiPort.ToString()},
+            {"RabbitMq:Username", rabbitMqFixture.Username},
+            {"RabbitMq:Password", rabbitMqFixture.Password},
         });
     }
 

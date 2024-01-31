@@ -10,6 +10,7 @@ using ProjectOrigin.VerifiableEventStore.Services.Repository;
 using ProjectOrigin.Registry.Server.Extensions;
 using Google.Protobuf;
 using ProjectOrigin.Registry.Server.Interfaces;
+using RabbitMQ.Client;
 
 namespace ProjectOrigin.Registry.Server;
 
@@ -47,9 +48,9 @@ public class RegistryService : V1.RegistryService.RegistryServiceBase
                     )
                     .ConfigureAwait(false);
 
-                var queue = _queueResolver.GetQueue(transaction);
+                var queue = _queueResolver.GetQueueName(transaction);
 
-                await brokerChannel.PublishToQueue(queue, transaction.ToByteArray())
+                await brokerChannel.Channel.BasicPublishAsync("", queue, transaction.ToByteArray())
                     .ConfigureAwait(false);
             }
         }

@@ -2,8 +2,10 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using ProjectOrigin.Registry.Server.Extensions;
 using ProjectOrigin.Registry.Server.Interfaces;
 using ProjectOrigin.Registry.V1;
+using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
 namespace ProjectOrigin.Registry.Server.Services;
@@ -14,33 +16,41 @@ public class VerifyTransactionWorker : IDisposable
     private readonly IRabbitMqChannel _channel;
     private readonly string _queueName;
     private readonly VerifyTransactionConsumer _transactionVerifier;
+    private readonly IQueueResolver _queueResolver;
     private readonly string _consumerTag;
     private AsyncEventingBasicConsumer? _consumer;
 
-    public VerifyTransactionWorker(ILogger<VerifyTransactionWorker> logger, IRabbitMqChannel channel, string queueName, VerifyTransactionConsumer transactionVerifier)
+    public VerifyTransactionWorker(
+        ILogger<VerifyTransactionWorker> logger,
+        IRabbitMqChannel channel,
+        string queueName,
+        VerifyTransactionConsumer transactionVerifier,
+        IQueueResolver queueResolver)
     {
         _logger = logger;
         _channel = channel;
         _queueName = queueName;
         _consumerTag = $"consumer.{queueName}";
         _transactionVerifier = transactionVerifier;
+        _queueResolver = queueResolver;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        return Task.Run(() =>
+        return Task.Run(async () =>
         {
             _logger.LogInformation("Starting VerifyTransactionWorker for queue {queueName}", _queueName);
 
-            _channel.Channel.QueueDeclare(
+            await _channel.Channel.QueueDeclareAsync(
                 queue: _queueName,
+                passive: false,
                 durable: true,
                 exclusive: false,
                 autoDelete: false,
                 arguments: null
                 );
 
-            _channel.Channel.BasicQos(
+            await _channel.Channel.BasicQosAsync(
                     prefetchSize: 0,
                     prefetchCount: 5,
                     global: false
@@ -49,7 +59,7 @@ public class VerifyTransactionWorker : IDisposable
             _consumer = new AsyncEventingBasicConsumer(_channel.Channel);
             _consumer.Received += Consumer_Received;
 
-            _channel.Channel.BasicConsume(
+            await _channel.Channel.BasicConsumeAsync(
                 queue: _queueName,
                 autoAck: false,
                 consumerTag: _consumerTag,
@@ -58,6 +68,7 @@ public class VerifyTransactionWorker : IDisposable
                 arguments: null,
                 consumer: _consumer
                 );
+
         }, cancellationToken);
     }
 
@@ -72,9 +83,17 @@ public class VerifyTransactionWorker : IDisposable
         try
         {
             var transaction = Transaction.Parser.ParseFrom(ea.Body.ToArray());
-            var streamId = transaction.Header.FederatedStreamId.StreamId.ToString();
+            var targetQueue = _queueResolver.GetQueueName(transaction);
 
-            await _transactionVerifier.Verify(transaction);
+            if (targetQueue == _queueName)
+            {
+                await _transactionVerifier.Verify(transaction);
+            }
+            else
+            {
+                _logger.LogWarning("Received transaction for wrong queue {current_queue}, requeing to {new_queue}", _queueName, targetQueue);
+                await _channel.Channel.BasicPublishAsync("", targetQueue, ea.Body);
+            }
 
             _channel.Channel.BasicAck(ea.DeliveryTag, false);
         }
