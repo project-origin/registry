@@ -17,7 +17,7 @@ public class VerifyTransactionManager : IHostedService
     private readonly List<VerifyTransactionWorker> _workers = new List<VerifyTransactionWorker>();
     private readonly IRabbitMqChannelPool _channelPool;
     private readonly ProcessOptions _options;
-    private IServiceProvider _serviceProvider;
+    private readonly IServiceProvider _serviceProvider;
     private readonly IQueueResolver _queueResolver;
 
     public VerifyTransactionManager(IRabbitMqChannelPool channelPool, IOptions<ProcessOptions> options, IServiceProvider serviceProvider)

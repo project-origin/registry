@@ -20,7 +20,11 @@ using ProjectOrigin.Registry.IntegrationTests;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
-public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixture>, IClassFixture<PostgresDatabaseFixture>, IClassFixture<RedisFixture>
+public class PerformanceTests : IAsyncLifetime,
+    IClassFixture<ContainerImageFixture>,
+    IClassFixture<PostgresDatabaseFixture>,
+    IClassFixture<RedisFixture>,
+    IClassFixture<RabbitMqFixture>
 {
     private const string ElectricityVerifierImage = "ghcr.io/project-origin/electricity-server:0.3.0";
     private const int ElectricityVerifierGrpcPort = 80;
@@ -38,6 +42,7 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
         ContainerImageFixture imageFixture,
         PostgresDatabaseFixture postgresDatabaseFixture,
         RedisFixture redisFixture,
+        RabbitMqFixture rabbitMqFixture,
         ITestOutputHelper outputHelper)
     {
         _issuerKey = Algorithms.Ed25519.GenerateNewPrivateKey();
@@ -72,6 +77,15 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
                 .WithEnvironment("Logging__LogLevel__Grpc.AspNetCore", "Information")
                 .WithEnvironment("Cache__Type", "redis")
                 .WithEnvironment("Cache__Redis__ConnectionString", redisFixture.ContainerConnectionString)
+                .WithEnvironment("Process__ServerNumber", "0")
+                .WithEnvironment("Process__Servers", "1")
+                .WithEnvironment("Process__VerifyThreads", "5")
+                .WithEnvironment("Process__Weight", "10")
+                .WithEnvironment("RabbitMq__Hostname", rabbitMqFixture.Hostname)
+                .WithEnvironment("RabbitMq__AmqpPort", RabbitMqFixture.ContainerAmqpPort.ToString())
+                .WithEnvironment("RabbitMq__HttpApiPort", RabbitMqFixture.ContainerHttpPort.ToString())
+                .WithEnvironment("RabbitMq__Username", rabbitMqFixture.Username)
+                .WithEnvironment("RabbitMq__Password", rabbitMqFixture.Password)
                 .WithWaitStrategy(
                     Wait.ForUnixContainer()
                         .UntilPortIsAvailable(GrpcPort)

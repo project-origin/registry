@@ -9,13 +9,16 @@ namespace ProjectOrigin.TestUtils;
 
 public class RabbitMqFixture : IAsyncLifetime
 {
-    private const int HttpPort = 15672;
+    public const int ContainerHttpPort = 15672;
+    public const int ContainerAmqpPort = RabbitMqBuilder.RabbitMqPort;
+
     private readonly IFutureDockerImage _image;
     private readonly RabbitMqContainer _container;
 
     public string Hostname => _container.Hostname;
-    public int AmqpPort => _container.GetMappedPublicPort(RabbitMqBuilder.RabbitMqPort);
-    public int HttpApiPort => _container.GetMappedPublicPort(HttpPort);
+    public string ContainerIp => _container.IpAddress;
+    public int AmqpPort => _container.GetMappedPublicPort(ContainerAmqpPort);
+    public int HttpApiPort => _container.GetMappedPublicPort(ContainerHttpPort);
     public string Username => RabbitMqBuilder.DefaultUsername;
     public string Password => RabbitMqBuilder.DefaultPassword;
 
@@ -28,7 +31,7 @@ public class RabbitMqFixture : IAsyncLifetime
 
         _container = new RabbitMqBuilder()
             .WithImage(_image)
-            .WithPortBinding(HttpPort, true)
+            .WithPortBinding(ContainerHttpPort, true)
             .Build();
     }
 

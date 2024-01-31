@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
 using ProjectOrigin.Registry.IntegrationTests.Extensions;
 using ProjectOrigin.Registry.Server.Models;
+using ProjectOrigin.Registry.Server.Services;
 using Xunit;
 
 namespace ProjectOrigin.Registry.IntegrationTests;
@@ -25,19 +27,12 @@ public class ConsistentHashResolverTests
         var expected = number / (options.Servers * options.VerifyThreads);
         var resolver = new ConsistentHashRingQueueResolver(Options.Create(options));
 
-        Dictionary<string, int> queueCounts = new Dictionary<string, int>();
+        ConcurrentDictionary<string, int> queueCounts = new ConcurrentDictionary<string, int>();
         for (int i = 0; i < number; i++)
         {
             var s = r.GenerateString();
             var queue = resolver.GetQueueName(s);
-            if (queueCounts.ContainsKey(queue))
-            {
-                queueCounts[queue]++;
-            }
-            else
-            {
-                queueCounts[queue] = 1;
-            }
+            queueCounts.AddOrUpdate(queue, 1, (key, value) => value + 1);
         }
 
         double deviation = NormalizedStandardDeviation(queueCounts.Select(x => x.Value));

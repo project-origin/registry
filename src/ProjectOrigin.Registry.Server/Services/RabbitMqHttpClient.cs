@@ -11,7 +11,7 @@ using ProjectOrigin.Registry.Server.Models;
 
 namespace ProjectOrigin.Registry.Server.Services;
 
-public class RabbitMqHttpClient : IRabbitMqHttpClient, IDisposable
+public sealed class RabbitMqHttpClient : IRabbitMqHttpClient, IDisposable
 {
     private const string Protocol = "http";
     private readonly HttpClient _httpClient;

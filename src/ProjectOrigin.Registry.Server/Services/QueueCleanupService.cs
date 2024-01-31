@@ -11,7 +11,7 @@ using RabbitMQ.Client;
 
 namespace ProjectOrigin.Registry.Server.Services;
 
-public class QueueCleanupService : BackgroundService, IDisposable
+public sealed class QueueCleanupService : BackgroundService, IDisposable
 {
     private readonly ILogger<QueueCleanupService> _logger;
     private readonly IRabbitMqHttpClient _rabbitMqHttpClient;

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Concurrent;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using ProjectOrigin.Registry.Server.Interfaces;
 using ProjectOrigin.Registry.Server.Models;
@@ -8,7 +7,7 @@ using RabbitMQ.Client;
 
 namespace ProjectOrigin.Registry.Server.Services;
 
-public class RabbitMqChannelPool : IRabbitMqChannelPool
+public sealed class RabbitMqChannelPool : IRabbitMqChannelPool
 {
     private readonly Lazy<IConnection> _connection;
     private readonly ConcurrentBag<IChannel> _channels;

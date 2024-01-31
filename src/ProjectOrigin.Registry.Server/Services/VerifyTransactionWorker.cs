@@ -10,7 +10,7 @@ using RabbitMQ.Client.Events;
 
 namespace ProjectOrigin.Registry.Server.Services;
 
-public class VerifyTransactionWorker : IDisposable
+public sealed class VerifyTransactionWorker : IDisposable
 {
     private readonly ILogger<VerifyTransactionWorker> _logger;
     private readonly IRabbitMqChannel _channel;

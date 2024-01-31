@@ -13,13 +13,12 @@ using Google.Protobuf;
 
 namespace ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector.Concordium;
 
-public class ConcordiumPublisher : IBlockPublisher, IDisposable
+public sealed class ConcordiumPublisher : IBlockPublisher, IDisposable
 {
     private readonly TimeSpan sleepTime = TimeSpan.FromSeconds(15);
     private readonly ILogger<ConcordiumPublisher> _logger;
     private readonly IOptions<ConcordiumOptions> _options;
     private readonly ConcordiumClient _concordiumClient;
-    private bool _disposed = false;
 
     public ConcordiumPublisher(ILogger<ConcordiumPublisher> logger, IOptions<ConcordiumOptions> options)
     {
@@ -102,28 +101,8 @@ public class ConcordiumPublisher : IBlockPublisher, IDisposable
         return signer;
     }
 
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposed)
-        {
-            if (disposing)
-            {
-                _concordiumClient.Dispose();
-            }
-            _disposed = true;
-        }
-    }
-
     public void Dispose()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
+        _concordiumClient.Dispose();
     }
-
-    ~ConcordiumPublisher()
-    {
-        Dispose(false);
-    }
-
 }
