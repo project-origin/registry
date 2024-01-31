@@ -23,8 +23,8 @@ public class RabbitMqHttpClientTests
             // Arrange
             var options = Options.Create(new RabbitMqOptions()
             {
-                Username = rabbitMq.Username,
-                Password = rabbitMq.Password,
+                Username = RabbitMqFixture.Username,
+                Password = RabbitMqFixture.Password,
                 Hostname = rabbitMq.Hostname,
                 HttpApiPort = rabbitMq.HttpApiPort,
                 AmqpPort = rabbitMq.AmqpPort
@@ -35,8 +35,8 @@ public class RabbitMqHttpClientTests
             {
                 HostName = rabbitMq.Hostname,
                 Port = rabbitMq.AmqpPort,
-                UserName = rabbitMq.Username,
-                Password = rabbitMq.Password,
+                UserName = RabbitMqFixture.Username,
+                Password = RabbitMqFixture.Password,
             };
 
             using var con = factory.CreateConnection();
@@ -70,8 +70,8 @@ public class RabbitMqHttpClientTests
             // Arrange
             var options = Options.Create(new RabbitMqOptions()
             {
-                Username = rabbitMq.Username,
-                Password = rabbitMq.Password,
+                Username = RabbitMqFixture.Username,
+                Password = RabbitMqFixture.Password,
                 Hostname = rabbitMq.Hostname,
                 HttpApiPort = rabbitMq.HttpApiPort,
                 AmqpPort = rabbitMq.AmqpPort

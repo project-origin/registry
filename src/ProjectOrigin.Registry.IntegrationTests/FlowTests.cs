@@ -52,8 +52,8 @@ public class FlowTests :
             {"RabbitMq:Hostname", rabbitMqFixture.Hostname},
             {"RabbitMq:AmqpPort", rabbitMqFixture.AmqpPort.ToString()},
             {"RabbitMq:HttpApiPort", rabbitMqFixture.HttpApiPort.ToString()},
-            {"RabbitMq:Username", rabbitMqFixture.Username},
-            {"RabbitMq:Password", rabbitMqFixture.Password},
+            {"RabbitMq:Username", RabbitMqFixture.Username},
+            {"RabbitMq:Password", RabbitMqFixture.Password},
         });
     }
 

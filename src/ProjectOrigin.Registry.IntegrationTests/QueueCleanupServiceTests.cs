@@ -34,8 +34,8 @@ public class QueueCleanupServiceTests
             var numberOfMessages = 10000;
             var rabbitMqOptions = Options.Create(new RabbitMqOptions
             {
-                Username = rabbitMq.Username,
-                Password = rabbitMq.Password,
+                Username = RabbitMqFixture.Username,
+                Password = RabbitMqFixture.Password,
                 Hostname = rabbitMq.Hostname,
                 HttpApiPort = rabbitMq.HttpApiPort,
                 AmqpPort = rabbitMq.AmqpPort

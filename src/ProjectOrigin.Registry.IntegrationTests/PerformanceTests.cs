@@ -84,8 +84,8 @@ public class PerformanceTests : IAsyncLifetime,
                 .WithEnvironment("RabbitMq__Hostname", rabbitMqFixture.Hostname)
                 .WithEnvironment("RabbitMq__AmqpPort", RabbitMqFixture.ContainerAmqpPort.ToString())
                 .WithEnvironment("RabbitMq__HttpApiPort", RabbitMqFixture.ContainerHttpPort.ToString())
-                .WithEnvironment("RabbitMq__Username", rabbitMqFixture.Username)
-                .WithEnvironment("RabbitMq__Password", rabbitMqFixture.Password)
+                .WithEnvironment("RabbitMq__Username", RabbitMqFixture.Username)
+                .WithEnvironment("RabbitMq__Password", RabbitMqFixture.Password)
                 .WithWaitStrategy(
                     Wait.ForUnixContainer()
                         .UntilPortIsAvailable(GrpcPort)

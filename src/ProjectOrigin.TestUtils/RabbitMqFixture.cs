@@ -11,6 +11,8 @@ public class RabbitMqFixture : IAsyncLifetime
 {
     public const int ContainerHttpPort = 15672;
     public const int ContainerAmqpPort = RabbitMqBuilder.RabbitMqPort;
+    public const string Username = RabbitMqBuilder.DefaultUsername;
+    public const string Password = RabbitMqBuilder.DefaultPassword;
 
     private readonly IFutureDockerImage _image;
     private readonly RabbitMqContainer _container;
@@ -19,8 +21,6 @@ public class RabbitMqFixture : IAsyncLifetime
     public string ContainerIp => _container.IpAddress;
     public int AmqpPort => _container.GetMappedPublicPort(ContainerAmqpPort);
     public int HttpApiPort => _container.GetMappedPublicPort(ContainerHttpPort);
-    public string Username => RabbitMqBuilder.DefaultUsername;
-    public string Password => RabbitMqBuilder.DefaultPassword;
 
     public RabbitMqFixture()
     {
