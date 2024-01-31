@@ -18,7 +18,6 @@ public sealed class VerifyTransactionWorker : IDisposable
     private readonly VerifyTransactionConsumer _transactionVerifier;
     private readonly IQueueResolver _queueResolver;
     private readonly string _consumerTag;
-    private AsyncEventingBasicConsumer? _consumer;
 
     public VerifyTransactionWorker(
         ILogger<VerifyTransactionWorker> logger,
@@ -56,8 +55,8 @@ public sealed class VerifyTransactionWorker : IDisposable
                     global: false
                     );
 
-            _consumer = new AsyncEventingBasicConsumer(_channel.Channel);
-            _consumer.Received += Consumer_Received;
+            var consumer = new AsyncEventingBasicConsumer(_channel.Channel);
+            consumer.Received += Consumer_Received;
 
             await _channel.Channel.BasicConsumeAsync(
                 queue: _queueName,
@@ -66,7 +65,7 @@ public sealed class VerifyTransactionWorker : IDisposable
                 noLocal: false,
                 exclusive: true,
                 arguments: null,
-                consumer: _consumer
+                consumer: consumer
                 );
 
         }, cancellationToken);

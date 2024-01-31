@@ -6,7 +6,6 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.Options;
 using Murmur;
 using ProjectOrigin.Registry.Server.Interfaces;
-using ProjectOrigin.Registry.Server.Models;
 using ProjectOrigin.Registry.Server.Options;
 
 namespace ProjectOrigin.Registry.Server.Services;
