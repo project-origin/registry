@@ -114,7 +114,7 @@ echo "Wallet installed"
 echo "Installing registries"
 helm install ${registry_a_name} -n ${registry_a_namespace} charts/project-origin-registry --set persistance.cloudNativePG.enabled=true,image.tag=test,service.nodePort=$registry_a_nodeport,service.type=NodePort -f "${override_values_filename}"  --create-namespace --wait
 echo "Registry A installed"
-helm install ${registry_b_name}-postfix -n ${registry_b_namespace} charts/project-origin-registry --set persistance.inMemory.enabled=true,image.tag=test,registryName=$registry_b_name,service.nodePort=$registry_b_nodeport,service.type=NodePort -f "${override_values_filename}"  --create-namespace --wait
+helm install ${registry_b_name}-postfix -n ${registry_b_namespace} charts/project-origin-registry --set transactionProcessor.replicas=1,persistance.inMemory.enabled=true,image.tag=test,registryName=$registry_b_name,service.nodePort=$registry_b_nodeport,service.type=NodePort -f "${override_values_filename}"  --create-namespace --wait
 echo "Registry B installed"
 
 # wait for cluster to be ready
