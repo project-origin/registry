@@ -1,6 +1,6 @@
 namespace ProjectOrigin.Registry.Server.Models;
 
-public record RabbitMqQueue
+public record RabbitMqQueue()
 {
     public required string Name { get; init; }
     public required string Vhost { get; init; }
