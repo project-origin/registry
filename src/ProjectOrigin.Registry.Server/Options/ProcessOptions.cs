@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ProjectOrigin.Registry.Server.Options;
 
-public record ProcessOptions
+public record ProcessOptions()
 {
     [Required, Range(0, 127)]
     public int ServerNumber { get; init; }

@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ProjectOrigin.Registry.Server.Options;
 
-public record RabbitMqOptions
+public record RabbitMqOptions()
 {
     [Required]
     public required string Hostname { get; init; }
