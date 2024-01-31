@@ -81,7 +81,7 @@ public class PerformanceTests : IAsyncLifetime,
                 .WithEnvironment("Process__Servers", "1")
                 .WithEnvironment("Process__VerifyThreads", "5")
                 .WithEnvironment("Process__Weight", "10")
-                .WithEnvironment("RabbitMq__Hostname", rabbitMqFixture.Hostname)
+                .WithEnvironment("RabbitMq__Hostname", rabbitMqFixture.ContainerIp)
                 .WithEnvironment("RabbitMq__AmqpPort", RabbitMqFixture.ContainerAmqpPort.ToString())
                 .WithEnvironment("RabbitMq__HttpApiPort", RabbitMqFixture.ContainerHttpPort.ToString())
                 .WithEnvironment("RabbitMq__Username", RabbitMqFixture.Username)
