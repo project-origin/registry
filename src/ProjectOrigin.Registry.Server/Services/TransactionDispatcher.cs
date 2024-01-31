@@ -6,7 +6,7 @@ using Grpc.Net.Client;
 using Microsoft.Extensions.Options;
 using ProjectOrigin.Registry.Server.Exceptions;
 using ProjectOrigin.Registry.Server.Interfaces;
-using ProjectOrigin.Registry.Server.Models;
+using ProjectOrigin.Registry.Server.Options;
 using ProjectOrigin.Registry.V1;
 using ProjectOrigin.Verifier.V1;
 

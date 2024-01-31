@@ -6,7 +6,6 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using ProjectOrigin.Registry.Server.Models;
 using ProjectOrigin.Registry.Server.Services;
 using ProjectOrigin.Registry.Server.Extensions;
 using ProjectOrigin.TestUtils;
@@ -14,6 +13,7 @@ using Xunit;
 using RabbitMQ.Client;
 using Google.Protobuf;
 using System.Linq;
+using ProjectOrigin.Registry.Server.Options;
 
 namespace ProjectOrigin.Registry.IntegrationTests;
 

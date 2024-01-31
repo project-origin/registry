@@ -2,6 +2,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
+using ProjectOrigin.Registry.Server.Options;
 using ProjectOrigin.Registry.Server.Services;
 using ProjectOrigin.TestUtils;
 using RabbitMQ.Client;
@@ -20,7 +21,7 @@ public class RabbitMqHttpClientTests
             await rabbitMq.InitializeAsync();
 
             // Arrange
-            var options = Options.Create(new Server.Models.RabbitMqOptions()
+            var options = Options.Create(new RabbitMqOptions()
             {
                 Username = rabbitMq.Username,
                 Password = rabbitMq.Password,
@@ -67,7 +68,7 @@ public class RabbitMqHttpClientTests
             await rabbitMq.InitializeAsync();
 
             // Arrange
-            var options = Options.Create(new Server.Models.RabbitMqOptions()
+            var options = Options.Create(new RabbitMqOptions()
             {
                 Username = rabbitMq.Username,
                 Password = rabbitMq.Password,

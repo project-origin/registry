@@ -8,7 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ProjectOrigin.Registry.Server.Interfaces;
-using ProjectOrigin.Registry.Server.Models;
+using ProjectOrigin.Registry.Server.Options;
 
 namespace ProjectOrigin.Registry.Server.Services;
 

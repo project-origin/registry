@@ -5,7 +5,7 @@ using System.Linq;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
 using ProjectOrigin.Registry.IntegrationTests.Extensions;
-using ProjectOrigin.Registry.Server.Models;
+using ProjectOrigin.Registry.Server.Options;
 using ProjectOrigin.Registry.Server.Services;
 using Xunit;
 

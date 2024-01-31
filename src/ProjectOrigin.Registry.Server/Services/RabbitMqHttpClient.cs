@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using ProjectOrigin.Registry.Server.Interfaces;
 using ProjectOrigin.Registry.Server.Models;
+using ProjectOrigin.Registry.Server.Options;
 
 namespace ProjectOrigin.Registry.Server.Services;
 

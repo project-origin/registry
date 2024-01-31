@@ -6,6 +6,7 @@ using OpenTelemetry.Metrics;
 using ProjectOrigin.Registry.Server.Extensions;
 using ProjectOrigin.Registry.Server.Interfaces;
 using ProjectOrigin.Registry.Server.Models;
+using ProjectOrigin.Registry.Server.Options;
 using ProjectOrigin.Registry.Server.Services;
 using ProjectOrigin.VerifiableEventStore.Models;
 using ProjectOrigin.VerifiableEventStore.Services.BlockFinalizer;

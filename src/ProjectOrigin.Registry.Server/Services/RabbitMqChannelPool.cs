@@ -2,7 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Options;
 using ProjectOrigin.Registry.Server.Interfaces;
-using ProjectOrigin.Registry.Server.Models;
+using ProjectOrigin.Registry.Server.Options;
 using RabbitMQ.Client;
 
 namespace ProjectOrigin.Registry.Server.Services;
