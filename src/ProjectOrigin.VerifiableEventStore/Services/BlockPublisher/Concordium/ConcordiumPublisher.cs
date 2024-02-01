@@ -80,7 +80,7 @@ public sealed class ConcordiumPublisher : IBlockPublisher, IDisposable
         }
     }
 
-    private async Task<TransactionHash> SignAndSendTransaction(AccountTransactionPayload transaction)
+    private async Task<TransactionHash> SignAndSendTransaction(RegisterData transaction)
     {
         var sender = AccountAddress.From(_options.Value.AccountAddress);
         var sequenceNumber = (await _concordiumClient.GetNextAccountSequenceNumberAsync(sender)).Item1;
