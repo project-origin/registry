@@ -1,18 +1,18 @@
 using Grpc.Core;
-using MassTransit;
 using ProjectOrigin.Registry.V1;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
 using ProjectOrigin.VerifiableEventStore.Services.TransactionStatusCache;
-using System.Security.Cryptography;
-using Google.Protobuf;
 using System.Diagnostics.Metrics;
 using ProjectOrigin.VerifiableEventStore.Models;
 using ProjectOrigin.VerifiableEventStore.Services.Repository;
 using ProjectOrigin.Registry.Server.Extensions;
+using Google.Protobuf;
+using ProjectOrigin.Registry.Server.Interfaces;
+using RabbitMQ.Client;
 
-namespace ProjectOrigin.Registry.Server;
+namespace ProjectOrigin.Registry.Server.Grpc;
 
 public class RegistryService : V1.RegistryService.RegistryServiceBase
 {
@@ -20,30 +20,39 @@ public class RegistryService : V1.RegistryService.RegistryServiceBase
     public static readonly Counter<long> TransactionsSubmitted = Meter.CreateCounter<long>("TransactionsSubmitted");
 
     private readonly ITransactionRepository _transactionRepository;
-    private readonly IBus _bus;
     private readonly ITransactionStatusService _transactionStatusService;
+    private readonly IRabbitMqChannelPool _brokerPool;
+    private readonly IQueueResolver _queueResolver;
 
-    public RegistryService(ITransactionRepository eventStore, IBus bus, ITransactionStatusService transactionStatusService)
+    public RegistryService(
+        ITransactionRepository transactionRepository,
+        ITransactionStatusService transactionStatusService,
+        IRabbitMqChannelPool brokerPool,
+        IQueueResolver queueResolver)
     {
-        _transactionRepository = eventStore;
-        _bus = bus;
+        _transactionRepository = transactionRepository;
         _transactionStatusService = transactionStatusService;
+        _brokerPool = brokerPool;
+        _queueResolver = queueResolver;
     }
 
     public override async Task<SubmitTransactionResponse> SendTransactions(SendTransactionsRequest request, ServerCallContext context)
     {
-        foreach (var transaction in request.Transactions)
+        using (var brokerChannel = _brokerPool.GetChannel())
         {
-            var message = VerifyTransaction.Create(transaction);
-            var transactionHash = transaction.GetTransactionHash();
+            foreach (var transaction in request.Transactions)
+            {
+                await _transactionStatusService.SetTransactionStatus(
+                        transaction.GetTransactionHash(),
+                        new TransactionStatusRecord(TransactionStatus.Pending)
+                    )
+                    .ConfigureAwait(false);
 
-            await _transactionStatusService.SetTransactionStatus(
-                transactionHash,
-                new TransactionStatusRecord(TransactionStatus.Pending)
-                )
-                .ConfigureAwait(false);
+                var queue = _queueResolver.GetQueueName(transaction);
 
-            await _bus.Publish(message).ConfigureAwait(false); // Should be reworked to Send() to a specific exchange once it is implemented
+                await brokerChannel.Channel.BasicPublishAsync("", queue, transaction.ToByteArray())
+                    .ConfigureAwait(false);
+            }
         }
 
         TransactionsSubmitted.Add(request.Transactions.Count);

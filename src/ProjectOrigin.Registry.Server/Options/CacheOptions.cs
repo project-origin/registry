@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace ProjectOrigin.Registry.Server.Models;
+namespace ProjectOrigin.Registry.Server.Options;
 
-public record CacheOptions : IValidatableObject
+public record CacheOptions() : IValidatableObject
 {
     public CacheTypes Type { get; init; }
 

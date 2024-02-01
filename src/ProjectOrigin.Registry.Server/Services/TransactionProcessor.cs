@@ -1,34 +1,32 @@
 using System;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Google.Protobuf;
-using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ProjectOrigin.Registry.Server.Exceptions;
 using ProjectOrigin.Registry.Server.Extensions;
 using ProjectOrigin.Registry.Server.Interfaces;
-using ProjectOrigin.Registry.Server.Models;
+using ProjectOrigin.Registry.Server.Options;
 using ProjectOrigin.VerifiableEventStore.Models;
 using ProjectOrigin.VerifiableEventStore.Services.Repository;
 using ProjectOrigin.VerifiableEventStore.Services.TransactionStatusCache;
 
 namespace ProjectOrigin.Registry.Server.Services;
 
-public class VerifyTransactionConsumer : IConsumer<VerifyTransaction>
+public class TransactionProcessor
 {
-    private readonly TransactionProcessorOptions _options;
+    private readonly RegistryOptions _options;
     private readonly ITransactionRepository _transactionRepository;
     private readonly ITransactionDispatcher _verifier;
     private readonly ITransactionStatusService _transactionStatusService;
-    private readonly ILogger<VerifyTransactionConsumer> _logger;
+    private readonly ILogger<TransactionProcessor> _logger;
 
-    public VerifyTransactionConsumer(IOptions<TransactionProcessorOptions> options,
+    public TransactionProcessor(IOptions<RegistryOptions> options,
                                 ITransactionRepository transactionRepository,
                                 ITransactionDispatcher verifier,
                                 ITransactionStatusService transactionStatusService,
-                                ILogger<VerifyTransactionConsumer> logger)
+                                ILogger<TransactionProcessor> logger)
     {
         _options = options.Value;
         _transactionRepository = transactionRepository;
@@ -37,9 +35,8 @@ public class VerifyTransactionConsumer : IConsumer<VerifyTransaction>
         _logger = logger;
     }
 
-    public async Task Consume(ConsumeContext<VerifyTransaction> context)
+    public async Task Verify(V1.Transaction transaction)
     {
-        V1.Transaction transaction = context.Message.ToTransaction();
         var transactionHash = transaction.GetTransactionHash();
         try
         {
@@ -78,15 +75,5 @@ public class VerifyTransactionConsumer : IConsumer<VerifyTransaction>
             _logger.LogError(ex, "Unknown exception for transaction {transactionHash} -  {exceptionMessage}", transactionHash, ex.Message);
             throw;
         }
-    }
-}
-
-public class VerifyTransactionConsumerDefinition : ConsumerDefinition<VerifyTransactionConsumer>
-{
-    public VerifyTransactionConsumerDefinition()
-    {
-        // limit the number of messages consumed concurrently
-        // this applies to the consumer only, not the endpoint
-        ConcurrentMessageLimit = 1;
     }
 }

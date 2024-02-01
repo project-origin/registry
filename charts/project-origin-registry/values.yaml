@@ -10,6 +10,30 @@ image:
   # tag is the tag to pull defaults to the chart version
   tag:
 
+# transactionProcessor holds the configuration for the transaction processor
+transactionProcessor:
+  # replicas defines the number of transaction processor containers to run
+  replicas: 3
+  # threads defines the number of parallel threads to run per transaction processor
+  threads: 5
+  # defines the weight in the consistent hash ring used to determine which transaction processor to send a transaction to.
+  weight: 10
+
+# rabbitmq defines the rabbitmq configuration for rabbitmq, with rabbitmqOperator
+rabbitmq:
+  # operatorEnabled determines if the rabbitmq operator should be used to create the rabbitmq cluster, if true then other fields are ignored.
+  operatorEnabled: true
+  # host defines the host of the rabbitmq server in url format 'localhost'
+  host:
+  # amqpPort defines the port of the rabbitmq server
+  amqpPort: 5672
+  # httpPort defines the api management port of the rabbitmq server
+  httpPort: 15672
+  # username defines the username to use to connect to the rabbitmq server
+  username:
+  # password defines the password to use to connect to the rabbitmq server
+  password:
+
 # service holds the configuration for the service
 service:
   # type is the type of service to create, allowed values are (ClusterIP | NodePort | LoadBalancer)
@@ -74,7 +98,6 @@ verifiers:
       # - name: test
       #   address: http://test-registry:80
 
-
 # immutableRecord holds the configuration for where and how the log is published.
 immutableRecord:
   # type determines where the immutable log is send to, supported values are (log | concordium) if concordium is specified, then it must be configured below.
@@ -94,6 +117,11 @@ immutableRecord:
       name: ""
       # key is the reference to the value within the secret
       key: ""
+
+# redis holds the configuration for the redis subchart
+redis:
+  # enabled specifies if the redis subchart should be enabled or not
+  enabled: true
 
 # concordium holds the configuration for the concordium node
 concordium:

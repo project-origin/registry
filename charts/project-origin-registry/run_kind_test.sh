@@ -53,7 +53,10 @@ EOF
 
 # recreate clean cluster
 kind delete cluster -n helm-test
-kind create cluster -n helm-test --config "$kind_filename"
+kind create cluster -n helm-test --config "$kind_filename" --image kindest/node:v1.29.0
+
+# install rabbitmq-operator
+kubectl apply -f "https://github.com/rabbitmq/cluster-operator/releases/download/v2.7.0/cluster-operator.yml"
 
 # load docker image into cluster
 kind load -n helm-test docker-image ghcr.io/project-origin/registry-server:test
@@ -90,10 +93,10 @@ cat << EOF > "${wallet_filename}"
 service:
   type: NodePort
   nodePort: ${wallet_nodeport}
-wallet:
+config:
   externalUrl: http://localhost:${wallet_nodeport}
-redis:
-  enabled: true
+  jwt:
+    allowAnyJwtToken: true
 messageBroker:
   type: inMemory
 registries:
@@ -104,14 +107,14 @@ registries:
 EOF
 
 # install wallet
-helm install my-wallet project-origin-wallet --version 0.6.0 -f "${wallet_filename}" --repo https://project-origin.github.io/helm-registry --namespace wallet --create-namespace --wait
+helm install my-wallet project-origin-wallet --version 0.8.0 -f "${wallet_filename}" --repo https://project-origin.github.io/helm-registry --namespace wallet --create-namespace --wait
 echo "Wallet installed"
 
 # install two registries
 echo "Installing registries"
 helm install ${registry_a_name} -n ${registry_a_namespace} charts/project-origin-registry --set persistance.cloudNativePG.enabled=true,image.tag=test,service.nodePort=$registry_a_nodeport,service.type=NodePort -f "${override_values_filename}"  --create-namespace --wait
 echo "Registry A installed"
-helm install ${registry_b_name}-postfix -n ${registry_b_namespace} charts/project-origin-registry --set persistance.inMemory.enabled=true,image.tag=test,registryName=$registry_b_name,service.nodePort=$registry_b_nodeport,service.type=NodePort -f "${override_values_filename}"  --create-namespace --wait
+helm install ${registry_b_name}-postfix -n ${registry_b_namespace} charts/project-origin-registry --set transactionProcessor.replicas=1,persistance.inMemory.enabled=true,image.tag=test,registryName=$registry_b_name,service.nodePort=$registry_b_nodeport,service.type=NodePort -f "${override_values_filename}"  --create-namespace --wait
 echo "Registry B installed"
 
 # wait for cluster to be ready

@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace ProjectOrigin.Registry.Server.Models;
+namespace ProjectOrigin.Registry.Server.Options;
 
-public record RedisOptions : IValidatableObject
+public record RedisOptions() : IValidatableObject
 {
     public string? Password { get; init; }
     public string ConnectionString { get; init; } = string.Empty;

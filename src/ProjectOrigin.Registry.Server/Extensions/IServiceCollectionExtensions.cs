@@ -1,8 +1,7 @@
 using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using ProjectOrigin.Registry.Server.Models;
+using ProjectOrigin.Registry.Server.Options;
 using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector.Concordium;
 using ProjectOrigin.VerifiableEventStore.Services.BlockPublisher;
 using ProjectOrigin.VerifiableEventStore.Services.BlockPublisher.Log;

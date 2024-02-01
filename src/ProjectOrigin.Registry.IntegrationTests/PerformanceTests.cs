@@ -20,7 +20,11 @@ using ProjectOrigin.Registry.IntegrationTests;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
-public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixture>, IClassFixture<PostgresDatabaseFixture>, IClassFixture<RedisFixture>
+public class PerformanceTests : IAsyncLifetime,
+    IClassFixture<ContainerImageFixture>,
+    IClassFixture<PostgresDatabaseFixture>,
+    IClassFixture<RedisFixture>,
+    IClassFixture<RabbitMqFixture>
 {
     private const string ElectricityVerifierImage = "ghcr.io/project-origin/electricity-server:0.3.0";
     private const int ElectricityVerifierGrpcPort = 80;
@@ -38,6 +42,7 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
         ContainerImageFixture imageFixture,
         PostgresDatabaseFixture postgresDatabaseFixture,
         RedisFixture redisFixture,
+        RabbitMqFixture rabbitMqFixture,
         ITestOutputHelper outputHelper)
     {
         _issuerKey = Algorithms.Ed25519.GenerateNewPrivateKey();
@@ -72,6 +77,15 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
                 .WithEnvironment("Logging__LogLevel__Grpc.AspNetCore", "Information")
                 .WithEnvironment("Cache__Type", "redis")
                 .WithEnvironment("Cache__Redis__ConnectionString", redisFixture.ContainerConnectionString)
+                .WithEnvironment("RabbitMq__Hostname", rabbitMqFixture.ContainerIp)
+                .WithEnvironment("RabbitMq__AmqpPort", RabbitMqFixture.ContainerAmqpPort.ToString())
+                .WithEnvironment("RabbitMq__HttpApiPort", RabbitMqFixture.ContainerHttpPort.ToString())
+                .WithEnvironment("RabbitMq__Username", RabbitMqFixture.Username)
+                .WithEnvironment("RabbitMq__Password", RabbitMqFixture.Password)
+                .WithEnvironment("TransactionProcessor__ServerNumber", "0")
+                .WithEnvironment("TransactionProcessor__Servers", "1")
+                .WithEnvironment("TransactionProcessor__Threads", "5")
+                .WithEnvironment("TransactionProcessor__Weight", "10")
                 .WithWaitStrategy(
                     Wait.ForUnixContainer()
                         .UntilPortIsAvailable(GrpcPort)
@@ -137,7 +151,7 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
         Console.WriteLine($"Completed {completed.Count} transactions in {elapsedSeconds} seconds ({requestsPerSecond} requests per second).");
         Console.WriteLine($"-- Finished throughput test --");
 
-        requestsPerSecond.Should().BeGreaterThan(30); // based on througput test on github ~35
+        requestsPerSecond.Should().BeGreaterThan(150); // based on througput test on github ~170
     }
 
     [Fact]
@@ -173,7 +187,7 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
         Console.WriteLine("Min:  " + measurements.Min());
         Console.WriteLine($"-- Finished sequential test --");
 
-        ms95th.Should().BeLessThan(6000);
+        ms95th.Should().BeLessThan(3500);
     }
 
     [Fact]
@@ -220,7 +234,7 @@ public class PerformanceTests : IAsyncLifetime, IClassFixture<ContainerImageFixt
         Console.WriteLine("Min:  " + measurements.Min());
         Console.WriteLine($"-- Finished parallel test --");
 
-        ms95th.Should().BeLessThan(5000);
+        ms95th.Should().BeLessThan(2000);
     }
 
     private async Task<Registry.V1.Transaction> SendRequest(GrpcChannel channel)

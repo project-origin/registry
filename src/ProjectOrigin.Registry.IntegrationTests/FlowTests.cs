@@ -9,11 +9,15 @@ using FluentAssertions;
 using ProjectOrigin.Electricity.V1;
 using ProjectOrigin.HierarchicalDeterministicKeys;
 using System.Collections.Generic;
-using ProjectOrigin.Registry.IntegrationTests;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
-public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityServiceFixture>, IClassFixture<PostgresDatabaseFixture>, IClassFixture<RedisFixture>
+public class FlowTests :
+    GrpcTestBase<Startup>,
+    IClassFixture<ElectricityServiceFixture>,
+    IClassFixture<PostgresDatabaseFixture>,
+    IClassFixture<RedisFixture>,
+    IClassFixture<RabbitMqFixture>
 {
     protected ElectricityServiceFixture _verifierFixture;
     private PostgresDatabaseFixture _postgresDatabaseFixture;
@@ -26,6 +30,7 @@ public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityService
         GrpcTestFixture<Startup> grpcFixture,
         PostgresDatabaseFixture postgresDatabaseFixture,
         RedisFixture redisFixture,
+        RabbitMqFixture rabbitMqFixture,
         ITestOutputHelper outputHelper) : base(grpcFixture, outputHelper)
     {
         _verifierFixture = verifierFixture;
@@ -33,13 +38,22 @@ public class FlowTests : GrpcTestBase<Startup>, IClassFixture<ElectricityService
         grpcFixture.ConfigureHostConfiguration(new Dictionary<string, string?>()
         {
             {"RegistryName", RegistryName},
-            {$"Verifiers:project_origin.electricity.v1", _verifierFixture.Url},
-            {$"ImmutableLog:type", "log"},
+            {"Verifiers:project_origin.electricity.v1", _verifierFixture.Url},
+            {"ImmutableLog:type", "log"},
             {"BlockFinalizer:Interval", "00:00:05"},
             {"Persistance:type", "postgresql"},
             {"Persistance:postgresql:ConnectionString", _postgresDatabaseFixture.HostConnectionString},
             {"Cache:Type", "redis"},
             {"Cache:Redis:ConnectionString", redisFixture.HostConnectionString},
+            {"RabbitMq:Hostname", rabbitMqFixture.Hostname},
+            {"RabbitMq:AmqpPort", rabbitMqFixture.AmqpPort.ToString()},
+            {"RabbitMq:HttpApiPort", rabbitMqFixture.HttpApiPort.ToString()},
+            {"RabbitMq:Username", RabbitMqFixture.Username},
+            {"RabbitMq:Password", RabbitMqFixture.Password},
+            {"TransactionProcessor:ServerNumber", "0"},
+            {"TransactionProcessor:Servers", "1"},
+            {"TransactionProcessor:Threads", "5"},
+            {"TransactionProcessor:Weight", "10"},
         });
     }
 

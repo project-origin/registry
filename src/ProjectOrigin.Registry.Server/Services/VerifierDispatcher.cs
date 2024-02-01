@@ -6,18 +6,18 @@ using Grpc.Net.Client;
 using Microsoft.Extensions.Options;
 using ProjectOrigin.Registry.Server.Exceptions;
 using ProjectOrigin.Registry.Server.Interfaces;
-using ProjectOrigin.Registry.Server.Models;
+using ProjectOrigin.Registry.Server.Options;
 using ProjectOrigin.Registry.V1;
 using ProjectOrigin.Verifier.V1;
 
 namespace ProjectOrigin.Registry.Server.Services;
 
-public class TransactionDispatcher : ITransactionDispatcher
+public class VerifierDispatcher : ITransactionDispatcher
 {
     private readonly ConcurrentDictionary<string, Lazy<VerifierService.VerifierServiceClient>> concurrentDictionary;
     private readonly VerifierOptions _options;
 
-    public TransactionDispatcher(IOptions<VerifierOptions> options)
+    public VerifierDispatcher(IOptions<VerifierOptions> options)
     {
         concurrentDictionary = new ConcurrentDictionary<string, Lazy<VerifierService.VerifierServiceClient>>();
         _options = options.Value;
