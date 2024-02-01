@@ -13,7 +13,7 @@ using Google.Protobuf;
 
 namespace ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector.Concordium;
 
-public class ConcordiumPublisher : IBlockPublisher, IDisposable
+public sealed class ConcordiumPublisher : IBlockPublisher, IDisposable
 {
     private readonly TimeSpan sleepTime = TimeSpan.FromSeconds(15);
     private readonly ILogger<ConcordiumPublisher> _logger;
@@ -81,7 +81,7 @@ public class ConcordiumPublisher : IBlockPublisher, IDisposable
         }
     }
 
-    private async Task<TransactionHash> SignAndSendTransaction(AccountTransactionPayload transaction)
+    private async Task<TransactionHash> SignAndSendTransaction(RegisterData transaction)
     {
         var sender = AccountAddress.From(_options.Value.AccountAddress);
         var sequenceNumber = (await _concordiumClient.GetNextAccountSequenceNumberAsync(sender)).Item1;
@@ -102,28 +102,8 @@ public class ConcordiumPublisher : IBlockPublisher, IDisposable
         return signer;
     }
 
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposed)
-        {
-            if (disposing)
-            {
-                _concordiumClient.Dispose();
-            }
-            _disposed = true;
-        }
-    }
-
     public void Dispose()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
+        _concordiumClient.Dispose();
     }
-
-    ~ConcordiumPublisher()
-    {
-        Dispose(false);
-    }
-
 }
