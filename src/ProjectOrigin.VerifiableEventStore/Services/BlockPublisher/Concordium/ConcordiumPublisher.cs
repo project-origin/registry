@@ -19,7 +19,6 @@ public sealed class ConcordiumPublisher : IBlockPublisher, IDisposable
     private readonly ILogger<ConcordiumPublisher> _logger;
     private readonly IOptions<ConcordiumOptions> _options;
     private readonly ConcordiumClient _concordiumClient;
-    private bool _disposed = false;
 
     public ConcordiumPublisher(ILogger<ConcordiumPublisher> logger, IOptions<ConcordiumOptions> options)
     {
