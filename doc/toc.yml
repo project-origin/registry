@@ -1,8 +1,11 @@
 - name: Overview
   href: index.md
-- name: Registry Service
-  href: container.md
+- name: Registry System
+  href: registry_system.md
+  items:
+  - name: Registry Service
+    href: registry_service.md
+  - name: Consistent hash ring
+    href: consistent_hash_ring.md
 - name: Quickstart
   href: quickstart.md
-- name: Verifiable event store
-  href: verifiable_event_store/README.md
