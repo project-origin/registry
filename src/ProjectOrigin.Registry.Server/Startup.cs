@@ -80,6 +80,8 @@ public class Startup
 
         services.AddHostedService<TransactionProcessorManager>();
         services.AddHostedService<QueueCleanupService>();
+
+        services.AddTransient<IBlockFinalizer, BlockFinalizerJob>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
