@@ -25,7 +25,6 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddGrpc();
-        services.AddHostedService<BlockFinalizerBackgroundService>();
         services.AddSingleton<ITransactionDispatcher, VerifierDispatcher>();
 
         services.AddOpenTelemetry()
@@ -81,7 +80,13 @@ public class Startup
         services.AddHostedService<TransactionProcessorManager>();
         services.AddHostedService<QueueCleanupService>();
 
-        services.AddTransient<IBlockFinalizer, BlockFinalizerJob>();
+        // Only one server should run the block finalizer
+        var serverNumber = _configuration.GetSection("TransactionProcessor").GetValue<int>("ServerNumber");
+        if (serverNumber == 0)
+        {
+            services.AddHostedService<BlockFinalizerBackgroundService>();
+            services.AddTransient<IBlockFinalizer, BlockFinalizerJob>();
+        }
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
