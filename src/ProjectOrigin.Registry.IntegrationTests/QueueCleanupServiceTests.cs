@@ -14,6 +14,7 @@ using RabbitMQ.Client;
 using Google.Protobuf;
 using System.Linq;
 using ProjectOrigin.Registry.Server.Options;
+using System.Net.Http;
 
 namespace ProjectOrigin.Registry.IntegrationTests;
 
@@ -42,7 +43,7 @@ public class QueueCleanupServiceTests
             });
 
             using var channelPool = new RabbitMqChannelPool(rabbitMqOptions);
-            using var httpClient = new RabbitMqHttpClient(rabbitMqOptions);
+            var httpClient = new RabbitMqHttpClient(new HttpClient(), rabbitMqOptions);
 
             List<V1.Transaction> transactions = new();
             for (var i = 0; i < numberOfMessages; i++)

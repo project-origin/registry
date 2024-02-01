@@ -12,7 +12,7 @@ using ProjectOrigin.Registry.Server.Options;
 
 namespace ProjectOrigin.Registry.Server.Services;
 
-public sealed class RabbitMqHttpClient : IRabbitMqHttpClient, IDisposable
+public sealed class RabbitMqHttpClient : IRabbitMqHttpClient
 {
     private const string Protocol = "http";
     private readonly HttpClient _httpClient;
@@ -21,15 +21,12 @@ public sealed class RabbitMqHttpClient : IRabbitMqHttpClient, IDisposable
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
     };
 
-    public RabbitMqHttpClient(IOptions<RabbitMqOptions> rabbitMqOptions)
+    public RabbitMqHttpClient(HttpClient httpClient, IOptions<RabbitMqOptions> rabbitMqOptions)
     {
-        var option = rabbitMqOptions.Value;
-        Console.WriteLine($"{Protocol}://{option.Hostname}:{option.HttpApiPort}");
-        _httpClient = new HttpClient()
-        {
-            BaseAddress = new Uri($"{Protocol}://{option.Hostname}:{option.HttpApiPort}")
-        };
-        var byteArray = Encoding.ASCII.GetBytes($"{option.Username}:{option.Password}");
+        _httpClient = httpClient;
+        _httpClient.BaseAddress = new Uri($"{Protocol}://{rabbitMqOptions.Value.Hostname}:{rabbitMqOptions.Value.HttpApiPort}");
+
+        var byteArray = Encoding.ASCII.GetBytes($"{rabbitMqOptions.Value.Username}:{rabbitMqOptions.Value.Password}");
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
     }
 
@@ -40,10 +37,5 @@ public sealed class RabbitMqHttpClient : IRabbitMqHttpClient, IDisposable
 
         return await JsonSerializer.DeserializeAsync<IEnumerable<RabbitMqQueue>>(response.Content.ReadAsStream(), _options)
             ?? throw new FormatException("No queues found");
-    }
-
-    public void Dispose()
-    {
-        _httpClient.Dispose();
     }
 }

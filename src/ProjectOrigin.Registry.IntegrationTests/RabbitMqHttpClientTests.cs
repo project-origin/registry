@@ -1,4 +1,4 @@
-using System;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -30,7 +30,7 @@ public class RabbitMqHttpClientTests
                 HttpApiPort = rabbitMq.HttpApiPort,
                 AmqpPort = rabbitMq.AmqpPort
             });
-            var client = new RabbitMqHttpClient(options);
+            var client = new RabbitMqHttpClient(new HttpClient(), options);
 
             var factory = new ConnectionFactory()
             {
@@ -77,7 +77,7 @@ public class RabbitMqHttpClientTests
                 HttpApiPort = rabbitMq.HttpApiPort,
                 AmqpPort = rabbitMq.AmqpPort
             });
-            var client = new RabbitMqHttpClient(options);
+            var client = new RabbitMqHttpClient(new HttpClient(), options);
 
             // Act
             var queues = await client.GetQueuesAsync();
