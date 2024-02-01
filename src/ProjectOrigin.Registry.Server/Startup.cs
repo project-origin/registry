@@ -36,6 +36,13 @@ public class Startup
                     .AddPrometheusExporter()
             );
 
+        services.AddOptions<RegistryOptions>().Configure<IConfiguration>((settings, configuration) =>
+        {
+            configuration.Bind(settings);
+        })
+        .ValidateDataAnnotations()
+        .ValidateOnStart();
+
         services.AddOptions<VerifierOptions>().Configure<IConfiguration>((settings, configuration) =>
         {
             configuration.Bind(settings);
@@ -57,7 +64,9 @@ public class Startup
 
         services.AddOptions<RabbitMqOptions>().Configure<IConfiguration>((settings, configuration) =>
             _configuration.GetSection("RabbitMq").Bind(settings)
-        );
+        )
+        .ValidateDataAnnotations()
+        .ValidateOnStart();
 
         services.ConfigureImmutableLog(_configuration);
         services.ConfigurePersistance(_configuration);

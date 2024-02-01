@@ -16,13 +16,13 @@ namespace ProjectOrigin.Registry.Server.Services;
 
 public class VerifyTransactionConsumer
 {
-    private readonly TransactionProcessorOptions _options;
+    private readonly RegistryOptions _options;
     private readonly ITransactionRepository _transactionRepository;
     private readonly ITransactionDispatcher _verifier;
     private readonly ITransactionStatusService _transactionStatusService;
     private readonly ILogger<VerifyTransactionConsumer> _logger;
 
-    public VerifyTransactionConsumer(IOptions<TransactionProcessorOptions> options,
+    public VerifyTransactionConsumer(IOptions<RegistryOptions> options,
                                 ITransactionRepository transactionRepository,
                                 ITransactionDispatcher verifier,
                                 ITransactionStatusService transactionStatusService,

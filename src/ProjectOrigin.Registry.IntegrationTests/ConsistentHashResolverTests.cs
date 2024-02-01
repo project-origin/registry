@@ -19,6 +19,7 @@ public class ConsistentHashResolverTests
         Random r = new Random(42); // Seed the random number generator to get consistent results
         var options = new TransactionProcessorOptions
         {
+            ServerNumber = 0,
             Servers = 3,
             Threads = 5,
             Weight = 20
@@ -45,6 +46,7 @@ public class ConsistentHashResolverTests
     {
         var options = new TransactionProcessorOptions
         {
+            ServerNumber = 0,
             Servers = 2,
             Threads = 2,
             Weight = 2
@@ -63,6 +65,7 @@ public class ConsistentHashResolverTests
 
         var resolverOld = new ConsistentHashRingQueueResolver(Options.Create(new TransactionProcessorOptions
         {
+            ServerNumber = 0,
             Servers = 10,
             Threads = 2,
             Weight = 20
@@ -70,6 +73,7 @@ public class ConsistentHashResolverTests
 
         var resolverNew = new ConsistentHashRingQueueResolver(Options.Create(new TransactionProcessorOptions
         {
+            ServerNumber = 0,
             Servers = 9,
             Threads = 2,
             Weight = 20

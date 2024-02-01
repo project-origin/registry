@@ -4,9 +4,6 @@ namespace ProjectOrigin.Registry.Server.Options;
 
 public record TransactionProcessorOptions()
 {
-    [Required(AllowEmptyStrings = false)]
-    public required string RegistryName { get; init; }
-
     [Required, Range(0, 127)]
     public required int ServerNumber { get; init; }
 

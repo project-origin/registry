@@ -31,15 +31,11 @@ spec:
           args:
             - "--serve"
           env:
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-          # TransactionProcessor configuration
-            - name: TransactionProcessor__RegistryName
+          # General configuration
+            - name: RegistryName
               value: {{ .Values.registryName | default .Release.Name }}
 
-            # the valuee should be the last number usingg regex in the env variable POD_NAME
+          # TransactionProcessor configuration
             - name: TransactionProcessor__ServerNumber
               valueFrom:
                 fieldRef:
