@@ -12,15 +12,15 @@ using ProjectOrigin.Registry.Server.Options;
 
 namespace ProjectOrigin.Registry.Server.Services;
 
-public class VerifyTransactionManager : IHostedService
+public class TransactionProcessorManager : IHostedService
 {
-    private readonly List<VerifyTransactionWorker> _workers = new List<VerifyTransactionWorker>();
+    private readonly List<TransactionProcessorWorker> _workers = new List<TransactionProcessorWorker>();
     private readonly TransactionProcessorOptions _options;
     private readonly IRabbitMqChannelPool _channelPool;
     private readonly IServiceProvider _serviceProvider;
     private readonly IQueueResolver _queueResolver;
 
-    public VerifyTransactionManager(
+    public TransactionProcessorManager(
         IOptions<TransactionProcessorOptions> options,
         IRabbitMqChannelPool channelPool,
         IServiceProvider serviceProvider,
@@ -36,12 +36,12 @@ public class VerifyTransactionManager : IHostedService
     {
         for (int i = 0; i < _options.Threads; i++)
         {
-            var logger = _serviceProvider.GetRequiredService<ILogger<VerifyTransactionWorker>>();
+            var logger = _serviceProvider.GetRequiredService<ILogger<TransactionProcessorWorker>>();
             var queueName = _queueResolver.GetQueueName(_options.ServerNumber, i);
-            var transactionVerifier = _serviceProvider.GetRequiredService<VerifyTransactionConsumer>();
+            var transactionVerifier = _serviceProvider.GetRequiredService<TransactionProcessor>();
             var queueResolver = _serviceProvider.GetRequiredService<IQueueResolver>();
 
-            var worker = new VerifyTransactionWorker(
+            var worker = new TransactionProcessorWorker(
                 logger,
                 _channelPool.GetChannel(),
                 queueName,

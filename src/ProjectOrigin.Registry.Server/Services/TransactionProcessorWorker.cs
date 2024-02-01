@@ -10,20 +10,20 @@ using RabbitMQ.Client.Events;
 
 namespace ProjectOrigin.Registry.Server.Services;
 
-public sealed class VerifyTransactionWorker : IDisposable
+public sealed class TransactionProcessorWorker : IDisposable
 {
-    private readonly ILogger<VerifyTransactionWorker> _logger;
+    private readonly ILogger<TransactionProcessorWorker> _logger;
     private readonly IRabbitMqChannel _channel;
     private readonly string _queueName;
-    private readonly VerifyTransactionConsumer _transactionVerifier;
+    private readonly TransactionProcessor _transactionVerifier;
     private readonly IQueueResolver _queueResolver;
     private readonly string _consumerTag;
 
-    public VerifyTransactionWorker(
-        ILogger<VerifyTransactionWorker> logger,
+    public TransactionProcessorWorker(
+        ILogger<TransactionProcessorWorker> logger,
         IRabbitMqChannel channel,
         string queueName,
-        VerifyTransactionConsumer transactionVerifier,
+        TransactionProcessor transactionVerifier,
         IQueueResolver queueResolver)
     {
         _logger = logger;

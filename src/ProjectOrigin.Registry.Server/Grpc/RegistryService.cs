@@ -12,7 +12,7 @@ using Google.Protobuf;
 using ProjectOrigin.Registry.Server.Interfaces;
 using RabbitMQ.Client;
 
-namespace ProjectOrigin.Registry.Server;
+namespace ProjectOrigin.Registry.Server.Grpc;
 
 public class RegistryService : V1.RegistryService.RegistryServiceBase
 {

@@ -12,12 +12,12 @@ using ProjectOrigin.Verifier.V1;
 
 namespace ProjectOrigin.Registry.Server.Services;
 
-public class TransactionDispatcher : ITransactionDispatcher
+public class VerifierDispatcher : ITransactionDispatcher
 {
     private readonly ConcurrentDictionary<string, Lazy<VerifierService.VerifierServiceClient>> concurrentDictionary;
     private readonly VerifierOptions _options;
 
-    public TransactionDispatcher(IOptions<VerifierOptions> options)
+    public VerifierDispatcher(IOptions<VerifierOptions> options)
     {
         concurrentDictionary = new ConcurrentDictionary<string, Lazy<VerifierService.VerifierServiceClient>>();
         _options = options.Value;

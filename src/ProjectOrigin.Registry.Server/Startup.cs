@@ -26,7 +26,7 @@ public class Startup
     {
         services.AddGrpc();
         services.AddHostedService<BlockFinalizerBackgroundService>();
-        services.AddSingleton<ITransactionDispatcher, TransactionDispatcher>();
+        services.AddSingleton<ITransactionDispatcher, VerifierDispatcher>();
 
         services.AddOpenTelemetry()
             .WithMetrics(provider =>
@@ -76,9 +76,9 @@ public class Startup
         services.AddSingleton<IRabbitMqChannelPool, RabbitMqChannelPool>();
         services.AddTransient(sp => sp.GetRequiredService<IRabbitMqChannelPool>().GetChannel());
         services.AddTransient<IRabbitMqHttpClient, RabbitMqHttpClient>();
-        services.AddTransient<VerifyTransactionConsumer>();
+        services.AddTransient<TransactionProcessor>();
 
-        services.AddHostedService<VerifyTransactionManager>();
+        services.AddHostedService<TransactionProcessorManager>();
         services.AddHostedService<QueueCleanupService>();
     }
 
