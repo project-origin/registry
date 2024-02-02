@@ -36,10 +36,14 @@ spec:
               value: {{ .Values.registryName | default .Release.Name }}
 
           # TransactionProcessor configuration
-            - name: TransactionProcessor__ServerNumber
+            - name: TransactionProcessor__PodName
               valueFrom:
                 fieldRef:
-                  fieldPath: metadata.labels['apps.kubernetes.io/pod-index']
+                  fieldPath: metadata.name
+            # - name: TransactionProcessor__ServerNumber
+            #   valueFrom:
+            #     fieldRef:
+            #       fieldPath: metadata.labels['apps.kubernetes.io/pod-index']
             - name: TransactionProcessor__Servers
               value: {{ .Values.transactionProcessor.replicas | quote }}
             - name: TransactionProcessor__Threads
