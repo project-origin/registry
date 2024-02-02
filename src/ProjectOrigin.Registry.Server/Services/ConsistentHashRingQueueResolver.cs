@@ -53,7 +53,7 @@ public partial class ConsistentHashRingQueueResolver : IQueueResolver
         }
     }
 
-    [GeneratedRegex(@"registry_(.+)\.verifier_(.+)", RegexOptions.Compiled, 10)]
+    [GeneratedRegex(@"registry_(.+)\.verifier_(.+)", RegexOptions.Compiled, 100)]
     private static partial Regex MultipleWhitespacesGeneratedRegex();
     public IEnumerable<string> GetInactiveQueues(IEnumerable<string> queues)
     {

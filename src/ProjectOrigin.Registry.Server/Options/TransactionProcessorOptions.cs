@@ -7,7 +7,7 @@ namespace ProjectOrigin.Registry.Server.Options;
 public partial record TransactionProcessorOptions()
 {
     // To compensate for pre 1.28 kubernetes that does not support apps.kubernetes.io/pod-index
-    [GeneratedRegex(@"\d+$", RegexOptions.Compiled, 10)]
+    [GeneratedRegex(@"\d+$", RegexOptions.Compiled, 100)]
     private static partial Regex EndingNumberRegex();
     private string? _podName = null;
     public string? PodName
