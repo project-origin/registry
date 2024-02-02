@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -11,7 +10,7 @@ using ProjectOrigin.VerifiableEventStore.Services.TransactionStatusCache;
 
 namespace ProjectOrigin.VerifiableEventStore.Services.BlockFinalizer;
 
-public sealed class BlockFinalizerJob
+public sealed class BlockFinalizerJob : IBlockFinalizer
 {
     public static readonly Meter Meter = new("Registry.BlockFinalizer");
     public static readonly Counter<long> BlockCounter = Meter.CreateCounter<long>("block_finalizer.blocks_processed");
