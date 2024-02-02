@@ -4,9 +4,12 @@ using System.Text.RegularExpressions;
 
 namespace ProjectOrigin.Registry.Server.Options;
 
-public record TransactionProcessorOptions()
+public partial record TransactionProcessorOptions()
 {
+
     // To compensate for pre 1.28 kubernetes that does not support apps.kubernetes.io/pod-index
+    [GeneratedRegex(@"\d+$", RegexOptions.Compiled, 10)]
+    private static partial Regex EndingNumberRegex();
     private string? _podName = null;
     public string? PodName
     {
@@ -15,9 +18,9 @@ public record TransactionProcessorOptions()
         {
             _podName = value;
             // regex to find last integer in a string
-            if (value is not null)
+            if (value is not null && ServerNumber == -1)
             {
-                var match = Regex.Match(value, @"\d+$");
+                var match = EndingNumberRegex().Match(value);
                 if (match.Success)
                 {
                     ServerNumber = int.Parse(match.Value);
