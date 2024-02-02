@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
@@ -6,10 +7,13 @@ namespace ProjectOrigin.Registry.Server.Options;
 public record TransactionProcessorOptions()
 {
     // To compensate for pre 1.28 kubernetes that does not support apps.kubernetes.io/pod-index
+    private string? _podName = null;
     public string? PodName
     {
+        get => _podName;
         init
         {
+            _podName = value;
             // regex to find last integer in a string
             if (value is not null)
             {
