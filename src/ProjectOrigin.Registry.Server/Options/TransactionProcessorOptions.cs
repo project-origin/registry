@@ -23,7 +23,7 @@ public record TransactionProcessorOptions()
     }
 
     [Required, Range(0, 127)]
-    public required int ServerNumber { get; init; }
+    public required int ServerNumber { get; init; } = -1;
 
     [Required, Range(1, 128)]
     public required int Servers { get; init; }
