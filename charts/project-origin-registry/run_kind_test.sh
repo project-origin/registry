@@ -19,7 +19,6 @@ trap 'rm -fr $temp_folder; kind delete cluster -n helm-test  >/dev/null 2>&1' 0
 temp_folder=$(mktemp -d)
 override_values_filename=${temp_folder}/values_override.sh
 kind_filename=${temp_folder}/kind.yaml
-wallet_filename=${temp_folder}/wallet_values.yaml
 example_area=Narnia
 registry_a_name=test-a
 registry_a_port=8080
@@ -29,12 +28,9 @@ registry_b_name=test-b
 registry_b_port=8081
 registry_b_nodeport=32081
 registry_b_namespace=ns-b
-wallet_port=8082
-wallet_nodeport=32082
 
 # build docker image
 docker build -f src/ProjectOrigin.Registry.Server/Dockerfile -t ghcr.io/project-origin/registry-server:test src/
-docker build -f src/ProjectOrigin.Electricity.Server/Dockerfile -t ghcr.io/project-origin/electricity-server:test src/
 
 # create kind configuration
 cat << EOF > "$kind_filename"
@@ -47,20 +43,17 @@ nodes:
     hostPort: $registry_a_port
   - containerPort: $registry_b_nodeport
     hostPort: $registry_b_port
-  - containerPort: $wallet_nodeport
-    hostPort: $wallet_port
 EOF
 
 # recreate clean cluster
 kind delete cluster -n helm-test
-kind create cluster -n helm-test --config "$kind_filename" --image kindest/node:v1.29.0
+kind create cluster -n helm-test --config "$kind_filename"
 
 # install rabbitmq-operator
 kubectl apply -f "https://github.com/rabbitmq/cluster-operator/releases/download/v2.7.0/cluster-operator.yml"
 
 # load docker image into cluster
 kind load -n helm-test docker-image ghcr.io/project-origin/registry-server:test
-kind load -n helm-test docker-image ghcr.io/project-origin/electricity-server:test
 
 # install cnpg-operator
 helm install cnpg-operator cloudnative-pg --repo https://cloudnative-pg.io/charts --version 0.18.0 --namespace cnpg --create-namespace --wait
@@ -77,7 +70,7 @@ verifiers:
     type: project_origin.electricity.v1
     image:
       repository: ghcr.io/project-origin/electricity-server
-      tag: test
+      tag: 0.5.0
     issuers:
       - area: $example_area
         publicKey: $PublicKeyBase64
@@ -87,28 +80,6 @@ verifiers:
       - name: ${registry_b_name}
         address: http://registry-${registry_b_name}-postfix.${registry_b_namespace}:5000
 EOF
-
-# generate values
-cat << EOF > "${wallet_filename}"
-service:
-  type: NodePort
-  nodePort: ${wallet_nodeport}
-config:
-  externalUrl: http://localhost:${wallet_nodeport}
-  jwt:
-    allowAnyJwtToken: true
-messageBroker:
-  type: inMemory
-registries:
-  - name: ${registry_a_name}
-    address: http://registry-${registry_a_name}.${registry_a_namespace}:5000
-  - name: ${registry_b_name}
-    address: http://registry-${registry_b_name}-postfix.${registry_b_namespace}:5000
-EOF
-
-# install wallet
-helm install my-wallet project-origin-wallet --version 0.8.0 -f "${wallet_filename}" --repo https://project-origin.github.io/helm-registry --namespace wallet --create-namespace --wait
-echo "Wallet installed"
 
 # install two registries
 echo "Installing registries"
@@ -121,8 +92,12 @@ echo "Registry B installed"
 sleep 15
 
 # run tests
-dotnet run --project src/ProjectOrigin.Electricity.Example WithoutWalletFlow $example_area $PrivateKeyBase64 ${registry_a_name} http://localhost:$registry_a_port ${registry_b_name} http://localhost:$registry_b_port
-echo "Test without wallet completed"
+dotnet test src/ProjectOrigin.Registry.ChartTests \
+  -e "AREA=$example_area" \
+  -e "ISSUER_KEY=$PrivateKeyBase64" \
+  -e "PROD_REGISTRY_NAME=$registry_a_name" \
+  -e "PROD_REGISTRY_ADDRESS=http://localhost:$registry_a_port" \
+  -e "CONS_REGISTRY_NAME=$registry_b_name" \
+  -e "CONS_REGISTRY_ADDRESS=http://localhost:$registry_b_port"
 
-dotnet run --project src/ProjectOrigin.Electricity.Example WithWalletFlow $example_area $PrivateKeyBase64 ${registry_a_name} http://localhost:$registry_a_port ${registry_b_name} http://localhost:$registry_b_port http://localhost:$wallet_port
-echo "Test with wallet completed"
+echo "Test completed"

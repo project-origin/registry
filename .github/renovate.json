@@ -19,5 +19,17 @@
                 "**/Dockerfile"
             ]
         }
+    ],
+    "customManagers": [
+        {
+            "customType": "regex",
+            "fileMatch": [
+                "\\.csproj$"
+            ],
+            "matchStrings": [
+                "<SourceUrl>https://github.com/(?<depName>[^/]+/[^/]+)/releases/tag/(?<currentValue>.+)</SourceUrl>"
+            ],
+            "datasourceTemplate": "github-releases"
+        }
     ]
 }

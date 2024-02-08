@@ -51,16 +51,6 @@ jobs:
       - name: Verify performance
         run: make verify-performance
 
-  verify-electricity-server-container-build:
-    name: Verify electricity container can be built.
-    uses: project-origin/.github/.github/workflows/reusable-build-push-container-ghcr.yaml@main
-    with:
-      imagename: ghcr.io/project-origin/electricity-server
-      version: test
-      context: ./src
-      dockerfile: ./src/ProjectOrigin.Electricity.Server/Dockerfile
-      push: false
-
   verify-registry-server-container-build:
     name: Verify registry container can be built.
     uses: project-origin/.github/.github/workflows/reusable-build-push-container-ghcr.yaml@main
