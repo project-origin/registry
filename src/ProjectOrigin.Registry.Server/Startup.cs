@@ -2,7 +2,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using ProjectOrigin.Registry.Server.Extensions;
 using ProjectOrigin.Registry.Server.Grpc;
 using ProjectOrigin.Registry.Server.Interfaces;
@@ -27,13 +30,42 @@ public class Startup
         services.AddGrpc();
         services.AddSingleton<ITransactionDispatcher, VerifierDispatcher>();
 
-        services.AddOpenTelemetry()
-            .WithMetrics(provider =>
-                provider
+        services.AddOptions<OtlpOptions>()
+            .BindConfiguration(OtlpOptions.Prefix)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        var otlpOptions = _configuration.GetSection(OtlpOptions.Prefix).GetValid<OtlpOptions>();
+        if (otlpOptions.Enabled)
+        {
+            services.AddOpenTelemetry()
+                .ConfigureResource(resource => resource
+                    .AddService(serviceName: "ProjectOrigin.Registry.Server"))
+                .WithMetrics(meterProviderBuilder =>
+                    meterProviderBuilder
+                    .AddHttpClientInstrumentation()
+                    .AddAspNetCoreInstrumentation()
                     .AddMeter(BlockFinalizerJob.Meter.Name)
                     .AddMeter(RegistryService.Meter.Name)
-                    .AddPrometheusExporter()
-            );
+                    .AddRuntimeInstrumentation()
+                    .AddProcessInstrumentation()
+                    .AddOtlpExporter(o => o.Endpoint = otlpOptions.Endpoint))
+                .WithTracing(tracerProviderBuilder =>
+                    tracerProviderBuilder
+                        .AddGrpcClientInstrumentation(grpcOptions =>
+                        {
+                            grpcOptions.SuppressDownstreamInstrumentation = true;
+                            grpcOptions.EnrichWithHttpRequestMessage = (activity, httpRequestMessage) =>
+                                activity.SetTag("requestVersion", httpRequestMessage.Version);
+                            grpcOptions.EnrichWithHttpResponseMessage = (activity, httpResponseMessage) =>
+                                activity.SetTag("responseVersion", httpResponseMessage.Version);
+                        })
+                        .AddHttpClientInstrumentation()
+                        .AddAspNetCoreInstrumentation()
+                        .AddRedisInstrumentation()
+                        .AddNpgsql()
+                        .AddOtlpExporter(o => o.Endpoint = otlpOptions.Endpoint));
+        }
 
         services.AddOptions<RegistryOptions>().Configure<IConfiguration>((settings, configuration) =>
         {
