@@ -26,8 +26,8 @@ public class PerformanceTests : IAsyncLifetime,
     IClassFixture<RedisFixture>,
     IClassFixture<RabbitMqFixture>
 {
-    private const string ElectricityVerifierImage = "ghcr.io/project-origin/electricity-server:0.3.0";
-    private const int ElectricityVerifierGrpcPort = 80;
+    private const string ElectricityVerifierImage = "ghcr.io/project-origin/electricity-server:0.5.0";
+    private const int ElectricityVerifierGrpcPort = 5000;
     private const int GrpcPort = 5000;
     private const string IssuerArea = "Narnia";
     private const string RegistryName = "TheRegistry";

@@ -38,7 +38,7 @@ clean:
 restore:
 	dotnet tool restore --tool-manifest src/.config/dotnet-tools.json
 	dotnet restore $(src_path)
-	helm repo add bitnami-charts https://charts.bitnami.com/bitnami
+
 
 ## Builds all the code
 build: restore
@@ -49,24 +49,25 @@ format:
 	dotnet format $(src_path)
 
 ## Run all tests except Concordium integration
-test:
-	dotnet test $(src_path) --filter 'FullyQualifiedName!~ConcordiumIntegrationTests&FullyQualifiedName!~PerformanceTests'
+test: build
+	dotnet test $(src_path) --no-build --filter 'FullyQualifiedName!~ConcordiumIntegrationTests&FullyQualifiedName!~PerformanceTests&FullyQualifiedName!~ChartTests'
 
 ## Run all Unit-tests
-unit-test:
-	dotnet test $(src_path) --filter 'FullyQualifiedName!~IntegrationTests'
+unit-test: build
+	dotnet test $(src_path) --no-build --filter 'FullyQualifiedName!~IntegrationTests&FullyQualifiedName!~ChartTests'
 
 ## Builds the local container, creates kind cluster and installs chart, and verifies it works
 verify-chart: restore
 	@kind version >/dev/null 2>&1 || { echo >&2 "kind not installed! kind is required to use recipe, please install or use devcontainer"; exit 1;}
 	@helm version >/dev/null 2>&1 || { echo >&2 "helm not installed! helm is required to use recipe, please install or use devcontainer"; exit 1;}
+	helm repo add bitnami-charts https://charts.bitnami.com/bitnami
 	helm dependency build charts/project-origin-registry
 	charts/project-origin-registry/run_kind_test.sh
 
 ## Run Concordium integration tests, requires access to running node and environment variables
-concordium-tests:
-	dotnet test $(src_path)/ProjectOrigin.VerifiableEventStore.ConcordiumIntegrationTests
+concordium-tests: build
+	dotnet test $(src_path)/ProjectOrigin.VerifiableEventStore.ConcordiumIntegrationTests --no-build
 
 ## Run performance tests, takes a long time.
-verify-performance:
-	dotnet test $(src_path)  --filter 'FullyQualifiedName~PerformanceTests'
+verify-performance: build
+	dotnet test $(src_path) --no-build --filter 'FullyQualifiedName~PerformanceTests'

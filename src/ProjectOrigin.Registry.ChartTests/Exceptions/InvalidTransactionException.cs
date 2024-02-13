@@ -1,6 +1,6 @@
 using System;
 
-namespace ProjectOrigin.Electricity.Example.Exceptions;
+namespace ProjectOrigin.Registry.ChartTests.Exceptions;
 
 public class InvalidTransactionException : Exception
 {

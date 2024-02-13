@@ -17,17 +17,6 @@ jobs:
         id: output-version
         run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
-  publish-electricity-server-container:
-    needs:
-      - define-version
-    uses: project-origin/.github/.github/workflows/reusable-build-push-container-ghcr.yaml@main
-    with:
-      imagename: ghcr.io/project-origin/electricity-server
-      version: ${{ needs.define-version.outputs.version }}
-      context: ./src
-      dockerfile: ./src/ProjectOrigin.Electricity.Server/Dockerfile
-      push: true
-
   publish-registry-server-container:
     needs:
       - define-version
