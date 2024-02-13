@@ -99,5 +99,5 @@ EXAMPLE_AREA="Narnia"
 PRIVATE_KEY_BASE64=$(cat narnia.pem | base64 -w 0)
 REGISTRY_NAME="my-example-registry"
 REGISTRY_URL= # the url of the registry, e.g. http://my-example-registry:5000
-dotnet run --project src/ProjectOrigin.Electricity.Example WithoutWalletFlow $example_area $PrivateKeyBase64 $REGISTRY_NAME $REGISTRY_URL
+dotnet run --project src/ProjectOrigin.Registry.ChartTests WithoutWalletFlow $example_area $PrivateKeyBase64 $REGISTRY_NAME $REGISTRY_URL
 ```

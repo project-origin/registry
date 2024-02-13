@@ -2,10 +2,10 @@ using System;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Google.Protobuf;
-using ProjectOrigin.Electricity.Example.Exceptions;
 using ProjectOrigin.Registry.V1;
+using Xunit;
 
-namespace ProjectOrigin.Electricity.Example.Extensions;
+namespace ProjectOrigin.Registry.ChartTests.Extensions;
 
 public static class RegistryServiceClientExtensions
 {
@@ -36,13 +36,13 @@ public static class RegistryServiceClientExtensions
             if (result.Status == TransactionState.Committed)
                 return result;
             else if (result.Status == TransactionState.Failed)
-                throw new InvalidTransactionException($"Transaction failed ”{result.Status}” with message ”{result.Message}”");
+                Assert.Fail($"Transaction failed ”{result.Status}” with message ”{result.Message}”");
 
             await Task.Delay(1000);
 
             if (began + timeout < DateTimeOffset.UtcNow)
             {
-                throw new TimeoutException($"Transaction timed out ”{result.Status}” with message ”{result.Message}”");
+                Assert.Fail($"Transaction timed out ”{result.Status}” with message ”{result.Message}”");
             }
         }
     }

@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 using Google.Protobuf;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 
-namespace ProjectOrigin.Electricity.Example.Extensions;
+namespace ProjectOrigin.Registry.ChartTests.Extensions;
 
 public static class IPrivateKeyExtensions
 {
