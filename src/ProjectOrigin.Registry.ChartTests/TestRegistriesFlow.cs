@@ -1,29 +1,35 @@
 using System;
-using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using Grpc.Net.Client;
 using ProjectOrigin.Common.V1;
-using ProjectOrigin.Electricity.Example.Extensions;
+using ProjectOrigin.Registry.ChartTests.Extensions;
 using ProjectOrigin.Electricity.V1;
 using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.PedersenCommitment;
 using ProjectOrigin.Registry.V1;
 using RegistryV1 = ProjectOrigin.Registry.V1;
+using Xunit;
 
-namespace ProjectOrigin.Electricity.Example;
+namespace ProjectOrigin.Registry.ChartTests;
 
-public class WithoutWalletFlow
+public class TestRegistriesFlow
 {
-    public required string Area { get; init; }
-    public required string IssuerKey { get; init; }
-    public required string ProdRegistryName { get; init; }
-    public required string ProdRegistryAddress { get; init; }
-    public required string ConsRegistryName { get; init; }
-    public required string ConsRegistryAddress { get; init; }
+    public static string Area => GetEnvVariable("AREA");
+    public static string IssuerKey => GetEnvVariable("ISSUER_KEY");
+    public static string ProdRegistryName => GetEnvVariable("PROD_REGISTRY_NAME");
+    public static string ProdRegistryAddress => GetEnvVariable("PROD_REGISTRY_ADDRESS");
+    public static string ConsRegistryName => GetEnvVariable("CONS_REGISTRY_NAME");
+    public static string ConsRegistryAddress => GetEnvVariable("CONS_REGISTRY_ADDRESS");
 
-    public async Task<int> Run()
+    private static string GetEnvVariable(string key)
+    {
+        return Environment.GetEnvironmentVariable(key) ?? throw new Exception();
+    }
+
+    [Fact]
+    public async Task TestRegistriesFlow_Success()
     {
         // Create a new key for the owner since we have no wallet in this example
         var ownerKey = Algorithms.Secp256k1.GenerateNewPrivateKey();
@@ -100,7 +106,7 @@ public class WithoutWalletFlow
         Console.WriteLine($"Claiming Consumption Granular Certificate");
         await SendClaim(ownerKey, consClient, consCertId, allocationId);
 
-        return 0;
+        Assert.True(true);
     }
 
     private static async Task SendClaim(IHDPrivateKey ownerKey, RegistryService.RegistryServiceClient prodClient, FederatedStreamId prodCertId, Guid allocationId)

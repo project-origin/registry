@@ -3,11 +3,10 @@ using System.Linq;
 using System.Security.Cryptography;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
-using ProjectOrigin.Common.V1;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.PedersenCommitment;
 
-namespace ProjectOrigin.Electricity.Example;
+namespace ProjectOrigin.Registry.ChartTests;
 
 public class ProtoEventBuilder
 {
@@ -15,7 +14,10 @@ public class ProtoEventBuilder
     public required DateTimeOffset Start { get; init; }
     public required DateTimeOffset End { get; init; }
 
-    public Electricity.V1.IssuedEvent CreateConsumptionIssuedEvent(FederatedStreamId certId, SecretCommitmentInfo commitmentInfo, IPublicKey ownerKey)
+    public Electricity.V1.IssuedEvent CreateConsumptionIssuedEvent(
+        Common.V1.FederatedStreamId certId,
+        SecretCommitmentInfo commitmentInfo,
+        IPublicKey ownerKey)
     {
         var @event = new Electricity.V1.IssuedEvent
         {
@@ -38,7 +40,10 @@ public class ProtoEventBuilder
         return @event;
     }
 
-    public Electricity.V1.IssuedEvent CreateProductionIssuedEvent(FederatedStreamId certId, SecretCommitmentInfo commitmentInfo, IPublicKey ownerKey)
+    public Electricity.V1.IssuedEvent CreateProductionIssuedEvent(
+        Common.V1.FederatedStreamId certId,
+        SecretCommitmentInfo commitmentInfo,
+        IPublicKey ownerKey)
     {
         var @event = new Electricity.V1.IssuedEvent
         {
@@ -58,13 +63,13 @@ public class ProtoEventBuilder
             }
         };
 
-        @event.Attributes.Add(new V1.Attribute
+        @event.Attributes.Add(new Electricity.V1.Attribute
         {
             Key = "TechCode",
             Value = "T010101"
         });
 
-        @event.Attributes.Add(new V1.Attribute
+        @event.Attributes.Add(new Electricity.V1.Attribute
         {
             Key = "FuelCode",
             Value = "F010101"
@@ -73,7 +78,11 @@ public class ProtoEventBuilder
         return @event;
     }
 
-    public static Electricity.V1.SlicedEvent CreateSliceEvent(FederatedStreamId certId, IPublicKey newOwnerKey, SecretCommitmentInfo sourceSlice, params SecretCommitmentInfo[] slices)
+    public static Electricity.V1.SlicedEvent CreateSliceEvent(
+        Common.V1.FederatedStreamId certId,
+        IPublicKey newOwnerKey,
+        SecretCommitmentInfo sourceSlice,
+        params SecretCommitmentInfo[] slices)
     {
         var sumOfNewSlices = slices.Aggregate((left, right) => left + right);
         var equalityProof = SecretCommitmentInfo.CreateEqualityProof(sourceSlice, sumOfNewSlices, certId.StreamId.Value);
@@ -88,10 +97,10 @@ public class ProtoEventBuilder
 
         foreach (var slice in slices)
         {
-            @event.NewSlices.Add(new V1.SlicedEvent.Types.Slice
+            @event.NewSlices.Add(new Electricity.V1.SlicedEvent.Types.Slice
             {
                 Quantity = CommitmentToProto(certId, slice),
-                NewOwner = new V1.PublicKey
+                NewOwner = new Electricity.V1.PublicKey
                 {
                     Content = ByteString.CopyFrom(newOwnerKey.Export())
                 }
@@ -101,7 +110,12 @@ public class ProtoEventBuilder
         return @event;
     }
 
-    public static Electricity.V1.AllocatedEvent CreateAllocatedEvent(Guid allocationId, FederatedStreamId prodCertId, FederatedStreamId consCertId, SecretCommitmentInfo prodComtInfo, SecretCommitmentInfo consComtInfo)
+    public static Electricity.V1.AllocatedEvent CreateAllocatedEvent(
+        Guid allocationId,
+        Common.V1.FederatedStreamId prodCertId,
+        Common.V1.FederatedStreamId consCertId,
+        SecretCommitmentInfo prodComtInfo,
+        SecretCommitmentInfo consComtInfo)
     {
         var equalityProof = SecretCommitmentInfo.CreateEqualityProof(prodComtInfo, consComtInfo, allocationId.ToString());
 
@@ -116,7 +130,9 @@ public class ProtoEventBuilder
         };
     }
 
-    public static Electricity.V1.ClaimedEvent CreateClaimEvent(Guid allocationId, FederatedStreamId certificateId)
+    public static Electricity.V1.ClaimedEvent CreateClaimEvent(
+        Guid allocationId,
+        Common.V1.FederatedStreamId certificateId)
     {
         return new Electricity.V1.ClaimedEvent
         {
@@ -125,7 +141,9 @@ public class ProtoEventBuilder
         };
     }
 
-    public static FederatedStreamId ToCertId(string registry, Guid certId)
+    public static Common.V1.FederatedStreamId ToCertId(
+        string registry,
+        Guid certId)
     {
         return new Common.V1.FederatedStreamId
         {
@@ -137,7 +155,9 @@ public class ProtoEventBuilder
         };
     }
 
-    private static V1.Commitment CommitmentToProto(FederatedStreamId certId, SecretCommitmentInfo commitmentInfo)
+    private static Electricity.V1.Commitment CommitmentToProto(
+        Common.V1.FederatedStreamId certId,
+        SecretCommitmentInfo commitmentInfo)
     {
         return new Electricity.V1.Commitment
         {
@@ -146,7 +166,7 @@ public class ProtoEventBuilder
         };
     }
 
-    private static ByteString ToSliceId(PedersenCommitment.Commitment commitment)
+    private static ByteString ToSliceId(Commitment commitment)
     {
         return ByteString.CopyFrom(SHA256.HashData(commitment.C));
     }
