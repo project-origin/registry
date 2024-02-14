@@ -261,13 +261,13 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
 
     private sealed record BlockTransaction
     {
-        public required long Id { get; init; }
-        public required byte[] Payload { get; init; }
+        public long Id { get; }
+        public byte[]? Payload { get; }
     }
 
     private sealed record BlockRecord
     {
-        public int Id { get; init; }
+        public int Id { get; }
         public required byte[] BlockHash { get; init; }
         public required byte[] PreviousHeaderHash { get; init; }
         public required byte[] PreviousPublicationHash { get; init; }
