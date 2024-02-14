@@ -82,4 +82,14 @@ public class RegistryService : V1.RegistryService.RegistryServiceBase
 
         return response;
     }
+
+    public async override Task<GetBlocksResponse> GetBlocks(
+        GetBlocksRequest request,
+        ServerCallContext context)
+    {
+        var blocks = await _transactionRepository.GetBlocks(request.Skip, request.Limit, request.IncludeTransactions).ConfigureAwait(false);
+        var response = new GetBlocksResponse();
+        response.Blocks.AddRange(blocks);
+        return response;
+    }
 }

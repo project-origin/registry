@@ -86,5 +86,14 @@ public class FlowTests :
 
         var stream = await Client.GetStream(certId);
         stream.Transactions.Should().HaveCount(1);
+
+        var blocks = await Client.GetBlocksAsync(new Registry.V1.GetBlocksRequest
+        {
+            Skip = 0,
+            Limit = 1,
+            IncludeTransactions = true
+        });
+
+        blocks.Blocks.Should().HaveCount(1);
     }
 }

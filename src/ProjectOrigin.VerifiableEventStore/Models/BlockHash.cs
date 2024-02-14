@@ -6,7 +6,7 @@ namespace ProjectOrigin.VerifiableEventStore.Models;
 
 public sealed record BlockHash(byte[] Data)
 {
-    public static BlockHash FromHeader(ImmutableLog.V1.BlockHeader blockHeader) => new(SHA256.HashData(blockHeader.ToByteArray()));
+    public static BlockHash FromHeader(Registry.V1.BlockHeader blockHeader) => new(SHA256.HashData(blockHeader.ToByteArray()));
 
     public bool Equals(BlockHash? right)
     {

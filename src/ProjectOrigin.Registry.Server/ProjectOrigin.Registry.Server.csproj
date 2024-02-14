@@ -15,8 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\Protos\common.proto" GrpcServices="None"/>
-    <Protobuf Include="..\Protos\registry.proto" GrpcServices="Both"/>
     <Protobuf Include="..\Protos\verifier.proto" GrpcServices="Client" />
   </ItemGroup>
 </Project>

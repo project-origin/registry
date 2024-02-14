@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
+using ProjectOrigin.Registry.V1;
 using ProjectOrigin.VerifiableEventStore.Extensions;
 using ProjectOrigin.VerifiableEventStore.Models;
 using ProjectOrigin.VerifiableEventStore.Services.Repository;
@@ -16,6 +17,7 @@ public class InMemoryRepository : ITransactionRepository
     private readonly object _lockObject = new();
     private readonly List<StreamTransaction> _events = new();
     private readonly Dictionary<BlockHash, BlockRecord> _blocks = new();
+    private readonly List<BlockRecord> _blockList = new();
 
     public Task<NewBlock?> CreateNextBlock()
     {
@@ -38,7 +40,7 @@ public class InMemoryRepository : ITransactionRepository
             var previousHeaderHash = previousBlock is not null ? SHA256.HashData(previousBlock.Header.ToByteArray()) : new byte[32];
             var previousPublicationHash = previousBlock is not null ? SHA256.HashData(previousBlock!.Publication!.ToByteArray()) : new byte[32];
 
-            var blockHeader = new ImmutableLog.V1.BlockHeader
+            var blockHeader = new Registry.V1.BlockHeader
             {
                 PreviousHeaderHash = ByteString.CopyFrom(previousHeaderHash),
                 PreviousPublicationHash = ByteString.CopyFrom(previousPublicationHash),
@@ -47,13 +49,15 @@ public class InMemoryRepository : ITransactionRepository
             };
 
             var blockHash = BlockHash.FromHeader(blockHeader);
-            _blocks[blockHash] = new BlockRecord(blockHeader, null, fromTransaction, fromTransaction + numberOfTransactions - 1);
+            var newBlock = new BlockRecord(blockHeader, null, fromTransaction, fromTransaction + numberOfTransactions - 1);
+            _blocks[blockHash] = newBlock;
+            _blockList.Add(newBlock);
 
             return Task.FromResult<NewBlock?>(new(blockHeader, transactions.Select(x => x.TransactionHash).ToList()));
         }
     }
 
-    public Task FinalizeBlock(BlockHash hash, ImmutableLog.V1.BlockPublication publication)
+    public Task FinalizeBlock(BlockHash hash, Registry.V1.BlockPublication publication)
     {
         lock (_lockObject)
         {
@@ -69,29 +73,60 @@ public class InMemoryRepository : ITransactionRepository
         }
     }
 
-    public Task<ImmutableLog.V1.Block?> GetBlock(TransactionHash transactionHash)
+    public Task<Registry.V1.Block?> GetBlock(TransactionHash transactionHash)
     {
         lock (_lockObject)
         {
             var e = _events.SingleOrDefault(x => x.TransactionHash == transactionHash);
 
             if (e is null)
-                return Task.FromResult<ImmutableLog.V1.Block?>(null);
+                return Task.FromResult<Registry.V1.Block?>(null);
 
             var index = _events.IndexOf(e);
 
             var block = _blocks.Values.SingleOrDefault(x => x.FromTransaction <= index && index <= x.ToTransaction);
 
             if (block is null)
-                return Task.FromResult<ImmutableLog.V1.Block?>(null);
+                return Task.FromResult<Registry.V1.Block?>(null);
 
-            var result = new ImmutableLog.V1.Block
+            var result = new Registry.V1.Block
             {
                 Header = block.Header,
                 Publication = block.Publication
             };
 
-            return Task.FromResult<ImmutableLog.V1.Block?>(result);
+            return Task.FromResult<Registry.V1.Block?>(result);
+        }
+    }
+
+    public Task<IList<Block>> GetBlocks(int skip, int take, bool includeTransactions)
+    {
+        lock (_lockObject)
+        {
+            var data = _blockList.Skip(skip).Take(take).Select(x =>
+            {
+                var block = new Block
+                {
+                    Header = x.Header,
+                    Publication = x.Publication,
+                    Height = _blockList.IndexOf(x) + 1
+                };
+
+                if (includeTransactions)
+                {
+                    var transactions = _events
+                        .Skip(x.FromTransaction)
+                        .Take(x.ToTransaction - x.FromTransaction + 1)
+                        .Select(y => Transaction.Parser.ParseFrom(y.Payload))
+                        .ToList();
+                    block.Transactions.AddRange(transactions);
+                }
+
+                return block;
+            }
+            ).ToList();
+
+            return Task.FromResult<IList<Block>>(data);
         }
     }
 
@@ -152,5 +187,5 @@ public class InMemoryRepository : ITransactionRepository
     }
 
 
-    private sealed record BlockRecord(ImmutableLog.V1.BlockHeader Header, ImmutableLog.V1.BlockPublication? Publication, int FromTransaction, int ToTransaction);
+    private sealed record BlockRecord(Registry.V1.BlockHeader Header, Registry.V1.BlockPublication? Publication, int FromTransaction, int ToTransaction);
 }

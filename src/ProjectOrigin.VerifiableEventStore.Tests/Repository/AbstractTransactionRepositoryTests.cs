@@ -26,8 +26,37 @@ public abstract class AbstractTransactionRepositoryTests<T> where T : ITransacti
 
     private StreamTransaction CreateFakeEvent(Guid stream, int index)
     {
-        var transaction = _fixture.Create<byte[]>();
-        return new StreamTransaction { TransactionHash = new TransactionHash(SHA256.HashData(transaction)), StreamId = stream, StreamIndex = index, Payload = transaction };
+        var payload = _fixture.Create<byte[]>();
+
+        var transaction = new Registry.V1.Transaction
+        {
+            Header = new Registry.V1.TransactionHeader
+            {
+                FederatedStreamId = new Common.V1.FederatedStreamId
+                {
+                    Registry = _fixture.Create<string>(),
+                    StreamId = new Common.V1.Uuid()
+                    {
+                        Value = stream.ToString()
+                    }
+                },
+                Nonce = _fixture.Create<string>(),
+                PayloadSha512 = ByteString.CopyFrom(SHA512.HashData(payload)),
+                PayloadType = _fixture.Create<string>()
+            },
+            HeaderSignature = ByteString.CopyFrom(_fixture.Create<byte[]>()),
+            Payload = ByteString.CopyFrom(payload),
+        };
+
+        var transactionBytes = transaction.ToByteArray();
+
+        return new StreamTransaction
+        {
+            TransactionHash = new TransactionHash(SHA256.HashData(transactionBytes)),
+            StreamId = stream,
+            StreamIndex = index,
+            Payload = transactionBytes
+        };
     }
 
     [Fact]
@@ -143,7 +172,7 @@ public abstract class AbstractTransactionRepositoryTests<T> where T : ITransacti
         var block1 = await Repository.CreateNextBlock();
         block1.Should().NotBeNull();
         block1!.TransactionHashes.Should().HaveCount(1);
-        await Repository.FinalizeBlock(BlockHash.FromHeader(block1!.Header), new ImmutableLog.V1.BlockPublication());
+        await Repository.FinalizeBlock(BlockHash.FromHeader(block1!.Header), new Registry.V1.BlockPublication());
 
         // When
         var newBlock = await Repository.CreateNextBlock();
@@ -210,9 +239,9 @@ public abstract class AbstractTransactionRepositoryTests<T> where T : ITransacti
 
         newBlock.Should().NotBeNull();
 
-        var publication = new ImmutableLog.V1.BlockPublication
+        var publication = new Registry.V1.BlockPublication
         {
-            LogEntry = new ImmutableLog.V1.BlockPublication.Types.LogEntry
+            LogEntry = new Registry.V1.BlockPublication.Types.LogEntry
             {
                 BlockHeaderHash = ByteString.CopyFrom(SHA256.HashData(newBlock!.Header.ToByteArray())),
             }
@@ -237,7 +266,7 @@ public abstract class AbstractTransactionRepositoryTests<T> where T : ITransacti
         block1!.Header.PreviousPublicationHash.Should().BeEquivalentTo(new byte[32]);
         block1!.TransactionHashes.Should().HaveCount(transactionList1.Count);
         block1!.TransactionHashes.Should().ContainInOrder(transactionList1.Select(x => x.TransactionHash));
-        var pub1 = new ImmutableLog.V1.BlockPublication();
+        var pub1 = new Registry.V1.BlockPublication();
         await Repository.FinalizeBlock(BlockHash.FromHeader(block1!.Header), pub1);
 
 
@@ -254,7 +283,7 @@ public abstract class AbstractTransactionRepositoryTests<T> where T : ITransacti
         block2!.Header.PreviousPublicationHash.Should().BeEquivalentTo(SHA256.HashData(pub1.ToByteArray()));
         block2!.TransactionHashes.Should().HaveCount(transactionList2.Count);
         block2!.TransactionHashes.Should().ContainInOrder(transactionList2.Select(x => x.TransactionHash));
-        var pub2 = new ImmutableLog.V1.BlockPublication();
+        var pub2 = new Registry.V1.BlockPublication();
         await Repository.FinalizeBlock(BlockHash.FromHeader(block2!.Header), pub2);
 
 
@@ -271,7 +300,48 @@ public abstract class AbstractTransactionRepositoryTests<T> where T : ITransacti
         block3!.Header.PreviousPublicationHash.Should().BeEquivalentTo(SHA256.HashData(pub2.ToByteArray()));
         block3!.TransactionHashes.Should().HaveCount(transactionList3.Count);
         block3!.TransactionHashes.Should().ContainInOrder(transactionList3.Select(x => x.TransactionHash));
-        var pub3 = new ImmutableLog.V1.BlockPublication();
+        var pub3 = new Registry.V1.BlockPublication();
         await Repository.FinalizeBlock(BlockHash.FromHeader(block3!.Header), pub3);
+    }
+
+    [Fact]
+    public async Task CanGetBlocks()
+    {
+        // Arrange
+        for (var b = 0; b < 10; b++)
+        {
+            for (var t = 0; t < 10 * (b + 1); t++)
+            {
+                var @event = CreateFakeEvent(Guid.NewGuid(), 0);
+                await Repository.Store(@event);
+            }
+            var block = await Repository.CreateNextBlock();
+            await Repository.FinalizeBlock(BlockHash.FromHeader(block!.Header), new Registry.V1.BlockPublication());
+        }
+
+        // Act
+        var blocks1 = await Repository.GetBlocks(0, 2, false);
+
+        // Assert
+        blocks1.Should().HaveCount(2);
+        blocks1[0].Header.Should().NotBeNull();
+        blocks1[1].Header.Should().NotBeNull();
+
+        blocks1[0].Height.Should().Be(1);
+        blocks1[0].Transactions.Should().BeEmpty();
+        blocks1[1].Height.Should().Be(2);
+        blocks1[0].Transactions.Should().BeEmpty();
+
+        // Act
+        var blocks2 = await Repository.GetBlocks(6, 2, true);
+        blocks2.Should().HaveCount(2);
+        blocks2[0].Header.Should().NotBeNull();
+        blocks1[1].Header.Should().NotBeNull();
+
+        blocks2[0].Height.Should().Be(7);
+        blocks2[0].Transactions.Should().HaveCount(70);
+        blocks2[1].Height.Should().Be(8);
+        blocks2[1].Transactions.Should().HaveCount(80);
+
     }
 }

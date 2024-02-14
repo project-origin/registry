@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using ProjectOrigin.ImmutableLog.V1;
+using ProjectOrigin.Registry.V1;
 using ProjectOrigin.VerifiableEventStore.Services.BlockPublisher;
 using Concordium.Sdk.Client;
 using Concordium.Sdk.Crypto;

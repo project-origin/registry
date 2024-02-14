@@ -17,15 +17,15 @@ public class LogPublisher : IBlockPublisher
         _logger = logger;
     }
 
-    public Task<ImmutableLog.V1.BlockPublication> PublishBlock(ImmutableLog.V1.BlockHeader blockHeader)
+    public Task<Registry.V1.BlockPublication> PublishBlock(Registry.V1.BlockHeader blockHeader)
     {
         var hash = BlockHash.FromHeader(blockHeader);
         var hashBase64 = Convert.ToBase64String(hash.Data);
         _logger.LogInformation("Block published - {hashBase64}", hashBase64);
 
-        return Task.FromResult(new ImmutableLog.V1.BlockPublication
+        return Task.FromResult(new Registry.V1.BlockPublication
         {
-            LogEntry = new ImmutableLog.V1.BlockPublication.Types.LogEntry
+            LogEntry = new Registry.V1.BlockPublication.Types.LogEntry
             {
                 BlockHeaderHash = ByteString.CopyFrom(hash.Data),
             }

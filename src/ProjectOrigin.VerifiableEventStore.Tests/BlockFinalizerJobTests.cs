@@ -41,7 +41,7 @@ public class BlockFinalizerJobTests
     public async Task Success()
     {
         // Given
-        var header = new ImmutableLog.V1.BlockHeader
+        var header = new Registry.V1.BlockHeader
         {
             PreviousHeaderHash = ByteString.CopyFrom(new byte[32]),
             PreviousPublicationHash = ByteString.CopyFrom(new byte[32]),
@@ -49,9 +49,9 @@ public class BlockFinalizerJobTests
             CreatedAt = Timestamp.FromDateTime(DateTime.UtcNow)
         };
 
-        var publication = new ImmutableLog.V1.BlockPublication
+        var publication = new Registry.V1.BlockPublication
         {
-            LogEntry = new ImmutableLog.V1.BlockPublication.Types.LogEntry
+            LogEntry = new Registry.V1.BlockPublication.Types.LogEntry
             {
                 BlockHeaderHash = ByteString.CopyFrom(SHA256.HashData(header.ToByteArray())),
             }
@@ -60,15 +60,15 @@ public class BlockFinalizerJobTests
         var transactions = _fixture.Create<List<TransactionHash>>();
 
         _repository.Setup(obj => obj.CreateNextBlock()).ReturnsAsync(new NewBlock(header, transactions));
-        _blockPublisher.Setup(obj => obj.PublishBlock(It.IsAny<ImmutableLog.V1.BlockHeader>())).Returns(Task.FromResult(publication));
+        _blockPublisher.Setup(obj => obj.PublishBlock(It.IsAny<Registry.V1.BlockHeader>())).Returns(Task.FromResult(publication));
 
         // When
         await _job.Execute(CancellationToken.None);
 
         // Then
         _repository.Verify(obj => obj.CreateNextBlock(), Times.Exactly(1));
-        _blockPublisher.Verify(obj => obj.PublishBlock(It.Is<ImmutableLog.V1.BlockHeader>(x => x == header)), Times.Exactly(1));
-        _repository.Verify(obj => obj.FinalizeBlock(It.Is<BlockHash>(x => x.Equals(BlockHash.FromHeader(header))), It.Is<ImmutableLog.V1.BlockPublication>(x => x == publication)), Times.Exactly(1));
+        _blockPublisher.Verify(obj => obj.PublishBlock(It.Is<Registry.V1.BlockHeader>(x => x == header)), Times.Exactly(1));
+        _repository.Verify(obj => obj.FinalizeBlock(It.Is<BlockHash>(x => x.Equals(BlockHash.FromHeader(header))), It.Is<Registry.V1.BlockPublication>(x => x == publication)), Times.Exactly(1));
         _statusService.Verify(obj => obj.SetTransactionStatus(It.IsAny<TransactionHash>(), It.Is<TransactionStatusRecord>(x => x.NewStatus == Models.TransactionStatus.Committed)), Times.Exactly(transactions.Count));
     }
 

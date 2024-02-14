@@ -22,11 +22,7 @@ public class TestRegistriesFlow
     public static string ProdRegistryAddress => GetEnvVariable("PROD_REGISTRY_ADDRESS");
     public static string ConsRegistryName => GetEnvVariable("CONS_REGISTRY_NAME");
     public static string ConsRegistryAddress => GetEnvVariable("CONS_REGISTRY_ADDRESS");
-
-    private static string GetEnvVariable(string key)
-    {
-        return Environment.GetEnvironmentVariable(key) ?? throw new Exception();
-    }
+    public static int ConRegistryBlocks => int.Parse(GetEnvVariable("CONS_REGISTRY_BLOCKS"));
 
     [Fact]
     public async Task TestRegistriesFlow_Success()
@@ -106,7 +102,15 @@ public class TestRegistriesFlow
         Console.WriteLine($"Claiming Consumption Granular Certificate");
         await SendClaim(ownerKey, consClient, consCertId, allocationId);
 
-        Assert.True(true);
+        // ------------------  check block count ------------------
+        var blocks = await consClient.GetBlocksAsync(new GetBlocksRequest()
+        {
+            Skip = 0,
+            Limit = ConRegistryBlocks + 10,
+            IncludeTransactions = true
+        });
+
+        Assert.Equal(ConRegistryBlocks, blocks.Blocks.Count);
     }
 
     private static async Task SendClaim(IHDPrivateKey ownerKey, RegistryService.RegistryServiceClient prodClient, FederatedStreamId prodCertId, Guid allocationId)
@@ -160,5 +164,10 @@ public class TestRegistriesFlow
 
         // Send transaction to registry, and wait for committed state
         await prodClient.SendTransactionAndWait(signedTransaction);
+    }
+
+    private static string GetEnvVariable(string key)
+    {
+        return Environment.GetEnvironmentVariable(key) ?? throw new Exception();
     }
 }
