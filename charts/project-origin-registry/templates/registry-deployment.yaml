@@ -154,11 +154,14 @@ spec:
               value: "Redis"
             - name: cache__redis__connectionString
               value: {{ .Release.Name }}-redis-master
+            # only set password if auth is enabled
+            {{- if .Values.redis.auth.enabled }}
             - name: cache__redis__password
               valueFrom:
                 secretKeyRef:
                   name: {{ .Release.Name }}-redis
                   key: redis-password
+            {{- end }}
           {{- else }}
             - name: cache__type
               value: "InMemory"
