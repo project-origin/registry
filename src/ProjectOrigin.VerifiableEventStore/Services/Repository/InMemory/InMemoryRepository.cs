@@ -16,14 +16,13 @@ public class InMemoryRepository : ITransactionRepository
 {
     private readonly object _lockObject = new();
     private readonly List<StreamTransaction> _events = new();
-    private readonly Dictionary<BlockHash, BlockRecord> _blocks = new();
-    private readonly List<BlockRecord> _blockList = new();
+    private readonly List<BlockRecord> _blocks = new();
 
     public Task<NewBlock?> CreateNextBlock()
     {
         lock (_lockObject)
         {
-            var previousBlock = _blocks.Values.OrderByDescending(x => x.ToTransaction).FirstOrDefault();
+            var previousBlock = _blocks.OrderByDescending(x => x.ToTransaction).FirstOrDefault();
 
             if (previousBlock is not null && previousBlock.Publication is null)
                 throw new InvalidOperationException("Previous block has not been published");
@@ -48,10 +47,8 @@ public class InMemoryRepository : ITransactionRepository
                 CreatedAt = Timestamp.FromDateTimeOffset(DateTimeOffset.UtcNow)
             };
 
-            var blockHash = BlockHash.FromHeader(blockHeader);
             var newBlock = new BlockRecord(blockHeader, null, fromTransaction, fromTransaction + numberOfTransactions - 1);
-            _blocks[blockHash] = newBlock;
-            _blockList.Add(newBlock);
+            _blocks.Add(newBlock);
 
             return Task.FromResult<NewBlock?>(new(blockHeader, transactions.Select(x => x.TransactionHash).ToList()));
         }
@@ -61,9 +58,11 @@ public class InMemoryRepository : ITransactionRepository
     {
         lock (_lockObject)
         {
-            if (_blocks.TryGetValue(hash, out var block) && block.Publication is null)
+            var foundBlock = _blocks.FirstOrDefault(block => BlockHash.FromHeader(block.Header) == hash && block.Publication is null);
+            if (foundBlock is not null)
             {
-                _blocks[hash] = new BlockRecord(block.Header, publication, block.FromTransaction, block.ToTransaction);
+                _blocks.Remove(foundBlock);
+                _blocks.Add(new BlockRecord(foundBlock.Header, publication, foundBlock.FromTransaction, foundBlock.ToTransaction));
                 return Task.CompletedTask;
             }
             else
@@ -84,7 +83,7 @@ public class InMemoryRepository : ITransactionRepository
 
             var index = _events.IndexOf(e);
 
-            var block = _blocks.Values.SingleOrDefault(x => x.FromTransaction <= index && index <= x.ToTransaction);
+            var block = _blocks.SingleOrDefault(x => x.FromTransaction <= index && index <= x.ToTransaction);
 
             if (block is null)
                 return Task.FromResult<Registry.V1.Block?>(null);
@@ -103,13 +102,13 @@ public class InMemoryRepository : ITransactionRepository
     {
         lock (_lockObject)
         {
-            var data = _blockList.Skip(skip).Take(take).Select(x =>
+            var data = _blocks.Skip(skip).Take(take).Select(x =>
             {
                 var block = new Block
                 {
                     Header = x.Header,
                     Publication = x.Publication,
-                    Height = _blockList.IndexOf(x) + 1
+                    Height = _blocks.IndexOf(x) + 1
                 };
 
                 if (includeTransactions)
@@ -134,7 +133,7 @@ public class InMemoryRepository : ITransactionRepository
     {
         lock (_lockObject)
         {
-            var block = _blocks[blockHash];
+            var block = _blocks.Single(block => BlockHash.FromHeader(block.Header) == blockHash);
 
             var events = _events.Skip(block.FromTransaction).Take(block.ToTransaction - block.FromTransaction + 1);
 
@@ -163,7 +162,7 @@ public class InMemoryRepository : ITransactionRepository
 
             var index = _events.IndexOf(e);
 
-            var block = _blocks.Values.SingleOrDefault(x => x.FromTransaction <= index && index <= x.ToTransaction);
+            var block = _blocks.SingleOrDefault(x => x.FromTransaction <= index && index <= x.ToTransaction);
 
             if (block is not null && block.Publication is not null)
                 return Task.FromResult(TransactionStatus.Committed);
