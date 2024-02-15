@@ -103,7 +103,7 @@ public abstract class AbstractTransactionStatusServiceTests
         });
 
         var newBlock = await _repository.CreateNextBlock();
-        await _repository.FinalizeBlock(BlockHash.FromHeader(newBlock!.Header), new ImmutableLog.V1.BlockPublication());
+        await _repository.FinalizeBlock(BlockHash.FromHeader(newBlock!.Header), new Registry.V1.BlockPublication());
 
         // Act
         var record = await Service.GetTransactionStatus(transactionHash);

@@ -24,16 +24,45 @@ public abstract class AbstractTransactionRepositoryTests<T> where T : ITransacti
         _fixture = new Fixture();
     }
 
-    private StreamTransaction CreateFakeEvent(Guid stream, int index)
+    private StreamTransaction CreateFakeStreamTransaction(Guid stream, int index)
     {
-        var transaction = _fixture.Create<byte[]>();
-        return new StreamTransaction { TransactionHash = new TransactionHash(SHA256.HashData(transaction)), StreamId = stream, StreamIndex = index, Payload = transaction };
+        var payload = _fixture.Create<byte[]>();
+
+        var transaction = new Registry.V1.Transaction
+        {
+            Header = new Registry.V1.TransactionHeader
+            {
+                FederatedStreamId = new Common.V1.FederatedStreamId
+                {
+                    Registry = _fixture.Create<string>(),
+                    StreamId = new Common.V1.Uuid()
+                    {
+                        Value = stream.ToString()
+                    }
+                },
+                Nonce = _fixture.Create<string>(),
+                PayloadSha512 = ByteString.CopyFrom(SHA512.HashData(payload)),
+                PayloadType = _fixture.Create<string>()
+            },
+            HeaderSignature = ByteString.CopyFrom(_fixture.Create<byte[]>()),
+            Payload = ByteString.CopyFrom(payload),
+        };
+
+        var transactionBytes = transaction.ToByteArray();
+
+        return new StreamTransaction
+        {
+            TransactionHash = new TransactionHash(SHA256.HashData(transactionBytes)),
+            StreamId = stream,
+            StreamIndex = index,
+            Payload = transactionBytes
+        };
     }
 
     [Fact]
     public async Task InsertSingleEvent_InOrder_Success()
     {
-        var @event = CreateFakeEvent(Guid.NewGuid(), 0);
+        var @event = CreateFakeStreamTransaction(Guid.NewGuid(), 0);
 
         await Repository.Store(@event);
 
@@ -51,7 +80,7 @@ public abstract class AbstractTransactionRepositoryTests<T> where T : ITransacti
         List<StreamTransaction> events = new();
         for (var i = 0; i < NUMBER_OF_EVENTS; i++)
         {
-            var @event = CreateFakeEvent(Guid.NewGuid(), 0);
+            var @event = CreateFakeStreamTransaction(Guid.NewGuid(), 0);
             events.Add(@event);
             await Repository.Store(@event);
         }
@@ -71,7 +100,7 @@ public abstract class AbstractTransactionRepositoryTests<T> where T : ITransacti
 
         for (var i = 0; i < NUMBER_OF_EVENTS; i++)
         {
-            var @event = CreateFakeEvent(streamId, i);
+            var @event = CreateFakeStreamTransaction(streamId, i);
             await Repository.Store(@event);
         }
 
@@ -85,8 +114,8 @@ public abstract class AbstractTransactionRepositoryTests<T> where T : ITransacti
     {
         var streamId = Guid.NewGuid();
 
-        await Repository.Store(CreateFakeEvent(streamId, 0));
-        var @event = CreateFakeEvent(streamId, 3);
+        await Repository.Store(CreateFakeStreamTransaction(streamId, 0));
+        var @event = CreateFakeStreamTransaction(streamId, 3);
 
         async Task act() => await Repository.Store(@event);
         await Assert.ThrowsAnyAsync<OutOfOrderException>(act);
@@ -97,7 +126,7 @@ public abstract class AbstractTransactionRepositoryTests<T> where T : ITransacti
     {
         var streamId = Guid.NewGuid();
 
-        var @event = CreateFakeEvent(streamId, 99);
+        var @event = CreateFakeStreamTransaction(streamId, 99);
 
         async Task act() => await Repository.Store(@event);
         await Assert.ThrowsAnyAsync<OutOfOrderException>(act);
@@ -106,7 +135,7 @@ public abstract class AbstractTransactionRepositoryTests<T> where T : ITransacti
     [Fact]
     public async Task Will_Store_EventAsync()
     {
-        var @event = CreateFakeEvent(Guid.NewGuid(), 0);
+        var @event = CreateFakeStreamTransaction(Guid.NewGuid(), 0);
 
         await Repository.Store(@event);
 
@@ -139,11 +168,11 @@ public abstract class AbstractTransactionRepositoryTests<T> where T : ITransacti
     public async Task CreateNextBlock_NoNewTransactions_NullBlock()
     {
         // Given
-        await Repository.Store(CreateFakeEvent(Guid.NewGuid(), 0));
+        await Repository.Store(CreateFakeStreamTransaction(Guid.NewGuid(), 0));
         var block1 = await Repository.CreateNextBlock();
         block1.Should().NotBeNull();
         block1!.TransactionHashes.Should().HaveCount(1);
-        await Repository.FinalizeBlock(BlockHash.FromHeader(block1!.Header), new ImmutableLog.V1.BlockPublication());
+        await Repository.FinalizeBlock(BlockHash.FromHeader(block1!.Header), new Registry.V1.BlockPublication());
 
         // When
         var newBlock = await Repository.CreateNextBlock();
@@ -156,7 +185,7 @@ public abstract class AbstractTransactionRepositoryTests<T> where T : ITransacti
     public async Task CreateNextBlock_NotFinalized_ThrowsException()
     {
         // Given
-        await Repository.Store(CreateFakeEvent(Guid.NewGuid(), 0));
+        await Repository.Store(CreateFakeStreamTransaction(Guid.NewGuid(), 0));
         var block1 = await Repository.CreateNextBlock();
         block1.Should().NotBeNull();
         block1!.TransactionHashes.Should().HaveCount(1);
@@ -182,7 +211,7 @@ public abstract class AbstractTransactionRepositoryTests<T> where T : ITransacti
         var transactions = new List<StreamTransaction>();
         foreach (var i in Enumerable.Range(0, numberOfTransaction))
         {
-            var @event = CreateFakeEvent(Guid.NewGuid(), 0);
+            var @event = CreateFakeStreamTransaction(Guid.NewGuid(), 0);
             await Repository.Store(@event);
             transactions.Add(@event);
         }
@@ -202,7 +231,7 @@ public abstract class AbstractTransactionRepositoryTests<T> where T : ITransacti
     {
         for (var i = 0; i < 100; i++)
         {
-            var @event = CreateFakeEvent(Guid.NewGuid(), 0);
+            var @event = CreateFakeStreamTransaction(Guid.NewGuid(), 0);
             await Repository.Store(@event);
         }
 
@@ -210,9 +239,9 @@ public abstract class AbstractTransactionRepositoryTests<T> where T : ITransacti
 
         newBlock.Should().NotBeNull();
 
-        var publication = new ImmutableLog.V1.BlockPublication
+        var publication = new Registry.V1.BlockPublication
         {
-            LogEntry = new ImmutableLog.V1.BlockPublication.Types.LogEntry
+            LogEntry = new Registry.V1.BlockPublication.Types.LogEntry
             {
                 BlockHeaderHash = ByteString.CopyFrom(SHA256.HashData(newBlock!.Header.ToByteArray())),
             }
@@ -227,7 +256,7 @@ public abstract class AbstractTransactionRepositoryTests<T> where T : ITransacti
         var transactionList1 = new List<StreamTransaction>();
         for (var i = 0; i < 10; i++)
         {
-            var @event = CreateFakeEvent(Guid.NewGuid(), 0);
+            var @event = CreateFakeStreamTransaction(Guid.NewGuid(), 0);
             transactionList1.Add(@event);
             await Repository.Store(@event);
         }
@@ -237,14 +266,14 @@ public abstract class AbstractTransactionRepositoryTests<T> where T : ITransacti
         block1!.Header.PreviousPublicationHash.Should().BeEquivalentTo(new byte[32]);
         block1!.TransactionHashes.Should().HaveCount(transactionList1.Count);
         block1!.TransactionHashes.Should().ContainInOrder(transactionList1.Select(x => x.TransactionHash));
-        var pub1 = new ImmutableLog.V1.BlockPublication();
+        var pub1 = new Registry.V1.BlockPublication();
         await Repository.FinalizeBlock(BlockHash.FromHeader(block1!.Header), pub1);
 
 
         var transactionList2 = new List<StreamTransaction>();
         for (var i = 0; i < 10; i++)
         {
-            var @event = CreateFakeEvent(Guid.NewGuid(), 0);
+            var @event = CreateFakeStreamTransaction(Guid.NewGuid(), 0);
             transactionList2.Add(@event);
             await Repository.Store(@event);
         }
@@ -254,14 +283,14 @@ public abstract class AbstractTransactionRepositoryTests<T> where T : ITransacti
         block2!.Header.PreviousPublicationHash.Should().BeEquivalentTo(SHA256.HashData(pub1.ToByteArray()));
         block2!.TransactionHashes.Should().HaveCount(transactionList2.Count);
         block2!.TransactionHashes.Should().ContainInOrder(transactionList2.Select(x => x.TransactionHash));
-        var pub2 = new ImmutableLog.V1.BlockPublication();
+        var pub2 = new Registry.V1.BlockPublication();
         await Repository.FinalizeBlock(BlockHash.FromHeader(block2!.Header), pub2);
 
 
         var transactionList3 = new List<StreamTransaction>();
         for (var i = 0; i < 10; i++)
         {
-            var @event = CreateFakeEvent(Guid.NewGuid(), 0);
+            var @event = CreateFakeStreamTransaction(Guid.NewGuid(), 0);
             transactionList3.Add(@event);
             await Repository.Store(@event);
         }
@@ -271,7 +300,63 @@ public abstract class AbstractTransactionRepositoryTests<T> where T : ITransacti
         block3!.Header.PreviousPublicationHash.Should().BeEquivalentTo(SHA256.HashData(pub2.ToByteArray()));
         block3!.TransactionHashes.Should().HaveCount(transactionList3.Count);
         block3!.TransactionHashes.Should().ContainInOrder(transactionList3.Select(x => x.TransactionHash));
-        var pub3 = new ImmutableLog.V1.BlockPublication();
+        var pub3 = new Registry.V1.BlockPublication();
         await Repository.FinalizeBlock(BlockHash.FromHeader(block3!.Header), pub3);
+    }
+
+    [Theory]
+    [InlineData(1, 10)]
+    [InlineData(7, 70)]
+    [InlineData(8, 80)]
+    public async Task BlockRepository_GetBlocks_IncludeTransactions(int blockNumber, int expectedTransactionCount)
+    {
+        // Arrange: Create a series of blocks
+        var takeCount = 2;
+        await CreateProgressiveBlocks();
+
+        // Act: Retrieve two blocks starting from the seventh block, including transactions
+        var blocks = await Repository.GetBlocks(skip: blockNumber - 1, take: takeCount, includeTransactions: true);
+
+        // Assert: Check that the blocks have the expected transactions based on their height
+        blocks.Should().HaveCount(takeCount);
+
+        // Verification for blocks starting from the seventh
+        blocks[0].Header.Should().NotBeNull();
+        blocks[0].Height.Should().Be(blockNumber);
+        blocks[0].Transactions.Should().HaveCount(expectedTransactionCount);
+    }
+
+    [Fact]
+    public async Task BlockRepository_GetBlocks_ExcludeTransaction_ShouldBeEmpty()
+    {
+        // Arrange: Create a series of blocks
+        var takeCount = 2;
+        await CreateProgressiveBlocks();
+
+        // Act: Retrieve the first two blocks and verify their headers and contents
+        var firstTwoBlocks = await Repository.GetBlocks(skip: 0, take: takeCount, includeTransactions: false);
+
+        // Assert: Check that the first two blocks have been retrieved correctly
+        firstTwoBlocks.Should().HaveCount(takeCount);
+        firstTwoBlocks[0].Header.Should().NotBeNull();
+        firstTwoBlocks[0].Height.Should().Be(1);
+        firstTwoBlocks[0].Transactions.Should().BeEmpty();
+    }
+
+    private async Task CreateProgressiveBlocks()
+    {
+        // Arrange: Create a series of blocks, each with a progressively increasing number of transactions
+        const int totalBlocksToCreate = 10;
+        for (int currentBlockNumber = 0; currentBlockNumber < totalBlocksToCreate; currentBlockNumber++)
+        {
+            int transactionsInCurrentBlock = 10 * (currentBlockNumber + 1);
+            for (int eventIndex = 0; eventIndex < transactionsInCurrentBlock; eventIndex++)
+            {
+                var newTransaction = CreateFakeStreamTransaction(Guid.NewGuid(), 0);
+                await Repository.Store(newTransaction);
+            }
+            var createdBlock = await Repository.CreateNextBlock();
+            await Repository.FinalizeBlock(BlockHash.FromHeader(createdBlock!.Header), new Registry.V1.BlockPublication());
+        }
     }
 }

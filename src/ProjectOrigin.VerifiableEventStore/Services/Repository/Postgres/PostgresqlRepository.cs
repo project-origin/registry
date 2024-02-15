@@ -9,6 +9,7 @@ using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Options;
 using Npgsql;
+using ProjectOrigin.Registry.V1;
 using ProjectOrigin.VerifiableEventStore.Extensions;
 using ProjectOrigin.VerifiableEventStore.Models;
 using ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres.Mapping;
@@ -49,7 +50,7 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
         }
     }
 
-    public async Task<ImmutableLog.V1.Block?> GetBlock(TransactionHash transactionHash)
+    public async Task<Registry.V1.Block?> GetBlock(TransactionHash transactionHash)
     {
         using var connection = _dataSource.CreateConnection();
 
@@ -67,16 +68,16 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
         if (block.Publication is null)
             return null;
 
-        return new ImmutableLog.V1.Block
+        return new Registry.V1.Block
         {
-            Header = new ImmutableLog.V1.BlockHeader
+            Header = new Registry.V1.BlockHeader
             {
                 PreviousHeaderHash = ByteString.CopyFrom(block.PreviousHeaderHash),
                 PreviousPublicationHash = ByteString.CopyFrom(block.PreviousPublicationHash),
                 MerkleRootHash = ByteString.CopyFrom(block.MerkleRootHash),
                 CreatedAt = block.CreatedAt.ToTimestamp(),
             },
-            Publication = ImmutableLog.V1.BlockPublication.Parser.ParseFrom(block.Publication)
+            Publication = Registry.V1.BlockPublication.Parser.ParseFrom(block.Publication)
         };
     }
 
@@ -157,7 +158,7 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
             var previousHeaderHash = previousBlock?.BlockHash ?? new byte[32];
             var previousPublicationHash = previousBlock is not null ? SHA256.HashData(previousBlock!.Publication!) : new byte[32];
 
-            var blockHeader = new ImmutableLog.V1.BlockHeader
+            var blockHeader = new Registry.V1.BlockHeader
             {
                 PreviousHeaderHash = ByteString.CopyFrom(previousHeaderHash),
                 PreviousPublicationHash = ByteString.CopyFrom(previousPublicationHash),
@@ -190,7 +191,7 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
         }
     }
 
-    public async Task FinalizeBlock(BlockHash hash, ImmutableLog.V1.BlockPublication publication)
+    public async Task FinalizeBlock(BlockHash hash, Registry.V1.BlockPublication publication)
     {
         using var connection = _dataSource.CreateConnection();
 
@@ -210,8 +211,63 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
               new { transactionHash = transactionHash.Data });
     }
 
+    public async Task<IList<Block>> GetBlocks(int skip, int take, bool includeTransactions)
+    {
+        using var connection = _dataSource.CreateConnection();
+
+        var blocks = await connection.QueryAsync<BlockRecord>(
+                "SELECT * FROM blocks ORDER BY id ASC OFFSET @skip LIMIT @take", new { skip, take });
+
+        IEnumerable<BlockTransaction>? transactions = null;
+
+        if (includeTransactions)
+        {
+            var start = blocks.Min(x => x.FromTransaction);
+            var end = blocks.Max(x => x.ToTransaction);
+            transactions = (await connection.QueryAsync<BlockTransaction>(
+                "SELECT  id, payload FROM transactions WHERE @start <= id AND id <= @end ORDER BY ID ASC",
+                new { start, end })).ToList();
+        }
+
+        var mappedBlocks = blocks.Select(x =>
+        {
+            var block = new Block
+            {
+                Header = new BlockHeader
+                {
+                    PreviousHeaderHash = ByteString.CopyFrom(x.PreviousHeaderHash),
+                    PreviousPublicationHash = ByteString.CopyFrom(x.PreviousPublicationHash),
+                    MerkleRootHash = ByteString.CopyFrom(x.MerkleRootHash),
+                    CreatedAt = x.CreatedAt.ToTimestamp(),
+                },
+                Publication = x.Publication is not null ? BlockPublication.Parser.ParseFrom(x.Publication) : null,
+                Height = x.Id,
+            };
+
+            if (transactions is not null)
+            {
+                block.Transactions.AddRange(
+                    transactions
+                        .Where(t => x.FromTransaction <= t.Id && t.Id <= x.ToTransaction)
+                        .Select(t => Transaction.Parser.ParseFrom(t.Payload)
+                ));
+            }
+
+            return block;
+        }).ToList();
+
+        return mappedBlocks;
+    }
+
+    private sealed record BlockTransaction
+    {
+        public long Id { get; }
+        public byte[]? Payload { get; }
+    }
+
     private sealed record BlockRecord
     {
+        public int Id { get; }
         public required byte[] BlockHash { get; init; }
         public required byte[] PreviousHeaderHash { get; init; }
         public required byte[] PreviousPublicationHash { get; init; }

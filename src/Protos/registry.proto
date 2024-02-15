@@ -1,5 +1,6 @@
 syntax = "proto3";
 
+import "google/protobuf/timestamp.proto";
 import "common.proto";
 
 package project_origin.registry.v1;
@@ -9,6 +10,33 @@ service RegistryService {
     rpc GetStreamTransactions (GetStreamTransactionsRequest) returns (GetStreamTransactionsResponse);
     rpc GetTransactionStatus(GetTransactionStatusRequest) returns (GetTransactionStatusResponse);
     rpc GetTransactionProof (GetTransactionProofRequest) returns (GetTransactionProofResponse);
+    rpc GetBlocks(GetBlocksRequest) returns (GetBlocksResponse);
+}
+
+message GetBlocksRequest {
+    // Number of blocks to skip.
+    int32 skip = 1;
+
+    // The maximum number of blocks to return.
+    int32 limit = 2;
+
+    // If true, the result will include the transactions in the blocks.
+    bool include_transactions = 3;
+}
+
+message GetBlocksResponse {
+    // The blocks.
+    repeated Block blocks = 1;
+}
+
+message GetBlockTransactionsRequest {
+    // The block number to get transactions from, 0 based.
+    int32 block_number = 1;
+}
+
+message GetBlockTransactionsResponse {
+    // The transactions in the block.
+    repeated Transaction transactions = 1;
 }
 
 message SendTransactionsRequest {
@@ -91,4 +119,56 @@ message MerkleProof {
     int32 leaf_index = 2;
     repeated bytes hashes = 3;
     bytes block_id = 4;
+}
+
+message BlockHeader {
+    // SHA-256 hash of the previous block header.
+    bytes previous_header_hash = 1;
+
+    // SHA-256 hash of the previous publication.
+    bytes previous_publication_hash = 2;
+
+    // SHA-256 hash of the merkle root of the transactions in the block.
+    bytes merkle_root_hash = 3;
+
+    // Timestamp of when the block was created.
+    google.protobuf.Timestamp created_at = 4;
+}
+
+// A block in the immutable log.
+message Block {
+    // Height of the block in the chain.
+    int32 height = 1;
+
+    // The header of the block.
+    BlockHeader header = 2;
+
+    // The publication of the block.
+    BlockPublication publication = 3;
+
+    // The transactions in the block.
+    repeated Transaction transactions = 4;
+}
+
+// A publication of a block.
+message BlockPublication {
+    // Contains the type of the publication.
+    oneof immutable_log_type {
+        // Should only be used for testing.
+        LogEntry log_entry = 1;
+        Concordium concordium = 2;
+    }
+
+    message LogEntry {
+        // SHA-256 hash of the block header.
+        bytes block_header_hash = 1;
+    }
+
+    message Concordium {
+        // The hash of the transaction on the Concordium blockchain.
+        bytes transaction_hash = 1;
+
+        // The hash of the block on the Concordium blockchain.
+        bytes block_hash = 2;
+    }
 }

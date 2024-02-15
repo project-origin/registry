@@ -56,7 +56,7 @@ public class PostgresDatabaseFixture : IAsyncLifetime
     {
         var dataSource = NpgsqlDataSource.Create(_postgreSqlContainer.GetConnectionString());
         using var connection = await dataSource.OpenConnectionAsync();
-        await connection.ExecuteAsync("TRUNCATE blocks, transactions");
+        await connection.ExecuteAsync("TRUNCATE blocks, transactions RESTART IDENTITY CASCADE;");
     }
 
     public async Task DisposeAsync()

@@ -63,6 +63,7 @@ verify-chart: restore
 	helm repo add bitnami-charts https://charts.bitnami.com/bitnami
 	helm dependency build charts/project-origin-registry
 	charts/project-origin-registry/run_kind_test.sh
+	charts/project-origin-registry/migration_test.sh
 
 ## Run Concordium integration tests, requires access to running node and environment variables
 concordium-tests: build

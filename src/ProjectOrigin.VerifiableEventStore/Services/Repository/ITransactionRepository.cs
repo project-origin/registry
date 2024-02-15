@@ -9,11 +9,12 @@ public interface ITransactionRepository
 {
     Task Store(StreamTransaction @event);
 
-    Task<ImmutableLog.V1.Block?> GetBlock(TransactionHash transactionHash);
+    Task<Registry.V1.Block?> GetBlock(TransactionHash transactionHash);
+    Task<IList<Registry.V1.Block>> GetBlocks(int skip, int take, bool includeTransactions);
     Task<TransactionStatus> GetTransactionStatus(TransactionHash transactionHash);
     Task<IList<StreamTransaction>> GetStreamTransactionsForBlock(BlockHash blockHash);
     Task<IList<StreamTransaction>> GetStreamTransactionsForStream(Guid streamId);
 
     Task<NewBlock?> CreateNextBlock();
-    Task FinalizeBlock(BlockHash hash, ImmutableLog.V1.BlockPublication publication);
+    Task FinalizeBlock(BlockHash hash, Registry.V1.BlockPublication publication);
 }
