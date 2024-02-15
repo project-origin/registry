@@ -123,6 +123,10 @@ redis:
   # enabled specifies if the redis subchart should be enabled or not
   enabled: true
 
+  auth:
+    # enabled specifies if the redis subchart should be enabled or not
+    enabled: false
+
 # concordium holds the configuration for the concordium node
 concordium:
   # enabled specified wether or not to run a local node
