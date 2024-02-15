@@ -168,6 +168,6 @@ public class TestRegistriesFlow
 
     private static string GetEnvVariable(string key)
     {
-        return Environment.GetEnvironmentVariable(key) ?? throw new Exception();
+        return Environment.GetEnvironmentVariable(key) ?? throw new ArgumentNullException($"Environment variable ”{key}” not set.");
     }
 }
