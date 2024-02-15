@@ -1,13 +1,14 @@
 #!/bin/bash
 
-# This script is a test of the registry and electricy verifier using the example client
+# This script is a test that the registry chart can be upgraded from the current most recent version to the one in tree.
 # This script does the following
 # - creates a kind cluster
 # - generates issuing keys
-# - creates two registries
-# - issues consumption and production certificates
-# - slices production certificate
-# - claims certificate
+# - installs a registry
+# - runs tests
+# - updates the registry
+# - runs tests again
+# - cleans up
 
 # Ensures script fails if something goes wrong.
 set -eo pipefail
@@ -24,10 +25,6 @@ registry_a_name=test-a
 registry_a_port=8080
 registry_a_nodeport=32080
 registry_a_namespace=ns-a
-registry_b_name=test-b
-registry_b_port=8081
-registry_b_nodeport=32081
-registry_b_namespace=ns-b
 
 # build docker image
 docker build -f src/ProjectOrigin.Registry.Server/Dockerfile -t ghcr.io/project-origin/registry-server:test src/
@@ -41,8 +38,6 @@ nodes:
   extraPortMappings:
   - containerPort: $registry_a_nodeport
     hostPort: $registry_a_port
-  - containerPort: $registry_b_nodeport
-    hostPort: $registry_b_port
 EOF
 
 # recreate clean cluster
@@ -77,16 +72,12 @@ verifiers:
     registries:
       - name: ${registry_a_name}
         address: http://registry-${registry_a_name}.${registry_a_namespace}:5000
-      - name: ${registry_b_name}
-        address: http://registry-${registry_b_name}-postfix.${registry_b_namespace}:5000
 EOF
 
-# install two registries
-echo "Installing registries"
-helm install ${registry_a_name} -n ${registry_a_namespace} charts/project-origin-registry --set persistance.cloudNativePG.enabled=true,image.tag=test,service.nodePort=$registry_a_nodeport,service.type=NodePort -f "${override_values_filename}"  --create-namespace --wait
-echo "Registry A installed"
-helm install ${registry_b_name}-postfix -n ${registry_b_namespace} charts/project-origin-registry --set transactionProcessor.replicas=1,persistance.inMemory.enabled=true,image.tag=test,registryName=$registry_b_name,service.nodePort=$registry_b_nodeport,service.type=NodePort -f "${override_values_filename}"  --create-namespace --wait
-echo "Registry B installed"
+# install most recent registry-chart version
+echo "Install registry"
+helm install ${registry_a_name} project-origin-registry --set persistance.cloudNativePG.enabled=true,image.tag=test,service.nodePort=$registry_a_nodeport,service.type=NodePort -f "${override_values_filename}" -n ${registry_a_namespace} --repo https://project-origin.github.io/helm-registry --create-namespace --wait
+echo "Registry installed"
 
 # wait for cluster to be ready
 sleep 15
@@ -97,8 +88,20 @@ dotnet test src/ProjectOrigin.Registry.ChartTests \
   -e "ISSUER_KEY=$PrivateKeyBase64" \
   -e "PROD_REGISTRY_NAME=$registry_a_name" \
   -e "PROD_REGISTRY_ADDRESS=http://localhost:$registry_a_port" \
-  -e "CONS_REGISTRY_NAME=$registry_b_name" \
-  -e "CONS_REGISTRY_ADDRESS=http://localhost:$registry_b_port" \
-  -e "CONS_REGISTRY_BLOCKS=3"
+  -e "CONS_REGISTRY_NAME=$registry_a_name" \
+  -e "CONS_REGISTRY_ADDRESS=http://localhost:$registry_a_port" \
+  -e "CONS_REGISTRY_BLOCKS=7"
 
-echo "Test completed"
+# Updates registry to the one in tree and runs tests
+echo "Updating registry"
+helm upgrade ${registry_a_name} -n ${registry_a_namespace} charts/project-origin-registry --set persistance.cloudNativePG.enabled=true,image.tag=test,service.nodePort=$registry_a_nodeport,service.type=NodePort -f "${override_values_filename}"  --create-namespace --wait
+echo "Registry updated"
+
+dotnet test src/ProjectOrigin.Registry.ChartTests \
+  -e "AREA=$example_area" \
+  -e "ISSUER_KEY=$PrivateKeyBase64" \
+  -e "PROD_REGISTRY_NAME=$registry_a_name" \
+  -e "PROD_REGISTRY_ADDRESS=http://localhost:$registry_a_port" \
+  -e "CONS_REGISTRY_NAME=$registry_a_name" \
+  -e "CONS_REGISTRY_ADDRESS=http://localhost:$registry_a_port" \
+  -e "CONS_REGISTRY_BLOCKS=14"

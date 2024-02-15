@@ -48,6 +48,7 @@ public static class IServiceCollectionExtensions
         switch (type)
         {
             case "in_memory":
+                Log.Warning("Using in memory repository - this is not recommended for production use! Data is not persisted and unable to run multiple instances.");
                 services.AddTransient<IRepositoryUpgrader, InMemoryUpgrader>();
                 services.AddSingleton<ITransactionRepository, InMemoryRepository>();
                 break;

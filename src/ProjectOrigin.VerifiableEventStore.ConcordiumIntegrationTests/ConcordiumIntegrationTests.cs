@@ -5,7 +5,7 @@ using Google.Protobuf;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using ProjectOrigin.ImmutableLog.V1;
+using ProjectOrigin.Registry.V1;
 using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector.Concordium;
 using Xunit;
 
