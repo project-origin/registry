@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry.Metrics;
+
+using OpenTelemetry.Trace;
+
 using ProjectOrigin.Registry.Server.Extensions;
 using ProjectOrigin.Registry.Server.Grpc;
 using ProjectOrigin.Registry.Server.Interfaces;
@@ -33,7 +36,22 @@ public class Startup
                     .AddMeter(BlockFinalizerJob.Meter.Name)
                     .AddMeter(RegistryService.Meter.Name)
                     .AddPrometheusExporter()
-            );
+
+            )
+            .WithTracing(provider =>
+                provider
+                    .AddGrpcClientInstrumentation(grpcOptions =>
+                    {
+                        grpcOptions.EnrichWithHttpRequestMessage = (activity, httpRequestMessage) =>
+                            activity.SetTag("requestVersion", httpRequestMessage.Version);
+                        grpcOptions.EnrichWithHttpResponseMessage = (activity, httpResponseMessage) =>
+                            activity.SetTag("responseVersion", httpResponseMessage.Version);
+                        grpcOptions.SuppressDownstreamInstrumentation = true;
+                    })
+                    .AddHttpClientInstrumentation()
+                    .AddAspNetCoreInstrumentation()
+                    .AddNpgsql()
+                    .AddOtlpExporter(o => o.Endpoint = otlpOptions.Endpoint));
 
         services.AddOptions<RegistryOptions>().Configure<IConfiguration>((settings, configuration) =>
         {
