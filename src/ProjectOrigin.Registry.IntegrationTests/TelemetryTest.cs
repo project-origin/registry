@@ -11,6 +11,7 @@ using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using ProjectOrigin.Electricity.IntegrationTests;
 using ProjectOrigin.Registry.Server;
 using ProjectOrigin.TestUtils;
 using WireMock.RequestBuilders;
@@ -26,22 +27,21 @@ public class TelemetryTest :
     IClassFixture<GrpcTestBase<Startup>>,
     IClassFixture<RabbitMqFixture>,
     IClassFixture<RedisFixture>,
+    IClassFixture<ElectricityServiceFixture>,
+    IClassFixture<OpenTelemetryFixture>,
     IDisposable
 {
     private readonly GrpcTestFixture<Startup> _grpcTestFixture;
-    private readonly WireMockServer _wireMockServer;
 
     public TelemetryTest(GrpcTestFixture<Startup> grpcTestFixture,
         PostgresDatabaseFixture dbFixture,
         RabbitMqFixture rabbitMqFixture,
-        RedisFixture redisFixture
+        RedisFixture redisFixture,
+        OpenTelemetryFixture openTelemetryFixture
         )
     {
-
+        openTelemetryFixture.InitializeAsync();
         _grpcTestFixture = grpcTestFixture;
-        _wireMockServer = WireMockServer.Start();
-        _wireMockServer.Given(Request.Create().UsingAnyMethod())
-            .RespondWith(Response.Create().WithStatusCode(200));
 
         grpcTestFixture.ConfigureHostConfiguration(new Dictionary<string, string?>()
         {
@@ -65,33 +65,6 @@ public class TelemetryTest :
             {"TransactionProcessor:Threads", "5"},
             {"TransactionProcessor:Weight", "10"},
         });
-        grpcTestFixture.testServicesConfigure += services =>
-        {
-            services.AddOpenTelemetry()
-                .ConfigureResource(resource => resource
-                    .AddService(serviceName: "Wallet.Test"))
-                .WithMetrics(metrics => metrics
-                    .AddOtlpExporter(o => o.Endpoint = new Uri(_wireMockServer.Urls[0])))
-                .WithTracing(provider =>
-                    provider
-                        .AddOtlpExporter(o =>
-                        {
-                            o.Endpoint = new Uri(_wireMockServer.Urls[0]);
-                            o.Protocol = OtlpExportProtocol.HttpProtobuf;
-                            o.BatchExportProcessorOptions = new BatchExportProcessorOptions<Activity>()
-                            {
-                                MaxQueueSize = 2,
-                                ScheduledDelayMilliseconds = 1000,
-                                MaxExportBatchSize = 1
-                            };
-                            o.HttpClientFactory = () =>
-                            {
-                                HttpClient client = new HttpClient();
-                                client.DefaultRequestHeaders.Add("X-TestHeader", "value");
-                                return client;
-                            };
-                        }));
-        };
     }
     [Fact]
     public async Task TelemetryData_ShouldBeSentToMockCollector()
