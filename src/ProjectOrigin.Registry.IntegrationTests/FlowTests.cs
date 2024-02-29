@@ -37,6 +37,7 @@ public class FlowTests :
         _postgresDatabaseFixture = postgresDatabaseFixture;
         grpcFixture.ConfigureHostConfiguration(new Dictionary<string, string?>()
         {
+            {"Otlp:Enabled", "false"},
             {"RegistryName", RegistryName},
             {"Verifiers:project_origin.electricity.v1", _verifierFixture.Url},
             {"ImmutableLog:type", "log"},

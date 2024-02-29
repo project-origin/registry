@@ -1,7 +1,9 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using OpenTelemetry.Metrics;
 
 using OpenTelemetry.Trace;
@@ -30,28 +32,37 @@ public class Startup
         services.AddGrpc();
         services.AddSingleton<ITransactionDispatcher, VerifierDispatcher>();
 
-        services.AddOpenTelemetry()
-            .WithMetrics(provider =>
-                provider
-                    .AddMeter(BlockFinalizerJob.Meter.Name)
-                    .AddMeter(RegistryService.Meter.Name)
-                    .AddPrometheusExporter()
+        services.AddOptions<OtlpOptions>()
+            .BindConfiguration(OtlpOptions.Prefix)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        var otlpOptions = _configuration.GetSection(OtlpOptions.Prefix).GetValid<OtlpOptions>();
+        if (otlpOptions.Enabled)
+        {
+            services.AddOpenTelemetry()
+                .WithMetrics(provider =>
+                    provider
+                        .AddMeter(BlockFinalizerJob.Meter.Name)
+                        .AddMeter(RegistryService.Meter.Name)
+                        .AddOtlpExporter(o => o.Endpoint = otlpOptions.Endpoint)
+                )
+                .WithTracing(provider =>
+                    provider
+                        .AddGrpcClientInstrumentation(grpcOptions =>
+                        {
+                            grpcOptions.EnrichWithHttpRequestMessage = (activity, httpRequestMessage) =>
+                                activity.SetTag("requestVersion", httpRequestMessage.Version);
+                            grpcOptions.EnrichWithHttpResponseMessage = (activity, httpResponseMessage) =>
+                                activity.SetTag("responseVersion", httpResponseMessage.Version);
+                            grpcOptions.SuppressDownstreamInstrumentation = true;
+                        })
+                        .AddAspNetCoreInstrumentation()
+                        .AddRedisInstrumentation()
+                        .AddNpgsql()
+                        .AddOtlpExporter(o => o.Endpoint = otlpOptions.Endpoint));
+        }
 
-            )
-            .WithTracing(provider =>
-                provider
-                    .AddGrpcClientInstrumentation(grpcOptions =>
-                    {
-                        grpcOptions.EnrichWithHttpRequestMessage = (activity, httpRequestMessage) =>
-                            activity.SetTag("requestVersion", httpRequestMessage.Version);
-                        grpcOptions.EnrichWithHttpResponseMessage = (activity, httpResponseMessage) =>
-                            activity.SetTag("responseVersion", httpResponseMessage.Version);
-                        grpcOptions.SuppressDownstreamInstrumentation = true;
-                    })
-                    .AddHttpClientInstrumentation()
-                    .AddAspNetCoreInstrumentation()
-                    .AddNpgsql()
-                    .AddOtlpExporter(o => o.Endpoint = otlpOptions.Endpoint));
+
 
         services.AddOptions<RegistryOptions>().Configure<IConfiguration>((settings, configuration) =>
         {
@@ -116,8 +127,9 @@ public class Startup
             endpoints.MapGrpcService<RegistryService>();
             endpoints.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
         });
-
-        app.UseOpenTelemetryPrometheusScrapingEndpoint();
+        var otlpOptions = _configuration.GetSection(OtlpOptions.Prefix).GetValid<OtlpOptions>();
+        if (otlpOptions.Enabled)
+            app.UseOpenTelemetryPrometheusScrapingEndpoint();
     }
 
 }

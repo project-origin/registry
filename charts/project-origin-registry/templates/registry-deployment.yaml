@@ -51,6 +51,12 @@ spec:
             - name: TransactionProcessor__Weight
               value: {{ .Values.transactionProcessor.weight | quote }}
 
+            # OpenTelemetry Collector Configuration
+            - name: Otlp__Enabled
+              value: {{ .Values.otlp.enabled | quote }}
+            - name: Otlp__Endpoint
+              value: {{ .Values.otlp.endpoint }}
+
           # BlockFinalizer configuration
             - name: BlockFinalizer__Interval
               value: {{ .Values.blockFinalizer.interval }}

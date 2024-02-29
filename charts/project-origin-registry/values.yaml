@@ -19,6 +19,13 @@ transactionProcessor:
   # defines the weight in the consistent hash ring used to determine which transaction processor to send a transaction to.
   weight: 10
 
+# otlp holds the configuration for the opentelemetry collector
+otlp:
+  # enabled determines if the opentelemetry collector is enabled
+  enabled: false
+  # endpoint defines the endpoint of the opentelemetry collector, example "http://otel-collector:4317"
+  endpoint: "http://opentelemetry-collector.otel-collector:4317"
+
 # rabbitmq defines the rabbitmq configuration for rabbitmq, with rabbitmqOperator
 rabbitmq:
   # operatorEnabled determines if the rabbitmq operator should be used to create the rabbitmq cluster, if true then other fields are ignored.
