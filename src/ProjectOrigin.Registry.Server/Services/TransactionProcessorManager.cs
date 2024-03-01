@@ -58,7 +58,7 @@ public class TransactionProcessorManager : IHostedService
     {
         foreach (var worker in _workers)
         {
-            worker.Dispose();
+            await worker.DisposeAsync();
         }
 
         await Task.CompletedTask;
