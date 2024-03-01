@@ -10,7 +10,7 @@ using RabbitMQ.Client.Events;
 
 namespace ProjectOrigin.Registry.Server.Services;
 
-public sealed class TransactionProcessorWorker : IDisposable
+public sealed class TransactionProcessorWorker : IAsyncDisposable
 {
     private readonly ILogger<TransactionProcessorWorker> _logger;
     private readonly IRabbitMqChannel _channel;
@@ -71,9 +71,9 @@ public sealed class TransactionProcessorWorker : IDisposable
         }, cancellationToken);
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
-        _channel.Channel.BasicCancel(_consumerTag);
+        await _channel.Channel.BasicCancelAsync(_consumerTag);
         _channel.Dispose();
     }
 
@@ -94,12 +94,12 @@ public sealed class TransactionProcessorWorker : IDisposable
                 await _channel.Channel.BasicPublishAsync("", targetQueue, ea.Body);
             }
 
-            _channel.Channel.BasicAck(ea.DeliveryTag, false);
+            await _channel.Channel.BasicAckAsync(ea.DeliveryTag, false);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error processing transaction");
-            _channel.Channel.BasicNack(ea.DeliveryTag, false, true);
+            await _channel.Channel.BasicNackAsync(ea.DeliveryTag, false, true);
         }
     }
 }

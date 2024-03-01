@@ -43,7 +43,7 @@ public class TransactionProcessorManager : IHostedService
 
             var worker = new TransactionProcessorWorker(
                 logger,
-                _channelPool.GetChannel(),
+                await _channelPool.GetChannelAsync(),
                 queueName,
                 transactionVerifier,
                 queueResolver);
