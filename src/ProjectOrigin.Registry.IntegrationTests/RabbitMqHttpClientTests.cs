@@ -40,13 +40,14 @@ public class RabbitMqHttpClientTests
                 Password = RabbitMqFixture.Password,
             };
 
-            using var con = factory.CreateConnection();
-            using var channel = con.CreateChannel();
+            using var con = await factory.CreateConnectionAsync();
+            using var channel = await con.CreateChannelAsync();
 
-            channel.QueueDeclare("test", true, false, false, null);
-            channel.BasicPublish("", "test", Encoding.UTF8.GetBytes("test1"));
-            channel.BasicPublish("", "test", Encoding.UTF8.GetBytes("test2"));
-            channel.BasicPublish("", "test", Encoding.UTF8.GetBytes("test3"));
+            await channel.QueueDeclareAsync("test", true, false, false, null);
+            await channel.BasicPublishAsync("", "test", Encoding.UTF8.GetBytes("test1"));
+            await channel.BasicPublishAsync("", "test", Encoding.UTF8.GetBytes("test2"));
+            await channel.BasicPublishAsync("", "test", Encoding.UTF8.GetBytes("test3"));
+            await con.CloseAsync();
 
             // Act
             var queues = await client.GetQueuesAsync();
