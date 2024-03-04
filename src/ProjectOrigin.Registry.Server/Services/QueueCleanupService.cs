@@ -15,19 +15,26 @@ public sealed class QueueCleanupService : BackgroundService, IDisposable
 {
     private readonly ILogger<QueueCleanupService> _logger;
     private readonly IRabbitMqHttpClient _rabbitMqHttpClient;
-    private readonly IRabbitMqChannel _rabbitMqChannel;
+    private readonly IRabbitMqChannelPool _rabbitMqChannelPool;
     private readonly IQueueResolver _queueResolver;
+    private IRabbitMqChannel? _rabbitMqChannel;
 
     public QueueCleanupService(
         ILogger<QueueCleanupService> logger,
         IRabbitMqHttpClient rabbitMqHttpClient,
-        IRabbitMqChannel rabbitMqChannel,
+        IRabbitMqChannelPool rabbitMqChannelPool,
         IQueueResolver queueResolver)
     {
         _logger = logger;
         _rabbitMqHttpClient = rabbitMqHttpClient;
-        _rabbitMqChannel = rabbitMqChannel;
+        _rabbitMqChannelPool = rabbitMqChannelPool;
         _queueResolver = queueResolver;
+    }
+
+    public override async Task StartAsync(CancellationToken cancellationToken)
+    {
+        _rabbitMqChannel = await _rabbitMqChannelPool.GetChannelAsync();
+        await base.StartAsync(cancellationToken);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -59,14 +66,14 @@ public sealed class QueueCleanupService : BackgroundService, IDisposable
         }
 
         _logger.LogInformation("Deleting queue: {queue}", queue.Name);
-        await _rabbitMqChannel.Channel.QueueDeleteAsync(queue.Name, false, true);
+        await _rabbitMqChannel!.Channel.QueueDeleteAsync(queue.Name, false, true);
     }
 
     private async Task FlushAndSortQueue(string queue)
     {
         while (true)
         {
-            var getResult = await _rabbitMqChannel.Channel.BasicGetAsync(queue, false);
+            var getResult = await _rabbitMqChannel!.Channel.BasicGetAsync(queue, false);
             if (getResult == null)
                 break;
 
@@ -81,6 +88,6 @@ public sealed class QueueCleanupService : BackgroundService, IDisposable
     public override void Dispose()
     {
         base.Dispose();
-        _rabbitMqChannel.Dispose();
+        _rabbitMqChannel!.Dispose();
     }
 }

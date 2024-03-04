@@ -38,7 +38,7 @@ public class RegistryService : V1.RegistryService.RegistryServiceBase
 
     public override async Task<SubmitTransactionResponse> SendTransactions(SendTransactionsRequest request, ServerCallContext context)
     {
-        using (var brokerChannel = _brokerPool.GetChannel())
+        using (var brokerChannel = await _brokerPool.GetChannelAsync())
         {
             foreach (var transaction in request.Transactions)
             {
