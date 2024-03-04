@@ -1,3 +1,0 @@
-cargo:rerun-if-changed=build/main.rs
-cargo:rustc-env=TYPENUM_BUILD_CONSTS=/workspaces/registry/src/rust-ffi/target/debug/build/typenum-d407fe3878377fd5/out/consts.rs
-cargo:rustc-env=TYPENUM_BUILD_OP=/workspaces/registry/src/rust-ffi/target/debug/build/typenum-d407fe3878377fd5/out/op.rs

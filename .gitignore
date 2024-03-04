@@ -3,6 +3,9 @@
 # ignore all sub charts
 charts/*/charts
 
+# Ignore Jetbrains
+src/.idea
+
 # ignore dotnet code coverage files
 **/coverage.cobertura.xml
 
