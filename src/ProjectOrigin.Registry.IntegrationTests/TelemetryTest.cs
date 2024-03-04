@@ -1,8 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
 using ProjectOrigin.Electricity.IntegrationTests;
@@ -11,11 +8,7 @@ using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.PedersenCommitment;
 using ProjectOrigin.Registry.Server;
 using ProjectOrigin.TestUtils;
-using WireMock.RequestBuilders;
-using WireMock.ResponseBuilders;
-using WireMock.Server;
 using Xunit;
-using Xunit.Sdk;
 
 namespace ProjectOrigin.Registry.IntegrationTests;
 
