@@ -42,7 +42,7 @@ public class QueueCleanupServiceTests
                 AmqpPort = rabbitMq.AmqpPort
             });
 
-            using var channelPool = new RabbitMqChannelPool(rabbitMqOptions);
+            await using var channelPool = new RabbitMqChannelPool(rabbitMqOptions);
             var httpClient = new RabbitMqHttpClient(new HttpClient(), rabbitMqOptions);
 
             List<V1.Transaction> transactions = new();
@@ -59,7 +59,7 @@ public class QueueCleanupServiceTests
                 Weight = 10,
             }));
 
-            using (var channel = channelPool.GetChannel())
+            using (var channel = await channelPool.GetChannelAsync())
             {
                 foreach (var transaction in transactions)
                 {
@@ -81,7 +81,7 @@ public class QueueCleanupServiceTests
             var uot = new QueueCleanupService(
                 Mock.Of<ILogger<QueueCleanupService>>(),
                 httpClient,
-                channelPool.GetChannel(),
+                channelPool,
                 queueResolver2
             );
 

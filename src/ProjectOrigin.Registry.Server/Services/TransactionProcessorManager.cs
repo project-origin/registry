@@ -43,7 +43,7 @@ public class TransactionProcessorManager : IHostedService
 
             var worker = new TransactionProcessorWorker(
                 logger,
-                _channelPool.GetChannel(),
+                await _channelPool.GetChannelAsync(),
                 queueName,
                 transactionVerifier,
                 queueResolver);
@@ -58,7 +58,7 @@ public class TransactionProcessorManager : IHostedService
     {
         foreach (var worker in _workers)
         {
-            worker.Dispose();
+            await worker.DisposeAsync();
         }
 
         await Task.CompletedTask;
