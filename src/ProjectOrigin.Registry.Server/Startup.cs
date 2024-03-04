@@ -127,9 +127,5 @@ public class Startup
             endpoints.MapGrpcService<RegistryService>();
             endpoints.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
         });
-        var otlpOptions = _configuration.GetSection(OtlpOptions.Prefix).GetValid<OtlpOptions>();
-        if (otlpOptions.Enabled)
-            app.UseOpenTelemetryPrometheusScrapingEndpoint();
     }
-
 }

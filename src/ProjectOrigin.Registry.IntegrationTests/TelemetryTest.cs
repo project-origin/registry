@@ -5,12 +5,10 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
-using OpenTelemetry;
-using OpenTelemetry.Exporter;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
+using ProjectOrigin.Electricity.IntegrationTests;
+using ProjectOrigin.Electricity.V1;
+using ProjectOrigin.HierarchicalDeterministicKeys;
+using ProjectOrigin.PedersenCommitment;
 using ProjectOrigin.Registry.Server;
 using ProjectOrigin.TestUtils;
 using WireMock.RequestBuilders;
@@ -23,80 +21,71 @@ namespace ProjectOrigin.Registry.IntegrationTests;
 
 public class TelemetryTest :
     IClassFixture<PostgresDatabaseFixture>,
-    IClassFixture<GrpcTestBase<Startup>>,
+    IClassFixture<GrpcTestFixture<Startup>>,
+    IClassFixture<ElectricityServiceFixture>,
     IClassFixture<RabbitMqFixture>,
     IClassFixture<RedisFixture>,
+    IClassFixture<OpenTelemetryFixture>,
     IDisposable
 {
     private readonly GrpcTestFixture<Startup> _grpcTestFixture;
-    private readonly WireMockServer _wireMockServer;
+    private readonly OpenTelemetryFixture _openTelemetryFixture;
+    private readonly ElectricityServiceFixture _electricityServiceFixture;
+    private V1.RegistryService.RegistryServiceClient Client => new(_grpcTestFixture.Channel);
 
     public TelemetryTest(GrpcTestFixture<Startup> grpcTestFixture,
         PostgresDatabaseFixture dbFixture,
         RabbitMqFixture rabbitMqFixture,
-        RedisFixture redisFixture
-        )
+        RedisFixture redisFixture,
+        OpenTelemetryFixture openTelemetryFixture,
+        ElectricityServiceFixture electricityServiceFixture
+    )
     {
-
         _grpcTestFixture = grpcTestFixture;
-        _wireMockServer = WireMockServer.Start();
-        _wireMockServer.Given(Request.Create().UsingAnyMethod())
-            .RespondWith(Response.Create().WithStatusCode(200));
+        _openTelemetryFixture = openTelemetryFixture;
+        _electricityServiceFixture = electricityServiceFixture;
 
         grpcTestFixture.ConfigureHostConfiguration(new Dictionary<string, string?>()
         {
-            {"Otlp:Enabled", "false"},
-            {"RegistryName", "Test"},
-            {"Verifiers:project_origin.electricity.v1", "https://localhost:5001"},
-            {"ImmutableLog:type", "log"},
-            {"BlockFinalizer:Interval", "00:00:05"},
-            {"Persistance:type", "postgresql"},
-            {"Persistance:postgresql:ConnectionString", dbFixture.HostConnectionString},
-            {"Cache:Type", "redis"},
-            {"Cache:Redis:ConnectionString", redisFixture.HostConnectionString},
-            {"RabbitMq:Hostname", rabbitMqFixture.Hostname},
-            {"RabbitMq:AmqpPort", rabbitMqFixture.AmqpPort.ToString()},
-            {"RabbitMq:HttpApiPort", rabbitMqFixture.HttpApiPort.ToString()},
-            {"RabbitMq:Username", RabbitMqFixture.Username},
-            {"RabbitMq:Password", RabbitMqFixture.Password},
-            {"TransactionProcessor:PodName", "Registry_0"},
-            //{"TransactionProcessor:ServerNumber", "0"},
-            {"TransactionProcessor:Servers", "1"},
-            {"TransactionProcessor:Threads", "5"},
-            {"TransactionProcessor:Weight", "10"},
+            { "Otlp:Enabled", "true" },
+            { "Otlp:Endpoint", openTelemetryFixture.OtelUrl},
+            { "RegistryName", "Test" },
+            { "Verifiers:project_origin.electricity.v1", _electricityServiceFixture.Url },
+            { "ImmutableLog:type", "log" },
+            { "BlockFinalizer:Interval", "00:00:05" },
+            { "Persistance:type", "postgresql" },
+            { "Persistance:postgresql:ConnectionString", dbFixture.HostConnectionString },
+            { "Cache:Type", "redis" },
+            { "Cache:Redis:ConnectionString", redisFixture.HostConnectionString },
+            { "RabbitMq:Hostname", rabbitMqFixture.Hostname },
+            { "RabbitMq:AmqpPort", rabbitMqFixture.AmqpPort.ToString() },
+            { "RabbitMq:HttpApiPort", rabbitMqFixture.HttpApiPort.ToString() },
+            { "RabbitMq:Username", RabbitMqFixture.Username },
+            { "RabbitMq:Password", RabbitMqFixture.Password },
+            { "TransactionProcessor:PodName", "Registry_0" },
+            { "TransactionProcessor:Servers", "1" },
+            { "TransactionProcessor:Threads", "5" },
+            { "TransactionProcessor:Weight", "10" },
         });
-        grpcTestFixture.testServicesConfigure += services =>
-        {
-            services.AddOpenTelemetry()
-                .ConfigureResource(resource => resource
-                    .AddService(serviceName: "Wallet.Test"))
-                .WithMetrics(metrics => metrics
-                    .AddOtlpExporter(o => o.Endpoint = new Uri(_wireMockServer.Urls[0])))
-                .WithTracing(provider =>
-                    provider
-                        .AddOtlpExporter(o =>
-                        {
-                            o.Endpoint = new Uri(_wireMockServer.Urls[0]);
-                            o.Protocol = OtlpExportProtocol.HttpProtobuf;
-                            o.BatchExportProcessorOptions = new BatchExportProcessorOptions<Activity>()
-                            {
-                                MaxQueueSize = 2,
-                                ScheduledDelayMilliseconds = 1000,
-                                MaxExportBatchSize = 1
-                            };
-                            o.HttpClientFactory = () =>
-                            {
-                                HttpClient client = new HttpClient();
-                                client.DefaultRequestHeaders.Add("X-TestHeader", "value");
-                                return client;
-                            };
-                        }));
-        };
     }
+
     [Fact]
     public async Task TelemetryData_ShouldBeSentToMockCollector()
     {
+        var owner = Algorithms.Secp256k1.GenerateNewPrivateKey();
 
+        var commitmentInfo = new SecretCommitmentInfo(250);
+        var certId = Guid.NewGuid();
+
+        IssuedEvent @event = Helper.CreateIssuedEvent("Test", _electricityServiceFixture.IssuerArea, owner.PublicKey, commitmentInfo, certId);
+
+        var transaction = Helper.SignTransaction(@event.CertificateId, @event, _electricityServiceFixture.IssuerKey);
+
+        await Client.SendTransactions(transaction);
+
+        await Task.Delay(10000);
+        var telemetryData = await _openTelemetryFixture.GetContainerLog();
+        telemetryData.Should().Contain("Trace ID       : ");
     }
 
     public void Dispose()
