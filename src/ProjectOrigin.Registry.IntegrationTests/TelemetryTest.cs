@@ -90,6 +90,7 @@ public class TelemetryTest :
 
     public void Dispose()
     {
+        GC.SuppressFinalize(this);
         _grpcTestFixture.Dispose();
     }
 }
