@@ -2,7 +2,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ProjectOrigin.VerifiableEventStore\ProjectOrigin.VerifiableEventStore.csproj" />
     <PackageReference Include="protobuf-net" Version="3.2.30" />
-    <PackageReference Include="Grpc.AspNetCore" Version="2.60.0" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.61.0" />
     <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.7.0" />
     <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.6.0-rc.1" />
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.7.0" />
