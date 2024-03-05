@@ -5,9 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using OpenTelemetry.Metrics;
-
 using OpenTelemetry.Trace;
-
 using ProjectOrigin.Registry.Server.Extensions;
 using ProjectOrigin.Registry.Server.Grpc;
 using ProjectOrigin.Registry.Server.Interfaces;
