@@ -2,9 +2,16 @@
     "labels": [
         "chore"
     ],
+    "platformAutomerge": true,
     "packageRules": [
         {
+            "description": "Automerge non-major updates",
+            "matchUpdateTypes": ["minor", "patch"],
+            "automerge": true
+        },
+        {
             "groupName": "nuget",
+            "automerge": true,
             "description": "Dotnet nuget packages",
             "matchDatasources": [
                 "nuget"
@@ -15,6 +22,7 @@
         },
         {
             "groupName": "Dockerfile updates",
+            "automerge": true,
             "matchFileNames": [
                 "**/Dockerfile"
             ]
