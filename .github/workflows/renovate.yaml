@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - renovate-config/**
+  merge_group:
 
 jobs:
   renovate:
