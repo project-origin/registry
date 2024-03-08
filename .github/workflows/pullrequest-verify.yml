@@ -27,6 +27,11 @@ jobs:
       - name: Verify formatting
         run: make lint
 
+      - name: Verify no changes
+        run: |
+          git diff --exit-code
+          git diff --cached --exit-code
+
   verify-chart:
     name: Verify chart
     runs-on: ubuntu-22.04
