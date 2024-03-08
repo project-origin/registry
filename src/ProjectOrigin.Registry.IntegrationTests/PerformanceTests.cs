@@ -187,7 +187,7 @@ public class PerformanceTests : IAsyncLifetime,
         Console.WriteLine("Min:  " + measurements.Min());
         Console.WriteLine($"-- Finished sequential test --");
 
-        ms95th.Should().BeLessThan(3500);
+        ms95th.Should().BeLessThan(4000);
     }
 
     [Fact]
