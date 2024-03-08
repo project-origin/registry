@@ -35,7 +35,7 @@
                 ".csproj$"
             ],
             "matchStrings": [
-                "<SourceUrl>https:\/\/raw.githubusercontent.com\/(?<depName>.+)\/v(?<currentValue>[^\/]+).+<\/SourceUrl>"
+                "<SourceUrl>https:\/\/raw.githubusercontent.com\/(?<depName>.+)\/(?<currentValue>v[^\/]+).+<\/SourceUrl>"
             ],
             "datasourceTemplate": "github-releases"
         }
