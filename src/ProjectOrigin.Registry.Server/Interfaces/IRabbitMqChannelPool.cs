@@ -1,8 +1,8 @@
-using System;
+using System.Threading.Tasks;
 
 namespace ProjectOrigin.Registry.Server.Interfaces;
 
-public interface IRabbitMqChannelPool : IDisposable
+public interface IRabbitMqChannelPool
 {
-    IRabbitMqChannel GetChannel();
+    Task<IRabbitMqChannel> GetChannelAsync();
 }
