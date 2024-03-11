@@ -28,7 +28,7 @@
     <Protobuf Include="..\Protos\common.proto" GrpcServices="None" />
     <Protobuf Include="..\Protos\registry.proto" GrpcServices="Client" />
     <Protobuf Include="../Protos/electricity.proto" Link="Protos\electricity.proto" GrpcServices="None">
-      <SourceUrl>https://raw.githubusercontent.com/project-origin/verifier_electricity/v0.5.0/src/Protos/electricity.proto</SourceUrl>
+      <SourceUrl>https://raw.githubusercontent.com/project-origin/verifier_electricity/v1.1.0/src/Protos/electricity.proto</SourceUrl>
     </Protobuf>
   </ItemGroup>
 
