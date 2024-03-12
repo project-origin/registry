@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: po-concordium-node
-          image: concordium/{{ required  "A concordium.network must be specificed ( testnet | mainnet )" .Values.concordium.network }}-node:5.2.4-0
+          image: concordium/{{ required  "A concordium.network must be specificed ( testnet | mainnet )" .Values.concordium.network }}-node:6.3.0-0
           command: ["/concordium-node"]
           ports:
             - containerPort: 10000
