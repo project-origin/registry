@@ -191,11 +191,10 @@ public abstract class AbstractTransactionRepositoryTests<T> where T : ITransacti
         block1!.TransactionHashes.Should().HaveCount(1);
 
         // When
-        async Task act() => await Repository.CreateNextBlock();
+        var sameblock = await Repository.CreateNextBlock();
 
         // Then
-        var ex = await Assert.ThrowsAnyAsync<InvalidOperationException>(act);
-        ex.Message.Should().BeEquivalentTo("Previous block has not been published");
+        sameblock.Should().BeEquivalentTo(block1);
     }
 
     [Theory]
