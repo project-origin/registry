@@ -42,10 +42,15 @@ public class ConcordiumIntegrationTests
             CreatedAt = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(DateTime.UtcNow)
         };
 
+        Console.WriteLine("STARTING AWAIT");
         var blockPublication = await _publisher.PublishBlock(header);
 
         blockPublication.Concordium.TransactionHash.Length.Should().BeGreaterThan(0);
         blockPublication.Concordium.BlockHash.Length.Should().BeGreaterThan(0);
+
+        Console.WriteLine(blockPublication.Concordium.TransactionHash);
+        Console.WriteLine(blockPublication.Concordium.BlockHash);
+        Console.WriteLine("AWAIT DONE");
     }
 
     private static string GetRequiredEnvironmentVariable(string name)
