@@ -48,8 +48,8 @@ public class ConcordiumIntegrationTests
         blockPublication.Concordium.TransactionHash.Length.Should().BeGreaterThan(0);
         blockPublication.Concordium.BlockHash.Length.Should().BeGreaterThan(0);
 
-        Console.WriteLine(blockPublication.Concordium.TransactionHash);
-        Console.WriteLine(blockPublication.Concordium.BlockHash);
+        Console.WriteLine(Convert.ToBase64String(blockPublication.Concordium.TransactionHash.ToByteArray()));
+        Console.WriteLine(Convert.ToBase64String(blockPublication.Concordium.BlockHash.ToByteArray()));
         Console.WriteLine("AWAIT DONE");
     }
 
