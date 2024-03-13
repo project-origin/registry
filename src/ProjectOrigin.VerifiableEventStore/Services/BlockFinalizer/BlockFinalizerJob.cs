@@ -36,8 +36,7 @@ public sealed class BlockFinalizerJob : IBlockFinalizer
 
     public async Task Execute(CancellationToken stoppingToken)
     {
-        Stopwatch sw = new();
-        sw.Start();
+        var sw = Stopwatch.StartNew();
 
         var newBlock = await _transactionRepository.CreateNextBlock();
         if (newBlock is null)
