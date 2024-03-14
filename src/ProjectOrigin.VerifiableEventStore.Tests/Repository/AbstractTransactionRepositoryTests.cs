@@ -186,16 +186,24 @@ public abstract class AbstractTransactionRepositoryTests<T> where T : ITransacti
     {
         // Given
         await Repository.Store(CreateFakeStreamTransaction(Guid.NewGuid(), 0));
+        await Repository.Store(CreateFakeStreamTransaction(Guid.NewGuid(), 0));
+        await Repository.Store(CreateFakeStreamTransaction(Guid.NewGuid(), 0));
         var block1 = await Repository.CreateNextBlock();
         block1.Should().NotBeNull();
-        block1!.TransactionHashes.Should().HaveCount(1);
+        block1!.TransactionHashes.Should().HaveCount(3);
+
+        // add more transactions, and verify they are not included in the reissued block
+        await Repository.Store(CreateFakeStreamTransaction(Guid.NewGuid(), 0));
+        await Repository.Store(CreateFakeStreamTransaction(Guid.NewGuid(), 0));
+        await Repository.Store(CreateFakeStreamTransaction(Guid.NewGuid(), 0));
 
         // When
-        async Task act() => await Repository.CreateNextBlock();
+        var sameblock = await Repository.CreateNextBlock();
 
         // Then
-        var ex = await Assert.ThrowsAnyAsync<InvalidOperationException>(act);
-        ex.Message.Should().BeEquivalentTo("Previous block has not been published");
+        sameblock.Should().NotBeNull();
+        sameblock!.TransactionHashes.Should().HaveCount(3);
+        sameblock.Should().BeEquivalentTo(block1);
     }
 
     [Theory]

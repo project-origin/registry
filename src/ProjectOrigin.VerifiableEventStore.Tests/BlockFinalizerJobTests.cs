@@ -88,24 +88,4 @@ public class BlockFinalizerJobTests
         _repository.VerifyNoOtherCalls();
         _statusService.VerifyNoOtherCalls();
     }
-
-    [Fact]
-    public async Task NotPublishedException()
-    {
-        // Given
-        var exception = new InvalidOperationException("Previous block has not been published");
-        _repository.Setup(obj => obj.CreateNextBlock()).ThrowsAsync(exception);
-
-        // When
-
-        async Task act() => await _job.Execute(CancellationToken.None);
-        var thrownException = await Assert.ThrowsAsync<InvalidOperationException>(act);
-
-        // Then
-        _repository.Verify(obj => obj.CreateNextBlock(), Times.Exactly(1));
-        thrownException.Message.Should().Be(exception.Message);
-        _blockPublisher.VerifyNoOtherCalls();
-        _repository.VerifyNoOtherCalls();
-        _statusService.VerifyNoOtherCalls();
-    }
 }

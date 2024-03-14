@@ -140,7 +140,20 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
                 "SELECT * FROM blocks ORDER BY to_transaction DESC LIMIT 1");
 
             if (previousBlock is not null && previousBlock.Publication is null)
-                throw new InvalidOperationException("Previous block has not been published");
+            {
+                var blockHeader2 = new Registry.V1.BlockHeader
+                {
+                    PreviousHeaderHash = ByteString.CopyFrom(previousBlock.PreviousHeaderHash),
+                    PreviousPublicationHash = ByteString.CopyFrom(previousBlock.PreviousPublicationHash),
+                    MerkleRootHash = ByteString.CopyFrom(previousBlock.MerkleRootHash),
+                    CreatedAt = Timestamp.FromDateTimeOffset(previousBlock.CreatedAt)
+                };
+                var transactions2 = (await connection.QueryAsync<StreamTransaction>(
+                    "SELECT transaction_hash, stream_id, stream_index, payload FROM transactions WHERE @fromTransaction <= id AND id <= @toTransaction ORDER BY ID ASC",
+                    new { previousBlock.FromTransaction, previousBlock.ToTransaction })).ToList();
+
+                return new(blockHeader2, transactions2.Select(x => x.TransactionHash).ToList());
+            }
 
             var fromTransaction = (previousBlock?.ToTransaction ?? 0) + 1;
             var maxTransactionId = await connection.QuerySingleOrDefaultAsync<long?>("SELECT MAX(id) FROM transactions");
@@ -157,13 +170,14 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
             var merkleRootHash = transactions.CalculateMerkleRoot(x => x.Payload);
             var previousHeaderHash = previousBlock?.BlockHash ?? new byte[32];
             var previousPublicationHash = previousBlock is not null ? SHA256.HashData(previousBlock!.Publication!) : new byte[32];
+            var now = DateTimeOffset.UtcNow.TruncateMicroSeconds();
 
             var blockHeader = new Registry.V1.BlockHeader
             {
                 PreviousHeaderHash = ByteString.CopyFrom(previousHeaderHash),
                 PreviousPublicationHash = ByteString.CopyFrom(previousPublicationHash),
                 MerkleRootHash = ByteString.CopyFrom(merkleRootHash),
-                CreatedAt = Timestamp.FromDateTimeOffset(DateTimeOffset.UtcNow)
+                CreatedAt = Timestamp.FromDateTimeOffset(now)
             };
 
             await connection.ExecuteAsync(
@@ -174,7 +188,7 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
                     PreviousHeaderHash = previousHeaderHash,
                     PreviousPublicationHash = previousPublicationHash,
                     MerkleRootHash = merkleRootHash,
-                    CreatedAt = DateTimeOffset.UtcNow,
+                    CreatedAt = now,
                     FromTransaction = fromTransaction,
                     ToTransaction = toTransaction,
                     Publication = null,

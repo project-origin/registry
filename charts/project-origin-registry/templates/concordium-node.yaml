@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: po-concordium-node
-          image: concordium/{{ required  "A concordium.network must be specificed ( testnet | mainnet )" .Values.concordium.network }}-node:5.2.4-0
+          image: concordium/{{ required  "A concordium.network must be specificed ( testnet | mainnet )" .Values.concordium.network }}-node:6.3.0-0
           command: ["/concordium-node"]
           ports:
             - containerPort: 10000
@@ -96,7 +96,7 @@ spec:
 
       {{- if .Values.concordium.collector.enabled }}
         - name: po-concordium-node-collector
-          image: concordium/{{ .Values.concordium.network }}-node:5.2.4-0
+          image: concordium/{{ .Values.concordium.network }}-node:6.3.0-0
           command: ["/node-collector"]
           env:
             # Settings that should be customized by the user.
@@ -114,7 +114,7 @@ spec:
             # the `testnet-node`. If the name of the node service is changed from
             # `testnet-node` then the name here must also be changed.
             - name: CONCORDIUM_NODE_COLLECTOR_GRPC_HOST
-              value: http://localhost:10000
+              value: http://localhost:20000
       {{- end }}
 
   {{- if .Values.concordium.persistence.enabled }}

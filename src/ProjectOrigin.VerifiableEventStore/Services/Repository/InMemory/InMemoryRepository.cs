@@ -23,9 +23,11 @@ public class InMemoryRepository : ITransactionRepository
         lock (_lockObject)
         {
             var previousBlock = _blocks.OrderByDescending(x => x.ToTransaction).FirstOrDefault();
-
             if (previousBlock is not null && previousBlock.Publication is null)
-                throw new InvalidOperationException("Previous block has not been published");
+            {
+                var blockTransactions = _events.Skip(previousBlock.FromTransaction).Take(previousBlock.ToTransaction - previousBlock.FromTransaction + 1).ToList();
+                return Task.FromResult<NewBlock?>(new(previousBlock.Header, blockTransactions.Select(x => x.TransactionHash).ToList()));
+            }
 
             var fromTransaction = (previousBlock?.ToTransaction ?? -1) + 1; //-1 since we are 0 indexed
             if (_events.Count <= fromTransaction)
