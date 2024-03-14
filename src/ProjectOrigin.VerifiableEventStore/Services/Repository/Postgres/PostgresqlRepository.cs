@@ -170,15 +170,14 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
             var merkleRootHash = transactions.CalculateMerkleRoot(x => x.Payload);
             var previousHeaderHash = previousBlock?.BlockHash ?? new byte[32];
             var previousPublicationHash = previousBlock is not null ? SHA256.HashData(previousBlock!.Publication!) : new byte[32];
-            var now = DateTimeOffset.UtcNow;
-            var nowWithoutMicroseconds = new DateTimeOffset(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second, now.Millisecond, now.Offset);
+            var now = DateTimeOffset.UtcNow.TruncateMicroSeconds();
 
             var blockHeader = new Registry.V1.BlockHeader
             {
                 PreviousHeaderHash = ByteString.CopyFrom(previousHeaderHash),
                 PreviousPublicationHash = ByteString.CopyFrom(previousPublicationHash),
                 MerkleRootHash = ByteString.CopyFrom(merkleRootHash),
-                CreatedAt = Timestamp.FromDateTimeOffset(nowWithoutMicroseconds)
+                CreatedAt = Timestamp.FromDateTimeOffset(now)
             };
 
             await connection.ExecuteAsync(
@@ -189,7 +188,7 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
                     PreviousHeaderHash = previousHeaderHash,
                     PreviousPublicationHash = previousPublicationHash,
                     MerkleRootHash = merkleRootHash,
-                    CreatedAt = nowWithoutMicroseconds,
+                    CreatedAt = now,
                     FromTransaction = fromTransaction,
                     ToTransaction = toTransaction,
                     Publication = null,
