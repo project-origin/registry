@@ -107,8 +107,8 @@ public class Startup
         services.AddHostedService<QueueCleanupService>();
 
         // Only one server should run the block finalizer
-        var serverNumber = _configuration.GetSection("TransactionProcessor").GetValue<int>("ServerNumber");
-        if (serverNumber == 0)
+        var processorOptions = _configuration.GetRequiredSection("TransactionProcessor").GetValid<TransactionProcessorOptions>();
+        if (processorOptions.ServerNumber == 0)
         {
             services.AddHostedService<BlockFinalizerBackgroundService>();
             services.AddTransient<IBlockFinalizer, BlockFinalizerJob>();
