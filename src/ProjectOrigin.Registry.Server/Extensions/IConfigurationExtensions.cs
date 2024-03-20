@@ -14,7 +14,7 @@ namespace ProjectOrigin.Registry.Server.Extensions;
 
 public static class IConfigurationExtensions
 {
-    public static T GetValid<T>(this IConfiguration configuration) where T : IValidatableObject
+    public static T GetValid<T>(this IConfiguration configuration)
     {
         try
         {
