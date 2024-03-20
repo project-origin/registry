@@ -77,3 +77,12 @@ jobs:
         with:
           push: never
           runCmd: make test
+
+  verify-renovate-config:
+    name: Verify Renovate config
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify Renovate config
+        run: npx --yes --package renovate -- renovate-config-validator --strict
