@@ -1,0 +1,56 @@
+name: Verifies PR are ready for merge
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  verify-devcontainer:
+    uses: project-origin/.github/.github/workflows/reusable-verify-devcontainer.yaml@main
+
+  verify-code:
+    uses: project-origin/.github/.github/workflows/reusable-verify-code.yaml@main
+
+  verify-renovate-config:
+    uses: project-origin/.github/.github/workflows/reusable-verify-renovate.yaml@main
+
+  verify-chart:
+    uses: project-origin/.github/.github/workflows/reusable-verify-chart.yaml@main
+
+  verify-container-build:
+    uses: project-origin/.github/.github/workflows/reusable-build-push-container-ghcr.yaml@main
+    with:
+      imagename: ghcr.io/project-origin/registry-server
+      version: test
+      context: ./src
+      dockerfile: ./src/ProjectOrigin.Registry.Server/Dockerfile
+      push: false
+
+  verify-concordium:
+    name: Verify Concordium integration
+    runs-on: [self-hosted, concordium-testnet]
+    environment: testnet
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET Core SDK from global.json
+        uses: actions/setup-dotnet@v4
+
+      - name: Run integration tests
+        env:
+          AccountAddress: ${{ secrets.AccountAddress }}
+          AccountKey: ${{ secrets.AccountKey }}
+        run: make concordium-tests
+
+  verify-performance:
+    name: Verify performance
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET Core SDK from global.json
+        uses: actions/setup-dotnet@v4
+
+      - name: Verify performance
+        run: make verify-performance
