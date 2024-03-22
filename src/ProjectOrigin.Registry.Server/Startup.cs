@@ -5,10 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using OpenTelemetry.Metrics;
-<<<<<<< Updated upstream
-=======
 using OpenTelemetry.Resources;
->>>>>>> Stashed changes
 using OpenTelemetry.Trace;
 using ProjectOrigin.Registry.Server.Extensions;
 using ProjectOrigin.Registry.Server.Grpc;
