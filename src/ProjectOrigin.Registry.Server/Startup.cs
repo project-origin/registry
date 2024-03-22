@@ -5,6 +5,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using OpenTelemetry.Metrics;
+<<<<<<< Updated upstream
+=======
+using OpenTelemetry.Resources;
+>>>>>>> Stashed changes
 using OpenTelemetry.Trace;
 using ProjectOrigin.Registry.Server.Extensions;
 using ProjectOrigin.Registry.Server.Grpc;
@@ -34,10 +38,17 @@ public class Startup
             .BindConfiguration(OtlpOptions.Prefix)
             .ValidateDataAnnotations()
             .ValidateOnStart();
+
+        void ConfigureResource(ResourceBuilder r)
+        {
+            r.AddService("ProjectOrigin.Registry.Server",
+                serviceInstanceId: Environment.MachineName);
+        }
         var otlpOptions = _configuration.GetSection(OtlpOptions.Prefix).GetValid<OtlpOptions>();
         if (otlpOptions.Enabled)
         {
             services.AddOpenTelemetry()
+                .ConfigureResource(ConfigureResource)
                 .WithMetrics(provider =>
                     provider
                         .AddMeter(BlockFinalizerJob.Meter.Name)
