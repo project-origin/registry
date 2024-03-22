@@ -36,16 +36,15 @@ public class Startup
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        void ConfigureResource(ResourceBuilder r)
-        {
-            r.AddService("ProjectOrigin.Registry.Server",
-                serviceInstanceId: Environment.MachineName);
-        }
         var otlpOptions = _configuration.GetSection(OtlpOptions.Prefix).GetValid<OtlpOptions>();
         if (otlpOptions.Enabled)
         {
             services.AddOpenTelemetry()
-                .ConfigureResource(ConfigureResource)
+                .ConfigureResource(r =>
+                {
+                    r.AddService("ProjectOrigin.WalletSystem.Server",
+                    serviceInstanceId: Environment.MachineName);
+                })
                 .WithMetrics(provider =>
                     provider
                         .AddMeter(BlockFinalizerJob.Meter.Name)
