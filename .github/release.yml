@@ -15,6 +15,9 @@ changelog:
     - title: Documentation
       labels:
         - documentation
+    - title: Dependency Updates
+      labels:
+        - dependencies
     - title: Other Changes
       labels:
         - "*"
