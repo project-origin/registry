@@ -42,7 +42,7 @@ public class Startup
             services.AddOpenTelemetry()
                 .ConfigureResource(r =>
                 {
-                    r.AddService("ProjectOrigin.WalletSystem.Server",
+                    r.AddService("ProjectOrigin.Registry.Server",
                     serviceInstanceId: Environment.MachineName);
                 })
                 .WithMetrics(provider =>
