@@ -8,7 +8,7 @@ jobs:
   define-version:
     uses: project-origin/.github/.github/workflows/reusable-tag-version.yaml@main
 
-  publish-registry-server-container:
+  publish-container:
     needs:
       - define-version
     uses: project-origin/.github/.github/workflows/reusable-build-push-container-ghcr.yaml@main
@@ -22,6 +22,7 @@ jobs:
   publish-chart:
     needs:
       - define-version
+      - publish-container
     uses: project-origin/.github/.github/workflows/reusable-publish-chart.yaml@main
     with:
       version: ${{ needs.define-version.outputs.version }}
