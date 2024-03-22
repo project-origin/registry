@@ -54,7 +54,7 @@ test: build
 
 ## Tests run with the sonarcloud analyser
 sonarcloud-test:
-	dotnet test --no-build $(src_path)
+	dotnet test $(src_path) --no-build --filter 'FullyQualifiedName!~ConcordiumIntegrationTests&FullyQualifiedName!~PerformanceTests&FullyQualifiedName!~ChartTests'
 
 ## Run all Unit-tests
 unit-test: build
