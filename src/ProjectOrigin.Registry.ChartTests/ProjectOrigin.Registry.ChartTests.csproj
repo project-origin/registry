@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.26.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.26.1" />
     <PackageReference Include="Grpc.Tools" Version="2.62.0" />
     <Protobuf Include="..\Protos\common.proto" GrpcServices="None" />
     <Protobuf Include="..\Protos\registry.proto" GrpcServices="Client" />
