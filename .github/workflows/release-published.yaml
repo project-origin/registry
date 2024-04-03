@@ -23,8 +23,10 @@ jobs:
     needs:
       - define-version
       - publish-container
-    uses: project-origin/.github/.github/workflows/reusable-publish-chart.yaml@35a40cccfbada6bdd49ca01a6e825779b95b46d5
+    uses: project-origin/.github/.github/workflows/reusable-publish-chart.yaml@967dd31727158b2301bbaf6e41f5aac3f9d7521c
     with:
       version: ${{ needs.define-version.outputs.version }}
       chart_folder: charts/project-origin-registry
       helm_registry_repository: project-origin/helm-registry
+    secrets:
+      helm_registry_token: ${{ secrets.HELM_REGISTRY_TOKEN }}
