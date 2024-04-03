@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
-    <PackageReference Include="ProjectOrigin.PedersenCommitment" Version="1.0.3" />
+    <PackageReference Include="ProjectOrigin.PedersenCommitment" Version="1.1.1" />
     <PackageReference Include="ProjectOrigin.HierarchicalDeterministicKeys" Version="0.4.0" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.62.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.5.0" />
