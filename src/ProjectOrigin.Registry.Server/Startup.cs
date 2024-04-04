@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using ProjectOrigin.Registry.Server.Extensions;
 using ProjectOrigin.Registry.Server.Grpc;
@@ -34,10 +35,16 @@ public class Startup
             .BindConfiguration(OtlpOptions.Prefix)
             .ValidateDataAnnotations()
             .ValidateOnStart();
+
         var otlpOptions = _configuration.GetSection(OtlpOptions.Prefix).GetValid<OtlpOptions>();
         if (otlpOptions.Enabled)
         {
             services.AddOpenTelemetry()
+                .ConfigureResource(r =>
+                {
+                    r.AddService("ProjectOrigin.Registry.Server",
+                    serviceInstanceId: Environment.MachineName);
+                })
                 .WithMetrics(provider =>
                     provider
                         .AddMeter(BlockFinalizerJob.Meter.Name)
@@ -107,8 +114,8 @@ public class Startup
         services.AddHostedService<QueueCleanupService>();
 
         // Only one server should run the block finalizer
-        var serverNumber = _configuration.GetSection("TransactionProcessor").GetValue<int>("ServerNumber");
-        if (serverNumber == 0)
+        var processorOptions = _configuration.GetRequiredSection("TransactionProcessor").GetValid<TransactionProcessorOptions>();
+        if (processorOptions.ServerNumber == 0)
         {
             services.AddHostedService<BlockFinalizerBackgroundService>();
             services.AddTransient<IBlockFinalizer, BlockFinalizerJob>();

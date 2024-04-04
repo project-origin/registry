@@ -24,9 +24,9 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
-    <PackageReference Include="Testcontainers" Version="3.7.0" />
-    <PackageReference Include="ProjectOrigin.PedersenCommitment" Version="1.0.3" />
-    <PackageReference Include="ProjectOrigin.HierarchicalDeterministicKeys" Version="0.4.0" />
+    <PackageReference Include="Testcontainers" Version="3.8.0" />
+    <PackageReference Include="ProjectOrigin.PedersenCommitment" Version="1.1.1" />
+    <PackageReference Include="ProjectOrigin.HierarchicalDeterministicKeys" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.26.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.26.1" />
     <PackageReference Include="Grpc.Tools" Version="2.62.0" />
     <Protobuf Include="../Protos/electricity.proto" Link="Protos\electricity.proto" GrpcServices="None">
       <SourceUrl>https://raw.githubusercontent.com/project-origin/verifier_electricity/v1.1.0/src/Protos/electricity.proto</SourceUrl>

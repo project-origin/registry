@@ -1,40 +1,8 @@
 {
-    "labels": [
-        "chore"
-    ],
-    "platformAutomerge": true,
-    "packageRules": [
-        {
-            "description": "Automerge non-major updates",
-            "matchUpdateTypes": [
-                "minor",
-                "patch"
-            ],
-            "automerge": true
-        },
-        {
-            "groupName": "nuget",
-            "automerge": true,
-            "description": "Dotnet nuget packages",
-            "matchDatasources": [
-                "nuget"
-            ],
-            "matchPackagePatterns": [
-                ".*"
-            ]
-        },
-        {
-            "groupName": "Dockerfile updates",
-            "automerge": true,
-            "matchFileNames": [
-                "**/Dockerfile"
-            ]
-        }
-    ],
+    "extends": ["github>project-origin/.github:renovate-defaults.json"],
     "customManagers": [
         {
             "customType": "regex",
-            "depNameTemplate": "concordium/testnet-node",
             "fileMatch": [
                 ".csproj$"
             ],
@@ -51,6 +19,7 @@
             "matchStrings": [
                 "concordium\\.network }}-node:(?<currentValue>\\d+\\.\\d+\\.\\d+-\\d+)"
             ],
+            "depNameTemplate": "concordium/mainnet-node",
             "datasourceTemplate": "docker"
         }
     ]
