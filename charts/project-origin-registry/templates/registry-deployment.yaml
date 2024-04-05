@@ -9,6 +9,7 @@ metadata:
   labels:
     app: registry-{{ .Release.Name }}
 spec:
+  serviceName: registry-{{ .Release.Name }}
   replicas: {{ .Values.transactionProcessor.replicas }}
   selector:
     matchLabels:
