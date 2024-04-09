@@ -5,10 +5,11 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: registry-{{ .Release.Name }}-processor
+  name: registry-{{ .Release.Name }}-processors
   labels:
     app: registry-{{ .Release.Name }}
 spec:
+  serviceName: registry-{{ .Release.Name }}
   replicas: {{ .Values.transactionProcessor.replicas }}
   selector:
     matchLabels:
