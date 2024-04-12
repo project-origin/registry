@@ -3,7 +3,7 @@
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="ConcordiumNetSdk" Version="4.4.0" />
-    <PackageReference Include="Dapper" Version="2.1.35" />
+    <PackageReference Include="Dapper" Version="2.1.42" />
     <PackageReference Include="dbup-postgresql" Version="5.0.40" />
     <PackageReference Include="NSec.Cryptography" Version="22.4.0" />
     <PackageReference Include="Npgsql" Version="8.0.2" />
