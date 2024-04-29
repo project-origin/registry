@@ -2,7 +2,7 @@
 
 Below is the C4 class-diagram for the block finalizer.
 
-![C4 context diagram of the verifiable event store](./block_finalizer.drawio.svg)
+![C4 context diagram of the verifiable event store](../diagrams/block_finalizer.drawio.svg)
 
 The finalizer is a BackgroundProcess that is requesting the repostory to create the next block.
 

@@ -56,7 +56,7 @@ A registry uses a `verifier` to verify transactions for a given stream based on 
 
 ## Energy Track and Trace
 
-In [Energy Track and Trace](https://energytrackandtrace.com/), the `federated stream id` is the id of the Granular Certificate (GC),
+In [Energy Track and Trace](https://energytrackandtrace.azurewebsites.net), the `federated stream id` is the id of the Granular Certificate (GC),
 and the `verifier` is the [electricity verifier](https://github.com/project-origin/verifier_electricity).
 
 ## Sketch
