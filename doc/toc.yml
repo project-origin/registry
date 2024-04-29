@@ -6,11 +6,9 @@
   - name: Registry Service
     href: registry_service.md
     items:
-    - name: Block finalizer
-      href: ./class_diagrams/block_finalizer.md
+    - name: Components
+      items:
+      - name: Block finalizer
+        href: components/block_finalizer.md
   - name: Consistent hash ring
-    href: consistent_hash_ring.md
-- name: Quickstart
-  href: quickstart.md
-- name: Contributing
-  href: contribute
+    href: consistent-hash-ring.md

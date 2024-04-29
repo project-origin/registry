@@ -1,19 +1,21 @@
-# Overview
+# OriginRegistry
 
-This file contains a overview of the registry.
+OpenSource project to create a registry to store and verify transactions for Granular Certificate schemes.
+
+The name `OriginRegistry` references `Origin` which links the the projects name (Project-Origin),
+and `Registry` as in a place to store and verify transactions.
 
 ## Glossary
 
-- **Transactions**: are request to change data on the registry. A transaction is signed by a valid key.
-- **Stream**: are sequences of transactions for a specific  are state changes that has happened and are persisted when they have been included in a merkle tree.
-- **Event store**: a datastore that stores all the events for the registry.
+- **[Transactions](../concept/registry/transactions.md#transactions)**: are request to change data on the registry. A transaction is signed by a valid key.
+- **[Streams](../concept/registry/transactions.md#streams)**: are a sequences of transactions, this collection makes up the current state of an [GC](../concept/granular-certificates/readme.md).
 
 ## Overview
 
 Below is a [system context diagram](https://c4model.com/#SystemContextDiagram)
 showing the landscape of systems the registry interacts with.
 
-![C4 system diagram](system_diagram.drawio.svg)
+![C4 system diagram](./diagrams/system_diagram.drawio.svg)
 
 
 ### What is the registry?
@@ -32,19 +34,19 @@ at the time of issuance with the help of the [Federated Certificate ID](../conce
 
 [^ib]: The issuing body is the entity that has the legal right to issue GCs within a given area.
 
-The life-cycle of a single GC always stays within the same registry as to ensure atomic operations on the GC
+The life-cycle of a single GC `always` stays within the same registry as to ensure atomic operations on the GC
 and reduce the need for distributed transactions.
 
 In practice this makes each registry the authority of what is the truth for the current state of a GCs held within it.
 
 Some transactions like [claim](../concept/granular-certificates/transactions/claim.md)
-does span multiple registries, but are performed as a distributed transaction using a saga pattern.
+does span multiple registries, but are performed as a "distributed transaction" using a orchestration based saga.
 
 
 ### The registry is neither strongly typed nor context-aware
 
-The registry is not context-aware, which means that it does not know anything about the data it stores.
-It is up to the user of the registry to interpret the data. The registry only hashes the data.
+The registry is not context-aware, which means that it does not know anything about the data it store or verifies.
+It is up to the users of the registry to interpret the data. The registry only verifies the data using a `Verifier` and adds it to the stream.
 The registry does not know what the data means, or how it should be interpreted, all it does is to verify provide proofs of the data.
 
 The reason why the registry is not strongly typed or context aware is that it allows for greater flexibility and applicability across different use cases and industries.
@@ -56,4 +58,3 @@ By not being strongly typed or context aware, the registry can be used in a mult
 In addition, the registry provides unique proof of ownership for events added to the event store, and can be used to ease audits from third parties without disclosing the data itself. These benefits remain true regardless of the specific context in which the registry is being used.
 
 Overall, while a strongly typed or context-aware registry may be useful in some specific scenarios, the flexibility and versatility of a more generic registry can make it a more practical solution for many organizations.
-

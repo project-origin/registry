@@ -1,56 +1,72 @@
-# Project-Origin
+# OriginRegistry
 
-## Navigation
-- [Documentation](https://project-origin.github.io/registry/)
-- [Code](https://github.com/project-origin/registry/tree/main/src)
-## How to run and test the registry
-The registry is currently available as .devcontainer in the repository. This means that you can run the registry in a docker container with all the dependencies installed.
+OpenSource project to create a registry to store and verify transactions for Granular Certificate schemes.
 
-### Prerequisites
-- [Docker](https://docs.docker.com/get-docker/)
-- [VSCode](https://code.visualstudio.com/download)
+The name `OriginRegistry` references `Origin` which links the the projects name (Project-Origin),
+and `Registry` as in a place to store and verify transactions.
 
-### Steps
-1. Clone the [repository](https://github.com/project-origin/registry/tree/main)
-2. Open the repository in VSCode
-3. Install the [Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension
-4. Open the Command Palette (Ctrl+Shift+P) and select the Remote-Containers: Reopen in Container command.
-5. Check the ports terminal to see which ports are available
+For more information, see the [documentation](https://project-origin.github.io/docs/registry/index.html).
 
-## Why Project-Origin?
+## tl:dr
 
-The GCs purpose is to prove the origin and potential conversions of energy, thus supporting the green transition and power-to-X (PtX).
+The OriginRegistry is a federated system that verifies transactions for a given stream,
+then stores the transaction in the stream in a tamper-evident way using a immutable log.
 
-If one searches for greenwashing, there is no shortages of articles on the internet showing a growing scepticism with [the current system](https://en.energinet.dk/Energy-data/Guarantees-of-origin-el-gas-hydrogen/) for proving the origin of electricity. 
+All streams in the federated system are identified by a `federated stream id`.
 
+Doing it as a federated system ensures a high throughput since consensus is not needed for each transaction.
 
-## What Is Project-Origin?
+Transactions referencing data on other registries are done in a choreography pattern,
+where distributed "transactions" are done in a sequence to ensure that the data is consistent.
+This does add latency to the system, while not compromising the integrity or throughput of the system.
 
-Project-Origin is an Open Source project that is focused on creating verifiable and unique objects for the [Energy Track and Trace](https://energytrackandtrace.com/), Granular Certification Scheme. There are two main features of Project-Origin:
+## Problem
 
-1. Merkle Tree implementation - ensures that the registry is tamper-evident, auditible and that the individual entries are unique and verifiable using proof of inclusion.
-2. Pedersen Commitment implementation - ensures that the sensitive data is not stored in the registry, but only a commitment to the data. This ensures that the data is not leaked, but can be verified by the registry. The commitments are non-retrievable, and can hence never be retrieved by external parties or future systems such as quantum computers.
+The current system for proving the origin of electricity is not granular enough to support the green transition and power-to-X (PtX).
 
-Project-Origin functions as a layer-2 for logs or for external blockchains to leverage the trust from issuing bodies to 3. party service providers and consumers by ensuring that the data is verifiable and unique and not possible to tamper with from registry operators after publication on data-bearing blockchain. The functionality is a pre-requisite for a decentralized energy market, where the actual data is stored on conventional infrastructure, but the merkle-tree hashes that can contain large amounts o transactions in a single hash from the certificate transactions on a registry in a form that is verifiable and unique.
+If one searches for greenwashing, there is no shortages of articles on the internet showing a growing scepticism with [the current system](https://en.energinet.dk/Energy-data/Guarantees-of-origin-el-gas-hydrogen/) for proving the origin of electricity.
 
-In order to facilitate a **[Federated](https://arxiv.org/pdf/1202.4503.pdf) Infrastructure** it is of utmost importance to have trust towards the other parties involved in the infrastructure. Hence the Registry can be audited in real-time and expose a health check of the entries in the Registry to other registries and that audits can be done by independent 3. parties as well without revealing sensitive information. This is especially true for the energy sector, where the infrastructure is highly regulated and the data is sensitive. 
+Going to hourly or 15 minute intervals for the 300 million electricity meters in Europe would result in upwards of 1.2 billion transactions per hour,
+or 11 trillion transactions per year.
 
-## What The Registry does not do?
-The registry is not a PKI or a **Federated Network** infrastructure such as the following:
-- [Hyperledger Firefly](https://www.hyperledger.org/projects/firefly)
-- [Alchemy Supernode](https://www.alchemy.com/supernode)
-- [Confidential Consortium Framework](https://ccf.microsoft.com/)
+Using blockchains for this would be infeasible as no blockchain can handle this amount of transactions.
 
-The registry is not exposing external PKI's to the network but merely acts as a validation mechanism that handles **Granular Certificates** (GCs). Preferably with an external eventstore to store the events that are used in state transitions, otherwise a local SQL database can be used with some modifications so that internal consistency is assured. 
+Companies continuously strive to be more sustainable and to be able to prove that they are sustainable
+in a way that is verifiable and trustworthy.
 
+## Forces
 
-Project-Origin was created because there is a need to provide a trustworthy,
-**publicly verifiable** way to prove the origin of the electricity one uses on
-with a high granularity. 
-The project aims to enable extended use of the implementation, to other energy forms than electricity alone. 
+OriginRegistry is designed to be a federated system to ensure high throughput and autonomy for the participants.
 
-## Need any help? 
-In the registry repository, the Trusted Committer is currently @wisbech. The Trusted Committer provides timely support and mentorship for contributors, and helps contributors to shape their pull request to be ready to be submitted/accepted. If you want to contribute to this repository, the Trusted Committer has the mandate to specify any requirements that the contribution must fulfill on behalf of the partnership, to ensure product quality. 
+OriginRegistry should be able to handle a large amount of transactions, and the transactions should be verifiable and tamper-evident.
 
-## Documentation
-To learn more about the implementation [go to the complete documention.](https://project-origin.github.io/registry/)
+OriginRegistry should not hold any sensitive data but only a way to verify the data.
+
+## Solution
+
+The OriginRegistry is a federated system that verifies transactions for a given stream,
+then stores the transaction in the stream in a tamper-evident way using a immutable log.
+
+The data within a stream is never moved from a registry as to ensure that the data is consistent.
+
+All streams in the federated system are identified by a `federated stream id`.
+This id is unique for each stream and is used to reference the stream in transactions.
+
+A registry uses a `verifier` to verify transactions for a given stream based on its current state.
+
+## Energy Track and Trace
+
+In [Energy Track and Trace](https://energytrackandtrace.azurewebsites.net), the `federated stream id` is the id of the Granular Certificate (GC),
+and the `verifier` is the [electricity verifier](https://github.com/project-origin/verifier_electricity).
+
+## Sketch
+
+Below is a C4 system diagram of an overview of the system landscape OriginRegistry is a part of.
+
+![C4 system diagram of OriginRegistry](./doc/system_diagram.drawio.svg)
+
+## Resulting Context
+
+The OriginRegistry enables high throughput of transactions for a given stream, which are guaranteed to be sequential.
+
+All transactions are verifiable and tamper-evident, and the system continuously writes to a immutable log to ensure no data can be tampered with.
