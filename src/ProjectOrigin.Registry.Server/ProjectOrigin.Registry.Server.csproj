@@ -3,7 +3,7 @@
     <ProjectReference Include="..\ProjectOrigin.VerifiableEventStore\ProjectOrigin.VerifiableEventStore.csproj" />
     <PackageReference Include="OpenTelemetry.Instrumentation.StackExchangeRedis" Version="1.0.0-rc9.14" />
     <PackageReference Include="protobuf-net" Version="3.2.30" />
-    <PackageReference Include="Grpc.AspNetCore" Version="2.62.0" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.63.0" />
     <PackageReference Include="OpenTelemetry" Version="1.8.1" />
     <PackageReference Include="Npgsql.OpenTelemetry" Version="8.0.3" />
     <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.8.1" />
