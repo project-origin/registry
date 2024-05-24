@@ -7,7 +7,7 @@
     <PackageReference Include="dbup-postgresql" Version="5.0.40" />
     <PackageReference Include="NSec.Cryptography" Version="24.4.0" />
     <PackageReference Include="Npgsql" Version="8.0.3" />
-    <PackageReference Include="Google.Protobuf" Version="3.26.1" />
+    <PackageReference Include="Google.Protobuf" Version="3.27.0" />
     <PackageReference Include="Grpc.Tools" Version="2.64.0" />
     <PackageReference Include="StackExchange.Redis" Version="2.7.33" />
   </ItemGroup>
