@@ -35,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.27.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.27.1" />
     <PackageReference Include="Grpc.Tools" Version="2.64.0" />
     <Protobuf Include="../Protos/electricity.proto" Link="Protos\electricity.proto" GrpcServices="None">
       <SourceUrl>https://raw.githubusercontent.com/project-origin/verifier_electricity/v1.1.0/src/Protos/electricity.proto</SourceUrl>
