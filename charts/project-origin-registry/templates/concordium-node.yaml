@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: po-concordium-node
-          image: concordium/{{ required  "A concordium.network must be specificed ( testnet | mainnet )" .Values.concordium.network }}-node:6.3.0-0
+          image: concordium/{{ required  "A concordium.network must be specificed ( testnet | mainnet )" .Values.concordium.network }}-node:6.3.1-0
           command: ["/concordium-node"]
           ports:
             - containerPort: 20000
@@ -96,7 +96,7 @@ spec:
 
       {{- if .Values.concordium.collector.enabled }}
         - name: po-concordium-node-collector
-          image: concordium/{{ .Values.concordium.network }}-node:6.3.0-0
+          image: concordium/{{ .Values.concordium.network }}-node:6.3.1-0
           command: ["/node-collector"]
           env:
             # Settings that should be customized by the user.
