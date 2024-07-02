@@ -1,5 +1,5 @@
 # Base ubuntu image
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 # Github runner version https://github.com/actions/runner/releases
 ARG VERSION="2.303.0"
