@@ -54,35 +54,36 @@ kind load -n helm-test docker-image ghcr.io/project-origin/registry-server:test
 # install cnpg-operator
 helm install cnpg-operator cloudnative-pg --repo https://cloudnative-pg.io/charts --version 0.18.0 --namespace cnpg --create-namespace --wait
 
-# setup cnpg cluster
-cat << EOF > "$cnpg_filename"
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: $registry_a_namespace
----
-apiVersion: rabbitmq.com/v1beta1
-kind: RabbitmqCluster
-metadata:
-  name: ${registry_a_name}-rabbitmq
-  namespace: $registry_a_namespace
----
-apiVersion: postgresql.cnpg.io/v1
-kind: Cluster
-metadata:
-  name: cnpg-registry-db
-  namespace: $registry_a_namespace
-spec:
-  instances: 3
-  storage:
-    size: 10Gi
-  bootstrap:
-    initdb:
-      database: registry-database
-      owner: app
-  monitoring:
-    enablePodMonitor: true
-EOF
+# TODO: Uncomment after merging
+# # setup cnpg cluster
+# cat << EOF > "$cnpg_filename"
+# apiVersion: v1
+# kind: Namespace
+# metadata:
+#   name: $registry_a_namespace
+# ---
+# apiVersion: rabbitmq.com/v1beta1
+# kind: RabbitmqCluster
+# metadata:
+#   name: ${registry_a_name}-rabbitmq
+#   namespace: $registry_a_namespace
+# ---
+# apiVersion: postgresql.cnpg.io/v1
+# kind: Cluster
+# metadata:
+#   name: cnpg-registry-db
+#   namespace: $registry_a_namespace
+# spec:
+#   instances: 3
+#   storage:
+#     size: 10Gi
+#   bootstrap:
+#     initdb:
+#       database: registry-database
+#       owner: app
+#   monitoring:
+#     enablePodMonitor: true
+# EOF
 
 kubectl apply -f "$cnpg_filename"
 
