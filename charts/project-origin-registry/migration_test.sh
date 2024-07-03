@@ -20,6 +20,7 @@ trap 'rm -fr $temp_folder; kind delete cluster -n helm-test  >/dev/null 2>&1' 0
 temp_folder=$(mktemp -d)
 override_values_filename=${temp_folder}/values_override.sh
 kind_filename=${temp_folder}/kind.yaml
+cnpg_filename=${temp_folder}/cnpg.yaml
 example_area=Narnia
 registry_a_name=test-a
 registry_a_port=8080
@@ -52,6 +53,38 @@ kind load -n helm-test docker-image ghcr.io/project-origin/registry-server:test
 
 # install cnpg-operator
 helm install cnpg-operator cloudnative-pg --repo https://cloudnative-pg.io/charts --version 0.18.0 --namespace cnpg --create-namespace --wait
+
+# setup cnpg cluster
+cat << EOF > "$cnpg_filename"
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: $registry_a_namespace
+---
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  name: ${registry_a_name}-rabbitmq
+  namespace: $registry_a_namespace
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: cnpg-registry-db
+  namespace: $registry_a_namespace
+spec:
+  instances: 3
+  storage:
+    size: 10Gi
+  bootstrap:
+    initdb:
+      database: registry-database
+      owner: app
+  monitoring:
+    enablePodMonitor: true
+EOF
+
+kubectl apply -f "$cnpg_filename"
 
 # generate keys
 PrivateKey=$(openssl genpkey -algorithm ED25519)

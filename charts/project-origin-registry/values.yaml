@@ -28,8 +28,12 @@ otlp:
 
 # rabbitmq defines the rabbitmq configuration for rabbitmq, with rabbitmqOperator
 rabbitmq:
-  # operatorEnabled determines if the rabbitmq operator should be used to create the rabbitmq cluster, if true then other fields are ignored.
-  operatorEnabled: true
+  # operator, if enabled then other fields are ignored.
+  operator:
+    # enabled determines if an rabbitmq operator made a cluster available
+    enabled: true
+    # name defines the name of the cluster to connect to
+    name: registry-rabbitmq
   # host defines the host of the rabbitmq server in url format 'localhost'
   host:
   # amqpPort defines the port of the rabbitmq server
@@ -54,26 +58,17 @@ blockFinalizer:
   interval: 00:00:30
 
 persistance:
-  # cloudNativePG determines if the database is created as a cloud native postgresql instance
+
   cloudNativePG:
 
-    # enabled determines if the cloud native postgresql instance is enabled
+    # enabled determines if a cloud native postgresql instance should be used
     enabled: false
 
     # name defines the name of the cloud native postgresql instance
     name: cnpg-registry-db
 
-    # owner defines the owner of the database
-    owner: app
-
-    # database defines the name of the database to create
+    # database defines the name of the database
     database: registry-database
-
-    # replicas defines the number of database instances to run
-    replicas: 3
-
-    # storage defines the storage configuration for the database
-    size: 10Gi
 
   # inMemory determines if the database is created as an in memory database
   inMemory:

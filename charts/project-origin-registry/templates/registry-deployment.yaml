@@ -86,28 +86,28 @@ spec:
           {{- end }}
 
           # rabbitmq - operator
-          {{- if .Values.rabbitmq.operatorEnabled }}
+          {{- if .Values.rabbitmq.operator.enabled }}
             - name: RabbitMq__Hostname
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-rabbitmq-default-user
+                  name: {{ .Values.rabbitmq.operator.name }}-default-user
                   key: host
             - name: RabbitMq__AmqpPort
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-rabbitmq-default-user
+                  name: {{ .Values.rabbitmq.operator.name }}-default-user
                   key: port
             - name: RabbitMq__HttpApiPort
               value: {{ required "A valid messageBroker rabbitmq httpPort is required!" .Values.rabbitmq.httpPort | quote }}
             - name: RabbitMq__Username
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-rabbitmq-default-user
+                  name: {{ .Values.rabbitmq.operator.name }}-default-user
                   key: username
             - name: RabbitMq__Password
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-rabbitmq-default-user
+                  name: {{ .Values.rabbitmq.operator.name }}-default-user
                   key: password
           {{- else }}
             # rabbitmq - non-operator
