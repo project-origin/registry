@@ -1,7 +1,0 @@
-{{- if .Values.rabbitmq.operatorEnabled  }}
-apiVersion: rabbitmq.com/v1beta1
-kind: RabbitmqCluster
-metadata:
-  name: {{ .Release.Name }}-rabbitmq
-  namespace: {{ .Release.Namespace }}
-{{- end }}
