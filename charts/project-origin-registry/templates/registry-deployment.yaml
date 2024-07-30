@@ -36,6 +36,12 @@ spec:
             - name: RegistryName
               value: {{ .Values.registryName | default .Release.Name }}
 
+          # Resources configuration
+              {{- with.Values.registry.resources}}
+              resources:
+                {{- toYaml . | nindent 12 }}
+              {{- end }}
+
           # TransactionProcessor configuration
             - name: TransactionProcessor__PodName
               valueFrom:
@@ -173,3 +179,4 @@ spec:
             - name: cache__type
               value: "InMemory"
           {{- end }}
+

@@ -28,6 +28,10 @@ spec:
             - name: Registries__{{ .name }}__address
               value: {{ .address }}
             {{- end }}
+          {{- with.Values.verifiers.resources}}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
 ---
 apiVersion: v1
 kind: Service
