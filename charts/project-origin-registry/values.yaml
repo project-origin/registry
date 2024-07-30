@@ -10,6 +10,15 @@ image:
   # tag is the tag to pull defaults to the chart version
   tag:
 
+registry:
+ resources: {}
+#   limits:
+#     cpu:
+#     memory:
+#   requests:
+#     cpu:
+#     memory:
+
 # transactionProcessor holds the configuration for the transaction processor
 transactionProcessor:
   # replicas defines the number of transaction processor containers to run
@@ -75,6 +84,14 @@ persistance:
     # storage defines the storage configuration for the database
     size: 10Gi
 
+    resources: {}
+    #   limits:
+    #     cpu:
+    #     memory:
+    #   requests:
+    #     cpu:
+    #     memory:
+
   # inMemory determines if the database is created as an in memory database
   inMemory:
 
@@ -104,6 +121,14 @@ verifiers:
       # example
       # - name: test
       #   address: http://test-registry:80
+
+    resources: {}
+    #   limits:
+    #     cpu:
+    #     memory:
+    #   requests:
+    #     cpu:
+    #     memory:
 
 # immutableRecord holds the configuration for where and how the log is published.
 immutableRecord:
