@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.0" />
     <PackageReference Include="ConcordiumNetSdk" Version="4.4.0" />
     <PackageReference Include="Dapper" Version="2.1.44" />
     <PackageReference Include="dbup-postgresql" Version="5.0.40" />
     <PackageReference Include="NSec.Cryptography" Version="24.4.0" />
     <PackageReference Include="Npgsql" Version="8.0.3" />
-    <PackageReference Include="Google.Protobuf" Version="3.27.2" />
+    <PackageReference Include="Google.Protobuf" Version="3.27.3" />
     <PackageReference Include="Grpc.Tools" Version="2.65.0" />
     <PackageReference Include="StackExchange.Redis" Version="2.8.0" />
   </ItemGroup>
