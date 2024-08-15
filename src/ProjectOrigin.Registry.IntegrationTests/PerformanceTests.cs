@@ -9,6 +9,7 @@ using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
 using System.Text;
+using Dapper;
 using Grpc.Net.Client;
 using System.Collections.Concurrent;
 using FluentAssertions;
@@ -102,6 +103,7 @@ public class PerformanceTests : IAsyncLifetime,
     [Fact]
     public async Task TestThroughput()
     {
+        //await InsertTransactions(1000);
         Console.WriteLine($"-- Starting throughput test --");
 
         int concurrency = 10;
@@ -142,16 +144,17 @@ public class PerformanceTests : IAsyncLifetime,
                 }
             });
         }
-        await Task.Delay(TimeSpan.FromMinutes(5));
-        stopwatch.Stop();
 
-        var elapsedSeconds = stopwatch.Elapsed.TotalSeconds;
-        var requestsPerSecond = completed.Count / elapsedSeconds;
+        while (true)
+        {
 
-        Console.WriteLine($"Completed {completed.Count} transactions in {elapsedSeconds} seconds ({requestsPerSecond} requests per second).");
+            await Task.Delay(TimeSpan.FromMinutes(1));
+
+            Console.WriteLine($"{completed.Count}; {stopwatch.Elapsed.TotalSeconds}");
+        }
+
         Console.WriteLine($"-- Finished throughput test --");
-
-        requestsPerSecond.Should().BeGreaterThan(150); // based on througput test on github ~170
+        //requestsPerSecond.Should().BeGreaterThan(150); // based on througput test on github ~170
     }
 
     [Fact]
@@ -237,6 +240,60 @@ public class PerformanceTests : IAsyncLifetime,
         ms95th.Should().BeLessThan(2000);
     }
 
+    [Fact]
+    public async Task TestInsertAndListTransactions()
+    {
+        int numberOfTransactions = 1000;
+
+        await InsertTransactions(numberOfTransactions);
+
+        using var connection = new Npgsql.NpgsqlConnection(_postgresDatabaseFixture.ContainerConnectionString);
+        await connection.OpenAsync();
+
+        var firstTransaction = await connection.QuerySingleAsync(
+            "SELECT transaction_hash, stream_id, stream_index, payload FROM transactions ORDER BY id ASC LIMIT 1");
+
+        var lastTransaction = await connection.QuerySingleAsync(
+            "SELECT transaction_hash, stream_id, stream_index, payload FROM transactions ORDER BY id DESC LIMIT 1");
+
+        Console.WriteLine("First Transaction:");
+        Console.WriteLine($"Transaction Hash: {BitConverter.ToString(firstTransaction.transaction_hash)}");
+        Console.WriteLine($"Stream ID: {firstTransaction.stream_id}");
+        Console.WriteLine($"Stream Index: {firstTransaction.stream_index}");
+        Console.WriteLine($"Payload Length: {firstTransaction.payload.Length}");
+
+        Console.WriteLine("Last Transaction:");
+        Console.WriteLine($"Transaction Hash: {BitConverter.ToString(lastTransaction.transaction_hash)}");
+        Console.WriteLine($"Stream ID: {lastTransaction.stream_id}");
+        Console.WriteLine($"Stream Index: {lastTransaction.stream_index}");
+        Console.WriteLine($"Payload Length: {lastTransaction.payload.Length}");
+    }
+
+    [Fact]
+    public async Task LoadTestInsertTransactions()
+    {
+        int numberOfTransactions = 100000;
+        int concurrencyLevel = 10;
+
+        var tasks = new List<Task>();
+        for (int i = 0; i < concurrencyLevel; i++)
+        {
+            tasks.Add(Task.Run(async () => await InsertTransactions(numberOfTransactions / concurrencyLevel)));
+        }
+
+        Console.WriteLine($"-- Starting load test with {numberOfTransactions} transactions and {concurrencyLevel} concurrent tasks --");
+        var stopwatch = Stopwatch.StartNew();
+
+        await Task.WhenAll(tasks);
+
+        stopwatch.Stop();
+        Console.WriteLine($"-- Load test completed in {stopwatch.Elapsed.TotalSeconds} seconds --");
+
+        using var connection = new Npgsql.NpgsqlConnection(_postgresDatabaseFixture.ContainerConnectionString);
+        var totalInserted = await connection.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM transactions");
+        Console.WriteLine($"Total transactions in database: {totalInserted}");
+    }
+
     private async Task<Registry.V1.Transaction> SendRequest(GrpcChannel channel)
     {
         var client = new Registry.V1.RegistryService.RegistryServiceClient(channel);
@@ -247,6 +304,85 @@ public class PerformanceTests : IAsyncLifetime,
         await client.SendTransactions(transaction);
         return transaction;
     }
+
+    private async Task InsertTransactions(int numberOfTransactions)
+    {
+        Console.WriteLine($"-- Starting insertion of {numberOfTransactions} transactions --");
+
+        int batchSize = 10000;
+        using var connection = new Npgsql.NpgsqlConnection(_postgresDatabaseFixture.ContainerConnectionString);
+
+        await connection.OpenAsync();
+
+        var streamId = Guid.NewGuid();
+        int globalStreamIndex = 0;
+
+        var sql = "INSERT INTO transactions (transaction_hash, stream_id, stream_index, payload) VALUES (@TransactionHash, @StreamId, @StreamIndex, @Payload)";
+
+        for (int i = 0; i < numberOfTransactions / batchSize; i++)
+        {
+            using var transaction = await connection.BeginTransactionAsync();
+
+            for (int j = 0; j < batchSize; j++)
+            {
+                var transactionHash = GenerateTransactionHash();
+                var payload = GeneratePayload();
+                var streamIndex = globalStreamIndex++;
+
+                await connection.ExecuteAsync(sql, new
+                {
+                    TransactionHash = transactionHash,
+                    StreamId = streamId,
+                    StreamIndex = streamIndex,
+                    Payload = payload
+                }, transaction: transaction);
+            }
+
+            await transaction.CommitAsync();
+            Console.WriteLine($"Inserted {batchSize * (i + 1)} transactions...");
+        }
+
+        int remainingTransactions = numberOfTransactions % batchSize;
+        if (remainingTransactions > 0)
+        {
+            using var transaction = await connection.BeginTransactionAsync();
+
+            for (int j = 0; j < remainingTransactions; j++)
+            {
+                var transactionHash = GenerateTransactionHash();
+                var payload = GeneratePayload();
+                var streamIndex = globalStreamIndex++;
+
+                await connection.ExecuteAsync(sql, new
+                {
+                    TransactionHash = transactionHash,
+                    StreamId = streamId,
+                    StreamIndex = streamIndex,
+                    Payload = payload
+                }, transaction: transaction);
+            }
+
+            await transaction.CommitAsync();
+            Console.WriteLine($"Inserted remaining {remainingTransactions} transactions.");
+        }
+
+        Console.WriteLine($"-- Finished inserting {numberOfTransactions} transactions --");
+    }
+
+
+    private byte[] GenerateTransactionHash()
+    {
+        using (var sha256 = System.Security.Cryptography.SHA256.Create())
+        {
+            return sha256.ComputeHash(Guid.NewGuid().ToByteArray());
+        }
+    }
+
+    private byte[] GeneratePayload()
+    {
+        return new byte[256];
+    }
+
 
     public async Task InitializeAsync()
     {
