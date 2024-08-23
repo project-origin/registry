@@ -146,10 +146,10 @@ postgresql:
 
 # verifiers defines where each verifier is located
 verifiers:
-    # type is the type of verifier, namespace of the protobuf transactions
-  - type: project_origin.electricity.v1
-    # url is the url to the verifier, the service name of the verifier
-    url: http://electricity-v1:5000
+  # type is the type of verifier, namespace of the protobuf transactions
+  # - type: project_origin.electricity.v1
+  # url is the url to the verifier, the service name of the verifier
+  # url: http://verifier-electricity.my-namespace.svc.cluster.local:5000
 
 # immutableRecord holds the configuration for where and how the log is published.
 immutableRecord:
