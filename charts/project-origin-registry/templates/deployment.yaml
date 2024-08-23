@@ -1,0 +1,168 @@
+{{- range $i, $e := until (int $.Values.transactionProcessor.replicas) }}
+{{- $serverNumber := $i }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $.Release.Name }}-deployment-{{ $serverNumber }}
+  labels:
+    app: {{ $.Release.Name }}-registry
+    instance: {{ $.Release.Name }}-registry-{{ $serverNumber }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: {{ $.Release.Name }}-registry
+      instance: {{ $.Release.Name }}-registry-{{ $serverNumber }}
+  template:
+    metadata:
+      name: {{ $.Release.Name }}-registry-{{ $serverNumber }}
+      labels:
+        app: {{ $.Release.Name }}-registry
+        instance: {{ $.Release.Name }}-registry-{{ $serverNumber }}
+    spec:
+      serviceAccountName: {{ $.Release.Name }}-migration-waiter
+      initContainers:
+        - name: wait-for-migration
+          image: {{ include "common.image" (dict "root" $ "image" $.Values.migrationWaiter.image) }}
+          resources:
+            requests:
+              cpu: 0.1
+            limits:
+              memory: 50Mi
+              ephemeral-storage: "1Mi"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          command:
+            - /bin/sh
+            - -c
+            - |
+              kubectl wait --for=condition=complete job/${JOB_NAME} --timeout=300s -n {{ $.Release.Namespace }}
+          env:
+            - name: JOB_NAME
+              value: {{ include "migrate.job-name" $ }}
+          volumeMounts:
+            - name: service-account-token
+              mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+
+      containers:
+        - name: registry
+          image: {{ include "common.image" (dict "root" $ "image" $.Values.image) }}
+          {{- include "limits" $ | nindent 10 }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          args:
+            - "--serve"
+          readinessProbe:
+            tcpSocket:
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          env:
+            {{- include "otlp.config" $ | nindent 12 }}
+
+          # General configuration
+            - name: RegistryName
+              value: {{ $.Values.registryName | default $.Release.Name }}
+
+          # TransactionProcessor configuration
+            - name: TransactionProcessor__ServerNumber
+              value: {{ $serverNumber | quote }}
+            - name: TransactionProcessor__Servers
+              value: {{ $.Values.transactionProcessor.replicas | quote }}
+            - name: TransactionProcessor__Threads
+              value: {{ $.Values.transactionProcessor.threads | quote }}
+            - name: TransactionProcessor__Weight
+              value: {{ $.Values.transactionProcessor.weight | quote }}
+
+          # BlockFinalizer configuration
+            - name: BlockFinalizer__Interval
+              value: {{ $.Values.blockFinalizer.interval }}
+
+          # Verifier configuration
+          {{- range $.Values.verifiers }}
+            - name: Verifiers__{{ .type }}
+              value: {{ .url }}
+          {{- end }}
+
+          # immutableLog configuration
+            - name: IMMUTABLELOG__TYPE
+              value: {{ $.Values.immutableRecord.type }}
+          {{- if eq $.Values.immutableRecord.type "concordium" }}
+            - name: IMMUTABLELOG__CONCORDIUM__ADDRESS
+              value: {{ $.Values.immutableRecord.concordium.rpcUrl }}
+            - name: IMMUTABLELOG__CONCORDIUM__AUTHENTICATIONTOKEN
+              value: {{ $.Values.immutableRecord.concordium.rpcToken }}
+            - name: IMMUTABLELOG__CONCORDIUM__ACCOUNTADDRESS
+              value: {{ required "When type is concordium, accountAddress must be set" $.Values.immutableRecord.concordium.accountAddress }}
+            - name: IMMUTABLELOG__CONCORDIUM__ACCOUNTKEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ required "When type is concordium, accountKeySecret.name must be set" $.Values.immutableRecord.concordium.accountKeySecret.name }}
+                  key: {{ required "When type is concordium, accountKeySecret.key must be set" $.Values.immutableRecord.concordium.accountKeySecret.key }}
+          {{- end }}
+
+          # rabbitmq
+            - name: MessageBroker__Type
+              value: RabbitMq
+            - name: RabbitMq__Hostname
+              {{- include "checkKey" (list $.Values.rabbitmq.host ".rabbitmq.host") | nindent 14 }}
+            - name: RabbitMq__AmqpPort
+              {{- include "checkKey" (list $.Values.rabbitmq.amqpPort ".rabbitmq.amqpPort") | nindent 14 }}
+            - name: RabbitMq__HttpApiPort
+              {{- include "checkKey" (list $.Values.rabbitmq.httpPort ".rabbitmq.httpPort") | nindent 14 }}
+            - name: RabbitMq__Username
+              {{- include "checkKey" (list $.Values.rabbitmq.username ".rabbitmq.username") | nindent 14 }}
+            - name: RabbitMq__Password
+              {{- include "checkKey" (list $.Values.rabbitmq.password ".rabbitmq.password") | nindent 14 }}
+
+          # postgresql
+            - name: PERSISTANCE__TYPE
+              value: postgresql
+            - name: DB_HOST
+              {{- include "checkKey" (list $.Values.postgresql.host ".postgresql.host") | nindent 14 }}
+            - name: DB_PORT
+              {{- include "checkKey" (list $.Values.postgresql.port ".postgresql.port") | nindent 14 }}
+            - name: DB_DATABASE
+              {{- include "checkKey" (list $.Values.postgresql.database ".postgresql.database") | nindent 14 }}
+            - name: DB_USERNAME
+              {{- include "checkKey" (list $.Values.postgresql.username ".postgresql.username") | nindent 14 }}
+            - name: DB_PASSWORD
+              {{- include "checkKey" (list $.Values.postgresql.password ".postgresql.password") | nindent 14 }}
+            - name: PERSISTANCE__POSTGRESQL__CONNECTIONSTRING
+              value: Host=$(DB_HOST); Port=$(DB_PORT); Database=$(DB_DATABASE); Username=$(DB_USERNAME); Password=$(DB_PASSWORD);
+
+          # cache configuration
+          {{- if $.Values.redis.enabled }}
+            - name: cache__type
+              value: "Redis"
+            - name: cache__redis__connectionString
+              value: {{ $.Release.Name }}-redis-master
+            # only set password if auth is enabled
+            {{- if $.Values.redis.auth.enabled }}
+            - name: cache__redis__password
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Release.Name }}-redis
+                  key: redis-password
+            {{- end }}
+          {{- else }}
+            - name: cache__type
+              value: "InMemory"
+          {{- end }}
+      volumes:
+        - name: service-account-token
+          projected:
+            sources:
+              - serviceAccountToken:
+                  path: token
+              - configMap:
+                  name: kube-root-ca.crt
+                  items:
+                    - key: ca.crt
+                      path: ca.crt
+---
+{{- end -}}

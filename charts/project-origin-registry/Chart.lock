@@ -1,6 +1,9 @@
 dependencies:
 - name: redis
   repository: https://charts.bitnami.com/bitnami
-  version: 19.6.4
-digest: sha256:25e686bd66e0013f215babe6490ae6c1147b61c1b23fa805136992bf5635d413
-generated: "2024-07-25T11:11:03.340517171Z"
+  version: 20.0.3
+- name: concordium
+  repository: file://../concordium
+  version: 0.1.0
+digest: sha256:7b5c1be3e50c007a5715b0cac46da907f5cb0a1fe043ccea7d9a20f426941a98
+generated: "2024-08-23T12:03:50.060042295Z"

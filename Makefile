@@ -64,10 +64,10 @@ unit-test: build
 verify-chart: restore
 	@kind version >/dev/null 2>&1 || { echo >&2 "kind not installed! kind is required to use recipe, please install or use devcontainer"; exit 1;}
 	@helm version >/dev/null 2>&1 || { echo >&2 "helm not installed! helm is required to use recipe, please install or use devcontainer"; exit 1;}
+	helm unittest charts/project-origin-registry
 	helm repo add bitnami-charts https://charts.bitnami.com/bitnami
 	helm dependency build charts/project-origin-registry
 	charts/project-origin-registry/run_kind_test.sh
-	charts/project-origin-registry/migration_test.sh
 
 ## Run Concordium integration tests, requires access to running node and environment variables
 concordium-tests: build

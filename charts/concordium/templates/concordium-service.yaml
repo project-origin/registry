@@ -1,4 +1,3 @@
-{{- if .Values.concordium.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -12,4 +11,3 @@ spec:
       protocol: TCP
       port: 20000
       targetPort: 20000
-{{- end }}
