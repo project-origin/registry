@@ -7,8 +7,8 @@ and `Registry` as in a place to store and verify transactions.
 
 ## Glossary
 
-- **[Transactions](../concept/registry/transactions.md#transactions)**: are request to change data on the registry. A transaction is signed by a valid key.
-- **[Streams](../concept/registry/transactions.md#streams)**: are a sequences of transactions, this collection makes up the current state of an [GC](../concept/granular-certificates/readme.md).
+- **[Transactions](../concept/transactions.md#transactions)**: are request to change data on the registry. A transaction is signed by a valid key.
+- **[Streams](../concept/transactions.md#streams)**: are a sequences of transactions, this collection makes up the current state of an [GC](../concept/granular-certificates/readme.md).
 
 ## Overview
 
