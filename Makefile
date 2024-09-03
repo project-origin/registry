@@ -61,6 +61,7 @@ unit-test: build
 verify-chart: restore
 	@kind version >/dev/null 2>&1 || { echo >&2 "kind not installed! kind is required to use recipe, please install or use devcontainer"; exit 1;}
 	@helm version >/dev/null 2>&1 || { echo >&2 "helm not installed! helm is required to use recipe, please install or use devcontainer"; exit 1;}
+	helm repo add bitnami-charts https://charts.bitnami.com/bitnami
 	helm dependency build charts/project-origin-registry
 	helm unittest charts/project-origin-registry
 	./charts/project-origin-registry/run_parallel_test.sh
