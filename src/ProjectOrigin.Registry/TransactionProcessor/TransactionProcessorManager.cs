@@ -38,7 +38,7 @@ public class TransactionProcessorManager : IHostedService
         {
             var logger = _serviceProvider.GetRequiredService<ILogger<TransactionProcessorWorker>>();
             var queueName = _queueResolver.GetQueueName(_options.ServerNumber, i);
-            var transactionVerifier = _serviceProvider.GetRequiredService<TransactionProcessor>();
+            var transactionVerifier = _serviceProvider.GetRequiredService<TransactionProcessorDispatcher>();
             var queueResolver = _serviceProvider.GetRequiredService<IQueueResolver>();
 
             var worker = new TransactionProcessorWorker(

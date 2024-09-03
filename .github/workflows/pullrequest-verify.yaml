@@ -24,7 +24,7 @@ jobs:
       imagename: ghcr.io/project-origin/registry-server
       version: test
       context: ./src
-      dockerfile: ./src/ProjectOrigin.Registry.Server/Dockerfile
+      dockerfile: ./src/Registry.Dockerfile
       push: false
 
   verify-concordium:

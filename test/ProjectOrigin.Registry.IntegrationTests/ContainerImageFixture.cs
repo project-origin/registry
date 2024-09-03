@@ -8,7 +8,7 @@ namespace ProjectOrigin.Registry.IntegrationTests;
 
 public class ContainerImageFixture : IAsyncLifetime
 {
-    private const string DockerfilePath = "ProjectOrigin.Registry.Server/Dockerfile";
+    private const string DockerfilePath = "Registry.Dockerfile";
     public IImage Image => _image;
     private IFutureDockerImage _image;
     private string _tempDockerPath;

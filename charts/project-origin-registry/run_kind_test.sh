@@ -54,7 +54,7 @@ trap 'cleanup' 0
 trap 'debug; cleanup' ERR
 
 # build docker image
-docker build -f src/ProjectOrigin.Registry.Server/Dockerfile -t ghcr.io/project-origin/registry-server:test src/
+docker build -f src/Registry.Dockerfile -t ghcr.io/project-origin/registry-server:test src/
 
 # create kind configuration
 cat << EOF > "$kind_filename"

@@ -1,6 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
@@ -21,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ProjectOrigin.VerifiableEventStore\ProjectOrigin.VerifiableEventStore.csproj" />
+    <ProjectReference Include="..\..\src\ProjectOrigin.Registry\ProjectOrigin.Registry.csproj" />
   </ItemGroup>
 
 </Project>

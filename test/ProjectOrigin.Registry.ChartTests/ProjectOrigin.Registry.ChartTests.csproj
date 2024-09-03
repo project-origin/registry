@@ -1,6 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
@@ -25,9 +28,9 @@
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.27.2" />
     <PackageReference Include="Grpc.Tools" Version="2.65.0" />
-    <Protobuf Include="..\Protos\common.proto" GrpcServices="None" />
-    <Protobuf Include="..\Protos\registry.proto" GrpcServices="Client" />
-    <Protobuf Include="../Protos/electricity.proto" Link="Protos\electricity.proto" GrpcServices="None">
+    <Protobuf Include="..\..\src\Protos\common.proto" GrpcServices="None" />
+    <Protobuf Include="..\..\src\Protos\registry.proto" GrpcServices="Client" />
+    <Protobuf Include="../../src/Protos/electricity.proto" Link="Protos\electricity.proto" GrpcServices="None">
       <SourceUrl>https://raw.githubusercontent.com/project-origin/verifier_electricity/v1.1.0/src/Protos/electricity.proto</SourceUrl>
     </Protobuf>
   </ItemGroup>

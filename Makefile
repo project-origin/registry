@@ -1,5 +1,3 @@
-src_path := src
-
 formatting_header := \033[1m
 formatting_command := \033[1;34m
 formatting_desc := \033[0;32m
@@ -28,36 +26,36 @@ info:
 ## Lint the dotnet code
 lint:
 	@echo "Verifying code formatting..."
-	dotnet format $(src_path) --verify-no-changes
+	dotnet format --verify-no-changes
 
 ## Does a dotnet clean
 clean:
-	dotnet clean $(src_path)
+	dotnet clean
 
 ## Restores all dotnet projects
 restore:
-	dotnet tool restore --tool-manifest src/.config/dotnet-tools.json
-	dotnet restore $(src_path)
+	dotnet tool restore --tool-manifest
+	dotnet restore
 
 ## Builds all the code
 build: restore
-	dotnet build $(src_path)
+	dotnet build
 
 ## Formats files using dotnet format
 format:
-	dotnet format $(src_path)
+	dotnet format
 
 ## Run all tests except Concordium integration
 test: build
-	dotnet test $(src_path) --no-build --filter 'FullyQualifiedName!~ConcordiumIntegrationTests&FullyQualifiedName!~PerformanceTests&FullyQualifiedName!~ChartTests'
+	dotnet test --no-build --filter 'FullyQualifiedName!~ConcordiumIntegrationTests&FullyQualifiedName!~PerformanceTests&FullyQualifiedName!~ChartTests'
 
 ## Tests run with the sonarcloud analyser
 sonarcloud-test:
-	dotnet test $(src_path) --no-build --filter 'FullyQualifiedName!~ConcordiumIntegrationTests&FullyQualifiedName!~PerformanceTests&FullyQualifiedName!~ChartTests'
+	dotnet test --no-build --filter 'FullyQualifiedName!~ConcordiumIntegrationTests&FullyQualifiedName!~PerformanceTests&FullyQualifiedName!~ChartTests'
 
 ## Run all Unit-tests
 unit-test: build
-	dotnet test $(src_path) --no-build --filter 'FullyQualifiedName!~IntegrationTests&FullyQualifiedName!~ChartTests'
+	dotnet test --no-build --filter 'FullyQualifiedName!~IntegrationTests&FullyQualifiedName!~ChartTests'
 
 ## Builds the local container, creates kind cluster and installs chart, and verifies it works
 verify-chart: restore
@@ -65,12 +63,16 @@ verify-chart: restore
 	@helm version >/dev/null 2>&1 || { echo >&2 "helm not installed! helm is required to use recipe, please install or use devcontainer"; exit 1;}
 	helm dependency build charts/project-origin-registry
 	helm unittest charts/project-origin-registry
-	charts&/project-origin-registry/run_parallel_tests.sh
+	./charts/project-origin-registry/run_parallel_test.sh
 
 ## Run Concordium integration tests, requires access to running node and environment variables
 concordium-tests: build
-	dotnet test $(src_path)/ProjectOrigin.VerifiableEventStore.ConcordiumIntegrationTests --no-build
+	dotnet test --no-build test/ProjectOrigin.VerifiableEventStore.ConcordiumIntegrationTests
 
 ## Run performance tests, takes a long time.
 verify-performance: build
-	dotnet test $(src_path) --no-build --filter 'FullyQualifiedName~PerformanceTests'
+	dotnet test --no-build --filter 'FullyQualifiedName~PerformanceTests'
+
+## Build the container image with tag ghcr.io/project-origin/registry-server:test
+build-container:
+	docker build -f src/Registry.Dockerfile -t ghcr.io/project-origin/registry-server:test src/

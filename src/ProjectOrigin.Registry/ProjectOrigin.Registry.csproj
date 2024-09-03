@@ -1,8 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+  </PropertyGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\ProjectOrigin.VerifiableEventStore\ProjectOrigin.VerifiableEventStore.csproj" />
     <PackageReference Include="OpenTelemetry.Instrumentation.StackExchangeRedis" Version="1.0.0-rc9.15" />
-    <PackageReference Include="protobuf-net" Version="3.2.30" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.65.0" />
     <PackageReference Include="OpenTelemetry" Version="1.9.0" />
     <PackageReference Include="Npgsql.OpenTelemetry" Version="8.0.3" />
@@ -19,9 +23,24 @@
     <PackageReference Include="Serilog.Expressions" Version="5.0.0" />
     <PackageReference Include="RabbitMQ.Client" Version="7.0.0-rc.6" />
     <PackageReference Include="murmurhash" Version="1.0.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="ConcordiumNetSdk" Version="4.4.0" />
+    <PackageReference Include="Dapper" Version="2.1.44" />
+    <PackageReference Include="dbup-postgresql" Version="5.0.40" />
+    <PackageReference Include="NSec.Cryptography" Version="24.4.0" />
+    <PackageReference Include="Npgsql" Version="8.0.3" />
+    <PackageReference Include="StackExchange.Redis" Version="2.8.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Services\Repository\Postgres\Scripts\202305141256-transactions.sql" />
+    <EmbeddedResource Include="Services\Repository\Postgres\Scripts\202305141317-blocks.sql" />
+    <EmbeddedResource Include="Services\Repository\Postgres\Scripts\202402141347-blocks-v2.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="..\Protos\common.proto" GrpcServices="None"/>
+    <Protobuf Include="..\Protos\registry.proto" GrpcServices="Both"/>
     <Protobuf Include="..\Protos\verifier.proto" GrpcServices="Client" />
   </ItemGroup>
 </Project>

@@ -16,7 +16,7 @@ jobs:
       imagename: ghcr.io/project-origin/registry-server
       version: ${{ needs.define-version.outputs.version }}
       context: ./src
-      dockerfile: ./src/ProjectOrigin.Registry.Server/Dockerfile
+      dockerfile: ./src/Registry.Dockerfile
       push: true
 
   publish-chart:

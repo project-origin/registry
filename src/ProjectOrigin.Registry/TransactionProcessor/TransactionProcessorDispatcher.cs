@@ -14,19 +14,19 @@ using ProjectOrigin.VerifiableEventStore.Services.TransactionStatusCache;
 
 namespace ProjectOrigin.Registry.Server.Services;
 
-public class TransactionProcessor
+public class TransactionProcessorDispatcher
 {
     private readonly RegistryOptions _options;
     private readonly ITransactionRepository _transactionRepository;
     private readonly ITransactionDispatcher _verifier;
     private readonly ITransactionStatusService _transactionStatusService;
-    private readonly ILogger<TransactionProcessor> _logger;
+    private readonly ILogger<TransactionProcessorDispatcher> _logger;
 
-    public TransactionProcessor(IOptions<RegistryOptions> options,
+    public TransactionProcessorDispatcher(IOptions<RegistryOptions> options,
                                 ITransactionRepository transactionRepository,
                                 ITransactionDispatcher verifier,
                                 ITransactionStatusService transactionStatusService,
-                                ILogger<TransactionProcessor> logger)
+                                ILogger<TransactionProcessorDispatcher> logger)
     {
         _options = options.Value;
         _transactionRepository = transactionRepository;

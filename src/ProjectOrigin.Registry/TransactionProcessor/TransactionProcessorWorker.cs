@@ -15,7 +15,7 @@ public sealed class TransactionProcessorWorker : IAsyncDisposable
     private readonly ILogger<TransactionProcessorWorker> _logger;
     private readonly IRabbitMqChannel _channel;
     private readonly string _queueName;
-    private readonly TransactionProcessor _transactionVerifier;
+    private readonly TransactionProcessorDispatcher _transactionVerifier;
     private readonly IQueueResolver _queueResolver;
     private readonly string _consumerTag;
 
@@ -23,7 +23,7 @@ public sealed class TransactionProcessorWorker : IAsyncDisposable
         ILogger<TransactionProcessorWorker> logger,
         IRabbitMqChannel channel,
         string queueName,
-        TransactionProcessor transactionVerifier,
+        TransactionProcessorDispatcher transactionVerifier,
         IQueueResolver queueResolver)
     {
         _logger = logger;

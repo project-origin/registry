@@ -107,7 +107,7 @@ public class Startup
 
         services.AddSingleton<IQueueResolver, ConsistentHashRingQueueResolver>();
         services.AddSingleton<IRabbitMqChannelPool, RabbitMqChannelPool>();
-        services.AddTransient<TransactionProcessor>();
+        services.AddTransient<TransactionProcessorDispatcher>();
         services.AddHttpClient<IRabbitMqHttpClient, RabbitMqHttpClient>();
 
         services.AddHostedService<TransactionProcessorManager>();
