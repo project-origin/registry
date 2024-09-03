@@ -21,10 +21,17 @@ spec:
       labels:
         app: po-concordium-node
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
       containers:
         - name: po-concordium-node
           image: {{ $registry }}/concordium/{{ .Values.network }}-node:{{ $.Values.image.tag | default $.Chart.AppVersion }}
           command: ["/concordium-node"]
+          {{- include "limits" $ | nindent 10 }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
           ports:
             - containerPort: 20000
           env:
@@ -100,6 +107,9 @@ spec:
         - name: po-concordium-node-collector
           image: $registry/concordium/{{ .Values.network }}-node:{{ $.Values.image.tag | default $.Chart.AppVersion }}
           command: ["/node-collector"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
           env:
             # Settings that should be customized by the user.
             - name: CONCORDIUM_NODE_COLLECTOR_NODE_NAME

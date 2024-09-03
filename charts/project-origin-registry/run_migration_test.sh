@@ -1,34 +1,29 @@
 #!/bin/bash
 
-# This script is a test of the registry and electricy verifier using the example client
+# This script is a test that the registry chart can be upgraded from the current most recent version to the one in tree.
 # This script does the following
 # - creates a kind cluster
 # - generates issuing keys
-# - creates two registries
-# - issues consumption and production certificates
-# - slices production certificate
-# - claims certificate
+# - installs a registry
+# - runs tests
+# - updates the registry
+# - runs tests again
+# - cleans up
 
 # Ensures script fails if something goes wrong.
 set -eo pipefail
 
 # define variables
-cluster_name=helm-test
+cluster_name=migration-test
 temp_folder=$(mktemp -d)
 electricity_values_filename=${temp_folder}/electricity_values.yaml
 registry_values_filename=${temp_folder}/registry_values.yaml
 kind_filename=${temp_folder}/kind.yaml
 example_area=Narnia
-
 registry_a_name=test-a
-registry_a_port=8080
+registry_a_port=8090
 registry_a_nodeport=32080
 registry_a_namespace=ns-a
-
-registry_b_name=test-b
-registry_b_port=8081
-registry_b_nodeport=32081
-registry_b_namespace=ns-b
 
 # define cleanup function
 cleanup() {
@@ -44,9 +39,6 @@ debug() {
 
     echo -e "\nHelm status Registry A:"
     helm status $registry_a_name --namespace ${registry_a_namespace} --show-desc --show-resources --kube-context kind-${cluster_name}
-
-    echo -e "\nHelm status Registry B:"
-    helm status $registry_b_name --namespace ${registry_b_namespace} --show-desc --show-resources --kube-context kind-${cluster_name}
 }
 
 # trap cleanup function on script exit
@@ -65,8 +57,6 @@ nodes:
   extraPortMappings:
   - containerPort: $registry_a_nodeport
     hostPort: $registry_a_port
-  - containerPort: $registry_b_nodeport
-    hostPort: $registry_b_port
 EOF
 
 # recreate clean cluster
@@ -80,9 +70,6 @@ kind load -n ${cluster_name} docker-image ghcr.io/project-origin/registry-server
 helm install postgresql oci://registry-1.docker.io/bitnamicharts/postgresql --version 15.5.23 --namespace ${registry_a_namespace} --create-namespace --kube-context kind-${cluster_name}
 helm install rabbitmq oci://registry-1.docker.io/bitnamicharts/rabbitmq --version 14.6.6 --namespace ${registry_a_namespace} --kube-context kind-${cluster_name}
 
-helm install postgresql oci://registry-1.docker.io/bitnamicharts/postgresql --version 15.5.23 --namespace ${registry_b_namespace} --create-namespace --kube-context kind-${cluster_name}
-helm install rabbitmq oci://registry-1.docker.io/bitnamicharts/rabbitmq --version 14.6.6 --namespace ${registry_b_namespace} --kube-context kind-${cluster_name}
-
 # generate keys
 PrivateKey=$(openssl genpkey -algorithm ED25519)
 PrivateKeyBase64=$(echo "$PrivateKey" | base64 -w 0)
@@ -95,8 +82,6 @@ networkConfig:
     registries:
       ${registry_a_name}:
         url: http://${registry_a_name}-service.${registry_a_namespace}:5000
-      ${registry_b_name}:
-        url: http://${registry_b_name}-postfix-service.${registry_b_namespace}:5000
     areas:
       $example_area:
         issuerKeys:
@@ -108,17 +93,16 @@ helm install electricity project-origin-verifier-electricity --repo https://proj
 
 # generate values for electricity verifier
 cat << EOF > "${registry_values_filename}"
-image:
-  tag: test
 service:
   type: NodePort
+  nodePort: ${registry_a_nodeport}
 verifiers:
   - type: project_origin.electricity.v1
     url: http://verifier-electricity.default.svc.cluster.local:5000
-blockFinalizer:
-  interval: 00:00:15
 transactionProcessor:
   replicas: 1
+blockFinalizer:
+  interval: 00:00:15
 postgresql:
   host: postgresql
   database: postgres
@@ -139,19 +123,11 @@ redis:
     replicaCount: 1
 EOF
 
-# install two registries
-echo "Installing registries"
-helm install ${registry_a_name} -n ${registry_a_namespace} charts/project-origin-registry --set service.nodePort=$registry_a_nodeport -f "${registry_values_filename}" --kube-context kind-${cluster_name}
-helm install ${registry_b_name}-postfix -n ${registry_b_namespace} charts/project-origin-registry --set registryName=$registry_b_name,service.nodePort=$registry_b_nodeport -f "${registry_values_filename}" --kube-context kind-${cluster_name}
-
-# wait for all pods to be ready
+# install registry from
+echo "Installing latest released registry"
+helm install ${registry_a_name} -n ${registry_a_namespace} project-origin-registry --version 2.0.0-rc.1 -f "${registry_values_filename}" --repo https://project-origin.github.io/helm-registry --kube-context kind-${cluster_name}
 kubectl wait --for=condition=available --timeout=300s deployment/${registry_a_name}-deployment-0 -n ${registry_a_namespace} --context kind-${cluster_name}
 echo "Registry A installed"
-kubectl wait --for=condition=available --timeout=300s deployment/${registry_b_name}-postfix-deployment-0  -n ${registry_b_namespace} --context kind-${cluster_name}
-echo "Registry B installed"
-
-# wait for cluster to be ready
-sleep 15
 
 # run tests
 dotnet test src/ProjectOrigin.Registry.ChartTests \
@@ -159,8 +135,21 @@ dotnet test src/ProjectOrigin.Registry.ChartTests \
   -e "ISSUER_KEY=$PrivateKeyBase64" \
   -e "PROD_REGISTRY_NAME=$registry_a_name" \
   -e "PROD_REGISTRY_ADDRESS=http://localhost:$registry_a_port" \
-  -e "CONS_REGISTRY_NAME=$registry_b_name" \
-  -e "CONS_REGISTRY_ADDRESS=http://localhost:$registry_b_port" \
-  -e "CONS_REGISTRY_BLOCKS=3"
+  -e "CONS_REGISTRY_NAME=$registry_a_name" \
+  -e "CONS_REGISTRY_ADDRESS=http://localhost:$registry_a_port" \
+  -e "CONS_REGISTRY_BLOCKS=7"
 
-echo "Test completed"
+# Updates registry to the one in tree and runs tests
+echo "Updating registry"
+helm upgrade ${registry_a_name} -n ${registry_a_namespace} charts/project-origin-registry --set image.tag=test -f "${registry_values_filename}" --kube-context kind-${cluster_name}
+kubectl wait --for=condition=available --timeout=300s deployment/${registry_a_name}-deployment-0 -n ${registry_a_namespace} --context kind-${cluster_name}
+echo "Registry updated"
+
+dotnet test src/ProjectOrigin.Registry.ChartTests \
+  -e "AREA=$example_area" \
+  -e "ISSUER_KEY=$PrivateKeyBase64" \
+  -e "PROD_REGISTRY_NAME=$registry_a_name" \
+  -e "PROD_REGISTRY_ADDRESS=http://localhost:$registry_a_port" \
+  -e "CONS_REGISTRY_NAME=$registry_a_name" \
+  -e "CONS_REGISTRY_ADDRESS=http://localhost:$registry_a_port" \
+  -e "CONS_REGISTRY_BLOCKS=14"

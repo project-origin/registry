@@ -5,6 +5,7 @@ global:
 
 # image holds the configuration for the image to use for the registry
 image:
+  # registry is the registry to pull the image from
   registry: ghcr.io
   # repository is the repository to pull the image from
   repository: project-origin/registry-server
@@ -16,7 +17,7 @@ resources:
   # requests holds the configuration for the resource requests
   requests:
     # cpu defines the cpu request limit for the registry server
-    cpu: 500m
+    cpu:
     # memory defines the memory request limit for the registry server
     memory:
 
@@ -25,7 +26,7 @@ resources:
     # cpu defines the cpu limit for the registry server
     cpu:
     # memory defines the memory limit for the registry server
-    memory: 500Mi
+    memory:
 
 # service holds the configuration for the service
 service:

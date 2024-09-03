@@ -16,7 +16,7 @@ help:
 	@printf "\n"
 
 ## Verify code is ready for commit to branch, runs tests and verifies formatting.
-verify: build test lint
+verify: test lint
 	@echo "Code is ready to commit."
 
 ## Prints dotnet info
@@ -38,7 +38,6 @@ clean:
 restore:
 	dotnet tool restore --tool-manifest src/.config/dotnet-tools.json
 	dotnet restore $(src_path)
-
 
 ## Builds all the code
 build: restore
@@ -64,10 +63,9 @@ unit-test: build
 verify-chart: restore
 	@kind version >/dev/null 2>&1 || { echo >&2 "kind not installed! kind is required to use recipe, please install or use devcontainer"; exit 1;}
 	@helm version >/dev/null 2>&1 || { echo >&2 "helm not installed! helm is required to use recipe, please install or use devcontainer"; exit 1;}
-	helm unittest charts/project-origin-registry
-	helm repo add bitnami-charts https://charts.bitnami.com/bitnami
 	helm dependency build charts/project-origin-registry
-	charts/project-origin-registry/run_kind_test.sh
+	helm unittest charts/project-origin-registry
+	charts&/project-origin-registry/run_parallel_tests.sh
 
 ## Run Concordium integration tests, requires access to running node and environment variables
 concordium-tests: build
