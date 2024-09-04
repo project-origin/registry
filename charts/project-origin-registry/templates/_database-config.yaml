@@ -15,7 +15,7 @@ valueFrom:
   configMapKeyRef:
     name: {{ required (printf "The value for %s.configMapRef.name is not provided" $name) $value.configMapRef.name | quote }}
     key: {{ required (printf "The value for %s.configMapRef.name is not provided" $name) $value.configMapRef.key | quote }}
-{{- else -}}
+{{- else }}
   {{ fail (printf "The value for %s is not provided" $name) }}
 {{- end }}
 {{- end -}}
@@ -23,15 +23,15 @@ valueFrom:
 {{- define "database.config" -}}
 # Database Configuration
 - name: DB_HOST
-  {{- include "checkKey" (list .Values.postgresql.host ".postgresql.host") | indent 2 }}
+  {{- include "checkKey" (list .Values.postgresql.host ".postgresql.host") | nindent 2 }}
 - name: DB_PORT
-  {{- include "checkKey" (list .Values.postgresql.port ".postgresql.port") | indent 2}}
+  {{- include "checkKey" (list .Values.postgresql.port ".postgresql.port") | nindent 2 }}
 - name: DB_DATABASE
-  {{- include "checkKey" (list .Values.postgresql.database ".postgresql.database") | indent 2 }}
+  {{- include "checkKey" (list .Values.postgresql.database ".postgresql.database") | nindent 2 }}
 - name: DB_USERNAME
-  {{- include "checkKey" (list .Values.postgresql.username ".postgresql.username") | indent 2 }}
+  {{- include "checkKey" (list .Values.postgresql.username ".postgresql.username") | nindent 2 }}
 - name: DB_PASSWORD
-  {{- include "checkKey" (list .Values.postgresql.password ".postgresql.password") | indent 2 }}
+  {{- include "checkKey" (list .Values.postgresql.password ".postgresql.password") | nindent 2 }}
 - name: ConnectionStrings__Database
   value: Host=$(DB_HOST); Port=$(DB_PORT); Database=$(DB_DATABASE); Username=$(DB_USERNAME); Password=$(DB_PASSWORD);
 {{- end }}

@@ -13,6 +13,7 @@ using ProjectOrigin.Registry.V1;
 using ProjectOrigin.Registry.Extensions;
 using ProjectOrigin.Registry.Repository.Models;
 using ProjectOrigin.Registry.Repository.Postgres.Mapping;
+using ProjectOrigin.ServiceCommon.Database.Postgres;
 
 namespace ProjectOrigin.Registry.Repository.Postgres;
 
@@ -20,7 +21,7 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
 {
     private readonly NpgsqlDataSource _dataSource;
 
-    public PostgresqlRepository(IOptions<PostgresqlEventStoreOptions> options)
+    public PostgresqlRepository(IOptions<PostgresOptions> options)
     {
         _dataSource = NpgsqlDataSource.Create(options.Value.ConnectionString);
 

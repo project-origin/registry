@@ -27,7 +27,7 @@ public class Startup
     {
         services.ConfigureDefaultOtlp(_configuration);
         services.ConfigureGrpc(_configuration);
-        services.ConfigurePersistance(_configuration);
+        services.ConfigurePersistence(_configuration);
 
         services.AddOptions<RegistryOptions>().Configure<IConfiguration>((settings, configuration) =>
         {

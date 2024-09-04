@@ -17,7 +17,10 @@ set:
   rabbitmq:
     host: "_"
     username: "_"
-    password: "_"
+    password:
+      secretRef:
+        name: "somePasswordName"
+        key: "somePassword"
 
 tests:
   - it: should set PostgreSQL configuration

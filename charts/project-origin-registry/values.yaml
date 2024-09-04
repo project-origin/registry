@@ -27,6 +27,8 @@ resources:
     cpu:
     # memory defines the memory limit for the registry server
     memory:
+    # ephemeralStorage defines the ephemeral storage limit for the verifier server
+    ephemeralStorage:
 
 # service holds the configuration for the service
 service:

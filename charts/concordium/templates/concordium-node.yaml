@@ -28,7 +28,7 @@ spec:
         - name: po-concordium-node
           image: {{ $registry }}/concordium/{{ .Values.network }}-node:{{ $.Values.image.tag | default $.Chart.AppVersion }}
           command: ["/concordium-node"]
-          {{- include "limits" $ | nindent 10 }}
+          {{- include "common.limits" $.resources | nindent 10 }}
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true

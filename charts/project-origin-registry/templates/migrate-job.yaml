@@ -17,24 +17,13 @@ spec:
       containers:
         - name: {{ .Release.Name }}-migrate-job
           image: {{ include "common.image" (dict "root" $ "image" $.Values.image) }}
-          {{- include "limits" . | nindent 10 }}
+          {{- include "common.limits" .resources | nindent 10 }}
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
           args:
             - "--migrate"
           env:
-            - name: PERSISTANCE__TYPE
+            - name: PERSISTENCE__TYPE
               value: postgresql
-            - name: DB_HOST
-              {{- include "checkKey" (list .Values.postgresql.host ".postgresql.host") | nindent 14}}
-            - name: DB_PORT
-              {{- include "checkKey" (list .Values.postgresql.port ".postgresql.port") | nindent 14}}
-            - name: DB_DATABASE
-              {{- include "checkKey" (list .Values.postgresql.database ".postgresql.database") | nindent 14}}
-            - name: DB_USERNAME
-              {{- include "checkKey" (list .Values.postgresql.username ".postgresql.username") | nindent 14}}
-            - name: DB_PASSWORD
-              {{- include "checkKey" (list .Values.postgresql.password ".postgresql.password") | nindent 14 }}
-            - name: PERSISTANCE__POSTGRESQL__CONNECTIONSTRING
-              value: Host=$(DB_HOST); Port=$(DB_PORT); Database=$(DB_DATABASE); Username=$(DB_USERNAME); Password=$(DB_PASSWORD);
+            {{- include "database.config" $ | nindent 12 }}

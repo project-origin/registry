@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +12,7 @@ using ProjectOrigin.Registry.Repository.InMemory;
 using ProjectOrigin.Registry.Repository.Postgres;
 using ProjectOrigin.Registry.TransactionStatusCache;
 using ProjectOrigin.ServiceCommon.Database;
+using ProjectOrigin.ServiceCommon.Database.Postgres;
 using ProjectOrigin.ServiceCommon.Extensions;
 using Serilog;
 using StackExchange.Redis;
@@ -43,10 +45,10 @@ public static class IServiceCollectionExtensions
         }
     }
 
-    public static void ConfigurePersistance(this IServiceCollection services, IConfiguration configuration)
+    public static void ConfigurePersistence(this IServiceCollection services, IConfiguration configuration)
     {
-        var persistance = configuration.GetRequiredSection("PERSISTANCE");
-        var type = persistance.GetValue<string>("type")?.ToLower();
+        var persistence = configuration.GetRequiredSection("PERSISTENCE");
+        var type = persistence.GetValue<string>("type")?.ToLower();
 
         switch (type)
         {
@@ -57,16 +59,14 @@ public static class IServiceCollectionExtensions
                 break;
 
             case "postgresql":
-                services.AddSingleton<IDatabaseUpgrader>(serviceProvider => ActivatorUtilities.CreateInstance<DatabaseUpgrader>(serviceProvider, Assembly.GetEntryAssembly()!));
+                IEnumerable<Assembly> assemblies = new List<Assembly> { Assembly.GetEntryAssembly()! };
+                services.AddSingleton<IDatabaseUpgrader>(serviceProvider => ActivatorUtilities.CreateInstance<DatabaseUpgrader>(serviceProvider, assemblies));
+                services.ConfigurePostgres(configuration);
                 services.AddTransient<ITransactionRepository, PostgresqlRepository>();
-                services.AddOptions<PostgresqlEventStoreOptions>()
-                    .Bind(persistance.GetRequiredSection("postgresql"))
-                    .ValidateDataAnnotations()
-                    .ValidateOnStart();
                 break;
 
             default:
-                throw new NotSupportedException($"Persistance type ”{type}” not supported");
+                throw new NotSupportedException($"Persistence type ”{type}” not supported");
         }
     }
 

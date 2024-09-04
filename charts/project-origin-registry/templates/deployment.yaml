@@ -23,6 +23,9 @@ spec:
         instance: {{ $.Release.Name }}-registry-{{ $serverNumber }}
     spec:
       serviceAccountName: {{ $.Release.Name }}-migration-waiter
+      securityContext:
+        runAsUser: 1654
+        runAsNonRoot: true
       initContainers:
         - name: wait-for-migration
           image: {{ include "common.image" (dict "root" $ "image" $.Values.migrationWaiter.image) }}
@@ -50,7 +53,7 @@ spec:
       containers:
         - name: registry
           image: {{ include "common.image" (dict "root" $ "image" $.Values.image) }}
-          {{- include "limits" $ | nindent 10 }}
+          {{- include "common.limits" $.resources | nindent 10 }}
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -62,7 +65,10 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 10
           env:
-            {{- include "otlp.config" $ | nindent 12 }}
+            - name: PERSISTENCE__TYPE
+              value: postgresql
+            {{- include "database.config" $ | nindent 12 }}
+            {{- include "common.otlp.config" $.Values.otlp | nindent 12 }}
 
           # General configuration
             - name: RegistryName
@@ -118,22 +124,6 @@ spec:
               {{- include "checkKey" (list $.Values.rabbitmq.username ".rabbitmq.username") | nindent 14 }}
             - name: RabbitMq__Password
               {{- include "checkKey" (list $.Values.rabbitmq.password ".rabbitmq.password") | nindent 14 }}
-
-          # postgresql
-            - name: PERSISTANCE__TYPE
-              value: postgresql
-            - name: DB_HOST
-              {{- include "checkKey" (list $.Values.postgresql.host ".postgresql.host") | nindent 14 }}
-            - name: DB_PORT
-              {{- include "checkKey" (list $.Values.postgresql.port ".postgresql.port") | nindent 14 }}
-            - name: DB_DATABASE
-              {{- include "checkKey" (list $.Values.postgresql.database ".postgresql.database") | nindent 14 }}
-            - name: DB_USERNAME
-              {{- include "checkKey" (list $.Values.postgresql.username ".postgresql.username") | nindent 14 }}
-            - name: DB_PASSWORD
-              {{- include "checkKey" (list $.Values.postgresql.password ".postgresql.password") | nindent 14 }}
-            - name: PERSISTANCE__POSTGRESQL__CONNECTIONSTRING
-              value: Host=$(DB_HOST); Port=$(DB_PORT); Database=$(DB_DATABASE); Username=$(DB_USERNAME); Password=$(DB_PASSWORD);
 
           # cache configuration
           {{- if $.Values.redis.enabled }}

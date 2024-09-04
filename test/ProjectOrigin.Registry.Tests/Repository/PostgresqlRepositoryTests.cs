@@ -3,6 +3,7 @@ using MsOptions = Microsoft.Extensions.Options.Options;
 using ProjectOrigin.Registry.Repository.Postgres;
 using ProjectOrigin.TestCommon.Fixtures;
 using Xunit;
+using ProjectOrigin.ServiceCommon.Database.Postgres;
 
 namespace ProjectOrigin.Registry.Tests.Repository;
 
@@ -16,7 +17,7 @@ public class PostgresqlRepositoryTests : AbstractTransactionRepositoryTests<Post
     public PostgresqlRepositoryTests(PostgresDatabaseFixture<Startup> postgresFixture)
     {
         _postgresFixture = postgresFixture;
-        var storeOptions = new PostgresqlEventStoreOptions
+        var storeOptions = new PostgresOptions
         {
             ConnectionString = postgresFixture.HostConnectionString,
         };

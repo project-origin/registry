@@ -13,11 +13,12 @@ RUN dotnet build ${PROJECT} -c Release --no-restore -p:CustomAssemblyName=App
 RUN dotnet publish ${PROJECT} -c Release --no-build -p:CustomAssemblyName=App -o /app/publish
 
 # ------- production image -------
-FROM mcr.microsoft.com/dotnet/aspnet:8.0.8-jammy-chiseled-extra AS production
+FROM mcr.microsoft.com/dotnet/aspnet:8.0.4-jammy-chiseled-extra AS production
 
 WORKDIR /app
 COPY --from=build /app/publish .
 
 EXPOSE 5000
+EXPOSE 5001
 
 ENTRYPOINT ["dotnet", "App.dll"]
