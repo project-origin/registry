@@ -6,7 +6,6 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using ProjectOrigin.Registry.Extensions;
-using ProjectOrigin.TestUtils;
 using Xunit;
 using RabbitMQ.Client;
 using Google.Protobuf;
@@ -15,8 +14,9 @@ using ProjectOrigin.Registry.Options;
 using System.Net.Http;
 using ProjectOrigin.Registry.MessageBroker;
 using MsOptions = Microsoft.Extensions.Options.Options;
+using ProjectOrigin.Registry.IntegrationTests.Fixtures;
 
-namespace ProjectOrigin.Registry.IntegrationTests;
+namespace ProjectOrigin.Registry.Tests;
 
 public class QueueCleanupServiceTests
 {

@@ -7,7 +7,7 @@ using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using Xunit;
 
-namespace ProjectOrigin.Electricity.IntegrationTests;
+namespace ProjectOrigin.Registry.IntegrationTests.Fixtures;
 
 public class ElectricityServiceFixture : IAsyncLifetime
 {

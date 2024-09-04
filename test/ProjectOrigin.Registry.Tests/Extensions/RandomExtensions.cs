@@ -1,6 +1,6 @@
 using System;
 
-namespace ProjectOrigin.Registry.IntegrationTests.Extensions
+namespace ProjectOrigin.Registry.Tests.Extensions
 {
     public static class RandomExtensions
     {

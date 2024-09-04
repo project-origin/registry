@@ -3,13 +3,13 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
-using ProjectOrigin.Registry.IntegrationTests.Extensions;
 using ProjectOrigin.Registry.MessageBroker;
 using ProjectOrigin.Registry.Options;
+using ProjectOrigin.Registry.Tests.Extensions;
 using Xunit;
 using MsOptions = Microsoft.Extensions.Options.Options;
 
-namespace ProjectOrigin.Registry.IntegrationTests;
+namespace ProjectOrigin.Registry.Tests;
 
 public class ConsistentHashResolverTests
 {

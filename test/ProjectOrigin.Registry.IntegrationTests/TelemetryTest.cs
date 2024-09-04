@@ -6,8 +6,8 @@ using ProjectOrigin.Electricity.IntegrationTests;
 using ProjectOrigin.Electricity.V1;
 using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.PedersenCommitment;
+using ProjectOrigin.Registry.IntegrationTests.Fixtures;
 using ProjectOrigin.TestCommon.Fixtures;
-using ProjectOrigin.TestUtils;
 using Xunit;
 
 namespace ProjectOrigin.Registry.IntegrationTests;
@@ -55,7 +55,7 @@ public class TelemetryTest :
             { "RabbitMq:HttpApiPort", rabbitMqFixture.HttpApiPort.ToString() },
             { "RabbitMq:Username", RabbitMqFixture.Username },
             { "RabbitMq:Password", RabbitMqFixture.Password },
-            { "TransactionProcessor:PodName", "Registry_0" },
+            { "TransactionProcessor:ServerNumber", "0" },
             { "TransactionProcessor:Servers", "1" },
             { "TransactionProcessor:Threads", "5" },
             { "TransactionProcessor:Weight", "10" },

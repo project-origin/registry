@@ -14,11 +14,10 @@ using System.Collections.Concurrent;
 using FluentAssertions;
 using System.Linq;
 using System.Collections.Generic;
-using ProjectOrigin.TestUtils;
 using Xunit.Abstractions;
-using ProjectOrigin.Registry.IntegrationTests;
 using ProjectOrigin.TestCommon.Fixtures;
 using ProjectOrigin.Registry;
+using ProjectOrigin.Registry.IntegrationTests.Fixtures;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 

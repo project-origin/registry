@@ -1,5 +1,4 @@
 using Xunit.Abstractions;
-using ProjectOrigin.TestUtils;
 using Xunit;
 using System.Threading.Tasks;
 using System;
@@ -10,6 +9,7 @@ using ProjectOrigin.HierarchicalDeterministicKeys;
 using System.Collections.Generic;
 using ProjectOrigin.TestCommon.Fixtures;
 using ProjectOrigin.Registry;
+using ProjectOrigin.Registry.IntegrationTests.Fixtures;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
@@ -54,8 +54,7 @@ public class FlowTests :
             {"RabbitMq:HttpApiPort", rabbitMqFixture.HttpApiPort.ToString()},
             {"RabbitMq:Username", RabbitMqFixture.Username},
             {"RabbitMq:Password", RabbitMqFixture.Password},
-            {"TransactionProcessor:PodName", "Registry_0"},
-            //{"TransactionProcessor:ServerNumber", "0"},
+            {"TransactionProcessor:ServerNumber", "0"},
             {"TransactionProcessor:Servers", "1"},
             {"TransactionProcessor:Threads", "5"},
             {"TransactionProcessor:Weight", "10"},

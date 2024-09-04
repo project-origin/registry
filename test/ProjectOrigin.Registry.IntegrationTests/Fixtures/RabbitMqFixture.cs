@@ -1,12 +1,11 @@
-using System;
-using System.IO;
 using System.Threading.Tasks;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Images;
+using ProjectOrigin.Registry.IntegrationTests.Extensions;
 using Testcontainers.RabbitMq;
 using Xunit;
 
-namespace ProjectOrigin.TestUtils;
+namespace ProjectOrigin.Registry.IntegrationTests.Fixtures;
 
 public class RabbitMqFixture : IAsyncLifetime
 {
@@ -50,21 +49,5 @@ public class RabbitMqFixture : IAsyncLifetime
     public async Task DisposeAsync()
     {
         await _container.StopAsync();
-    }
-}
-
-public static class ImageFromDockerfileBuilderExtensions
-{
-    public static ImageFromDockerfileBuilder WithDockerfileContent(this ImageFromDockerfileBuilder image, string dockerfileContent)
-    {
-        var tempfolder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        var filename = Guid.NewGuid().ToString() + ".Dockerfile";
-
-        Directory.CreateDirectory(tempfolder);
-        File.WriteAllText(Path.Combine(tempfolder, filename), dockerfileContent);
-
-        return image
-            .WithDockerfileDirectory(tempfolder)
-            .WithDockerfile(filename);
     }
 }
