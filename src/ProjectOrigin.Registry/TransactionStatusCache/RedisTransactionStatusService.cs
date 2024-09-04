@@ -2,11 +2,11 @@ using System;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using ProjectOrigin.VerifiableEventStore.Models;
-using ProjectOrigin.VerifiableEventStore.Services.Repository;
+using ProjectOrigin.Registry.Repository;
+using ProjectOrigin.Registry.Repository.Models;
 using StackExchange.Redis;
 
-namespace ProjectOrigin.VerifiableEventStore.Services.TransactionStatusCache;
+namespace ProjectOrigin.Registry.TransactionStatusCache;
 
 public class RedisTransactionStatusService : ITransactionStatusService
 {

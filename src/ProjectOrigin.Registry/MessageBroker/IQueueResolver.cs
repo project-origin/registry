@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace ProjectOrigin.Registry.Server.Interfaces
+namespace ProjectOrigin.Registry.MessageBroker
 {
     public interface IQueueResolver
     {

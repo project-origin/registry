@@ -10,12 +10,11 @@ using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using ProjectOrigin.Registry.V1;
-using ProjectOrigin.VerifiableEventStore.Extensions;
-using ProjectOrigin.VerifiableEventStore.Models;
-using ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres.Mapping;
-using ProjectOrigin.VerifiableEventStore.Services.Repository;
+using ProjectOrigin.Registry.Extensions;
+using ProjectOrigin.Registry.Repository.Models;
+using ProjectOrigin.Registry.Repository.Postgres.Mapping;
 
-namespace ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres;
+namespace ProjectOrigin.Registry.Repository.Postgres;
 
 public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
 {

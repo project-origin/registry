@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ProjectOrigin.Registry.Server.Models;
 
-namespace ProjectOrigin.Registry.Server.Interfaces;
+namespace ProjectOrigin.Registry.MessageBroker;
 
 public interface IRabbitMqHttpClient
 {

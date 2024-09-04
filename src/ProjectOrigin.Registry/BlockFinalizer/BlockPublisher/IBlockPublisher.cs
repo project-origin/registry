@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace ProjectOrigin.VerifiableEventStore.Services.BlockPublisher;
+namespace ProjectOrigin.Registry.BlockFinalizer.BlockPublisher;
 
 public interface IBlockPublisher
 {

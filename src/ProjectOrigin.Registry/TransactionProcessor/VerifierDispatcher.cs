@@ -4,13 +4,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Grpc.Net.Client;
 using Microsoft.Extensions.Options;
-using ProjectOrigin.Registry.Server.Exceptions;
-using ProjectOrigin.Registry.Server.Interfaces;
-using ProjectOrigin.Registry.Server.Options;
+using ProjectOrigin.Registry.Exceptions;
+using ProjectOrigin.Registry.Options;
 using ProjectOrigin.Registry.V1;
 using ProjectOrigin.Verifier.V1;
 
-namespace ProjectOrigin.Registry.Server.Services;
+namespace ProjectOrigin.Registry.TransactionProcessor;
 
 public class VerifierDispatcher : ITransactionDispatcher
 {

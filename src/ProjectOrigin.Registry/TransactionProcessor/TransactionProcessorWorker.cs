@@ -2,13 +2,13 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using ProjectOrigin.Registry.Server.Extensions;
-using ProjectOrigin.Registry.Server.Interfaces;
+using ProjectOrigin.Registry.Extensions;
+using ProjectOrigin.Registry.MessageBroker;
 using ProjectOrigin.Registry.V1;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace ProjectOrigin.Registry.Server.Services;
+namespace ProjectOrigin.Registry.TransactionProcessor;
 
 public sealed class TransactionProcessorWorker : IAsyncDisposable
 {

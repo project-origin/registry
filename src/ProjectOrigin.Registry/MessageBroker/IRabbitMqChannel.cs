@@ -1,8 +1,7 @@
 using System;
-using System.Threading.Tasks;
 using RabbitMQ.Client;
 
-namespace ProjectOrigin.Registry.Server.Interfaces;
+namespace ProjectOrigin.Registry.MessageBroker;
 
 public interface IRabbitMqChannel : IDisposable
 {

@@ -6,6 +6,7 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <WarningsAsErrors>IDE0005</WarningsAsErrors>
   </PropertyGroup>
 
   <Target Name="Updating grpc references" BeforeTargets="PreBuildEvent">

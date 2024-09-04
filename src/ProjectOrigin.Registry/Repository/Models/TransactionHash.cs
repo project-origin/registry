@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using StackExchange.Redis;
 
-namespace ProjectOrigin.VerifiableEventStore.Models;
+namespace ProjectOrigin.Registry.Repository.Models;
 
 public sealed record TransactionHash(byte[] Data)
 {

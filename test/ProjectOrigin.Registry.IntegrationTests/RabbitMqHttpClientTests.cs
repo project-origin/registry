@@ -2,12 +2,12 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.Extensions.Options;
-using ProjectOrigin.Registry.Server.Options;
-using ProjectOrigin.Registry.Server.Services;
+using ProjectOrigin.Registry.MessageBroker;
+using ProjectOrigin.Registry.Options;
 using ProjectOrigin.TestUtils;
 using RabbitMQ.Client;
 using Xunit;
+using MsOptions = Microsoft.Extensions.Options.Options;
 
 namespace ProjectOrigin.Registry.IntegrationTests;
 
@@ -22,7 +22,7 @@ public class RabbitMqHttpClientTests
             await rabbitMq.InitializeAsync();
 
             // Arrange
-            var options = Options.Create(new RabbitMqOptions()
+            var options = MsOptions.Create(new RabbitMqOptions()
             {
                 Username = RabbitMqFixture.Username,
                 Password = RabbitMqFixture.Password,
@@ -70,7 +70,7 @@ public class RabbitMqHttpClientTests
             await rabbitMq.InitializeAsync();
 
             // Arrange
-            var options = Options.Create(new RabbitMqOptions()
+            var options = MsOptions.Create(new RabbitMqOptions()
             {
                 Username = RabbitMqFixture.Username,
                 Password = RabbitMqFixture.Password,

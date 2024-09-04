@@ -1,21 +1,18 @@
-using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Npgsql;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
-using ProjectOrigin.Registry.Server.Extensions;
-using ProjectOrigin.Registry.Server.Grpc;
-using ProjectOrigin.Registry.Server.Interfaces;
-using ProjectOrigin.Registry.Server.Options;
-using ProjectOrigin.Registry.Server.Services;
-using ProjectOrigin.VerifiableEventStore.Models;
-using ProjectOrigin.VerifiableEventStore.Services.BlockFinalizer;
+using ProjectOrigin.Registry.BlockFinalizer.Process;
+using ProjectOrigin.Registry.Extensions;
+using ProjectOrigin.Registry.Grpc;
+using ProjectOrigin.Registry.MessageBroker;
+using ProjectOrigin.Registry.Options;
+using ProjectOrigin.Registry.TransactionProcessor;
+using ProjectOrigin.ServiceCommon.Extensions;
+using ProjectOrigin.ServiceCommon.Grpc;
+using ProjectOrigin.ServiceCommon.Otlp;
 
-namespace ProjectOrigin.Registry.Server;
+namespace ProjectOrigin.Registry;
 
 public class Startup
 {
@@ -28,46 +25,9 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddGrpc();
-        services.AddSingleton<ITransactionDispatcher, VerifierDispatcher>();
-
-        services.AddOptions<OtlpOptions>()
-            .BindConfiguration(OtlpOptions.Prefix)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
-        var otlpOptions = _configuration.GetSection(OtlpOptions.Prefix).GetValid<OtlpOptions>();
-        if (otlpOptions.Enabled)
-        {
-            services.AddOpenTelemetry()
-                .ConfigureResource(r =>
-                {
-                    r.AddService("ProjectOrigin.Registry.Server",
-                    serviceInstanceId: Environment.MachineName);
-                })
-                .WithMetrics(provider =>
-                    provider
-                        .AddMeter(BlockFinalizerJob.Meter.Name)
-                        .AddMeter(RegistryService.Meter.Name)
-                        .AddOtlpExporter(o => o.Endpoint = otlpOptions.Endpoint)
-                )
-                .WithTracing(provider =>
-                    provider
-                        .AddGrpcClientInstrumentation(grpcOptions =>
-                        {
-                            grpcOptions.EnrichWithHttpRequestMessage = (activity, httpRequestMessage) =>
-                                activity.SetTag("requestVersion", httpRequestMessage.Version);
-                            grpcOptions.EnrichWithHttpResponseMessage = (activity, httpResponseMessage) =>
-                                activity.SetTag("responseVersion", httpResponseMessage.Version);
-                            grpcOptions.SuppressDownstreamInstrumentation = true;
-                        })
-                        .AddAspNetCoreInstrumentation()
-                        .AddRedisInstrumentation()
-                        .AddNpgsql()
-                        .AddOtlpExporter(o => o.Endpoint = otlpOptions.Endpoint));
-        }
-
-
+        services.ConfigureDefaultOtlp(_configuration);
+        services.ConfigureGrpc(_configuration);
+        services.ConfigurePersistance(_configuration);
 
         services.AddOptions<RegistryOptions>().Configure<IConfiguration>((settings, configuration) =>
         {
@@ -102,9 +62,9 @@ public class Startup
         .ValidateOnStart();
 
         services.ConfigureImmutableLog(_configuration);
-        services.ConfigurePersistance(_configuration);
         services.ConfigureTransactionStatusCache(_configuration);
 
+        services.AddSingleton<ITransactionDispatcher, VerifierDispatcher>();
         services.AddSingleton<IQueueResolver, ConsistentHashRingQueueResolver>();
         services.AddSingleton<IRabbitMqChannelPool, RabbitMqChannelPool>();
         services.AddTransient<TransactionProcessorDispatcher>();

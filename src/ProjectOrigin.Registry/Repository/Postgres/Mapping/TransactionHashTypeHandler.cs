@@ -1,8 +1,8 @@
 using System.Data;
 using Dapper;
-using ProjectOrigin.VerifiableEventStore.Models;
+using ProjectOrigin.Registry.Repository.Models;
 
-namespace ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres.Mapping;
+namespace ProjectOrigin.Registry.Repository.Postgres.Mapping;
 
 public class TransactionHashTypeHandler : SqlMapper.TypeHandler<TransactionHash>
 {

@@ -1,6 +1,6 @@
 using System;
 
-namespace ProjectOrigin.VerifiableEventStore.Extensions;
+namespace ProjectOrigin.Registry.Extensions;
 
 public static class DateTimeOffsetExtensions
 {

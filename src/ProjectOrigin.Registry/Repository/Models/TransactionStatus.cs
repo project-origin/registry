@@ -1,4 +1,4 @@
-namespace ProjectOrigin.VerifiableEventStore.Models;
+namespace ProjectOrigin.Registry.Repository.Models;
 
 public enum TransactionStatus
 {

@@ -4,15 +4,14 @@ using System.Threading.Tasks;
 using Google.Protobuf;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using ProjectOrigin.Registry.Server.Exceptions;
-using ProjectOrigin.Registry.Server.Extensions;
-using ProjectOrigin.Registry.Server.Interfaces;
-using ProjectOrigin.Registry.Server.Options;
-using ProjectOrigin.VerifiableEventStore.Models;
-using ProjectOrigin.VerifiableEventStore.Services.Repository;
-using ProjectOrigin.VerifiableEventStore.Services.TransactionStatusCache;
+using ProjectOrigin.Registry.Exceptions;
+using ProjectOrigin.Registry.Extensions;
+using ProjectOrigin.Registry.Options;
+using ProjectOrigin.Registry.Repository;
+using ProjectOrigin.Registry.Repository.Models;
+using ProjectOrigin.Registry.TransactionStatusCache;
 
-namespace ProjectOrigin.Registry.Server.Services;
+namespace ProjectOrigin.Registry.TransactionProcessor;
 
 public class TransactionProcessorDispatcher
 {

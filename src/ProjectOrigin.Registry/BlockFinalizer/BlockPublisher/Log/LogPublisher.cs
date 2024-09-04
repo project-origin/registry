@@ -2,9 +2,9 @@ using System;
 using System.Threading.Tasks;
 using Google.Protobuf;
 using Microsoft.Extensions.Logging;
-using ProjectOrigin.VerifiableEventStore.Models;
+using ProjectOrigin.Registry.Repository.Models;
 
-namespace ProjectOrigin.VerifiableEventStore.Services.BlockPublisher.Log;
+namespace ProjectOrigin.Registry.BlockFinalizer.BlockPublisher.Log;
 
 /// The implementation can be used locally to see the output in the log, but it is not recommended for production use.
 /// There is no real immutability guarantee, as the log file is not tamper evident.

@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
-using ProjectOrigin.VerifiableEventStore.Services.Repository;
+using ProjectOrigin.ServiceCommon.Database;
 
-namespace ProjectOrigin.VerifiableEventStore.Services.EventStore.InMemory;
+namespace ProjectOrigin.Registry.Repository.InMemory;
 
-public class InMemoryUpgrader : IRepositoryUpgrader
+public class InMemoryUpgrader : IDatabaseUpgrader
 {
     public Task<bool> IsUpgradeRequired()
     {

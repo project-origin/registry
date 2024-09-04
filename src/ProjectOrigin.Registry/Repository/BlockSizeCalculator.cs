@@ -1,6 +1,6 @@
 using System;
 
-namespace ProjectOrigin.VerifiableEventStore.Services.EventStore;
+namespace ProjectOrigin.Registry.Repository;
 
 public static class BlockSizeCalculator
 {

@@ -2,7 +2,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using Google.Protobuf;
 
-namespace ProjectOrigin.VerifiableEventStore.Models;
+namespace ProjectOrigin.Registry.Repository.Models;
 
 public sealed record BlockHash(byte[] Data)
 {

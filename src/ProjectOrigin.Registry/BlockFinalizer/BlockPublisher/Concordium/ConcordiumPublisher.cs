@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using ProjectOrigin.Registry.V1;
-using ProjectOrigin.VerifiableEventStore.Services.BlockPublisher;
 using Concordium.Sdk.Client;
 using Concordium.Sdk.Crypto;
 using Concordium.Sdk.Types;
@@ -11,7 +10,7 @@ using ConcordiumV2 = Concordium.Grpc.V2;
 using Microsoft.Extensions.Logging;
 using Google.Protobuf;
 
-namespace ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector.Concordium;
+namespace ProjectOrigin.Registry.BlockFinalizer.BlockPublisher.Concordium;
 
 public sealed class ConcordiumPublisher : IBlockPublisher, IDisposable
 {

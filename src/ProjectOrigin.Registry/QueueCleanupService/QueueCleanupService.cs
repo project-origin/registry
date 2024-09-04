@@ -4,12 +4,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using ProjectOrigin.Registry.Server.Extensions;
-using ProjectOrigin.Registry.Server.Interfaces;
-using ProjectOrigin.Registry.Server.Models;
+using ProjectOrigin.Registry.Extensions;
+using ProjectOrigin.Registry.MessageBroker;
 using RabbitMQ.Client;
 
-namespace ProjectOrigin.Registry.Server.Services;
+namespace ProjectOrigin.Registry;
 
 public sealed class QueueCleanupService : BackgroundService, IDisposable
 {

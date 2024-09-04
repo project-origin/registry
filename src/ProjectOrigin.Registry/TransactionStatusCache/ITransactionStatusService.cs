@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
-using ProjectOrigin.VerifiableEventStore.Models;
+using ProjectOrigin.Registry.Repository.Models;
 
-namespace ProjectOrigin.VerifiableEventStore.Services.TransactionStatusCache;
+namespace ProjectOrigin.Registry.TransactionStatusCache;
 
 public interface ITransactionStatusService
 {

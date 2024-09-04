@@ -17,12 +17,14 @@ using System.Collections.Generic;
 using ProjectOrigin.TestUtils;
 using Xunit.Abstractions;
 using ProjectOrigin.Registry.IntegrationTests;
+using ProjectOrigin.TestCommon.Fixtures;
+using ProjectOrigin.Registry;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
 public class PerformanceTests : IAsyncLifetime,
     IClassFixture<ContainerImageFixture>,
-    IClassFixture<PostgresDatabaseFixture>,
+    IClassFixture<PostgresDatabaseFixture<Startup>>,
     IClassFixture<RedisFixture>,
     IClassFixture<RabbitMqFixture>
 {
@@ -35,12 +37,12 @@ public class PerformanceTests : IAsyncLifetime,
     private readonly IContainer _verifierContainer;
     private readonly Lazy<IContainer> _registryContainer;
     private readonly IPrivateKey _issuerKey;
-    private readonly PostgresDatabaseFixture _postgresDatabaseFixture;
+    private readonly PostgresDatabaseFixture<Startup> _postgresDatabaseFixture;
     private readonly ITestOutputHelper _outputHelper;
 
     public PerformanceTests(
         ContainerImageFixture imageFixture,
-        PostgresDatabaseFixture postgresDatabaseFixture,
+        PostgresDatabaseFixture<Startup> postgresDatabaseFixture,
         RedisFixture redisFixture,
         RabbitMqFixture rabbitMqFixture,
         ITestOutputHelper outputHelper)

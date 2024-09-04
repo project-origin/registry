@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ProjectOrigin.Registry.Server.Interfaces;
+namespace ProjectOrigin.Registry.TransactionProcessor;
 
 public interface ITransactionDispatcher
 {

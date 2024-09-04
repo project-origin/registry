@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace ProjectOrigin.Registry.Server.Interfaces;
+namespace ProjectOrigin.Registry.TransactionProcessor;
 
 public interface ITransactionProcessor
 {

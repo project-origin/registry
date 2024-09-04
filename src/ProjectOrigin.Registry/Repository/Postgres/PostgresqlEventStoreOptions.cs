@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres;
+namespace ProjectOrigin.Registry.Repository.Postgres;
 
 public sealed class PostgresqlEventStoreOptions
 {

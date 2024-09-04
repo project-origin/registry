@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace ProjectOrigin.Registry.Server.Options;
+namespace ProjectOrigin.Registry.Options;
 
 public record CacheOptions() : IValidatableObject
 {

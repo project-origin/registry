@@ -4,17 +4,17 @@ using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
-using ProjectOrigin.Registry.Server.Services;
-using ProjectOrigin.Registry.Server.Extensions;
+using ProjectOrigin.Registry.Extensions;
 using ProjectOrigin.TestUtils;
 using Xunit;
 using RabbitMQ.Client;
 using Google.Protobuf;
 using System.Linq;
-using ProjectOrigin.Registry.Server.Options;
+using ProjectOrigin.Registry.Options;
 using System.Net.Http;
+using ProjectOrigin.Registry.MessageBroker;
+using MsOptions = Microsoft.Extensions.Options.Options;
 
 namespace ProjectOrigin.Registry.IntegrationTests;
 
@@ -33,7 +33,7 @@ public class QueueCleanupServiceTests
 
             // Arrange
             var numberOfMessages = 10000;
-            var rabbitMqOptions = Options.Create(new RabbitMqOptions
+            var rabbitMqOptions = MsOptions.Create(new RabbitMqOptions
             {
                 Username = RabbitMqFixture.Username,
                 Password = RabbitMqFixture.Password,
@@ -51,7 +51,7 @@ public class QueueCleanupServiceTests
                 transactions.Add(new Fixture().Create<V1.Transaction>());
             }
 
-            var queueResolver1 = new ConsistentHashRingQueueResolver(Options.Create(new TransactionProcessorOptions
+            var queueResolver1 = new ConsistentHashRingQueueResolver(MsOptions.Create(new TransactionProcessorOptions
             {
                 Servers = queuesBefore,
                 ServerNumber = 0,
@@ -70,7 +70,7 @@ public class QueueCleanupServiceTests
                 }
             }
 
-            var queueResolver2 = new ConsistentHashRingQueueResolver(Options.Create(new TransactionProcessorOptions
+            var queueResolver2 = new ConsistentHashRingQueueResolver(MsOptions.Create(new TransactionProcessorOptions
             {
                 Servers = queuesAfter,
                 ServerNumber = 0,

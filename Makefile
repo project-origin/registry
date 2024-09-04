@@ -68,7 +68,7 @@ verify-chart: restore
 
 ## Run Concordium integration tests, requires access to running node and environment variables
 concordium-tests: build
-	dotnet test --no-build test/ProjectOrigin.VerifiableEventStore.ConcordiumIntegrationTests
+	dotnet test --no-build test/ProjectOrigin.Registry.ConcordiumIntegrationTests
 
 ## Run performance tests, takes a long time.
 verify-performance: build

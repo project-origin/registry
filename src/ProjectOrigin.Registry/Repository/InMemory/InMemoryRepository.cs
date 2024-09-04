@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using ProjectOrigin.Registry.V1;
-using ProjectOrigin.VerifiableEventStore.Extensions;
-using ProjectOrigin.VerifiableEventStore.Models;
-using ProjectOrigin.VerifiableEventStore.Services.Repository;
+using ProjectOrigin.Registry.Extensions;
+using ProjectOrigin.Registry.Repository.Models;
 
-namespace ProjectOrigin.VerifiableEventStore.Services.EventStore.InMemory;
+namespace ProjectOrigin.Registry.Repository.InMemory;
 
 public class InMemoryRepository : ITransactionRepository
 {

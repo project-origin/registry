@@ -6,28 +6,28 @@ using ProjectOrigin.Electricity.IntegrationTests;
 using ProjectOrigin.Electricity.V1;
 using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.PedersenCommitment;
-using ProjectOrigin.Registry.Server;
+using ProjectOrigin.TestCommon.Fixtures;
 using ProjectOrigin.TestUtils;
 using Xunit;
 
 namespace ProjectOrigin.Registry.IntegrationTests;
 
 public class TelemetryTest :
-    IClassFixture<PostgresDatabaseFixture>,
-    IClassFixture<GrpcTestFixture<Startup>>,
+    IClassFixture<PostgresDatabaseFixture<Startup>>,
+    IClassFixture<TestServerFixture<Startup>>,
     IClassFixture<ElectricityServiceFixture>,
     IClassFixture<RabbitMqFixture>,
     IClassFixture<RedisFixture>,
     IClassFixture<OpenTelemetryFixture>,
     IDisposable
 {
-    private readonly GrpcTestFixture<Startup> _grpcTestFixture;
+    private readonly TestServerFixture<Startup> _grpcTestFixture;
     private readonly OpenTelemetryFixture _openTelemetryFixture;
     private readonly ElectricityServiceFixture _electricityServiceFixture;
     private V1.RegistryService.RegistryServiceClient Client => new(_grpcTestFixture.Channel);
 
-    public TelemetryTest(GrpcTestFixture<Startup> grpcTestFixture,
-        PostgresDatabaseFixture dbFixture,
+    public TelemetryTest(TestServerFixture<Startup> grpcTestFixture,
+        PostgresDatabaseFixture<Startup> dbFixture,
         RabbitMqFixture rabbitMqFixture,
         RedisFixture redisFixture,
         OpenTelemetryFixture openTelemetryFixture,

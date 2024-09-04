@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector.Concordium;
+namespace ProjectOrigin.Registry.BlockFinalizer.BlockPublisher.Concordium;
 
 public class ConcordiumOptions
 {

@@ -3,11 +3,11 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
-using Microsoft.Extensions.Options;
 using ProjectOrigin.Registry.IntegrationTests.Extensions;
-using ProjectOrigin.Registry.Server.Options;
-using ProjectOrigin.Registry.Server.Services;
+using ProjectOrigin.Registry.MessageBroker;
+using ProjectOrigin.Registry.Options;
 using Xunit;
+using MsOptions = Microsoft.Extensions.Options.Options;
 
 namespace ProjectOrigin.Registry.IntegrationTests;
 
@@ -26,7 +26,7 @@ public class ConsistentHashResolverTests
         };
         var number = 100000;
         var expected = number / (options.Servers * options.Threads);
-        var resolver = new ConsistentHashRingQueueResolver(Options.Create(options));
+        var resolver = new ConsistentHashRingQueueResolver(MsOptions.Create(options));
 
         ConcurrentDictionary<string, int> queueCounts = new ConcurrentDictionary<string, int>();
         for (int i = 0; i < number; i++)
@@ -51,7 +51,7 @@ public class ConsistentHashResolverTests
             Threads = 2,
             Weight = 2
         };
-        var resolver = new ConsistentHashRingQueueResolver(Options.Create(options));
+        var resolver = new ConsistentHashRingQueueResolver(MsOptions.Create(options));
 
         var queue = resolver.GetQueueName("test");
 
@@ -63,7 +63,7 @@ public class ConsistentHashResolverTests
     {
         var totalNumber = 100000;
 
-        var resolverOld = new ConsistentHashRingQueueResolver(Options.Create(new TransactionProcessorOptions
+        var resolverOld = new ConsistentHashRingQueueResolver(MsOptions.Create(new TransactionProcessorOptions
         {
             ServerNumber = 0,
             Servers = 10,
@@ -71,7 +71,7 @@ public class ConsistentHashResolverTests
             Weight = 20
         }));
 
-        var resolverNew = new ConsistentHashRingQueueResolver(Options.Create(new TransactionProcessorOptions
+        var resolverNew = new ConsistentHashRingQueueResolver(MsOptions.Create(new TransactionProcessorOptions
         {
             ServerNumber = 0,
             Servers = 9,

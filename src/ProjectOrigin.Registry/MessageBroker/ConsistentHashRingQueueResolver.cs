@@ -5,10 +5,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Options;
 using Murmur;
-using ProjectOrigin.Registry.Server.Interfaces;
-using ProjectOrigin.Registry.Server.Options;
+using ProjectOrigin.Registry.Options;
 
-namespace ProjectOrigin.Registry.Server.Services;
+namespace ProjectOrigin.Registry.MessageBroker;
 
 public partial class ConsistentHashRingQueueResolver : IQueueResolver
 {

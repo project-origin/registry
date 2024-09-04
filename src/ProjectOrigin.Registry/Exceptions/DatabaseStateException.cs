@@ -1,6 +1,6 @@
 using System;
 
-namespace ProjectOrigin.Registry.Server.Exceptions;
+namespace ProjectOrigin.Registry.Exceptions;
 
 public class DatabaseStateException : Exception
 {

@@ -6,11 +6,9 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using ProjectOrigin.Registry.Server.Interfaces;
-using ProjectOrigin.Registry.Server.Models;
-using ProjectOrigin.Registry.Server.Options;
+using ProjectOrigin.Registry.Options;
 
-namespace ProjectOrigin.Registry.Server.Services;
+namespace ProjectOrigin.Registry.MessageBroker;
 
 public sealed class RabbitMqHttpClient : IRabbitMqHttpClient
 {

@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ProjectOrigin.VerifiableEventStore.Models;
+using ProjectOrigin.Registry.Repository.Models;
 
-namespace ProjectOrigin.VerifiableEventStore.Services.Repository;
+namespace ProjectOrigin.Registry.Repository;
 
 public interface ITransactionRepository
 {

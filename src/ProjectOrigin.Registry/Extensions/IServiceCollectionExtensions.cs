@@ -1,18 +1,21 @@
 using System;
+using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ProjectOrigin.Registry.Server.Options;
-using ProjectOrigin.VerifiableEventStore.Services.BlockchainConnector.Concordium;
-using ProjectOrigin.VerifiableEventStore.Services.BlockPublisher;
-using ProjectOrigin.VerifiableEventStore.Services.BlockPublisher.Log;
-using ProjectOrigin.VerifiableEventStore.Services.EventStore.InMemory;
-using ProjectOrigin.VerifiableEventStore.Services.EventStore.Postgres;
-using ProjectOrigin.VerifiableEventStore.Services.Repository;
-using ProjectOrigin.VerifiableEventStore.Services.TransactionStatusCache;
+using ProjectOrigin.Registry.BlockFinalizer.BlockPublisher;
+using ProjectOrigin.Registry.BlockFinalizer.BlockPublisher.Concordium;
+using ProjectOrigin.Registry.BlockFinalizer.BlockPublisher.Log;
+using ProjectOrigin.Registry.Options;
+using ProjectOrigin.Registry.Repository;
+using ProjectOrigin.Registry.Repository.InMemory;
+using ProjectOrigin.Registry.Repository.Postgres;
+using ProjectOrigin.Registry.TransactionStatusCache;
+using ProjectOrigin.ServiceCommon.Database;
+using ProjectOrigin.ServiceCommon.Extensions;
 using Serilog;
 using StackExchange.Redis;
 
-namespace ProjectOrigin.Registry.Server.Extensions;
+namespace ProjectOrigin.Registry.Extensions;
 
 public static class IServiceCollectionExtensions
 {
@@ -49,12 +52,12 @@ public static class IServiceCollectionExtensions
         {
             case "in_memory":
                 Log.Warning("Using in memory repository - this is not recommended for production use! Data is not persisted and unable to run multiple instances.");
-                services.AddTransient<IRepositoryUpgrader, InMemoryUpgrader>();
+                services.AddTransient<IDatabaseUpgrader, InMemoryUpgrader>();
                 services.AddSingleton<ITransactionRepository, InMemoryRepository>();
                 break;
 
             case "postgresql":
-                services.AddTransient<IRepositoryUpgrader, PostgresqlUpgrader>();
+                services.AddSingleton<IDatabaseUpgrader>(serviceProvider => ActivatorUtilities.CreateInstance<DatabaseUpgrader>(serviceProvider, Assembly.GetEntryAssembly()!));
                 services.AddTransient<ITransactionRepository, PostgresqlRepository>();
                 services.AddOptions<PostgresqlEventStoreOptions>()
                     .Bind(persistance.GetRequiredSection("postgresql"))

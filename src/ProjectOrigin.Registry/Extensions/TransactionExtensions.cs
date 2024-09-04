@@ -1,8 +1,8 @@
 using System.Security.Cryptography;
 using Google.Protobuf;
-using ProjectOrigin.VerifiableEventStore.Models;
+using ProjectOrigin.Registry.Repository.Models;
 
-namespace ProjectOrigin.Registry.Server.Extensions;
+namespace ProjectOrigin.Registry.Extensions;
 
 public static class TransactionExtensions
 {

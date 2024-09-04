@@ -6,6 +6,7 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <WarningsAsErrors>IDE0005</WarningsAsErrors>
   </PropertyGroup>
 
   <Target Name="Updating grpc references" BeforeTargets="PreBuildEvent">
@@ -27,13 +28,12 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
-    <PackageReference Include="Testcontainers" Version="3.9.0" />
     <PackageReference Include="ProjectOrigin.PedersenCommitment" Version="1.1.1" />
     <PackageReference Include="ProjectOrigin.HierarchicalDeterministicKeys" Version="1.0.0" />
+    <PackageReference Include="ProjectOrigin.TestCommon" Version="1.0.0-rc.5" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ProjectOrigin.TestUtils\ProjectOrigin.TestUtils.csproj" />
     <ProjectReference Include="..\..\src\ProjectOrigin.Registry\ProjectOrigin.Registry.csproj" />
   </ItemGroup>
 

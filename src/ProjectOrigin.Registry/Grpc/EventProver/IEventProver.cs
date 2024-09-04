@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
-using ProjectOrigin.VerifiableEventStore.Models;
+using ProjectOrigin.Registry.Repository.Models;
 
-namespace ProjectOrigin.VerifiableEventStore.Services.EventProver;
+namespace ProjectOrigin.Registry.Grpc.EventProver;
 
 public interface IEventProver
 {

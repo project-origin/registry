@@ -1,7 +1,7 @@
-using ProjectOrigin.Registry.Server.Interfaces;
+using ProjectOrigin.Registry.MessageBroker;
 using ProjectOrigin.Registry.V1;
 
-namespace ProjectOrigin.Registry.Server.Extensions;
+namespace ProjectOrigin.Registry.Extensions;
 
 public static class IQueueResolverExtensions
 {

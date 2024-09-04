@@ -1,6 +1,5 @@
 using Xunit.Abstractions;
 using ProjectOrigin.TestUtils;
-using ProjectOrigin.Registry.Server;
 using Xunit;
 using System.Threading.Tasks;
 using System;
@@ -9,33 +8,37 @@ using FluentAssertions;
 using ProjectOrigin.Electricity.V1;
 using ProjectOrigin.HierarchicalDeterministicKeys;
 using System.Collections.Generic;
+using ProjectOrigin.TestCommon.Fixtures;
+using ProjectOrigin.Registry;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
 public class FlowTests :
-    GrpcTestBase<Startup>,
+    IClassFixture<TestServerFixture<Startup>>,
     IClassFixture<ElectricityServiceFixture>,
-    IClassFixture<PostgresDatabaseFixture>,
+    IClassFixture<PostgresDatabaseFixture<Startup>>,
     IClassFixture<RedisFixture>,
     IClassFixture<RabbitMqFixture>
 {
-    protected ElectricityServiceFixture _verifierFixture;
-    private PostgresDatabaseFixture _postgresDatabaseFixture;
     protected const string RegistryName = "SomeRegistry";
+    protected readonly ElectricityServiceFixture _verifierFixture;
+    private readonly PostgresDatabaseFixture<Startup> _postgresDatabaseFixture;
 
-    protected Registry.V1.RegistryService.RegistryServiceClient Client => new(_grpcFixture.Channel);
+    private readonly Lazy<Registry.V1.RegistryService.RegistryServiceClient> _client;
+    protected Registry.V1.RegistryService.RegistryServiceClient Client => _client.Value;
 
     public FlowTests(
         ElectricityServiceFixture verifierFixture,
-        GrpcTestFixture<Startup> grpcFixture,
-        PostgresDatabaseFixture postgresDatabaseFixture,
+        TestServerFixture<Startup> serverFixture,
+        PostgresDatabaseFixture<Startup> postgresDatabaseFixture,
         RedisFixture redisFixture,
         RabbitMqFixture rabbitMqFixture,
-        ITestOutputHelper outputHelper) : base(grpcFixture, outputHelper)
+        ITestOutputHelper outputHelper)
     {
         _verifierFixture = verifierFixture;
         _postgresDatabaseFixture = postgresDatabaseFixture;
-        grpcFixture.ConfigureHostConfiguration(new Dictionary<string, string?>()
+        _client = new(() => new Registry.V1.RegistryService.RegistryServiceClient(serverFixture.Channel));
+        serverFixture.ConfigureHostConfiguration(new Dictionary<string, string?>()
         {
             {"Otlp:Enabled", "false"},
             {"RegistryName", RegistryName},

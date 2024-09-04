@@ -1,10 +1,10 @@
 using System.Linq;
 using System.Threading.Tasks;
-using ProjectOrigin.VerifiableEventStore.Extensions;
-using ProjectOrigin.VerifiableEventStore.Models;
-using ProjectOrigin.VerifiableEventStore.Services.Repository;
+using ProjectOrigin.Registry.Extensions;
+using ProjectOrigin.Registry.Repository;
+using ProjectOrigin.Registry.Repository.Models;
 
-namespace ProjectOrigin.VerifiableEventStore.Services.EventProver;
+namespace ProjectOrigin.Registry.Grpc.EventProver;
 
 public class EventProverService : IEventProver
 {

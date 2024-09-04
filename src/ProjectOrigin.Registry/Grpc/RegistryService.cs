@@ -3,16 +3,16 @@ using ProjectOrigin.Registry.V1;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
-using ProjectOrigin.VerifiableEventStore.Services.TransactionStatusCache;
 using System.Diagnostics.Metrics;
-using ProjectOrigin.VerifiableEventStore.Models;
-using ProjectOrigin.VerifiableEventStore.Services.Repository;
-using ProjectOrigin.Registry.Server.Extensions;
+using ProjectOrigin.Registry.Extensions;
 using Google.Protobuf;
-using ProjectOrigin.Registry.Server.Interfaces;
 using RabbitMQ.Client;
+using ProjectOrigin.Registry.MessageBroker;
+using ProjectOrigin.Registry.TransactionStatusCache;
+using ProjectOrigin.Registry.Repository;
+using ProjectOrigin.Registry.Repository.Models;
 
-namespace ProjectOrigin.Registry.Server.Grpc;
+namespace ProjectOrigin.Registry.Grpc;
 
 public class RegistryService : V1.RegistryService.RegistryServiceBase
 {
