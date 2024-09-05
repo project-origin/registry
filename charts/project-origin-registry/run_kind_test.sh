@@ -154,7 +154,7 @@ echo "Registry B installed"
 sleep 15
 
 # run tests
-dotnet test src/ProjectOrigin.Registry.ChartTests \
+dotnet test test/ProjectOrigin.Registry.ChartTests \
   -e "AREA=$example_area" \
   -e "ISSUER_KEY=$PrivateKeyBase64" \
   -e "PROD_REGISTRY_NAME=$registry_a_name" \

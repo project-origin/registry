@@ -130,7 +130,7 @@ kubectl wait --for=condition=available --timeout=300s deployment/${registry_a_na
 echo "Registry A installed"
 
 # run tests
-dotnet test src/ProjectOrigin.Registry.ChartTests \
+dotnet test test/ProjectOrigin.Registry.ChartTests \
   -e "AREA=$example_area" \
   -e "ISSUER_KEY=$PrivateKeyBase64" \
   -e "PROD_REGISTRY_NAME=$registry_a_name" \
@@ -145,7 +145,7 @@ helm upgrade ${registry_a_name} -n ${registry_a_namespace} charts/project-origin
 kubectl wait --for=condition=available --timeout=300s deployment/${registry_a_name}-deployment-0 -n ${registry_a_namespace} --context kind-${cluster_name}
 echo "Registry updated"
 
-dotnet test src/ProjectOrigin.Registry.ChartTests \
+dotnet test test/ProjectOrigin.Registry.ChartTests \
   -e "AREA=$example_area" \
   -e "ISSUER_KEY=$PrivateKeyBase64" \
   -e "PROD_REGISTRY_NAME=$registry_a_name" \

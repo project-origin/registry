@@ -86,7 +86,9 @@ public sealed class QueueCleanupService : BackgroundService, IDisposable
 
     public override void Dispose()
     {
+        if (_rabbitMqChannel is not null)
+            _rabbitMqChannel!.Dispose();
+
         base.Dispose();
-        _rabbitMqChannel!.Dispose();
     }
 }
