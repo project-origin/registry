@@ -1,12 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>disable</ImplicitUsings>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <WarningsAsErrors>IDE0005</WarningsAsErrors>
   </PropertyGroup>
 
   <Target Name="Updating grpc references" BeforeTargets="PreBuildEvent">
@@ -40,8 +36,8 @@
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.27.2" />
     <PackageReference Include="Grpc.Tools" Version="2.65.0" />
-    <Protobuf Include="../../src/Protos/electricity.proto" Link="Protos\electricity.proto" GrpcServices="None">
-      <SourceUrl>https://raw.githubusercontent.com/project-origin/verifier_electricity/v1.1.0/src/Protos/electricity.proto</SourceUrl>
+    <Protobuf Include="../../protos/electricity.proto" Link="Protos\electricity.proto" GrpcServices="None">
+      <SourceUrl>https://raw.githubusercontent.com/project-origin/verifier_electricity/v2.0.0-rc.5/protos/electricity.proto</SourceUrl>
     </Protobuf>
   </ItemGroup>
 

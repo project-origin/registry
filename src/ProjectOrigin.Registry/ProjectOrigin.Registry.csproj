@@ -4,16 +4,8 @@
     <AssemblyName Condition="'$(CustomAssemblyName)' != ''">$(CustomAssemblyName)</AssemblyName>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>disable</ImplicitUsings>
-    <WarningsAsErrors>IDE0005</WarningsAsErrors>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="ProjectOrigin.ServiceCommon" Version="1.0.0-rc.5" />
-
     <PackageReference Include="OpenTelemetry.Instrumentation.StackExchangeRedis" Version="1.0.0-rc9.15" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.65.0" />
     <PackageReference Include="OpenTelemetry" Version="1.9.0" />
@@ -45,8 +37,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\Protos\common.proto" GrpcServices="None"/>
-    <Protobuf Include="..\Protos\registry.proto" GrpcServices="Both"/>
-    <Protobuf Include="..\Protos\verifier.proto" GrpcServices="Client" />
+    <Protobuf Include="..\..\protos\common.proto" GrpcServices="None"/>
+    <Protobuf Include="..\..\protos\registry.proto" GrpcServices="Both"/>
+    <Protobuf Include="..\..\protos\verifier.proto" GrpcServices="Client" />
   </ItemGroup>
 </Project>

@@ -76,4 +76,4 @@ verify-performance: build
 
 ## Build the container image with tag ghcr.io/project-origin/registry-server:test
 build-container:
-	docker build -f src/Registry.Dockerfile -t ghcr.io/project-origin/registry-server:test src/
+	docker build -f Registry.Dockerfile -t ghcr.io/project-origin/registry-server:test .

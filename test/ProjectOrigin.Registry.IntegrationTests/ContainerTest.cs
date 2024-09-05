@@ -80,7 +80,6 @@ public class ContainerTest : IAsyncLifetime,
                 .WithEnvironment("TransactionProcessor__Servers", "1")
                 .WithEnvironment("TransactionProcessor__Threads", "5")
                 .WithEnvironment("TransactionProcessor__Weight", "10")
-                .WithCreateParameterModifier(parameterModifier => parameterModifier.User = "1654")
                 .WithWaitStrategy(
                     Wait.ForUnixContainer()
                         .UntilPortIsAvailable(GrpcPort)

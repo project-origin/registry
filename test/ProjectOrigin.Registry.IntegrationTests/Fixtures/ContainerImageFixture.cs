@@ -15,7 +15,7 @@ public class ContainerImageFixture : IAsyncLifetime
 
     public ContainerImageFixture()
     {
-        var folder = Path.Combine(CommonDirectoryPath.GetSolutionDirectory().DirectoryPath, "src");
+        var folder = Path.Combine(CommonDirectoryPath.GetSolutionDirectory().DirectoryPath);
 
         // Testcontainers doesn't support buildkit and therefore doesn't support $BUILDPLATFORM
         _tempDockerPath = CreateTempDockerfileWithoutPlatform(Path.Combine(folder, DockerfilePath));
@@ -42,7 +42,12 @@ public class ContainerImageFixture : IAsyncLifetime
     private static string CreateTempDockerfileWithoutPlatform(string source)
     {
         var target = $"{source}.tmp";
-        File.WriteAllText(target, File.ReadAllText(source).Replace(" --platform=$BUILDPLATFORM", ""));
+
+        var content = File.ReadAllText(source)
+            .Replace(" --platform=$BUILDPLATFORM", "") // not supported by Testcontainers
+            .Replace("-jammy-chiseled-extra", ""); // not supported by Testcontainers because of user permissions
+
+        File.WriteAllText(target, content);
         return target;
     }
 }
