@@ -4,4 +4,6 @@ kind: RabbitmqCluster
 metadata:
   name: {{ .Release.Name }}-rabbitmq
   namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/resource-policy": keep
 {{- end }}
