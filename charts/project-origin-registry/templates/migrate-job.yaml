@@ -26,4 +26,4 @@ spec:
           env:
             - name: PERSISTENCE__TYPE
               value: postgresql
-            {{- include "database.config" $ | nindent 12 }}
+            {{- include "common.database.config" $ | nindent 12 }}

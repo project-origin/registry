@@ -67,7 +67,7 @@ spec:
           env:
             - name: PERSISTENCE__TYPE
               value: postgresql
-            {{- include "database.config" $ | nindent 12 }}
+            {{- include "common.database.config" $ | nindent 12 }}
             {{- include "common.otlp.config" $.Values.otlp | nindent 12 }}
 
           # General configuration
@@ -103,27 +103,24 @@ spec:
             - name: IMMUTABLELOG__CONCORDIUM__AUTHENTICATIONTOKEN
               value: {{ $.Values.immutableRecord.concordium.rpcToken }}
             - name: IMMUTABLELOG__CONCORDIUM__ACCOUNTADDRESS
-              value: {{ required "When type is concordium, accountAddress must be set" $.Values.immutableRecord.concordium.accountAddress }}
+              {{- include "common.setValue" (list $.Values.immutableRecord.concordium.accountAddress ".immutableRecord.concordium.accountAddress") | nindent 14 }}
             - name: IMMUTABLELOG__CONCORDIUM__ACCOUNTKEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ required "When type is concordium, accountKeySecret.name must be set" $.Values.immutableRecord.concordium.accountKeySecret.name }}
-                  key: {{ required "When type is concordium, accountKeySecret.key must be set" $.Values.immutableRecord.concordium.accountKeySecret.key }}
+              {{- include "common.setValue" (list $.Values.immutableRecord.concordium.accountKey ".immutableRecord.concordium.accountKey") | nindent 14 }}
           {{- end }}
 
           # rabbitmq
             - name: MessageBroker__Type
               value: RabbitMq
             - name: RabbitMq__Hostname
-              {{- include "checkKey" (list $.Values.rabbitmq.host ".rabbitmq.host") | nindent 14 }}
+              {{- include "common.setValue" (list $.Values.rabbitmq.host ".rabbitmq.host") | nindent 14 }}
             - name: RabbitMq__AmqpPort
-              {{- include "checkKey" (list $.Values.rabbitmq.amqpPort ".rabbitmq.amqpPort") | nindent 14 }}
+              {{- include "common.setValue" (list $.Values.rabbitmq.amqpPort ".rabbitmq.amqpPort") | nindent 14 }}
             - name: RabbitMq__HttpApiPort
-              {{- include "checkKey" (list $.Values.rabbitmq.httpPort ".rabbitmq.httpPort") | nindent 14 }}
+              {{- include "common.setValue" (list $.Values.rabbitmq.httpPort ".rabbitmq.httpPort") | nindent 14 }}
             - name: RabbitMq__Username
-              {{- include "checkKey" (list $.Values.rabbitmq.username ".rabbitmq.username") | nindent 14 }}
+              {{- include "common.setValue" (list $.Values.rabbitmq.username ".rabbitmq.username") | nindent 14 }}
             - name: RabbitMq__Password
-              {{- include "checkKey" (list $.Values.rabbitmq.password ".rabbitmq.password") | nindent 14 }}
+              {{- include "common.setValue" (list $.Values.rabbitmq.password ".rabbitmq.password") | nindent 14 }}
 
           # cache configuration
           {{- if $.Values.redis.enabled }}

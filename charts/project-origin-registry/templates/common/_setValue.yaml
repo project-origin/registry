@@ -1,4 +1,4 @@
-{{- define "checkKey" -}}
+{{- define "common.setValue" -}}
 {{- $value := index . 0 -}}
 {{- $name := index . 1 -}}
 {{- if (not (kindIs "map" $value)) -}}
@@ -19,20 +19,3 @@ valueFrom:
   {{ fail (printf "The value for %s is not provided" $name) }}
 {{- end }}
 {{- end -}}
-
-{{- define "database.config" -}}
-# Database Configuration
-- name: DB_HOST
-  {{- include "checkKey" (list .Values.postgresql.host ".postgresql.host") | nindent 2 }}
-- name: DB_PORT
-  {{- include "checkKey" (list .Values.postgresql.port ".postgresql.port") | nindent 2 }}
-- name: DB_DATABASE
-  {{- include "checkKey" (list .Values.postgresql.database ".postgresql.database") | nindent 2 }}
-- name: DB_USERNAME
-  {{- include "checkKey" (list .Values.postgresql.username ".postgresql.username") | nindent 2 }}
-- name: DB_PASSWORD
-  {{- include "checkKey" (list .Values.postgresql.password ".postgresql.password") | nindent 2 }}
-- name: ConnectionStrings__Database
-  value: Host=$(DB_HOST); Port=$(DB_PORT); Database=$(DB_DATABASE); Username=$(DB_USERNAME); Password=$(DB_PASSWORD);
-{{- end }}
-

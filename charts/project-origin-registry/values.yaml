@@ -165,14 +165,22 @@ immutableRecord:
     rpcUrl: http://po-concordium:20000
     # rpcToken is the token used to communicate with the node.
     rpcToken: rpcadmin
-    # accountAddress must hold the address from which to use CCD
-    accountAddress: ""
-    # accountKeySecret is a reference to a kubernetes secret that holds the accountKey
-    accountKeySecret:
-      # name is the name of the kubernetes secret
-      name: ""
-      # key is the reference to the value within the secret
-      key: ""
+    # accountAddress must hold the address from which to use CCD, can be set directly, via a secretRef, or via a configMapRef
+    accountAddress: #""
+    # secretRef:
+    #   name:
+    #   key:
+    # configMapRef:
+    #   name:
+    #   key:
+    # accountKey holds the secret that contains the account key, can be set directly, via a secretRef, or via a configMapRef
+    accountKey:
+    # secretRef:
+    #   name:
+    #   key:
+    # configMapRef:
+    #   name:
+    #   key:
 
 # migrationWaiter holds the configuration for the migration waiter
 migrationWaiter:
