@@ -4,18 +4,19 @@
 {{- end }}
 {{ $registry := .Values.global.imageRegistry | default .Values.image.registry }}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: po-concordium-node-deployment
+  name: po-concordium-node-statefulset
   labels:
     app: po-concordium-node
 spec:
   replicas: 1
-  strategy:
-    type: Recreate
+  serviceName: po-concordium-node
   selector:
     matchLabels:
       app: po-concordium-node
+  updateStrategy:
+    type: RollingUpdate
   template:
     metadata:
       labels:
