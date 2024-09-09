@@ -11,7 +11,7 @@ metadata:
     app: po-concordium-node
 spec:
   replicas: 1
-  serviceName: po-concordium-node
+  serviceName: cpo-concordium-node
   selector:
     matchLabels:
       app: po-concordium-node
