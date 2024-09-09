@@ -106,7 +106,7 @@ spec:
 
       {{- if .Values.collector.enabled }}
         - name: po-concordium-node-collector
-          image: $registry/concordium/{{ .Values.network }}-node:{{ $.Values.image.tag | default $.Chart.AppVersion }}
+          image: {{ $registry }}/concordium/{{ .Values.network }}-node:{{ $.Values.image.tag | default $.Chart.AppVersion }}
           command: ["/node-collector"]
           securityContext:
             allowPrivilegeEscalation: false
