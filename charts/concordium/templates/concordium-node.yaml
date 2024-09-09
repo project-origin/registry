@@ -4,7 +4,7 @@
 {{- end }}
 {{ $registry := .Values.global.imageRegistry | default .Values.image.registry }}
 apiVersion: apps/v1
-kind: deployment
+kind: Deployment
 metadata:
   name: po-concordium-node-deployment
   labels:
