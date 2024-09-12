@@ -1,0 +1,13 @@
+apiVersion: v2
+name: concordium
+description: A helm chart for deploying a Concordium node.
+type: application
+version: 0.1.0
+appVersion: 6.3.1-0
+
+annotations:
+  artifacthub.io/licence: Apache-2.0
+  artifacthub.io/operator: "false"
+  artifacthub.io/links: |
+    - name: Source Code
+      url: https://github.com/project-origin/registry/charts/concordium
