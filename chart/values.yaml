@@ -162,7 +162,7 @@ immutableRecord:
   # concordium holds the configuration to contact and publish data on the network
   concordium:
     # rpcUrl are the url on which the local node is available.
-    rpcUrl: http://po-concordium:20000
+    rpcUrl:
     # rpcToken is the token used to communicate with the node.
     rpcToken: rpcadmin
     # accountAddress must hold the address from which to use CCD, can be set directly, via a secretRef, or via a configMapRef
