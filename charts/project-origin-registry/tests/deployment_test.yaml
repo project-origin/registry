@@ -1,0 +1,63 @@
+suite: Test Suite for Chronicler Chart
+
+templates:
+  - deployment.yaml
+
+set:
+  global:
+    imageRegistry: hello.com
+  image:
+    tag: "1.0.0"
+  postgresql:
+    host: "_"
+    port: "_"
+    database: "_"
+    username: "_"
+    password: "_"
+  rabbitmq:
+    host: "_"
+    username: "_"
+    password:
+      secretRef:
+        name: "somePasswordName"
+        key: "somePassword"
+
+tests:
+  - it: should set PostgreSQL configuration
+    set:
+      postgresql:
+        host: "localhost"
+        port: "1234"
+        database: "someDatabase"
+        username:
+          configMapRef:
+            name: "someUsernameName"
+            key: "someUsernameKey"
+        password:
+          secretRef:
+            name: "somePasswordName"
+            key: "somePasswordKey"
+    asserts:
+      - isKind:
+          of: Deployment
+      - matchRegex:
+          path: spec.template.spec.containers[0].env[?(@.name=="DB_HOST")].value
+          pattern: "localhost"
+      - matchRegex:
+          path: spec.template.spec.containers[0].env[?(@.name=="DB_PORT")].value
+          pattern: "1234"
+      - matchRegex:
+          path: spec.template.spec.containers[0].env[?(@.name=="DB_DATABASE")].value
+          pattern: "someDatabase"
+      - matchRegex:
+          path: spec.template.spec.containers[0].env[?(@.name=="DB_USERNAME")].valueFrom.configMapKeyRef.name
+          pattern: "someUsernameName"
+      - matchRegex:
+          path: spec.template.spec.containers[0].env[?(@.name=="DB_USERNAME")].valueFrom.configMapKeyRef.key
+          pattern: "someUsernameKey"
+      - matchRegex:
+          path: spec.template.spec.containers[0].env[?(@.name=="DB_PASSWORD")].valueFrom.secretKeyRef.name
+          pattern: "somePasswordName"
+      - matchRegex:
+          path: spec.template.spec.containers[0].env[?(@.name=="DB_PASSWORD")].valueFrom.secretKeyRef.key
+          pattern: "somePasswordKey"

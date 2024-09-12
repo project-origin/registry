@@ -1,0 +1,63 @@
+# global values
+global:
+  # imageRegistry is the global docker image registry that will override the image registry for all images in all charts
+  imageRegistry: ""
+
+# image holds the configuration for the image to use for the registry
+image:
+  # registry is the registry to pull the image from
+  registry: docker.io
+  # repository is the repository to pull the image from
+  repository: project-origin/registry-server
+  # tag is the tag to pull defaults to the chart version
+  tag:
+
+# resources holds the configuration for the resource requests and limits
+resources:
+  # requests holds the configuration for the resource requests
+  requests:
+    # cpu defines the cpu request limit for the registry server
+    cpu:
+    # memory defines the memory request limit for the registry server
+    memory:
+
+  # limits holds the configuration for the resource limits
+  limits:
+    # cpu defines the cpu limit for the registry server
+    cpu:
+    # memory defines the memory limit for the registry server
+    memory:
+    # ephemeralStorage defines the ephemeral storage limit for the verifier server
+    ephemeralStorage:
+
+# service holds the configuration for the service
+service:
+  # type is the type of service to create, allowed values are (ClusterIP | NodePort | LoadBalancer)
+  type: ClusterIP
+  # nodePort is the port to expose the service on if type is NodePort
+  nodePort:
+
+# network denotes which network the concordium node should run on, allowed values are (mainnet | testnet)
+network: ""
+
+# persistence holds the configuration for the persistent storage of the node
+persistence:
+  # enabled specifies if the node should use persistent storage or not.
+  enabled: true
+  # name is the name of the persistent volume claim
+  name: po-concordium-data
+  # storageClass is the name of the storage class to use, if not specified the default storage class will be used.
+  #storageClass:
+  # accessMode is the access mode to use for the persistent volume claim, allowed values are (ReadWriteOnce | ReadWriteMany)
+  accessMode: ReadWriteOnce
+  # size is the size of the persistent volume claim
+  size: 100Gi
+
+# collector configures the collector that collects statistics from the node and publishes them to the network dashboard.
+collector:
+  # enabled specifies if the collector should run or not.
+  enabled: true
+  # nodeName contains the name to report to the network dashboard. https://concordium.com/block-explorers/
+  nodeName:
+  # interval describes how often to collect the statistics from the node, in milliseconds
+  interval: 5000

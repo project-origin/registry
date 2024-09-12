@@ -1,0 +1,8 @@
+.devcontainer/
+.github/
+.vscode/
+chart/
+doc/
+src/*/bin/
+src/*/obj/
+test/
