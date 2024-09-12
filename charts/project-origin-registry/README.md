@@ -1,96 +1,92 @@
-# Project Origin Stack
+# Project Origin - Registry
 
-This Helm chart enables one to install all the components required to run Project Origin
-on a kubernetes cluster.
+This Helm chart is used to deploy a registry for the Project Origin
 
-## Quickstart
+> WARNING: version 2.0 is breaking changes from 1.0, please read the documentation before upgrading.
+> If you are upgrading from 1.0, please beware that cloudnative pg object has been removed,
+> and the ownership of the object must be removed from helm before upgrading.
+> Otherwise the database will be DELETED!
 
-This assumes general understanding of kubernetes and helm.
+## Requirements
 
-The minumum configuration required locally is the following values file:
+The registry requires the following other components to have been installed:
+
+- A ProjectOrigin verifier
+- PostgreSQL database
+- RabbitMQ message broker with rabbitmq_management plugin enabled
+
+### Verifier
+
+To install a verifier one can find the ETT electricity chart at [here](https://artifacthub.io/packages/helm/project-origin/project-origin-verifier-electricity), and the guide on how to install it in its readme.
+
+When installed, the registry must be configured using the following:
 
 ```yaml
-# defines the verifiers for the registry
 verifiers:
-  - name: electricity-v1
-    type: project_origin.electricity.v1
-    image:
-      repository: ghcr.io/project-origin/electricity-server
-      tag: 0.2.0-rc.17
-    issuers:
-        # the name of the grid area, here Narnia is used
-      - area: Narnia
-        # the base64 encoded public key of the issuer
-        publicKey: #BASE64_ENCODED_PUBLIC_KEY
-
-    # if you want to use multiple registries, then ALL verifiers must know all registries External url
-    # this is because the verifiers will use the external url to communicate with the registries
-    registries:
-      - name: my-example-registry
-        address: http://my-example-registry:5000
+  - type: project_origin.electricity.v1
+    url: http://${SERVICENAME}.${NAMESPACE}.svc.cluster.local:5000
 ```
 
-Once one have generated a key and added it to the values file,
-one can install the chart using the following command:
+### PostgreSQL
+
+The registry requires a PostgreSQL database to store its data.
+
+Below is an example of how to install a PostgreSQL database using the bitnami helm chart:
+
+```shell
+helm install my-postgres oci://registry-1.docker.io/bitnamicharts/postgresql --version 15.5.23
+```
+
+The registry must be configured to use the database using the following, this assumes same namespace as the registry:
+```yaml
+postgresql:
+  host: my-postgres
+  database: postgres
+  username: postgres
+  password:
+    secretRef:
+      name: my-postgres
+      key: postgres-password
+```
+
+### RabbitMQ
+
+The registry requires a RabbitMQ message broker to queue and process transactions.
+
+Below is an example of how to install a RabbitMQ message broker using the bitnami helm chart:
+
+```shell
+helm install my-rabbitmq oci://registry-1.docker.io/bitnamicharts/rabbitmq --version 14.6.6
+```
+
+The registry must be configured to use the RabbitMQ using the following, this assumes same namespace as the registry:
+```yaml
+rabbitmq:
+  host: my-rabbitmq
+  username: user
+  password:
+    secretRef:
+      name: my-rabbitmq
+      key: rabbitmq-password
+```
+
+## Installing the Chart
+
+To install the chart with the release name `my-example-registry` and configured using `values.yaml` one can use the following command:
 
 ```shell
 helm install -f values.yaml my-example-registry project-origin-registry --version 0.2.0-rc.1 --repo https://project-origin.github.io/helm-registry .
 ```
 
-### 1. Generating a issuer key
+## Ingress
 
-An issuer key is the public-private key-pair used by an issuing body
-to issue certificates on the registries.
+The chart does not include ingress, but must be configured if to expose it externally.
 
-Issuer algorithm used is the ED25519 curve,
-this is one of the most used curves for signing and is in broad use
-and is tried and tested.
-
-To generate a private key one can use openssl,
-below we generate a key for narnia.
-
-```shell
-openssl genpkey -algorithm ED25519 -out narnia.pem
-```
-
-> NOTE: This is the private key which must be kept secure
-
-#### Deriving public key
-
-To derive the public key to be shared with the registry verifiers one
-can use openssl, here the key is written to a file named
-narnia.pub
-
-```shell
-openssl pkey -in narnia.pem -pubout > narnia.pub
-```
-
-#### Add it values.yaml file
-
-To add the narnia.pub to the values file,
-one must encode the file as base64,
-this can again be done using the shell
-
-```shell
-cat narnia.pub | base64 -w 0
-```
-
-> note: the `-w 0` is to disable word-wrap of the output depending on the platform
-
-### Ingress
-
-The chart does not currently support ingress, but it is possible to
-use ingress to expose the registry.
-
-To do this one create an ingress resource which points to the service
-using ones favorite ingress controller.
-
-This will come in near future.
-
-#### Verify the setup
+## Verify the setup
 
 To verify the setup one can use the Electricy Example available in the
-[project-origin/registry](https://github.com/project-origin/registry) repository.
+[project-origin/registry](https://github.com/project-origin/registry) repository
+and using the key generated when installing the verifier.
 
 To run the example one can use the following command:
 
