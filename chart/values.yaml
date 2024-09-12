@@ -190,7 +190,7 @@ migrationWaiter:
     # repository is the repository to pull the image from
     repository: bitnami/kubectl
     # tag is the tag to pull defaults to the chart version
-    tag: 1.30.4
+    tag: 1.31.0
 
 # redis holds the configuration for the redis subchart https://charts.bitnami.com/bitnami
 redis:
