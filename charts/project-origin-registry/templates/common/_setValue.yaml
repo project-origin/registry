@@ -1,0 +1,21 @@
+{{- define "common.setValue" -}}
+{{- $value := index . 0 -}}
+{{- $name := index . 1 -}}
+{{- if (not (kindIs "map" $value)) -}}
+value: {{ required (printf "The value for %s is not provided" $name) $value | quote }}
+{{- else if and (hasKey $value "secretRef") (hasKey $value "configMapRef") }}
+  {{ fail (printf "Both secretRef and configMapRef are defined for %s" $name) }}
+{{- else if hasKey $value "secretRef" -}}
+valueFrom:
+  secretKeyRef:
+    name: {{ required (printf "The value for %s.secretRef.name is not provided" $name) $value.secretRef.name | quote }}
+    key: {{ required (printf "The value for %s.secretRef.key is not provided" $name) $value.secretRef.key | quote }}
+{{- else if hasKey $value "configMapRef" -}}
+valueFrom:
+  configMapKeyRef:
+    name: {{ required (printf "The value for %s.configMapRef.name is not provided" $name) $value.configMapRef.name | quote }}
+    key: {{ required (printf "The value for %s.configMapRef.name is not provided" $name) $value.configMapRef.key | quote }}
+{{- else }}
+  {{ fail (printf "The value for %s is not provided" $name) }}
+{{- end }}
+{{- end -}}

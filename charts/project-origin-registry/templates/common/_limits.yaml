@@ -1,0 +1,20 @@
+{{- define "common.limits" -}}
+resources:
+  requests:
+    {{- if .requests.cpu }}
+    cpu: {{ .requests.cpu }}
+    {{- end }}
+    {{- if .requests.memory }}
+    memory: {{ .requests.memory }}
+    {{- end }}
+  limits:
+    {{- if .limits.cpu }}
+    cpu: {{ .limits.cpu }}
+    {{- end }}
+    {{- if .limits.memory }}
+    memory: {{ .limits.memory }}
+    {{- end }}
+    {{- if .limits.ephemeralStorage }}
+    ephemeral-storage: {{ .limits.ephemeralStorage }}
+    {{- end }}
+{{- end -}}

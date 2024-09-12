@@ -7,35 +7,35 @@ on:
 
 jobs:
   verify-devcontainer:
-    uses: project-origin/.github/.github/workflows/reusable-verify-devcontainer.yaml@639a49296c45ee5e9859b6cd7356a380025d9959
+    uses: project-origin/.github/.github/workflows/reusable-verify-devcontainer.yaml@b1a1034591b6f491085a0d9d259ae3b486487701
 
   verify-code:
-    uses: project-origin/.github/.github/workflows/reusable-verify-code.yaml@639a49296c45ee5e9859b6cd7356a380025d9959
+    uses: project-origin/.github/.github/workflows/reusable-verify-code.yaml@b1a1034591b6f491085a0d9d259ae3b486487701
 
   verify-renovate-config:
-    uses: project-origin/.github/.github/workflows/reusable-verify-renovate.yaml@639a49296c45ee5e9859b6cd7356a380025d9959
+    uses: project-origin/.github/.github/workflows/reusable-verify-renovate.yaml@b1a1034591b6f491085a0d9d259ae3b486487701
 
   verify-chart:
-    uses: project-origin/.github/.github/workflows/reusable-verify-chart.yaml@639a49296c45ee5e9859b6cd7356a380025d9959
+    uses: project-origin/.github/.github/workflows/reusable-verify-chart.yaml@b1a1034591b6f491085a0d9d259ae3b486487701
 
   verify-container-build:
-    uses: project-origin/.github/.github/workflows/reusable-build-push-container-ghcr.yaml@639a49296c45ee5e9859b6cd7356a380025d9959
+    uses: project-origin/.github/.github/workflows/reusable-build-push-container-ghcr.yaml@b1a1034591b6f491085a0d9d259ae3b486487701
     with:
       imagename: ghcr.io/project-origin/registry-server
       version: test
-      context: ./src
-      dockerfile: ./src/ProjectOrigin.Registry.Server/Dockerfile
+      context: .
+      dockerfile: ./Registry.Dockerfile
       push: false
 
   verify-concordium:
     name: Verify Concordium integration
-    runs-on: [self-hosted, concordium-testnet]
+    runs-on: ubuntu-22.04
     environment: testnet
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
 
       - name: Setup .NET Core SDK from global.json
-        uses: actions/setup-dotnet@4d6c8fcf3c8f7a60068d26b594648e99df24cee3 # v4
+        uses: actions/setup-dotnet@6bd8b7f7774af54e05809fcc5431931b3eb1ddee # v4
 
       - name: Run integration tests
         env:
@@ -47,10 +47,10 @@ jobs:
     name: Verify performance
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
 
       - name: Setup .NET Core SDK from global.json
-        uses: actions/setup-dotnet@4d6c8fcf3c8f7a60068d26b594648e99df24cee3 # v4
+        uses: actions/setup-dotnet@6bd8b7f7774af54e05809fcc5431931b3eb1ddee # v4
 
       - name: Verify performance
         run: make verify-performance
