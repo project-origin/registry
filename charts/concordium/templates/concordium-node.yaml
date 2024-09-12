@@ -23,8 +23,6 @@ spec:
         app: po-concordium-node
     spec:
       automountServiceAccountToken: false
-      securityContext:
-        runAsNonRoot: true
       containers:
         - name: po-concordium-node
           image: {{ $registry }}/concordium/{{ .Values.network }}-node:{{ $.Values.image.tag | default $.Chart.AppVersion }}
@@ -39,13 +37,24 @@ spec:
             # Environment specific configuration
             # The url where IPs of the bootstrap nodes can be found.
             - name: CONCORDIUM_NODE_CONNECTION_BOOTSTRAP_NODES
-              value: bootstrap.{{ .Values.network }}.concordium.com:8888
+              {{- if eq .Values.network "mainnet" }}
+              value: bootstrap.mainnet.concordium.software:8888
+              {{- else }}
+              value: bootstrap.testnet.concordium.com:8888
+              {{- end }}
+
             # Where the genesis is located
             - name: CONCORDIUM_NODE_CONSENSUS_GENESIS_DATA_FILE
               value: /{{ .Values.network }}-genesis.dat
+
             # The url of the catchup file. This speeds up the catchup process.
             - name: CONCORDIUM_NODE_CONSENSUS_DOWNLOAD_BLOCKS_FROM
-              value: https://catchup.{{ .Values.network }}.concordium.com/blocks.idx
+              {{- if eq .Values.network "mainnet" }}
+              value: https://catchup.mainnet.concordium.software/blocks.idx
+              {{- else }}
+              value: https://catchup.testnet.concordium.com/blocks.idx
+              {{- end }}
+
             # General node configuration Data and config directories (it's OK if they
             # are the same). This should match the volume mount below. If the location
             # of the mount inside the container is changed, then these should be
@@ -117,7 +126,11 @@ spec:
               value: {{ required "A valid nodeName for the collector must be specified when enabled." .Values.collector.nodeName }}
             # Environment specific settings.
             - name: CONCORDIUM_NODE_COLLECTOR_URL
-              value: https://dashboard.{{ .Values.network }}.concordium.software/nodes/post
+              {{- if eq .Values.network "mainnet" }}
+              value: https://dashboard.mainnet.concordium.software/nodes/post
+              {{- else }}
+              value: https://dashboard.testnet.concordium.com/nodes/post
+              {{- end }}
             # Collection settings.
             # How often to collect the statistics from the node.
             - name: CONCORDIUM_NODE_COLLECTOR_COLLECT_INTERVAL

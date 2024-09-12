@@ -29,7 +29,7 @@ jobs:
 
   verify-concordium:
     name: Verify Concordium integration
-    runs-on: [self-hosted, concordium-testnet]
+    runs-on: ubuntu-22.04
     environment: testnet
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
