@@ -42,7 +42,7 @@ otlp:
   # enabled determines if the opentelemetry collector is enabled
   enabled: false
   # endpoint defines the endpoint of the opentelemetry collector, example "http://otel-collector:4317"
-  endpoint: "http://opentelemetry-collector.otel-collector:4317"
+  endpoint:
 
 # Enables one to override the name of the registry
 registryName:
