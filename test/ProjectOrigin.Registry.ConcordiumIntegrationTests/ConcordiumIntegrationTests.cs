@@ -13,7 +13,7 @@ namespace ProjectOrigin.Registry.ConcordiumIntegrationTests;
 
 public class ConcordiumIntegrationTests
 {
-    const string NodeAddress = "http://grpc.testnet.concordium.com:20000";
+    const string NodeAddress = "https://grpc.testnet.concordium.com:20000";
     const string NodeToken = "rpcadmin";
     private readonly ConcordiumPublisher _publisher;
 
