@@ -63,7 +63,7 @@ and the `verifier` is the [electricity verifier](https://github.com/project-orig
 
 Below is a C4 system diagram of an overview of the system landscape OriginRegistry is a part of.
 
-![C4 system diagram of OriginRegistry](./doc/system_diagram.drawio.svg)
+![C4 system diagram of OriginRegistry](./doc/diagrams/system_diagram.drawio.svg)
 
 ## Resulting Context
 
