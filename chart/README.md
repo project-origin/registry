@@ -2,10 +2,12 @@
 
 This Helm chart is used to deploy a registry for the Project Origin
 
-> WARNING: version 2.0 is breaking changes from 1.0, please read the documentation before upgrading.
-> If you are upgrading from 1.0, please beware that cloudnative pg object has been removed,
-> and the ownership of the object must be removed from helm before upgrading.
-> Otherwise the database will be DELETED!
+## WARNING ⚠️
+
+From version 2.0 there is a breaking changes from 1.x, the `cloudnative pg` and `rabbitmq operator` has been removed from the chart.
+Please first migrate to `1.3.1` to ensure helm does not delete the database.
+
+From 2.0 the database, rabbitmq, verifier and concordium must be installed separately.
 
 ## Requirements
 

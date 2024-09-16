@@ -33,7 +33,8 @@ public sealed class RabbitMqHttpClient : IRabbitMqHttpClient
         var response = await _httpClient.GetAsync("/api/queues?enable_queue_totals=true&disable_stats=true");
         response.EnsureSuccessStatusCode();
 
-        return await JsonSerializer.DeserializeAsync<IEnumerable<RabbitMqQueue>>(response.Content.ReadAsStream(), _options)
+        var stream = await response.Content.ReadAsStreamAsync();
+        return await JsonSerializer.DeserializeAsync<IEnumerable<RabbitMqQueue>>(stream, _options)
             ?? throw new FormatException("No queues found");
     }
 }

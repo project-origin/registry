@@ -71,8 +71,7 @@ public class TransactionProcessorDispatcher
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unknown exception for transaction {transactionHash} -  {exceptionMessage}", transactionHash, ex.Message);
-            throw;
+            throw new InvalidTransactionException(string.Format("Unknown exception for transaction {0}", transactionHash), ex);
         }
     }
 }

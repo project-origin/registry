@@ -26,7 +26,8 @@ jobs:
     uses: project-origin/.github/.github/workflows/reusable-publish-chart.yaml@a4cedc2c6ce9175f1a8123e150e46a94114fc8b1
     with:
       version: ${{ needs.define-version.outputs.version }}
-      chart_folder: charts/project-origin-registry
+      chart_folder: chart
       helm_registry_repository: project-origin/helm-registry
+      prerelease: ${{ github.event.release.prerelease }}
     secrets:
       helm_registry_token: ${{ secrets.HELM_REGISTRY_TOKEN }}

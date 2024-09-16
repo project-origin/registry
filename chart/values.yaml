@@ -42,7 +42,7 @@ otlp:
   # enabled determines if the opentelemetry collector is enabled
   enabled: false
   # endpoint defines the endpoint of the opentelemetry collector, example "http://otel-collector:4317"
-  endpoint: "http://opentelemetry-collector.otel-collector:4317"
+  endpoint:
 
 # Enables one to override the name of the registry
 registryName:
@@ -162,7 +162,7 @@ immutableRecord:
   # concordium holds the configuration to contact and publish data on the network
   concordium:
     # rpcUrl are the url on which the local node is available.
-    rpcUrl: http://po-concordium:20000
+    rpcUrl:
     # rpcToken is the token used to communicate with the node.
     rpcToken: rpcadmin
     # accountAddress must hold the address from which to use CCD, can be set directly, via a secretRef, or via a configMapRef
@@ -200,33 +200,3 @@ redis:
   auth:
     # enabled specifies if the redis subchart should be enabled or not
     enabled: false
-
-# concordium holds the configuration for the concordium node
-concordium:
-  # enabled specified wether or not to run a local node
-  enabled: false
-
-  # network denotes which network the concordium node should run on, allowed values are (mainnet | testnet)
-  network: ""
-
-  # collector configures the collector that collects statistics from the node and publishes them to the network dashboard.
-  collector:
-    # enabled specifies if the collector should run or not.
-    enabled: true
-    # nodeName contains the name to report to the network dashboard. https://concordium.com/block-explorers/
-    nodeName: ""
-    # interval describes how often to collect the statistics from the node, in milliseconds
-    interval: 5000
-
-  # persistence holds the configuration for the persistent storage of the node
-  persistence:
-    # enabled specifies if the node should use persistent storage or not.
-    enabled: true
-    # name is the name of the persistent volume claim
-    name: po-concordium-data
-    # storageClass is the name of the storage class to use, if not specified the default storage class will be used.
-    #storageClass:
-    # accessMode is the access mode to use for the persistent volume claim, allowed values are (ReadWriteOnce | ReadWriteMany)
-    accessMode: ReadWriteOnce
-    # size is the size of the persistent volume claim
-    size: 100Gi

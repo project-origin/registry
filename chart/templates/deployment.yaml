@@ -99,9 +99,9 @@ spec:
               value: {{ $.Values.immutableRecord.type }}
           {{- if eq $.Values.immutableRecord.type "concordium" }}
             - name: IMMUTABLELOG__CONCORDIUM__ADDRESS
-              value: {{ $.Values.immutableRecord.concordium.rpcUrl }}
+              value: {{ required "concordium.rpcUr must be set if concordium enabled, example http://concordium.svc:20000" $.Values.immutableRecord.concordium.rpcUrl }}
             - name: IMMUTABLELOG__CONCORDIUM__AUTHENTICATIONTOKEN
-              value: {{ $.Values.immutableRecord.concordium.rpcToken }}
+              value: {{ required "concordium.rpcToken must be set if concordium enabled" $.Values.immutableRecord.concordium.rpcToken }}
             - name: IMMUTABLELOG__CONCORDIUM__ACCOUNTADDRESS
               {{- include "common.setValue" (list $.Values.immutableRecord.concordium.accountAddress ".immutableRecord.concordium.accountAddress") | nindent 14 }}
             - name: IMMUTABLELOG__CONCORDIUM__ACCOUNTKEY

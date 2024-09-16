@@ -59,7 +59,7 @@ public class InMemoryRepository : ITransactionRepository
     {
         lock (_lockObject)
         {
-            var foundBlock = _blocks.FirstOrDefault(block => BlockHash.FromHeader(block.Header) == hash && block.Publication is null);
+            var foundBlock = _blocks.Find(block => BlockHash.FromHeader(block.Header) == hash && block.Publication is null);
             if (foundBlock is not null)
             {
                 _blocks.Remove(foundBlock);

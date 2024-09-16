@@ -2,7 +2,7 @@
 .debug/
 
 # ignore all sub charts
-charts/*/charts
+chart/charts
 
 # Ignore Jetbrains
 src/.idea

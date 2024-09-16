@@ -141,8 +141,8 @@ EOF
 
 # install two registries
 echo "Installing registries"
-helm install ${registry_a_name} -n ${registry_a_namespace} charts/project-origin-registry --set service.nodePort=$registry_a_nodeport -f "${registry_values_filename}" --kube-context kind-${cluster_name}
-helm install ${registry_b_name}-postfix -n ${registry_b_namespace} charts/project-origin-registry --set registryName=$registry_b_name,service.nodePort=$registry_b_nodeport -f "${registry_values_filename}" --kube-context kind-${cluster_name}
+helm install ${registry_a_name} -n ${registry_a_namespace} chart --set service.nodePort=$registry_a_nodeport -f "${registry_values_filename}" --kube-context kind-${cluster_name}
+helm install ${registry_b_name}-postfix -n ${registry_b_namespace} chart --set registryName=$registry_b_name,service.nodePort=$registry_b_nodeport -f "${registry_values_filename}" --kube-context kind-${cluster_name}
 
 # wait for all pods to be ready
 kubectl wait --for=condition=available --timeout=300s deployment/${registry_a_name}-deployment-0 -n ${registry_a_namespace} --context kind-${cluster_name}

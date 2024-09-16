@@ -141,7 +141,7 @@ dotnet test test/ProjectOrigin.Registry.ChartTests \
 
 # Updates registry to the one in tree and runs tests
 echo "Updating registry"
-helm upgrade ${registry_a_name} -n ${registry_a_namespace} charts/project-origin-registry --set image.tag=test -f "${registry_values_filename}" --kube-context kind-${cluster_name}
+helm upgrade ${registry_a_name} -n ${registry_a_namespace} chart --set image.tag=test -f "${registry_values_filename}" --kube-context kind-${cluster_name}
 kubectl wait --for=condition=available --timeout=300s deployment/${registry_a_name}-deployment-0 -n ${registry_a_namespace} --context kind-${cluster_name}
 echo "Registry updated"
 
