@@ -19,7 +19,6 @@ namespace ProjectOrigin.Electricity.IntegrationTests;
 
 public class ContainerTest : IAsyncLifetime,
     IClassFixture<ContainerImageFixture>,
-    IClassFixture<ElectricityServiceFixture>,
     IClassFixture<PostgresDatabaseFixture<Startup>>,
     IClassFixture<RedisFixture>,
     IClassFixture<RabbitMqFixture>
