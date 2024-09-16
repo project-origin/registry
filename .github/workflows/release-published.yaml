@@ -6,12 +6,12 @@ on:
 
 jobs:
   define-version:
-    uses: project-origin/.github/.github/workflows/reusable-tag-version.yaml@00b58a6e684d5cbc95b56cc1d9aac432f2ff4831
+    uses: project-origin/.github/.github/workflows/reusable-tag-version.yaml@a4cedc2c6ce9175f1a8123e150e46a94114fc8b1
 
   publish-container:
     needs:
       - define-version
-    uses: project-origin/.github/.github/workflows/reusable-build-push-container-ghcr.yaml@00b58a6e684d5cbc95b56cc1d9aac432f2ff4831
+    uses: project-origin/.github/.github/workflows/reusable-build-push-container-ghcr.yaml@a4cedc2c6ce9175f1a8123e150e46a94114fc8b1
     with:
       imagename: ghcr.io/project-origin/registry-server
       version: ${{ needs.define-version.outputs.version }}
