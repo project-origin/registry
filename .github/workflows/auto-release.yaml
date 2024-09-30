@@ -1,0 +1,59 @@
+name: Auto Release on Renovate
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: '0 12 * * 1-5'
+
+env:
+  BOT_USER: projectorigin-renovate[bot]
+
+jobs:
+  check-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Check if release should be created
+        id: should_create_release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+        run: |
+          # Get the latest release excluding pre-releases
+          lastest_release_tag=$(gh release list --exclude-pre-releases --exclude-drafts --limit 10 --json tagName,isLatest \
+            | jq -r '[.[] | select(.isLatest == true)][0] | .tagName')
+          echo "Latest release tag: ${lastest_release_tag}"
+          echo "tag_name=${lastest_release_tag}" >> $GITHUB_OUTPUT
+
+          count=$(git rev-list ${lastest_release_tag}..HEAD --count)
+          users=$(git log ${lastest_release_tag}..HEAD --format="%an" | sort | uniq)
+
+          if [ "$users" = "$USER" ]; then
+            echo "Only ${{ env.BOT_USER }} has created ${count} commits."
+            echo "proceed=true" >> $GITHUB_OUTPUT
+          else
+            echo "Other users have committed."
+            echo "proceed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create release
+        if: steps.should_create_release.outputs.proceed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          previous_tag: ${{ steps.should_create_release.outputs.tag_name }}
+        run: |
+          version=$(echo "$previous_tag" | sed 's/^v//')
+          major=$(echo "$version" | cut -d. -f1)
+          minor=$(echo "$version" | cut -d. -f2)
+          patch=$(echo "$version" | cut -d. -f3)
+
+          new_patch=$((patch + 1))
+          new_version="v${major}.${minor}.${new_patch}"
+          echo "New version: $new_version"
+
+          gh release create $new_version --generate-notes --notes-start-tag ${previous_tag} --latest
+          gh workflow run "Build release artifacts" --ref "refs/tags/${new_version}"
