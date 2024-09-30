@@ -34,7 +34,7 @@ spec:
               cpu: 0.1
             limits:
               memory: 50Mi
-              ephemeral-storage: "1Mi"
+              ephemeral-storage: "100Mi"
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
