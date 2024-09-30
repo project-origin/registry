@@ -29,7 +29,7 @@ spec:
       initContainers:
         - name: wait-for-migration
           image: {{ include "common.image" (dict "root" $ "image" $.Values.migrationWaiter.image) }}
-          {{- include "common.limits" $.Values.migrationWaiter | nindent 10 }}
+          {{- include "common.limits" $.Values.migrationWaiter.resources | nindent 10 }}
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
