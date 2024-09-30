@@ -29,12 +29,7 @@ spec:
       initContainers:
         - name: wait-for-migration
           image: {{ include "common.image" (dict "root" $ "image" $.Values.migrationWaiter.image) }}
-          resources:
-            requests:
-              cpu: 0.1
-            limits:
-              memory: 50Mi
-              ephemeral-storage: "100Mi"
+          {{- include "common.limits" $.Values.migrationWaiter | nindent 10 }}
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
