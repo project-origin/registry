@@ -1,6 +1,6 @@
 ARG PROJECT=ProjectOrigin.Registry
 
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0.403 AS build
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0.402 AS build
 ARG PROJECT
 
 WORKDIR /builddir
@@ -14,7 +14,7 @@ RUN dotnet build ./src/${PROJECT} -c Release --no-restore -p:CustomAssemblyName=
 RUN dotnet publish ./src/${PROJECT} -c Release --no-build -p:CustomAssemblyName=App -o /app/publish
 
 # ------- production image -------
-FROM mcr.microsoft.com/dotnet/aspnet:8.0.10-noble-chiseled-extra AS production
+FROM mcr.microsoft.com/dotnet/aspnet:8.0.8-noble-chiseled-extra AS production
 
 WORKDIR /app
 COPY --from=build /app/publish .
