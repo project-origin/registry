@@ -12,7 +12,7 @@
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
     // "forwardPorts": [5000, 5001],
     // Use 'postCreateCommand' to run commands after the container is created.
-    "postCreateCommand": "helm plugin install https://github.com/helm-unittest/helm-unittest.git && make restore",
+    "postStartCommand": "helm plugin install https://github.com/helm-unittest/helm-unittest.git && make restore",
     // Configure tool-specific properties.
     "customizations": {
         "vscode": {
