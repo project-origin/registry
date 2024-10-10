@@ -29,7 +29,7 @@ jobs:
 
   verify-concordium:
     name: Verify Concordium integration
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     environment: testnet
     steps:
       - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4
@@ -45,7 +45,7 @@ jobs:
 
   verify-performance:
     name: Verify performance
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4
 
