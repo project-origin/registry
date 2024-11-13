@@ -14,7 +14,7 @@ RUN dotnet build ./src/${PROJECT} -c Release --no-restore -p:CustomAssemblyName=
 RUN dotnet publish ./src/${PROJECT} -c Release --no-build -p:CustomAssemblyName=App -o /app/publish
 
 # ------- production image -------
-FROM mcr.microsoft.com/dotnet/aspnet:8.0.10-jammy-chiseled-extra AS production
+FROM mcr.microsoft.com/dotnet/aspnet:8.0.11-jammy-chiseled-extra AS production
 
 WORKDIR /app
 COPY --from=build /app/publish .
