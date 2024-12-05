@@ -22,4 +22,6 @@ COPY --from=build /app/publish .
 EXPOSE 5000
 EXPOSE 5001
 
+ENV ReturnComittedForFinalized=true
+
 ENTRYPOINT ["dotnet", "App.dll"]

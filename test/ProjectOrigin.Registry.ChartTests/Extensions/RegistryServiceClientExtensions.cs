@@ -33,7 +33,7 @@ public static class RegistryServiceClientExtensions
         {
             var result = await getTransactionStatus();
 
-            if (result.Status == TransactionState.Committed)
+            if (result.Status == TransactionState.Committed || result.Status == TransactionState.Finalized)
                 return result;
             else if (result.Status == TransactionState.Failed)
                 Assert.Fail($"Transaction failed ”{result.Status}” with message ”{result.Message}”");

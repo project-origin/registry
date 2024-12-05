@@ -57,6 +57,7 @@ public class TransactionProcessorDispatcher
             var nextEventIndex = stream.Count;
             var verifiableEvent = new StreamTransaction { TransactionHash = transactionHash, StreamId = streamId, StreamIndex = nextEventIndex, Payload = transaction.ToByteArray() };
             await _transactionRepository.Store(verifiableEvent).ConfigureAwait(false);
+            await _transactionStatusService.SetTransactionStatus(transactionHash, new TransactionStatusRecord(TransactionStatus.Committed));
 
             _logger.LogDebug("Transaction processed {transactionHash}", transactionHash);
         }

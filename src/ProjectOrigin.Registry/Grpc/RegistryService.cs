@@ -11,6 +11,8 @@ using ProjectOrigin.Registry.MessageBroker;
 using ProjectOrigin.Registry.TransactionStatusCache;
 using ProjectOrigin.Registry.Repository;
 using ProjectOrigin.Registry.Repository.Models;
+using Microsoft.Extensions.Options;
+using ProjectOrigin.Registry.Options;
 
 namespace ProjectOrigin.Registry.Grpc;
 
@@ -18,18 +20,20 @@ public class RegistryService : V1.RegistryService.RegistryServiceBase
 {
     public static readonly Meter Meter = new("Registry.RegistryService");
     public static readonly Counter<long> TransactionsSubmitted = Meter.CreateCounter<long>("TransactionsSubmitted");
-
+    private readonly RegistryOptions _options;
     private readonly ITransactionRepository _transactionRepository;
     private readonly ITransactionStatusService _transactionStatusService;
     private readonly IRabbitMqChannelPool _brokerPool;
     private readonly IQueueResolver _queueResolver;
 
     public RegistryService(
+        IOptions<RegistryOptions> options,
         ITransactionRepository transactionRepository,
         ITransactionStatusService transactionStatusService,
         IRabbitMqChannelPool brokerPool,
         IQueueResolver queueResolver)
     {
+        _options = options.Value;
         _transactionRepository = transactionRepository;
         _transactionStatusService = transactionStatusService;
         _brokerPool = brokerPool;
@@ -64,9 +68,14 @@ public class RegistryService : V1.RegistryService.RegistryServiceBase
     {
         var transactionHash = new TransactionHash(Convert.FromBase64String(request.Id));
         var state = await _transactionStatusService.GetTransactionStatus(transactionHash).ConfigureAwait(false);
+
+        var returnState = _options.ReturnComittedForFinalized && state.NewStatus == TransactionStatus.Finalized
+            ? V1.TransactionState.Committed
+            : (V1.TransactionState)state.NewStatus;
+
         return new GetTransactionStatusResponse
         {
-            Status = (V1.TransactionState)state.NewStatus,
+            Status = returnState,
             Message = state.Message,
         };
     }

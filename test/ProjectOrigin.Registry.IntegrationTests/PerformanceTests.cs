@@ -128,7 +128,7 @@ public class PerformanceTests : IAsyncLifetime,
                     {
                         if (queued.TryDequeue(out var transaction))
                         {
-                            if (await IsCommitted(channel, transaction))
+                            if (await IsFinalized(channel, transaction))
                             {
                                 completed.Add(transaction);
                             }
@@ -170,7 +170,7 @@ public class PerformanceTests : IAsyncLifetime,
         {
             stopwatch.Restart();
             var transaction = await SendRequest(channel);
-            while (!await IsCommitted(channel, transaction))
+            while (!await IsFinalized(channel, transaction))
             {
                 await Task.Delay(25);
             }
@@ -213,7 +213,7 @@ public class PerformanceTests : IAsyncLifetime,
 
         while (queued.TryDequeue(out var item))
         {
-            if (await IsCommitted(channel, item.transaction))
+            if (await IsFinalized(channel, item.transaction))
             {
                 item.stopwatch.Stop();
                 measurements.Add(item.stopwatch.ElapsedMilliseconds);
@@ -279,11 +279,11 @@ public class PerformanceTests : IAsyncLifetime,
         _outputHelper.WriteLine($"-------Container stdout------\n{log.Stdout}\n-------Container stderr------\n{log.Stderr}\n\n----------");
     }
 
-    private static async Task<bool> IsCommitted(GrpcChannel channel, Registry.V1.Transaction transaction)
+    private static async Task<bool> IsFinalized(GrpcChannel channel, Registry.V1.Transaction transaction)
     {
         var client = new Registry.V1.RegistryService.RegistryServiceClient(channel);
         var result = await client.GetStatus(transaction);
-        return result.Status == Registry.V1.TransactionState.Committed;
+        return result.Status == Registry.V1.TransactionState.Finalized;
     }
 
 }

@@ -13,7 +13,7 @@ using ProjectOrigin.Registry.IntegrationTests.Fixtures;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
-public class FlowTests :
+public class FlowTestsComitted :
     IClassFixture<TestServerFixture<Startup>>,
     IClassFixture<ElectricityServiceFixture>,
     IClassFixture<PostgresDatabaseFixture<Startup>>,
@@ -27,7 +27,7 @@ public class FlowTests :
     private readonly Lazy<Registry.V1.RegistryService.RegistryServiceClient> _client;
     protected Registry.V1.RegistryService.RegistryServiceClient Client => _client.Value;
 
-    public FlowTests(
+    public FlowTestsComitted(
         ElectricityServiceFixture verifierFixture,
         TestServerFixture<Startup> serverFixture,
         PostgresDatabaseFixture<Startup> postgresDatabaseFixture,
@@ -42,6 +42,7 @@ public class FlowTests :
         {
             {"Otlp:Enabled", "false"},
             {"RegistryName", RegistryName},
+            {"ReturnComittedForFinalized", "true"},
             {"Verifiers:project_origin.electricity.v1", _verifierFixture.Url},
             {"ImmutableLog:type", "log"},
             {"BlockFinalizer:Interval", "00:00:05"},
@@ -90,11 +91,13 @@ public class FlowTests :
         var stream = await Client.GetStream(certId);
         stream.Transactions.Should().HaveCount(1);
 
+        await Task.Delay(10000);
+
         var blocks = await Client.GetBlocksAsync(new Registry.V1.GetBlocksRequest
         {
             Skip = 0,
             Limit = 1,
-            IncludeTransactions = true
+            IncludeTransactions = false
         });
 
         blocks.Blocks.Should().HaveCount(1);

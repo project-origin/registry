@@ -86,6 +86,16 @@ public static class Helper
         });
     }
 
+    public static async Task<Registry.V1.GetBlocksResponse> GetBlock(this Registry.V1.RegistryService.RegistryServiceClient client)
+    {
+        return await client.GetBlocksAsync(new Registry.V1.GetBlocksRequest
+        {
+            Skip = 0,
+            Limit = 1,
+            IncludeTransactions = false
+        });
+    }
+
     public static Registry.V1.Transaction SignTransaction(Common.V1.FederatedStreamId streamId, IMessage @event, IPrivateKey signerKey)
     {
         var header = new Registry.V1.TransactionHeader()

@@ -166,9 +166,9 @@ public class InMemoryRepository : ITransactionRepository
             var block = _blocks.SingleOrDefault(x => x.FromTransaction <= index && index <= x.ToTransaction);
 
             if (block is not null && block.Publication is not null)
-                return Task.FromResult(TransactionStatus.Committed);
+                return Task.FromResult(TransactionStatus.Finalized);
 
-            return Task.FromResult(TransactionStatus.Pending);
+            return Task.FromResult(TransactionStatus.Committed);
         }
     }
 
