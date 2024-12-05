@@ -64,6 +64,7 @@ public class ContainerTest : IAsyncLifetime,
                 .WithPortBinding(GrpcPort, true)
                 .WithCommand("--serve")
                 .WithEnvironment("RegistryName", RegistryName)
+                .WithEnvironment("ReturnComittedForFinalized", "false")
                 .WithEnvironment("Verifiers__project_origin.electricity.v1", verifierUrl)
                 .WithEnvironment("ImmutableLog__type", "log")
                 .WithEnvironment("BlockFinalizer__Interval", "00:00:05")
@@ -147,7 +148,7 @@ public class ContainerTest : IAsyncLifetime,
 
         status = await Helper.RepeatUntilOrTimeout(
             () => Client.GetStatus(transaction),
-            result => result.Status == Registry.V1.TransactionState.Committed,
+            result => result.Status == Registry.V1.TransactionState.Finalized,
             TimeSpan.FromSeconds(60));
 
         status.Message.Should().BeEmpty();

@@ -50,7 +50,7 @@ public sealed class BlockFinalizerJob : IBlockFinalizer
 
         foreach (var transactionHash in newBlock.TransactionHashes)
         {
-            await _statusService.SetTransactionStatus(transactionHash, new TransactionStatusRecord(TransactionStatus.Committed));
+            await _statusService.SetTransactionStatus(transactionHash, new TransactionStatusRecord(TransactionStatus.Finalized));
         }
 
         sw.Stop();

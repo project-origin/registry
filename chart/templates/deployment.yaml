@@ -68,6 +68,8 @@ spec:
           # General configuration
             - name: RegistryName
               value: {{ $.Values.registryName | default $.Release.Name }}
+            - name: ReturnComittedForFinalized
+              value: {{ $.Values.returnComittedForFinalized | quote }}
 
           # TransactionProcessor configuration
             - name: TransactionProcessor__ServerNumber

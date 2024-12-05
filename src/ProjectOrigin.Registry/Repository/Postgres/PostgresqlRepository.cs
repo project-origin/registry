@@ -120,9 +120,9 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
             new { id });
 
         if (hasBeenPublished.HasValue && hasBeenPublished.Value)
-            return TransactionStatus.Committed;
+            return TransactionStatus.Finalized;
 
-        return TransactionStatus.Pending;
+        return TransactionStatus.Committed;
     }
 
     public async Task<NewBlock?> CreateNextBlock()

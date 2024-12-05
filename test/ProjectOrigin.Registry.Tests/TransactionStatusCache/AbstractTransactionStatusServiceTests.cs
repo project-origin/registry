@@ -68,7 +68,7 @@ public abstract class AbstractTransactionStatusServiceTests
     }
 
     [Fact]
-    public async Task ShouldReturnPendingRecordFromRepositoryNotInBlock()
+    public async Task ShouldReturnCommittedRecordFromRepositoryNotInBlock()
     {
         // Arrange
         var data = _fixture.Create<byte[]>();
@@ -85,11 +85,11 @@ public abstract class AbstractTransactionStatusServiceTests
         var record = await Service.GetTransactionStatus(transactionHash);
 
         // Assert
-        record.NewStatus.Should().Be(TransactionStatus.Pending);
+        record.NewStatus.Should().Be(TransactionStatus.Committed);
     }
 
     [Fact]
-    public async Task ShouldReturnCommittedRecordFromRepositoryInBlock()
+    public async Task ShouldReturnFinalizedRecordFromRepositoryInBlock()
     {
         // Arrange
         var data = _fixture.Create<byte[]>();
@@ -109,6 +109,6 @@ public abstract class AbstractTransactionStatusServiceTests
         var record = await Service.GetTransactionStatus(transactionHash);
 
         // Assert
-        record.NewStatus.Should().Be(TransactionStatus.Committed);
+        record.NewStatus.Should().Be(TransactionStatus.Finalized);
     }
 }

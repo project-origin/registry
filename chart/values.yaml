@@ -47,6 +47,9 @@ otlp:
 # Enables one to override the name of the registry
 registryName:
 
+# The registry returns comitted for finalized transactions to enable backwards compatibility with older clients
+returnComittedForFinalized: true
+
 # transactionProcessor holds the configuration for the transaction processor
 transactionProcessor:
   # replicas defines the number of transaction processor containers to run

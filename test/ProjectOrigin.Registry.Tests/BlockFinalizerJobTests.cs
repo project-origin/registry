@@ -68,7 +68,7 @@ public class BlockFinalizerJobTests
         _repository.Verify(obj => obj.CreateNextBlock(), Times.Exactly(1));
         _blockPublisher.Verify(obj => obj.PublishBlock(It.Is<Registry.V1.BlockHeader>(x => x == header)), Times.Exactly(1));
         _repository.Verify(obj => obj.FinalizeBlock(It.Is<BlockHash>(x => x.Equals(BlockHash.FromHeader(header))), It.Is<Registry.V1.BlockPublication>(x => x == publication)), Times.Exactly(1));
-        _statusService.Verify(obj => obj.SetTransactionStatus(It.IsAny<TransactionHash>(), It.Is<TransactionStatusRecord>(x => x.NewStatus == TransactionStatus.Committed)), Times.Exactly(transactions.Count));
+        _statusService.Verify(obj => obj.SetTransactionStatus(It.IsAny<TransactionHash>(), It.Is<TransactionStatusRecord>(x => x.NewStatus == TransactionStatus.Finalized)), Times.Exactly(transactions.Count));
     }
 
     [Fact]

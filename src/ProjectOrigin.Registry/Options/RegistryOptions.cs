@@ -6,4 +6,6 @@ public record RegistryOptions()
 {
     [Required(AllowEmptyStrings = false)]
     public string RegistryName { get; init; } = string.Empty;
+
+    public bool ReturnComittedForFinalized { get; init; } = false;
 }
