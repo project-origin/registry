@@ -83,7 +83,7 @@ public class FlowTestsComitted :
 
         status = await Helper.RepeatUntilOrTimeout(
             () => Client.GetStatus(transaction),
-            result => result.Status == Registry.V1.TransactionState.Finalized,
+            result => result.Status == Registry.V1.TransactionState.Committed,
             TimeSpan.FromSeconds(60));
 
         status.Message.Should().BeEmpty();
