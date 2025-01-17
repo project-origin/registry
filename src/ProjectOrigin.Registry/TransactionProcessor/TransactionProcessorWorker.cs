@@ -46,17 +46,17 @@ public sealed class TransactionProcessorWorker : IAsyncDisposable
                 durable: true,
                 exclusive: false,
                 autoDelete: false,
-                arguments: null
-                );
+                arguments: null,
+                cancellationToken: cancellationToken);
 
             await _channel.Channel.BasicQosAsync(
                     prefetchSize: 0,
                     prefetchCount: 5,
-                    global: false
-                    );
+                    global: false,
+                    cancellationToken: cancellationToken);
 
             var consumer = new AsyncEventingBasicConsumer(_channel.Channel);
-            consumer.Received += Consumer_Received;
+            consumer.ReceivedAsync += Consumer_Received;
 
             await _channel.Channel.BasicConsumeAsync(
                 queue: _queueName,
@@ -65,8 +65,8 @@ public sealed class TransactionProcessorWorker : IAsyncDisposable
                 noLocal: false,
                 exclusive: true,
                 arguments: null,
-                consumer: consumer
-                );
+                consumer: consumer,
+                cancellationToken: cancellationToken);
 
         }, cancellationToken);
     }
