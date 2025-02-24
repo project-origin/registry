@@ -10,18 +10,18 @@ using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
 using FluentAssertions;
 using Grpc.Net.Client;
-using ProjectOrigin.Electricity.IntegrationTests;
 using ProjectOrigin.Electricity.V1;
 using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
 using ProjectOrigin.PedersenCommitment;
+using ProjectOrigin.Registry;
 using ProjectOrigin.Registry.IntegrationTests.Fixtures;
 using ProjectOrigin.Registry.V1;
 using ProjectOrigin.TestCommon.Fixtures;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace ProjectOrigin.Registry.IntegrationTests;
+namespace ProjectOrigin.Electricity.IntegrationTests;
 
 public class PerformanceTests : IAsyncLifetime,
     IClassFixture<ContainerImageFixture>,
@@ -247,7 +247,7 @@ public class PerformanceTests : IAsyncLifetime,
         var commitmentInfo = new SecretCommitmentInfo(250);
         IssuedEvent @event = Helper.CreateIssuedEvent(RegistryName, IssuerArea, owner.Derive(1).PublicKey, commitmentInfo, Guid.NewGuid());
         var transaction = Helper.SignTransaction(@event.CertificateId, @event, _issuerKey);
-        await client.SendTransactionsAsync(new SendTransactionsRequest { Transactions = { transaction }});
+        await client.SendTransactionsAsync(new SendTransactionsRequest { Transactions = { transaction } });
         return transaction;
     }
 
