@@ -14,10 +14,12 @@ using System.Collections.Concurrent;
 using FluentAssertions;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading;
 using Xunit.Abstractions;
 using ProjectOrigin.TestCommon.Fixtures;
 using ProjectOrigin.Registry;
 using ProjectOrigin.Registry.IntegrationTests.Fixtures;
+using ProjectOrigin.Registry.V1;
 
 namespace ProjectOrigin.Electricity.IntegrationTests;
 
@@ -245,7 +247,7 @@ public class PerformanceTests : IAsyncLifetime,
         var commitmentInfo = new SecretCommitmentInfo(250);
         IssuedEvent @event = Helper.CreateIssuedEvent(RegistryName, IssuerArea, owner.Derive(1).PublicKey, commitmentInfo, Guid.NewGuid());
         var transaction = Helper.SignTransaction(@event.CertificateId, @event, _issuerKey);
-        await client.SendTransactions(transaction);
+        await client.SendTransactionsAsync(new SendTransactionsRequest { Transactions = { transaction }});
         return transaction;
     }
 
