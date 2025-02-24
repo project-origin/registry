@@ -71,6 +71,7 @@ public class PerformanceTests : IAsyncLifetime,
                 .WithEnvironment("Verifiers__project_origin.electricity.v1", verifierUrl)
                 .WithEnvironment("ImmutableLog__type", "log")
                 .WithEnvironment("BlockFinalizer__Interval", "00:00:02")
+                .WithEnvironment("Persistence__Type", "postgresql")
                 .WithEnvironment("ConnectionStrings__Database", _postgresDatabaseFixture.ContainerConnectionString)
                 .WithEnvironment("Logging__LogLevel__Default", "Debug")
                 .WithEnvironment("Logging__LogLevel__Grpc.AspNetCore", "Information")
