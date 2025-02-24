@@ -1,27 +1,27 @@
-using Xunit;
-using System.Threading.Tasks;
 using System;
-using ProjectOrigin.PedersenCommitment;
-using ProjectOrigin.Electricity.V1;
-using ProjectOrigin.HierarchicalDeterministicKeys;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
-using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
-using System.Text;
-using Grpc.Net.Client;
-using System.Collections.Concurrent;
 using FluentAssertions;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading;
-using Xunit.Abstractions;
-using ProjectOrigin.TestCommon.Fixtures;
-using ProjectOrigin.Registry;
+using Grpc.Net.Client;
+using ProjectOrigin.Electricity.IntegrationTests;
+using ProjectOrigin.Electricity.V1;
+using ProjectOrigin.HierarchicalDeterministicKeys;
+using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
+using ProjectOrigin.PedersenCommitment;
 using ProjectOrigin.Registry.IntegrationTests.Fixtures;
 using ProjectOrigin.Registry.V1;
+using ProjectOrigin.TestCommon.Fixtures;
+using Xunit;
+using Xunit.Abstractions;
 
-namespace ProjectOrigin.Electricity.IntegrationTests;
+namespace ProjectOrigin.Registry.IntegrationTests;
 
 public class PerformanceTests : IAsyncLifetime,
     IClassFixture<ContainerImageFixture>,
@@ -77,7 +77,6 @@ public class PerformanceTests : IAsyncLifetime,
                 .WithEnvironment("ConnectionStrings__Database", _postgresDatabaseFixture.ContainerConnectionString)
                 .WithEnvironment("Logging__LogLevel__Default", "Debug")
                 .WithEnvironment("Logging__LogLevel__Grpc.AspNetCore", "Information")
-                .WithEnvironment("Logging__LogLevel__Grpc.AspNetCore", "Information")
                 .WithEnvironment("Cache__Type", "redis")
                 .WithEnvironment("Cache__Redis__ConnectionString", redisFixture.ContainerConnectionString)
                 .WithEnvironment("RabbitMq__Hostname", rabbitMqFixture.ContainerIp)
@@ -116,12 +115,13 @@ public class PerformanceTests : IAsyncLifetime,
         ConcurrentBag<Registry.V1.Transaction> completed = new ConcurrentBag<Registry.V1.Transaction>();
         using var channel = CreateRegistryChannel();
 
+        var cts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
         stopwatch.Start();
         for (int i = 0; i < concurrency; i++)
         {
             tasks[i] = Task.Run(async () =>
             {
-                while (true)
+                while (!cts.Token.IsCancellationRequested)
                 {
                     if (queued.Count < concurrentRequests)
                     {
@@ -143,7 +143,7 @@ public class PerformanceTests : IAsyncLifetime,
                         }
                     }
                 }
-            });
+            }, cts.Token);
         }
         await Task.Delay(TimeSpan.FromMinutes(5));
         stopwatch.Stop();
@@ -288,5 +288,4 @@ public class PerformanceTests : IAsyncLifetime,
         var result = await client.GetStatus(transaction);
         return result.Status == Registry.V1.TransactionState.Finalized;
     }
-
 }
