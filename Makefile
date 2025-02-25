@@ -72,7 +72,7 @@ concordium-tests: build
 
 ## Run performance tests, takes a long time.
 verify-performance: build
-	dotnet test --no-build --filter 'FullyQualifiedName~PerformanceTests'
+	dotnet test test/ProjectOrigin.Registry.IntegrationTests/ProjectOrigin.Registry.IntegrationTests.csproj --no-build --filter 'FullyQualifiedName~PerformanceTests'
 
 ## Build the container image with tag ghcr.io/project-origin/registry-server:test
 build-container:
