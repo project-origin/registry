@@ -10,8 +10,8 @@ COPY ./protos ./protos
 COPY ./src ./src
 
 RUN dotnet restore ./src/${PROJECT}
-RUN dotnet build ./src/${PROJECT} -c Release --no-restore -p:CustomAssemblyName=App
-RUN dotnet publish ./src/${PROJECT} -c Release --no-build -p:CustomAssemblyName=App -o /app/publish
+RUN dotnet build ./src/${PROJECT} -c Release --no-restore -p:CustomAssemblyName=Registry
+RUN dotnet publish ./src/${PROJECT} -c Release --no-build -p:CustomAssemblyName=Registry -o /app/publish
 
 # ------- production image -------
 FROM mcr.microsoft.com/dotnet/aspnet:8.0.11-jammy-chiseled-extra AS production
@@ -24,4 +24,4 @@ EXPOSE 5001
 
 ENV ReturnComittedForFinalized=true
 
-ENTRYPOINT ["dotnet", "App.dll"]
+ENTRYPOINT ["dotnet", "Registry.dll"]
