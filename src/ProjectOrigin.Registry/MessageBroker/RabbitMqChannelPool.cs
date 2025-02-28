@@ -21,7 +21,6 @@ public sealed class RabbitMqChannelPool : IRabbitMqChannelPool, IAsyncDisposable
             Port = rabbitMqOptions.Value.AmqpPort,
             UserName = rabbitMqOptions.Value.Username,
             Password = rabbitMqOptions.Value.Password,
-            DispatchConsumersAsync = true,
         };
 
         _connection = new Lazy<Task<IConnection>>(() => Task.Run(() => factory.CreateConnectionAsync()), false);
