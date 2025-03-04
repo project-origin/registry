@@ -64,22 +64,31 @@ public static class IEnumerableMerkleExtension
 
     private static byte[] RecursiveShaNodes(IEnumerable<byte[]> nodes, int balancedCount)
     {
-        if (nodes.Count() == 1)
+        var nodeList = nodes.ToList();
+        if (nodeList.Count == 0)
+            throw new ArgumentException("Nodes cannot be empty.", nameof(nodes));
+
+        if (nodeList.Count == 1)
         {
-            var data = SHA256.HashData(nodes.Single());
+            var data = SHA256.HashData(nodeList[0]);
             for (int i = (int)Math.Log(balancedCount, 2); i > 0; i--)
             {
-                var doubleData = data.Concat(data);
-                data = SHA256.HashData(doubleData.ToArray());
+                var doubleData = data.Concat(data).ToArray();
+                data = SHA256.HashData(doubleData);
             }
             return data;
         }
         else
         {
             var halfSize = balancedCount / 2;
+            var leftNodes = nodeList.Take(halfSize).ToList();
+            var rightNodes = nodeList.Skip(halfSize).ToList();
 
-            var left = RecursiveShaNodes(nodes.Take(halfSize), halfSize);
-            var right = RecursiveShaNodes(nodes.Skip(halfSize).DefaultIfEmpty(nodes.Last()), halfSize);
+            if (rightNodes.Count == 0)
+                rightNodes.Add(leftNodes.Last());
+
+            var left = RecursiveShaNodes(leftNodes, halfSize);
+            var right = RecursiveShaNodes(rightNodes, halfSize);
 
             return SHA256.HashData(left.Concat(right).ToArray());
         }
