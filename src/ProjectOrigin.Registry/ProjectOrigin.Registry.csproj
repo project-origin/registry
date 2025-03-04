@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ProjectOrigin.ServiceCommon" Version="1.0.0" />
+    <PackageReference Include="ProjectOrigin.ServiceCommon" Version="1.1.0-rc.1" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.65.0" />
     <PackageReference Include="OpenTelemetry" Version="1.9.0" />
     <PackageReference Include="Npgsql.OpenTelemetry" Version="9.0.0" />
