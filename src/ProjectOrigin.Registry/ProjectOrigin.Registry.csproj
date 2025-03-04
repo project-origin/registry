@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ProjectOrigin.ServiceCommon" Version="1.0.0" />
+    <PackageReference Include="ProjectOrigin.ServiceCommon" Version="2.0.0-rc.1" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.67.0" />
     <PackageReference Include="OpenTelemetry" Version="1.11.1" />
     <PackageReference Include="Npgsql.OpenTelemetry" Version="9.0.3" />
@@ -22,7 +22,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.1" />
     <PackageReference Include="ConcordiumNetSdk" Version="6.0.1" />
     <PackageReference Include="Dapper" Version="2.1.66" />
-    <PackageReference Include="dbup-postgresql" Version="5.0.40" />
+    <PackageReference Include="dbup-postgresql" Version="6.0.3" />
     <PackageReference Include="NSec.Cryptography" Version="24.4.0" />
     <PackageReference Include="Npgsql" Version="9.0.3" />
     <PackageReference Include="StackExchange.Redis" Version="2.8.24" />
