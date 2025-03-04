@@ -70,13 +70,17 @@ public static class IEnumerableMerkleExtension
 
         if (nodeList.Count == 1)
         {
-            var data = SHA256.HashData(nodeList[0]);
+            var nodeHash = SHA256.HashData(nodeList[0]);
+
             for (int i = (int)Math.Log(balancedCount, 2); i > 0; i--)
             {
-                var doubleData = data.Concat(data).ToArray();
-                data = SHA256.HashData(doubleData);
+                byte[] combinedHash = new byte[nodeHash.Length * 2];
+                Buffer.BlockCopy(nodeHash, 0, combinedHash, 0, nodeHash.Length);
+                Buffer.BlockCopy(nodeHash, 0, combinedHash, nodeHash.Length, nodeHash.Length);
+
+                nodeHash = SHA256.HashData(combinedHash);
             }
-            return data;
+            return nodeHash;
         }
         else
         {
@@ -85,12 +89,18 @@ public static class IEnumerableMerkleExtension
             var rightNodes = nodeList.Skip(halfSize).ToList();
 
             if (rightNodes.Count == 0)
+            {
                 rightNodes.Add(leftNodes.Last());
+            }
 
-            var left = RecursiveShaNodes(leftNodes, halfSize);
-            var right = RecursiveShaNodes(rightNodes, halfSize);
+            var leftHash = RecursiveShaNodes(leftNodes, halfSize);
+            var rightHash = RecursiveShaNodes(rightNodes, halfSize);
 
-            return SHA256.HashData(left.Concat(right).ToArray());
+            byte[] combinedHash = new byte[leftHash.Length + rightHash.Length];
+            Buffer.BlockCopy(leftHash, 0, combinedHash, 0, leftHash.Length);
+            Buffer.BlockCopy(rightHash, 0, combinedHash, leftHash.Length, rightHash.Length);
+
+            return SHA256.HashData(combinedHash);
         }
     }
 
