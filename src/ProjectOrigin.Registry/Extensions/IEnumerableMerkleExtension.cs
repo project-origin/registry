@@ -90,7 +90,7 @@ public static class IEnumerableMerkleExtension
 
             if (rightNodes.Count == 0)
             {
-                rightNodes.Add(leftNodes.Last());
+                rightNodes.Add(leftNodes[^1]);
             }
 
             var leftHash = RecursiveShaNodes(leftNodes, halfSize);
