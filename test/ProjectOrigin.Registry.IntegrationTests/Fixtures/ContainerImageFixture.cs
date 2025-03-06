@@ -45,7 +45,7 @@ public class ContainerImageFixture : IAsyncLifetime
 
         var content = File.ReadAllText(source)
             .Replace(" --platform=$BUILDPLATFORM", "") // not supported by Testcontainers
-            .Replace("-jammy-chiseled-extra", ""); // not supported by Testcontainers because of user permissions
+            .Replace("-noble-chiseled-extra", ""); // not supported by Testcontainers because of user permissions
 
         File.WriteAllText(target, content);
         return target;
