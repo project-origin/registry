@@ -64,24 +64,43 @@ public static class IEnumerableMerkleExtension
 
     private static byte[] RecursiveShaNodes(IEnumerable<byte[]> nodes, int balancedCount)
     {
-        if (nodes.Count() == 1)
+        var nodeList = nodes.ToList();
+        if (nodeList.Count == 0)
+            throw new ArgumentException("Nodes cannot be empty.", nameof(nodes));
+
+        if (nodeList.Count == 1)
         {
-            var data = SHA256.HashData(nodes.Single());
+            var nodeHash = SHA256.HashData(nodeList[0]);
+
             for (int i = (int)Math.Log(balancedCount, 2); i > 0; i--)
             {
-                var doubleData = data.Concat(data);
-                data = SHA256.HashData(doubleData.ToArray());
+                byte[] combinedHash = new byte[nodeHash.Length * 2];
+                Buffer.BlockCopy(nodeHash, 0, combinedHash, 0, nodeHash.Length);
+                Buffer.BlockCopy(nodeHash, 0, combinedHash, nodeHash.Length, nodeHash.Length);
+
+                nodeHash = SHA256.HashData(combinedHash);
             }
-            return data;
+            return nodeHash;
         }
         else
         {
             var halfSize = balancedCount / 2;
+            var leftNodes = nodeList.Take(halfSize).ToList();
+            var rightNodes = nodeList.Skip(halfSize).ToList();
 
-            var left = RecursiveShaNodes(nodes.Take(halfSize), halfSize);
-            var right = RecursiveShaNodes(nodes.Skip(halfSize).DefaultIfEmpty(nodes.Last()), halfSize);
+            if (rightNodes.Count == 0)
+            {
+                rightNodes.Add(leftNodes[^1]);
+            }
 
-            return SHA256.HashData(left.Concat(right).ToArray());
+            var leftHash = RecursiveShaNodes(leftNodes, halfSize);
+            var rightHash = RecursiveShaNodes(rightNodes, halfSize);
+
+            byte[] combinedHash = new byte[leftHash.Length + rightHash.Length];
+            Buffer.BlockCopy(leftHash, 0, combinedHash, 0, leftHash.Length);
+            Buffer.BlockCopy(rightHash, 0, combinedHash, leftHash.Length, rightHash.Length);
+
+            return SHA256.HashData(combinedHash);
         }
     }
 
