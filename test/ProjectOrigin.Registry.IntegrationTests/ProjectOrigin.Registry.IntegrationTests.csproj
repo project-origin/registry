@@ -40,7 +40,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <Protobuf Include="../../protos/electricity.proto" Link="Protos\electricity.proto" GrpcServices="None">
-      <SourceUrl>https://raw.githubusercontent.com/project-origin/verifier_electricity/v3.0.0/protos/electricity.proto</SourceUrl>
+      <SourceUrl>https://raw.githubusercontent.com/project-origin/verifier_electricity/v3.0.1-rc.1/protos/electricity.proto</SourceUrl>
     </Protobuf>
   </ItemGroup>
 
