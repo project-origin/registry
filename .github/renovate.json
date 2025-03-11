@@ -3,7 +3,7 @@
     "packageRules": [
         {
             "matchPackageNames": ["FluentAssertions"],
-            "allowedVersions": "<=7.1.0"
+            "allowedVersions": "<8.0.0"
         }
     ],
     "customManagers": [
