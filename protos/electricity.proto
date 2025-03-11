@@ -41,11 +41,20 @@ message AllocatedEvent {
     bytes production_source_slice_hash = 4;
     bytes consumption_source_slice_hash = 5;
     bytes equality_proof = 6;
+    bytes chronicler_signature = 7;
 }
 
 message ClaimedEvent {
     project_origin.common.v1.FederatedStreamId  certificate_id = 1;
     project_origin.common.v1.Uuid allocation_id = 2;
+}
+
+message WithdrawnEvent {
+
+}
+
+message UnclaimedEvent {
+    project_origin.common.v1.Uuid allocation_id = 1;
 }
 
 enum GranularCertificateType {

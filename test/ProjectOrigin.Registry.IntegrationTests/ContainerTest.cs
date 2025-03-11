@@ -1,21 +1,23 @@
-using Xunit;
-using System.Threading.Tasks;
 using System;
-using ProjectOrigin.PedersenCommitment;
+using System.Text;
+using System.Threading.Tasks;
+using DotNet.Testcontainers.Builders;
+using DotNet.Testcontainers.Containers;
+using FluentAssertions;
+using Grpc.Net.Client;
+using ProjectOrigin.Electricity.IntegrationTests;
 using ProjectOrigin.Electricity.V1;
 using ProjectOrigin.HierarchicalDeterministicKeys;
 using ProjectOrigin.HierarchicalDeterministicKeys.Interfaces;
-using DotNet.Testcontainers.Builders;
-using DotNet.Testcontainers.Containers;
-using System.Text;
-using Grpc.Net.Client;
-using FluentAssertions;
-using Xunit.Abstractions;
-using ProjectOrigin.TestCommon.Fixtures;
-using ProjectOrigin.Registry;
+using ProjectOrigin.PedersenCommitment;
 using ProjectOrigin.Registry.IntegrationTests.Fixtures;
+using ProjectOrigin.Registry.V1;
+using ProjectOrigin.TestCommon.Extensions;
+using ProjectOrigin.TestCommon.Fixtures;
+using Xunit;
+using Xunit.Abstractions;
 
-namespace ProjectOrigin.Electricity.IntegrationTests;
+namespace ProjectOrigin.Registry.IntegrationTests;
 
 public class ContainerTest : IAsyncLifetime,
     IClassFixture<ContainerImageFixture>,
@@ -23,7 +25,7 @@ public class ContainerTest : IAsyncLifetime,
     IClassFixture<RedisFixture>,
     IClassFixture<RabbitMqFixture>
 {
-    private const string ElectricityVerifierImage = "ghcr.io/project-origin/electricity-server:0.5.0";
+    private const string ElectricityVerifierImage = "ghcr.io/project-origin/electricity-server:3.0.1-rc.1";
     private const int ElectricityVerifierGrpcPort = 5000;
     private const int GrpcPort = 5000;
     private const string IssuerArea = "Narnia";
@@ -52,7 +54,7 @@ public class ContainerTest : IAsyncLifetime,
                 .WithEnvironment($"Issuers__{IssuerArea}", Convert.ToBase64String(Encoding.UTF8.GetBytes(_issuerKey.PublicKey.ExportPkixText())))
                 .WithWaitStrategy(
                     Wait.ForUnixContainer()
-                        .UntilPortIsAvailable(ElectricityVerifierGrpcPort)
+                        .UntilGrpcResponds(ElectricityVerifierGrpcPort)
                     )
                 .Build();
 
@@ -82,7 +84,7 @@ public class ContainerTest : IAsyncLifetime,
                 .WithEnvironment("TransactionProcessor__Weight", "10")
                 .WithWaitStrategy(
                     Wait.ForUnixContainer()
-                        .UntilPortIsAvailable(GrpcPort)
+                        .UntilGrpcResponds(GrpcPort)
                     )
                 .Build();
         });
@@ -128,7 +130,7 @@ public class ContainerTest : IAsyncLifetime,
     [Fact]
     public async Task issue_comsumption_certificate_success()
     {
-        var Client = new Registry.V1.RegistryService.RegistryServiceClient(CreateRegistryChannel());
+        var Client = new RegistryService.RegistryServiceClient(CreateRegistryChannel());
 
         var owner = Algorithms.Secp256k1.GenerateNewPrivateKey();
 
@@ -140,15 +142,15 @@ public class ContainerTest : IAsyncLifetime,
         var transaction = Helper.SignTransaction(@event.CertificateId, @event, _issuerKey);
 
         var status = await Client.GetStatus(transaction);
-        status.Status.Should().Be(Registry.V1.TransactionState.Unknown);
+        status.Status.Should().Be(TransactionState.Unknown);
 
         await Client.SendTransactions(transaction);
         status = await Client.GetStatus(transaction);
-        status.Status.Should().Be(Registry.V1.TransactionState.Pending);
+        status.Status.Should().Be(TransactionState.Pending);
 
         status = await Helper.RepeatUntilOrTimeout(
             () => Client.GetStatus(transaction),
-            result => result.Status == Registry.V1.TransactionState.Finalized,
+            result => result.Status == TransactionState.Finalized,
             TimeSpan.FromSeconds(60));
 
         status.Message.Should().BeEmpty();
@@ -156,7 +158,7 @@ public class ContainerTest : IAsyncLifetime,
         var stream = await Client.GetStream(certId);
         stream.Transactions.Should().HaveCount(1);
 
-        var blocks = await Client.GetBlocksAsync(new Registry.V1.GetBlocksRequest
+        var blocks = await Client.GetBlocksAsync(new GetBlocksRequest
         {
             Skip = 0,
             Limit = 1,
