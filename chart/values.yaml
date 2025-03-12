@@ -193,7 +193,7 @@ migrationWaiter:
     # repository is the repository to pull the image from
     repository: bitnami/kubectl
     # tag is the tag to pull defaults to the chart version
-    tag: 1.32.2
+    tag: 1.32.3
 
   # resources holds the configuration for the resource requests and limits
   resources:
