@@ -7,19 +7,19 @@ on:
 
 jobs:
   verify-devcontainer:
-    uses: project-origin/.github/.github/workflows/reusable-verify-devcontainer.yaml@1fefdeaa0a8999f21ca03bf8f4d3db1324a2c688
+    uses: project-origin/.github/.github/workflows/reusable-verify-devcontainer.yaml@f431188c763a16fa1e4e4a71aa99a6cb2717ff71
 
   verify-code:
-    uses: project-origin/.github/.github/workflows/reusable-verify-code.yaml@1fefdeaa0a8999f21ca03bf8f4d3db1324a2c688
+    uses: project-origin/.github/.github/workflows/reusable-verify-code.yaml@f431188c763a16fa1e4e4a71aa99a6cb2717ff71
 
   verify-renovate-config:
-    uses: project-origin/.github/.github/workflows/reusable-verify-renovate.yaml@1fefdeaa0a8999f21ca03bf8f4d3db1324a2c688
+    uses: project-origin/.github/.github/workflows/reusable-verify-renovate.yaml@f431188c763a16fa1e4e4a71aa99a6cb2717ff71
 
   verify-chart:
-    uses: project-origin/.github/.github/workflows/reusable-verify-chart.yaml@1fefdeaa0a8999f21ca03bf8f4d3db1324a2c688
+    uses: project-origin/.github/.github/workflows/reusable-verify-chart.yaml@f431188c763a16fa1e4e4a71aa99a6cb2717ff71
 
   verify-container-build:
-    uses: project-origin/.github/.github/workflows/reusable-build-push-container-ghcr.yaml@1fefdeaa0a8999f21ca03bf8f4d3db1324a2c688
+    uses: project-origin/.github/.github/workflows/reusable-build-push-container-ghcr.yaml@f431188c763a16fa1e4e4a71aa99a6cb2717ff71
     with:
       imagename: ghcr.io/project-origin/registry-server
       version: test
