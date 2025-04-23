@@ -13,6 +13,6 @@ annotations:
 
 dependencies:
   - name: redis
-    version: 20.13.0
+    version: 20.13.1
     repository: https://charts.bitnami.com/bitnami
     condition: redis.enabled
