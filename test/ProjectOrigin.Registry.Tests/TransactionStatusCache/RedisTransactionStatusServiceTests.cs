@@ -9,14 +9,17 @@ namespace ProjectOrigin.Registry.Tests.TransactionStatusCache;
 
 public class RedisTransactionStatusServiceTests : AbstractTransactionStatusServiceTests, IClassFixture<RedisFixture>
 {
-    private RedisTransactionStatusService _service;
+    private readonly Mock<ILogger<RedisTransactionStatusService>> _mockLogger;
+    private readonly RedisTransactionStatusService _service;
 
     public RedisTransactionStatusServiceTests(RedisFixture redisFixture)
     {
         var connection = ConnectionMultiplexer.Connect(redisFixture.HostConnectionString);
-        var logger = new Mock<ILogger<RedisTransactionStatusService>>();
-        _service = new RedisTransactionStatusService(logger.Object, connection, _repository);
+        _mockLogger = new Mock<ILogger<RedisTransactionStatusService>>();
+
+        _service = new RedisTransactionStatusService(_mockLogger.Object, connection, _repository);
     }
 
     protected override ITransactionStatusService Service => _service;
+    protected override IInvocationList LoggedMessages => _mockLogger.Invocations;
 }

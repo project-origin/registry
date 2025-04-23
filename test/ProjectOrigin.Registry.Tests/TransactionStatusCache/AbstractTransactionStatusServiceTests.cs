@@ -2,6 +2,8 @@ using System;
 using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
+using Moq;
 using ProjectOrigin.Registry.Repository.InMemory;
 using ProjectOrigin.Registry.Repository.Models;
 using ProjectOrigin.Registry.TransactionStatusCache;
@@ -15,6 +17,7 @@ public abstract class AbstractTransactionStatusServiceTests
     protected InMemoryRepository _repository;
 
     protected abstract ITransactionStatusService Service { get; }
+    protected abstract IInvocationList LoggedMessages { get; }
 
     public AbstractTransactionStatusServiceTests()
     {
@@ -49,6 +52,27 @@ public abstract class AbstractTransactionStatusServiceTests
 
         // Assert
         record.Should().BeEquivalentTo(transactionStatusRecord);
+    }
+
+    [Fact]
+    public async Task ShouldReturnSetStatusMultipleTimesWithoutWarning()
+    {
+        // Arrange
+        var transactionHash = _fixture.Create<TransactionHash>();
+
+        // Act
+        await Service.SetTransactionStatus(transactionHash, new TransactionStatusRecord(TransactionStatus.Unknown));
+        await Service.SetTransactionStatus(transactionHash, new TransactionStatusRecord(TransactionStatus.Pending));
+        await Service.SetTransactionStatus(transactionHash, new TransactionStatusRecord(TransactionStatus.Committed));
+        await Service.SetTransactionStatus(transactionHash, new TransactionStatusRecord(TransactionStatus.Finalized));
+
+        var record = await Service.GetTransactionStatus(transactionHash);
+
+        // Assert
+        record.Should().BeEquivalentTo(new TransactionStatusRecord(TransactionStatus.Finalized));
+        LoggedMessages
+            .Should()
+            .NotContain(x => x.Method.Name == nameof(ILogger.Log) && x.Arguments[0].Equals(LogLevel.Warning));
     }
 
     [Fact]
