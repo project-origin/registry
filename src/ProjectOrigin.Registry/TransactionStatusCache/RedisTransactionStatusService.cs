@@ -75,7 +75,7 @@ public class RedisTransactionStatusService : ITransactionStatusService
         {
             var transaction = redisDatabase.CreateTransaction();
             transaction.AddCondition(Condition.StringEqual(transactionHash, JsonSerializer.Serialize(cacheRecord)));
-            await redisDatabase.StringSetAsync(
+            _ = transaction.StringSetAsync(
                 transactionHash,
                 JsonSerializer.Serialize(newRecord),
                 expiry: CacheTime);

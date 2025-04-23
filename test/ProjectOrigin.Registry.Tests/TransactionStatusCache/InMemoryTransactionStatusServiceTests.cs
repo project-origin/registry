@@ -9,15 +9,17 @@ namespace ProjectOrigin.Registry.Tests.TransactionStatusCache;
 
 public class InMemoryTransactionStatusServiceTests : AbstractTransactionStatusServiceTests
 {
-    private InMemoryTransactionStatusService _service;
+    private readonly Mock<ILogger<InMemoryTransactionStatusService>> _mockLogger;
+    private readonly InMemoryTransactionStatusService _service;
 
     public InMemoryTransactionStatusServiceTests()
     {
         var cache = new MemoryDistributedCache(MsOptions.Create(new MemoryDistributedCacheOptions()));
-        var logger = new Mock<ILogger<InMemoryTransactionStatusService>>();
+        _mockLogger = new Mock<ILogger<InMemoryTransactionStatusService>>();
 
-        _service = new InMemoryTransactionStatusService(logger.Object, cache, _repository);
+        _service = new InMemoryTransactionStatusService(_mockLogger.Object, cache, _repository);
     }
 
     protected override ITransactionStatusService Service => _service;
+    protected override IInvocationList LoggedMessages => _mockLogger.Invocations;
 }
