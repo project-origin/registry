@@ -10,7 +10,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="ProjectOrigin.ServiceCommon" Version="2.0.2" />
-    <PackageReference Include="Grpc.AspNetCore" Version="2.70.0" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
     <PackageReference Include="OpenTelemetry" Version="1.11.2" />
     <PackageReference Include="Npgsql.OpenTelemetry" Version="9.0.3" />
     <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.11.2" />
