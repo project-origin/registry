@@ -27,7 +27,7 @@
     <PackageReference Include="ConcordiumNetSdk" Version="6.0.1" />
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="dbup-postgresql" Version="6.0.3" />
-    <PackageReference Include="NSec.Cryptography" Version="24.4.0" />
+    <PackageReference Include="NSec.Cryptography" Version="25.4.0" />
     <PackageReference Include="Npgsql" Version="9.0.3" />
     <PackageReference Include="StackExchange.Redis" Version="2.8.31" />
   </ItemGroup>
