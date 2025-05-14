@@ -75,12 +75,18 @@ public class RedisTransactionStatusService : ITransactionStatusService
                 var cacheStatus = await GetRecordAsync(transactionHash);
                 if (cacheStatus!.NewStatus == TransactionStatus.Unknown)
                 {
-                    _logger.LogWarning("Transaction {transactionHash} status was set to unknown while setting it to {newStatus}, retrying.", transactionHash, newRecord.NewStatus);
-                    await SafeSetRecord(transactionHash, newRecord, cacheRecord);
+                    cacheStatus = await GetRecordAsync(transactionHash);
+                    if (cacheStatus == null)
+                    {
+                        _logger.LogWarning("Transaction {transactionHash} status was set to unknown while setting it to {newStatus}, retrying.", transactionHash, newRecord.NewStatus);
+                        await SafeSetRecord(transactionHash, newRecord, cacheRecord);
+                    }
+                    else
+                        _logger.LogError("Transaction {transactionHash} status was null, still null, but failed setting to {newStatus}, retrying.", transactionHash, newRecord.NewStatus);
                 }
                 else
                 {
-                    _logger.LogWarning("Transaction {transactionHash} status was set in the cache by another process while trying to set it to {newStatus}, change aborted.", transactionHash, newRecord.NewStatus);
+                    _logger.LogError("Transaction {transactionHash} status was set in the cache by another process while trying to set it to {newStatus}, change aborted.", transactionHash, newRecord.NewStatus);
                 }
             }
         }
@@ -96,7 +102,7 @@ public class RedisTransactionStatusService : ITransactionStatusService
 
             if (!success)
             {
-                _logger.LogWarning("Transaction {transactionHash} status was changed in the cache by another process while trying to set it to {newStatus} old known state {cacheState}, change aborted.", transactionHash, newRecord.NewStatus, cacheRecord.NewStatus);
+                _logger.LogError("Transaction {transactionHash} status was changed in the cache by another process while trying to set it to {newStatus} old known state {cacheState}, change aborted.", transactionHash, newRecord.NewStatus, cacheRecord.NewStatus);
             }
         }
     }

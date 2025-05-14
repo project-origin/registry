@@ -75,20 +75,23 @@ public abstract class AbstractTransactionStatusServiceTests
             .NotContain(x => x.Method.Name == nameof(ILogger.Log) && x.Arguments[0].Equals(LogLevel.Warning));
     }
 
-    [Fact]
-    public async Task ShouldNotSetLowerStatus()
+    [Theory]
+    [InlineData(TransactionStatus.Committed, TransactionStatus.Pending)]
+    [InlineData(TransactionStatus.Pending, TransactionStatus.Unknown)]
+    [InlineData(TransactionStatus.Finalized, TransactionStatus.Committed)]
+    public async Task ShouldNotSetLowerStatus(TransactionStatus firstState, TransactionStatus tryState)
     {
         // Arrange
         var transactionHash = _fixture.Create<TransactionHash>();
 
-        await Service.SetTransactionStatus(transactionHash, new TransactionStatusRecord(TransactionStatus.Committed));
-        await Service.SetTransactionStatus(transactionHash, new TransactionStatusRecord(TransactionStatus.Pending));
+        await Service.SetTransactionStatus(transactionHash, new TransactionStatusRecord(firstState));
+        await Service.SetTransactionStatus(transactionHash, new TransactionStatusRecord(tryState));
 
         // Act
         var record = await Service.GetTransactionStatus(transactionHash);
 
         // Assert
-        record.NewStatus.Should().Be(TransactionStatus.Committed);
+        record.NewStatus.Should().Be(firstState);
     }
 
     [Fact]
