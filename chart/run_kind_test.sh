@@ -51,7 +51,7 @@ debug() {
 
 # trap cleanup function on script exit
 trap 'cleanup' 0
-trap 'debug; cleanup' ERR
+trap 'debug; cleanup; exit 1' ERR
 
 # build docker image
 make build-container
@@ -104,7 +104,7 @@ networkConfig:
 EOF
 
 # install electricity verifier in default namespace
-helm install electricity project-origin-verifier-electricity --repo https://project-origin.github.io/helm-registry --version 2.0.0-rc.3 -f "${electricity_values_filename}" --wait --kube-context kind-${cluster_name}
+helm install electricity project-origin-verifier-electricity --repo https://project-origin.github.io/helm-registry --version 4.0.0 -f "${electricity_values_filename}" --wait --kube-context kind-${cluster_name}
 
 # generate values for electricity verifier
 cat << EOF > "${registry_values_filename}"
@@ -114,11 +114,12 @@ service:
   type: NodePort
 verifiers:
   - type: project_origin.electricity.v1
-    url: http://verifier-electricity.default.svc.cluster.local:5000
+    url: http://electricity.default.svc.cluster.local:5000
 blockFinalizer:
   interval: 00:00:15
 transactionProcessor:
   replicas: 1
+returnComittedForFinalized: false
 postgresql:
   host: postgresql
   database: postgres
