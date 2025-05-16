@@ -221,3 +221,21 @@ redis:
   auth:
     # enabled specifies if the redis subchart should be enabled or not
     enabled: false
+
+  # architecture replication means that the redis subchart will be deployed in a master/slave configuration
+  architecture: replication
+
+  # replica holds the configuration for the redis replica
+  replica:
+    # replicaCount specifies the number of replicas to run
+    replicaCount: 3
+
+  # sentinel holds the configuration for the redis sentinel
+  sentinel:
+    # enabled specifies if the redis subchart should be enabled or not
+    enabled: true
+
+  # readReplicas specifies if the redis subchart should be enabled or not
+  readReplicas:
+    # enabled specifies if the redis subchart should be enabled or not
+    enabled: false

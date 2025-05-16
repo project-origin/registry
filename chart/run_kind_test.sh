@@ -135,9 +135,6 @@ rabbitmq:
     secretRef:
       name: rabbitmq
       key: rabbitmq-password
-redis:
-  replica:
-    replicaCount: 1
 EOF
 
 # install two registries
