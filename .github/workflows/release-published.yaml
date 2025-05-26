@@ -7,12 +7,12 @@ on:
 
 jobs:
   define-version:
-    uses: project-origin/.github/.github/workflows/reusable-tag-version.yaml@bdc3ea00e6c54ebb2146d5c7b26af717ad25cddc
+    uses: project-origin/.github/.github/workflows/reusable-tag-version.yaml@1ae21d33d0a8dbfec2804162cd5233b8e1ca7c08
 
   publish-container:
     needs:
       - define-version
-    uses: project-origin/.github/.github/workflows/reusable-build-push-container-ghcr.yaml@bdc3ea00e6c54ebb2146d5c7b26af717ad25cddc
+    uses: project-origin/.github/.github/workflows/reusable-build-push-container-ghcr.yaml@1ae21d33d0a8dbfec2804162cd5233b8e1ca7c08
     with:
       imagename: ghcr.io/project-origin/registry-server
       version: ${{ needs.define-version.outputs.version }}
@@ -24,7 +24,7 @@ jobs:
     needs:
       - define-version
       - publish-container
-    uses: project-origin/.github/.github/workflows/reusable-publish-chart.yaml@bdc3ea00e6c54ebb2146d5c7b26af717ad25cddc
+    uses: project-origin/.github/.github/workflows/reusable-publish-chart.yaml@1ae21d33d0a8dbfec2804162cd5233b8e1ca7c08
     with:
       version: ${{ needs.define-version.outputs.version }}
       chart_folder: chart
