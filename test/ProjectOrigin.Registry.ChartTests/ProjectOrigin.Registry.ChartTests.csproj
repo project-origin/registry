@@ -10,7 +10,7 @@
   </Target>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="ProjectOrigin.PedersenCommitment" Version="1.1.1" />
     <PackageReference Include="ProjectOrigin.HierarchicalDeterministicKeys" Version="1.2.0" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
