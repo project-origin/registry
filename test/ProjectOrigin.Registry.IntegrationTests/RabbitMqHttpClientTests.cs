@@ -48,12 +48,13 @@ public class RabbitMqHttpClientTests
             await channel.BasicPublishAsync("", "test", Encoding.UTF8.GetBytes("test2"));
             await channel.BasicPublishAsync("", "test", Encoding.UTF8.GetBytes("test3"));
             await con.CloseAsync();
+            await Task.Delay(1000);
 
             // Act
             var queues = await client.GetQueuesAsync();
 
             // Assert
-            queues.Should().ContainSingle().Which.Messages.Should().Be(3);
+            queues.Should().ContainSingle().Which.Messages.Should().Be(3, "Messages on the queue should be 3");
         }
         finally
         {
