@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -48,17 +50,32 @@ public class RabbitMqHttpClientTests
             await channel.BasicPublishAsync("", "test", Encoding.UTF8.GetBytes("test2"));
             await channel.BasicPublishAsync("", "test", Encoding.UTF8.GetBytes("test3"));
             await con.CloseAsync();
-            await Task.Delay(1000);
-
-            // Act
-            var queues = await client.GetQueuesAsync();
 
             // Assert
-            queues.Should().ContainSingle().Which.Messages.Should().Be(3, "Messages on the queue should be 3");
+            await WaitForQueueToBePopulatedAsync(client, "test", expectedMessageCount: 3, timeout: TimeSpan.FromSeconds(10));
         }
         finally
         {
             await rabbitMq.DisposeAsync();
+        }
+    }
+
+    private async Task WaitForQueueToBePopulatedAsync(RabbitMqHttpClient client, string queueName, int expectedMessageCount, TimeSpan timeout)
+    {
+
+        var began = DateTimeOffset.UtcNow;
+        while (true)
+        {
+            var queues = await client.GetQueuesAsync();
+            var queue = queues.Single(q => q.Name == queueName);
+
+            if (queue != null && queue.Messages == expectedMessageCount)
+                return;
+
+            await Task.Delay(100);
+
+            if (began + timeout < DateTimeOffset.UtcNow)
+                throw new TimeoutException($"Queue '{queueName}' did not reach expected message count of {expectedMessageCount} within the timeout period.");
         }
     }
 
