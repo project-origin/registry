@@ -124,14 +124,19 @@ spec:
             - name: cache__type
               value: "Redis"
             - name: cache__redis__connectionString
+            {{- if $.Values.redis.sentinel.enabled }}
+              value: {{ $.Release.Name }}-redis-headless
+            {{- else }}
               value: {{ $.Release.Name }}-redis-master
+            {{- end }}
+
             # only set password if auth is enabled
             {{- if $.Values.redis.auth.enabled }}
             - name: cache__redis__password
               valueFrom:
                 secretKeyRef:
-                  name: {{ $.Release.Name }}-redis
-                  key: redis-password
+                  name: {{ $.Values.redis.auth.existingSecret }}
+                  key: {{ $.Values.redis.auth.existingSecretPasswordKey }}
             {{- end }}
           {{- else }}
             - name: cache__type
