@@ -51,7 +51,7 @@ debug() {
 
 # trap cleanup function on script exit
 trap 'cleanup' 0
-trap 'debug; cleanup; exit 1' ERR
+trap 'debug; cleanup' ERR
 
 # build docker image
 make build-container
