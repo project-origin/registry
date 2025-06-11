@@ -52,30 +52,13 @@ public class RabbitMqHttpClientTests
             await con.CloseAsync();
 
             // Assert
-            await WaitForQueueToBePopulatedAsync(client, "test", expectedMessageCount: 3, timeout: TimeSpan.FromSeconds(10));
+            var actualCount = await WaitForQueueToBePopulatedAsync(client, "test", expectedMessageCount: 3, timeout: TimeSpan.FromSeconds(10));
+
+            actualCount.Should().Be(3, "the queue should contain 3 messages after publishing them");
         }
         finally
         {
             await rabbitMq.DisposeAsync();
-        }
-    }
-
-    private async Task WaitForQueueToBePopulatedAsync(RabbitMqHttpClient client, string queueName, int expectedMessageCount, TimeSpan timeout)
-    {
-
-        var began = DateTimeOffset.UtcNow;
-        while (true)
-        {
-            var queues = await client.GetQueuesAsync();
-            var queue = queues.Single(q => q.Name == queueName);
-
-            if (queue != null && queue.Messages == expectedMessageCount)
-                return;
-
-            await Task.Delay(100);
-
-            if (began + timeout < DateTimeOffset.UtcNow)
-                throw new TimeoutException($"Queue '{queueName}' did not reach expected message count of {expectedMessageCount} within the timeout period.");
         }
     }
 
@@ -107,6 +90,25 @@ public class RabbitMqHttpClientTests
         finally
         {
             await rabbitMq.DisposeAsync();
+        }
+    }
+
+    private static async Task<int> WaitForQueueToBePopulatedAsync(RabbitMqHttpClient client, string queueName, int expectedMessageCount, TimeSpan timeout)
+    {
+
+        var began = DateTimeOffset.UtcNow;
+        while (true)
+        {
+            var queues = await client.GetQueuesAsync();
+            var queue = queues.Single(q => q.Name == queueName);
+
+            if (queue != null && queue.Messages == expectedMessageCount)
+                return queue.Messages;
+
+            await Task.Delay(100);
+
+            if (began + timeout < DateTimeOffset.UtcNow)
+                return queue?.Messages ?? 0;
         }
     }
 }
