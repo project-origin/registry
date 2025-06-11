@@ -5,9 +5,7 @@
     "image": "mcr.microsoft.com/devcontainers/dotnet:1.5.1-9.0-noble",
     // Features to add to the dev container. More info: https://containers.dev/features.
     "features": {
-        "ghcr.io/devcontainers/features/dotnet:2" : {
-            "additionalVersions": "9.0.102"
-        },
+        "ghcr.io/devcontainers/features/dotnet:2" : {},
         "ghcr.io/devcontainers/features/docker-in-docker:2": {},
         "ghcr.io/mpriscella/features/kind:1": {},
         "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {}
