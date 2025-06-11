@@ -1,3 +1,4 @@
+#!/bin/bash
 current_dir="$(dirname "$0")"
 
 "$current_dir/run_kind_test.sh" &
