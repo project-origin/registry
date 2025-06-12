@@ -33,7 +33,7 @@ registry_b_namespace=ns-b
 # define cleanup function
 cleanup() {
     rm -fr $temp_folderx
-    #kind delete cluster --name ${cluster_name} >/dev/null 2>&1
+    kind delete cluster --name ${cluster_name} >/dev/null 2>&1
 }
 
 # define debug function
@@ -51,7 +51,6 @@ debug() {
     helm status ${registry_b_name}-postfix --namespace ${registry_b_namespace} --show-desc --show-resources --kube-context kind-${cluster_name}
     echo -e "\nRegistry B logs:"
     kubectl logs -l app=${registry_b_name}-postfix-registry --namespace ${registry_b_namespace}  --all-containers=true
-
 }
 
 # trap cleanup function on script exit
