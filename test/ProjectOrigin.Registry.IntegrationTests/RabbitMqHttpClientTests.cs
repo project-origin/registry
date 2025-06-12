@@ -108,7 +108,7 @@ public class RabbitMqHttpClientTests
             await Task.Delay(100);
 
             if (began + timeout < DateTimeOffset.UtcNow)
-                return queue?.Messages ?? 0;
+                throw new TimeoutException($"Timeout reached while waiting for queue '{queueName}' to contain {expectedMessageCount} messages. Current message count: {queue?.Messages ?? 0}.");
         }
     }
 }
