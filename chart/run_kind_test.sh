@@ -123,7 +123,7 @@ verifiers:
 blockFinalizer:
   interval: 00:00:15
 transactionProcessor:
-  replicas: 1
+  replicas: 2
 returnComittedForFinalized: false
 postgresql:
   host: postgresql
@@ -149,8 +149,10 @@ helm install ${registry_b_name}-postfix -n ${registry_b_namespace} chart --set r
 
 # wait for all pods to be ready
 kubectl wait --for=condition=available --timeout=300s deployment/${registry_a_name}-deployment-0 -n ${registry_a_namespace} --context kind-${cluster_name}
+kubectl wait --for=condition=available --timeout=300s deployment/${registry_a_name}-deployment-1 -n ${registry_a_namespace} --context kind-${cluster_name}
 echo "Registry A installed"
 kubectl wait --for=condition=available --timeout=300s deployment/${registry_b_name}-postfix-deployment-0  -n ${registry_b_namespace} --context kind-${cluster_name}
+kubectl wait --for=condition=available --timeout=300s deployment/${registry_b_name}-postfix-deployment-1  -n ${registry_b_namespace} --context kind-${cluster_name}
 echo "Registry B installed"
 
 # wait for cluster to be ready

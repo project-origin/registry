@@ -99,7 +99,7 @@ service:
   nodePort: ${registry_a_nodeport}
 verifiers:
   - type: project_origin.electricity.v1
-    url: http://verifier-electricity.default.svc.cluster.local:5000
+    url: http://electricity.default.svc.cluster.local:5000
 transactionProcessor:
   replicas: 1
 returnComittedForFinalized: false
