@@ -169,8 +169,3 @@ dotnet test test/ProjectOrigin.Registry.ChartTests \
   -e "CONS_REGISTRY_BLOCKS=3"
 
 echo "Test completed"
-
-
-
-
-
