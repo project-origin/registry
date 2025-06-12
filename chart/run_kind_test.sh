@@ -44,9 +44,13 @@ debug() {
 
     echo -e "\nHelm status Registry A:"
     helm status $registry_a_name --namespace ${registry_a_namespace} --show-desc --show-resources --kube-context kind-${cluster_name}
+    echo -e "\nRegistry A logs:"
+    kubectl logs -l app=${registry_a_name}-registry --namespace ${registry_a_namespace}  --all-containers=true
 
     echo -e "\nHelm status Registry B:"
-    helm status $registry_b_name --namespace ${registry_b_namespace} --show-desc --show-resources --kube-context kind-${cluster_name}
+    helm status ${registry_b_name}-postfix --namespace ${registry_b_namespace} --show-desc --show-resources --kube-context kind-${cluster_name}
+    echo -e "\nRegistry B logs:"
+    kubectl logs -l app=${registry_b_name}-postfix-registry --namespace ${registry_b_namespace}  --all-containers=true
 }
 
 # trap cleanup function on script exit
@@ -87,6 +91,7 @@ helm install rabbitmq oci://registry-1.docker.io/bitnamicharts/rabbitmq --versio
 PrivateKey=$(openssl genpkey -algorithm ED25519)
 PrivateKeyBase64=$(echo "$PrivateKey" | base64 -w 0)
 PublicKeyBase64=$(echo "$PrivateKey" | openssl pkey -pubout | base64 -w 0)
+echo "Private key: $PrivateKeyBase64"
 
 # generate values for electricity verifier
 cat << EOF > "${electricity_values_filename}"
@@ -118,7 +123,7 @@ verifiers:
 blockFinalizer:
   interval: 00:00:15
 transactionProcessor:
-  replicas: 1
+  replicas: 2
 returnComittedForFinalized: false
 postgresql:
   host: postgresql
@@ -144,12 +149,14 @@ helm install ${registry_b_name}-postfix -n ${registry_b_namespace} chart --set r
 
 # wait for all pods to be ready
 kubectl wait --for=condition=available --timeout=300s deployment/${registry_a_name}-deployment-0 -n ${registry_a_namespace} --context kind-${cluster_name}
+kubectl wait --for=condition=available --timeout=300s deployment/${registry_a_name}-deployment-1 -n ${registry_a_namespace} --context kind-${cluster_name}
 echo "Registry A installed"
 kubectl wait --for=condition=available --timeout=300s deployment/${registry_b_name}-postfix-deployment-0  -n ${registry_b_namespace} --context kind-${cluster_name}
+kubectl wait --for=condition=available --timeout=300s deployment/${registry_b_name}-postfix-deployment-1  -n ${registry_b_namespace} --context kind-${cluster_name}
 echo "Registry B installed"
 
 # wait for cluster to be ready
-sleep 15
+sleep 10
 
 # run tests
 dotnet test test/ProjectOrigin.Registry.ChartTests \

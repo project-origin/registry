@@ -39,6 +39,7 @@ debug() {
 
     echo -e "\nHelm status Registry A:"
     helm status $registry_a_name --namespace ${registry_a_namespace} --show-desc --show-resources --kube-context kind-${cluster_name}
+    kubectl logs -l app=${registry_a_name}-registry --namespace ${registry_a_namespace}  --all-containers=true
 }
 
 # trap cleanup function on script exit
@@ -89,7 +90,7 @@ networkConfig:
 EOF
 
 # install electricity verifier in default namespace
-helm install electricity project-origin-verifier-electricity --repo https://project-origin.github.io/helm-registry --version 2.0.0-rc.3 -f "${electricity_values_filename}" --wait --kube-context kind-${cluster_name}
+helm install electricity project-origin-verifier-electricity --repo https://project-origin.github.io/helm-registry --version 4.0.0 -f "${electricity_values_filename}" --wait --kube-context kind-${cluster_name}
 
 # generate values for electricity verifier
 cat << EOF > "${registry_values_filename}"
@@ -98,9 +99,10 @@ service:
   nodePort: ${registry_a_nodeport}
 verifiers:
   - type: project_origin.electricity.v1
-    url: http://verifier-electricity.default.svc.cluster.local:5000
+    url: http://electricity.default.svc.cluster.local:5000
 transactionProcessor:
   replicas: 1
+returnComittedForFinalized: false
 blockFinalizer:
   interval: 00:00:15
 postgresql:
@@ -125,7 +127,7 @@ EOF
 
 # install registry from
 echo "Installing latest released registry"
-helm install ${registry_a_name} -n ${registry_a_namespace} project-origin-registry --version 2.0.0-rc.1 -f "${registry_values_filename}" --repo https://project-origin.github.io/helm-registry --kube-context kind-${cluster_name}
+helm install ${registry_a_name} -n ${registry_a_namespace} project-origin-registry --version 3.0.1 -f "${registry_values_filename}" --repo https://project-origin.github.io/helm-registry --kube-context kind-${cluster_name}
 kubectl wait --for=condition=available --timeout=300s deployment/${registry_a_name}-deployment-0 -n ${registry_a_namespace} --context kind-${cluster_name}
 echo "Registry A installed"
 

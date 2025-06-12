@@ -130,6 +130,11 @@ spec:
               value: {{ $.Release.Name }}-redis-master
             {{- end }}
 
+            {{- if $.Values.redis.sentinel.enabled }}
+            - name: cache__redis__serviceName
+              value: {{ $.Values.redis.sentinel.masterSet | quote }}
+            {{- end }}
+
             # only set password if auth is enabled
             {{- if $.Values.redis.auth.enabled }}
             - name: cache__redis__password

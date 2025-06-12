@@ -88,7 +88,8 @@ public static class IServiceCollectionExtensions
                     ConfigurationOptions redisOptions = new ConfigurationOptions()
                     {
                         Password = cacheOptions.Redis!.Password,
-                        EndPoints = { cacheOptions.Redis!.ConnectionString }
+                        EndPoints = { cacheOptions.Redis!.ConnectionString },
+                        ServiceName = cacheOptions.Redis!.ServiceName,
                     };
 
                     var connection = ConnectionMultiplexer.Connect(redisOptions);
