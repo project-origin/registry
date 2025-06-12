@@ -102,6 +102,7 @@ verifiers:
     url: http://verifier-electricity.default.svc.cluster.local:5000
 transactionProcessor:
   replicas: 1
+returnComittedForFinalized: false
 blockFinalizer:
   interval: 00:00:15
 postgresql:

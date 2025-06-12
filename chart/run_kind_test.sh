@@ -123,7 +123,7 @@ verifiers:
 blockFinalizer:
   interval: 00:00:15
 transactionProcessor:
-  replicas: 3
+  replicas: 1
 returnComittedForFinalized: false
 postgresql:
   host: postgresql
@@ -154,7 +154,7 @@ kubectl wait --for=condition=available --timeout=300s deployment/${registry_b_na
 echo "Registry B installed"
 
 # wait for cluster to be ready
-sleep 30
+sleep 10
 
 # run tests
 dotnet test test/ProjectOrigin.Registry.ChartTests \
