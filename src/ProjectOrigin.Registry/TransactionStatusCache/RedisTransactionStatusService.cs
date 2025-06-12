@@ -86,7 +86,13 @@ public class RedisTransactionStatusService : ITransactionStatusService
             if (await TryUpdateExistingRecordAsync(transactionHash, newRecord, cacheRecord))
                 return;
 
-            _logger.LogError("Transaction {transactionHash} status was changed by another process while setting to {newStatus}, old state {cacheState}, change aborted.", transactionHash, newRecord.NewStatus, cacheRecord.NewStatus);
+            var foundRecord = await GetRecordAsync(transactionHash) ?? throw new InvalidOperationException($"Transaction {transactionHash} status was not found in cache after update attempt.");
+            _logger.LogWarning("Transaction {transactionHash} status was changed by another process while setting to {newStatus}, old state {cacheState} found state {foundState}, change aborted.", transactionHash, newRecord.NewStatus, cacheRecord.NewStatus, foundRecord.NewStatus);
+
+            if (await TryUpdateExistingRecordAsync(transactionHash, newRecord, foundRecord))
+                return;
+
+            _logger.LogError("Transaction {transactionHash} status was changed by another process while setting to {newStatus}, old state {cacheState}, change aborted.", transactionHash, newRecord.NewStatus, foundRecord.NewStatus);
         }
     }
 
