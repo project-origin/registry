@@ -33,7 +33,7 @@ registry_b_namespace=ns-b
 # define cleanup function
 cleanup() {
     rm -fr $temp_folderx
-    kind delete cluster --name ${cluster_name} >/dev/null 2>&1
+    #kind delete cluster --name ${cluster_name} >/dev/null 2>&1
 }
 
 # define debug function
@@ -44,9 +44,14 @@ debug() {
 
     echo -e "\nHelm status Registry A:"
     helm status $registry_a_name --namespace ${registry_a_namespace} --show-desc --show-resources --kube-context kind-${cluster_name}
+    echo -e "\nRegistry A logs:"
+    kubectl logs -l app=${registry_a_name}-registry --namespace ${registry_a_namespace}  --all-containers=true
 
     echo -e "\nHelm status Registry B:"
-    helm status $registry_b_name --namespace ${registry_b_namespace} --show-desc --show-resources --kube-context kind-${cluster_name}
+    helm status ${registry_b_name}-postfix --namespace ${registry_b_namespace} --show-desc --show-resources --kube-context kind-${cluster_name}
+    echo -e "\nRegistry B logs:"
+    kubectl logs -l app=${registry_b_name}-postfix-registry --namespace ${registry_b_namespace}  --all-containers=true
+
 }
 
 # trap cleanup function on script exit
@@ -87,6 +92,7 @@ helm install rabbitmq oci://registry-1.docker.io/bitnamicharts/rabbitmq --versio
 PrivateKey=$(openssl genpkey -algorithm ED25519)
 PrivateKeyBase64=$(echo "$PrivateKey" | base64 -w 0)
 PublicKeyBase64=$(echo "$PrivateKey" | openssl pkey -pubout | base64 -w 0)
+echo "Private key: $PrivateKeyBase64"
 
 # generate values for electricity verifier
 cat << EOF > "${electricity_values_filename}"
@@ -118,7 +124,7 @@ verifiers:
 blockFinalizer:
   interval: 00:00:15
 transactionProcessor:
-  replicas: 1
+  replicas: 3
 returnComittedForFinalized: false
 postgresql:
   host: postgresql
@@ -149,7 +155,7 @@ kubectl wait --for=condition=available --timeout=300s deployment/${registry_b_na
 echo "Registry B installed"
 
 # wait for cluster to be ready
-sleep 15
+sleep 30
 
 # run tests
 dotnet test test/ProjectOrigin.Registry.ChartTests \
@@ -162,3 +168,8 @@ dotnet test test/ProjectOrigin.Registry.ChartTests \
   -e "CONS_REGISTRY_BLOCKS=3"
 
 echo "Test completed"
+
+
+
+
+
