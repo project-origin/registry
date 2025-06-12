@@ -28,7 +28,7 @@ registry_a_namespace=ns-a
 # define cleanup function
 cleanup() {
     rm -fr $temp_folderx
-    #kind delete cluster --name ${cluster_name} >/dev/null 2>&1
+    kind delete cluster --name ${cluster_name} >/dev/null 2>&1
 }
 
 # define debug function
