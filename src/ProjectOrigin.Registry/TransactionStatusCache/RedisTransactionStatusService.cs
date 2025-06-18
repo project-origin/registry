@@ -117,12 +117,12 @@ public class RedisTransactionStatusService : ITransactionStatusService
             return null;
     }
 
-    private string Serialize(TransactionStatusRecord record)
+    private static JsonSerializerOptions JsonSerializerOptions = new()
     {
-        return JsonSerializer.Serialize(record, new JsonSerializerOptions
-        {
-            WriteIndented = false,
-            PropertyNamingPolicy = null,
-        });
-    }
+        PropertyNamingPolicy = null,
+        WriteIndented = false,
+        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never
+    };
+
+    private static string Serialize(TransactionStatusRecord record) => JsonSerializer.Serialize(record, JsonSerializerOptions);
 }
