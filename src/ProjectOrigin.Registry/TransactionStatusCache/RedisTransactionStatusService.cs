@@ -28,7 +28,7 @@ public class RedisTransactionStatusService : ITransactionStatusService
 
     public async Task<TransactionStatusRecord> GetTransactionStatus(TransactionHash transactionHash)
     {
-        var cacheStatus = await GetRecordAsync(transactionHash);
+        var cacheStatus = await GetRecordAsync(transactionHash, CommandFlags.PreferMaster);
         if (cacheStatus is not null)
         {
             return cacheStatus;
@@ -47,7 +47,7 @@ public class RedisTransactionStatusService : ITransactionStatusService
     {
         _logger.LogTrace("Setting transaction status for {transactionHash} to {newStatus}", transactionHash, newRecord.NewStatus);
 
-        var cacheStatus = await GetRecordAsync(transactionHash);
+        var cacheStatus = await GetRecordAsync(transactionHash, CommandFlags.DemandMaster);
 
         if (newRecord.NewStatus < cacheStatus?.NewStatus)
         {
@@ -65,21 +65,7 @@ public class RedisTransactionStatusService : ITransactionStatusService
             if (await TrySetNewRecordAsync(transactionHash, newRecord))
                 return;
 
-            var cacheStatus = await GetRecordAsync(transactionHash);
-            if (cacheStatus == null)
-            {
-                _logger.LogError("Transaction {transactionHash} status was null, still null, but failed setting to {newStatus}, retrying.", transactionHash, newRecord.NewStatus);
-
-            }
-            else if (cacheStatus.NewStatus == TransactionStatus.Unknown)
-            {
-                _logger.LogWarning("Transaction {transactionHash} status was unknown while setting to {newStatus}, retrying.", transactionHash, newRecord.NewStatus);
-                await SafeSetRecord(transactionHash, newRecord, cacheRecord);
-            }
-            else
-            {
-                _logger.LogError("Transaction {transactionHash} status was set by another process while setting to {newStatus}, change aborted.", transactionHash, newRecord.NewStatus);
-            }
+            _logger.LogError("Transaction {transactionHash} status was set by another process while setting to {newStatus}, change aborted.", transactionHash, newRecord.NewStatus);
         }
         else
         {
@@ -96,8 +82,9 @@ public class RedisTransactionStatusService : ITransactionStatusService
 
         return await redisDatabase.StringSetAsync(
             transactionHash,
-            JsonSerializer.Serialize(newRecord),
+            Serialize(newRecord),
             when: When.NotExists,
+            flags: CommandFlags.DemandMaster,
             expiry: CacheTime);
     }
 
@@ -106,19 +93,20 @@ public class RedisTransactionStatusService : ITransactionStatusService
         var redisDatabase = _connectionMultiplexer.GetDatabase();
 
         var transaction = redisDatabase.CreateTransaction();
-        transaction.AddCondition(Condition.StringEqual(transactionHash, JsonSerializer.Serialize(cacheRecord)));
+        transaction.AddCondition(Condition.StringEqual(transactionHash, Serialize(cacheRecord)));
         _ = transaction.StringSetAsync(
             transactionHash,
-            JsonSerializer.Serialize(newRecord),
+            Serialize(newRecord),
+            flags: CommandFlags.DemandMaster,
             expiry: CacheTime);
         return await transaction.ExecuteAsync();
     }
 
-    private async Task<TransactionStatusRecord?> GetRecordAsync(TransactionHash transactionHash)
+    private async Task<TransactionStatusRecord?> GetRecordAsync(TransactionHash transactionHash, CommandFlags flags)
     {
         var redisDatabase = _connectionMultiplexer.GetDatabase();
 
-        var redisValue = await redisDatabase.StringGetAsync(transactionHash);
+        var redisValue = await redisDatabase.StringGetAsync(transactionHash, flags);
 
         if (redisValue.HasValue)
         {
@@ -128,4 +116,13 @@ public class RedisTransactionStatusService : ITransactionStatusService
         else
             return null;
     }
+
+    private static JsonSerializerOptions JsonSerializerOptions = new()
+    {
+        PropertyNamingPolicy = null,
+        WriteIndented = false,
+        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never
+    };
+
+    private static string Serialize(TransactionStatusRecord record) => JsonSerializer.Serialize(record, JsonSerializerOptions);
 }
