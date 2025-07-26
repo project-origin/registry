@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using ProjectOrigin.Registry.BlockFinalizer.BlockPublisher;
 using ProjectOrigin.Registry.BlockFinalizer.BlockPublisher.Concordium;
 using ProjectOrigin.Registry.BlockFinalizer.BlockPublisher.Log;
@@ -16,6 +19,9 @@ using ProjectOrigin.ServiceCommon.Database.Postgres;
 using ProjectOrigin.ServiceCommon.Extensions;
 using Serilog;
 using StackExchange.Redis;
+using ZiggyCreatures.Caching.Fusion;
+using ZiggyCreatures.Caching.Fusion.Backplane.StackExchangeRedis;
+using ZiggyCreatures.Caching.Fusion.Serialization.SystemTextJson;
 
 namespace ProjectOrigin.Registry.Extensions;
 
@@ -74,6 +80,40 @@ public static class IServiceCollectionExtensions
     {
         var cacheOptions = configuration.GetSection("cache").GetValid<CacheOptions>();
 
+        var fusionCacheBuilder = services.AddFusionCache()
+            .WithOptions(options =>
+            {
+                options.DistributedCacheCircuitBreakerDuration = TimeSpan.FromSeconds(2);
+
+                options.FailSafeActivationLogLevel = LogLevel.Debug;
+                options.SerializationErrorsLogLevel = LogLevel.Warning;
+                options.DistributedCacheSyntheticTimeoutsLogLevel = LogLevel.Debug;
+                options.DistributedCacheErrorsLogLevel = LogLevel.Error;
+                options.FactorySyntheticTimeoutsLogLevel = LogLevel.Debug;
+                options.FactoryErrorsLogLevel = LogLevel.Error;
+            })
+            .WithDefaultEntryOptions(new FusionCacheEntryOptions
+            {
+                Duration = TimeSpan.FromMinutes(60),
+
+                IsFailSafeEnabled = false,
+                AllowStaleOnReadOnly = false,
+                FailSafeMaxDuration = TimeSpan.FromHours(2),
+                FailSafeThrottleDuration = TimeSpan.FromSeconds(30),
+
+                FactorySoftTimeout = TimeSpan.FromMilliseconds(100),
+                FactoryHardTimeout = TimeSpan.FromMilliseconds(1500),
+
+                DistributedCacheSoftTimeout = TimeSpan.FromSeconds(1),
+                DistributedCacheHardTimeout = TimeSpan.FromSeconds(2),
+
+                AllowBackgroundDistributedCacheOperations = false,
+                AllowBackgroundBackplaneOperations = false,
+
+                JitterMaxDuration = TimeSpan.FromSeconds(2)
+            })
+            .WithSerializer(new FusionCacheSystemTextJsonSerializer());
+
         switch (cacheOptions.Type)
         {
             case CacheTypes.InMemory:
@@ -83,23 +123,39 @@ public static class IServiceCollectionExtensions
                 break;
 
             case CacheTypes.Redis:
-                services.AddSingleton<IConnectionMultiplexer>(services =>
+                services.AddSingleton<IConnectionMultiplexer>(_ =>
                 {
-                    ConfigurationOptions redisOptions = new ConfigurationOptions()
+                    var options = new ConfigurationOptions
                     {
                         Password = cacheOptions.Redis!.Password,
-                        EndPoints = { cacheOptions.Redis!.ConnectionString },
-                        ServiceName = cacheOptions.Redis!.ServiceName,
+                        EndPoints = { cacheOptions.Redis.ConnectionString }
                     };
-
-                    var connection = ConnectionMultiplexer.Connect(redisOptions);
-                    return connection;
+                    return ConnectionMultiplexer.Connect(options);
                 });
-                services.AddTransient<ITransactionStatusService, RedisTransactionStatusService>();
+
+                fusionCacheBuilder
+                    .WithDistributedCache(sp =>
+                    {
+                        var redis = sp.GetRequiredService<IConnectionMultiplexer>();
+                        return new RedisCache(new RedisCacheOptions
+                        {
+                            ConnectionMultiplexerFactory = () => Task.FromResult(redis)
+                        });
+                    })
+                    .WithBackplane(sp =>
+                    {
+                        var redis = sp.GetRequiredService<IConnectionMultiplexer>();
+                        return new RedisBackplane(new RedisBackplaneOptions
+                        {
+                            ConnectionMultiplexerFactory = () => Task.FromResult(redis)
+                        });
+                    });
                 break;
 
             default:
                 throw new NotSupportedException($"Cache type ”{cacheOptions.Type}” not supported");
         }
+
+        services.AddTransient<ITransactionStatusService, RedisTransactionStatusService>();
     }
 }

@@ -1,15 +1,20 @@
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
+using ProjectOrigin.Registry.Extensions;
 using ProjectOrigin.Registry.Repository.Models;
 using ProjectOrigin.Registry.TransactionStatusCache;
 using ProjectOrigin.TestCommon.Fixtures;
 using StackExchange.Redis;
 using Xunit;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace ProjectOrigin.Registry.Tests.TransactionStatusCache;
 
@@ -17,14 +22,41 @@ public class RedisTransactionStatusServiceTests : AbstractTransactionStatusServi
 {
     private readonly Mock<ILogger<RedisTransactionStatusService>> _mockLogger;
     private readonly RedisTransactionStatusService _service;
+    private readonly IFusionCache _fusionCache;
 
     public RedisTransactionStatusServiceTests(RedisFixture redisFixture)
     {
-        var connection = ConnectionMultiplexer.Connect(redisFixture.HostConnectionString);
+        // Set up service collection with minimal configuration
+        var services = new ServiceCollection();
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Cache:Type"] = "Redis",
+                ["Cache:Redis:ConnectionString"] = redisFixture.HostConnectionString,
+                ["Cache:Redis:ServiceName"] = "TestService"
+            })
+            .Build();
+
+        // Use the same configuration logic as the real application
+        services.ConfigureTransactionStatusCache(configuration);
+
+        // Build the service provider
+        var serviceProvider = services.BuildServiceProvider();
+
+        // Get the configured FusionCache instance
+        _fusionCache = serviceProvider.GetRequiredService<IFusionCache>();
         _mockLogger = new Mock<ILogger<RedisTransactionStatusService>>();
 
-        _service = new RedisTransactionStatusService(_mockLogger.Object, connection, _repository);
+        // Get the Redis connection from the service provider
+        var connection = serviceProvider.GetRequiredService<IConnectionMultiplexer>();
+
+        _service = new RedisTransactionStatusService(
+            _mockLogger.Object,
+            _fusionCache,
+            _repository,
+            connection);
     }
+
 
     protected override ITransactionStatusService Service => _service;
     protected override IInvocationList LoggedMessages => _mockLogger.Invocations;
@@ -59,7 +91,7 @@ public class RedisTransactionStatusServiceTests : AbstractTransactionStatusServi
             .ReturnsAsync(false)
             .ReturnsAsync(true);
 
-        var service = new RedisTransactionStatusService(_mockLogger.Object, mockMultiplexer.Object, _repository);
+        var service = new RedisTransactionStatusService(_mockLogger.Object, _fusionCache, _repository, mockMultiplexer.Object);
 
         mockDatabase
             .SetupSequence(db => db.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
