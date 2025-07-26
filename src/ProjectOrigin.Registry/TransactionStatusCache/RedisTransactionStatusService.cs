@@ -1,131 +1,104 @@
-using System;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using ProjectOrigin.Registry.Repository;
 using ProjectOrigin.Registry.Repository.Models;
 using StackExchange.Redis;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace ProjectOrigin.Registry.TransactionStatusCache;
 
 public class RedisTransactionStatusService : ITransactionStatusService
 {
-    private static readonly TimeSpan CacheTime = TimeSpan.FromMinutes(60);
-
     private readonly ILogger<RedisTransactionStatusService> _logger;
-    private readonly IConnectionMultiplexer _connectionMultiplexer;
+    private readonly IFusionCache _cache;
     private readonly ITransactionRepository _transactionRepository;
+    private readonly IConnectionMultiplexer _connectionMultiplexer;
 
     public RedisTransactionStatusService(
         ILogger<RedisTransactionStatusService> logger,
-        IConnectionMultiplexer connectionMultiplexer,
-        ITransactionRepository transactionRepository)
+        IFusionCache cache,
+        ITransactionRepository transactionRepository,
+        IConnectionMultiplexer connectionMultiplexer)
     {
         _logger = logger;
-        _connectionMultiplexer = connectionMultiplexer;
+        _cache = cache;
         _transactionRepository = transactionRepository;
+        _connectionMultiplexer = connectionMultiplexer;
     }
 
     public async Task<TransactionStatusRecord> GetTransactionStatus(TransactionHash transactionHash)
     {
-        var cacheStatus = await GetRecordAsync(transactionHash);
-        if (cacheStatus is not null)
-        {
-            return cacheStatus;
-        }
-        else
-        {
-            var dbStatus = await _transactionRepository.GetTransactionStatus(transactionHash);
-            var statusRecord = new TransactionStatusRecord(dbStatus);
-            await SafeSetRecord(transactionHash, statusRecord, null);
+        var key = transactionHash.ToString();
 
-            return statusRecord;
-        }
+        return await _cache.GetOrSetAsync<TransactionStatusRecord>(
+            key,
+            async _ =>
+            {
+                var dbStatus = await _transactionRepository.GetTransactionStatus(transactionHash);
+                return new TransactionStatusRecord(dbStatus);
+            });
     }
 
     public async Task SetTransactionStatus(TransactionHash transactionHash, TransactionStatusRecord newRecord)
     {
-        _logger.LogTrace("Setting transaction status for {transactionHash} to {newStatus}", transactionHash, newRecord.NewStatus);
+        var key = transactionHash.ToString();
+        _logger.LogTrace("Setting status for {transactionHash} to {newStatus}", transactionHash, newRecord.NewStatus);
 
-        var cacheStatus = await GetRecordAsync(transactionHash);
+        var redis = _connectionMultiplexer.GetDatabase();
 
-        if (newRecord.NewStatus < cacheStatus?.NewStatus)
+        var redisValue = await redis.StringGetAsync(key);
+        TransactionStatusRecord? current = null;
+
+        if (redisValue.HasValue)
+            current = JsonSerializer.Deserialize<TransactionStatusRecord>(redisValue!);
+
+        if (current != null && newRecord.NewStatus < current.NewStatus)
         {
-            _logger.LogWarning("Transaction {transactionHash} status in cache is {oldStatus} and is higher than {newStatus}, change aborted.", transactionHash, cacheStatus.NewStatus, newRecord.NewStatus);
+            _logger.LogWarning("Status downgrade prevented for {transactionHash}", transactionHash);
             return;
         }
 
-        await SafeSetRecord(transactionHash, newRecord, cacheStatus);
-    }
+        var serializedNew = JsonSerializer.Serialize(newRecord);
+        var transaction = redis.CreateTransaction();
 
-    private async Task SafeSetRecord(TransactionHash transactionHash, TransactionStatusRecord newRecord, TransactionStatusRecord? cacheRecord)
-    {
-        if (cacheRecord is null)
+        if (current == null)
         {
-            if (await TrySetNewRecordAsync(transactionHash, newRecord))
+            transaction.AddCondition(Condition.KeyNotExists(key));
+        }
+        else
+        {
+            var serializedCurrent = JsonSerializer.Serialize(current);
+            transaction.AddCondition(Condition.StringEqual(key, serializedCurrent));
+        }
+
+        _ = transaction.StringSetAsync(key, serializedNew);
+        bool isCommitted = await transaction.ExecuteAsync();
+
+        if (isCommitted)
+        {
+            await _cache.RemoveAsync(key);
+            await _cache.SetAsync(key, newRecord);
+        }
+        else
+        {
+            var latestValue = await redis.StringGetAsync(key);
+            if (!latestValue.HasValue)
+            {
+                _logger.LogError("Concurrent modification detected. Initial state was null. Update aborted for {transactionHash}", transactionHash);
                 return;
-
-            var cacheStatus = await GetRecordAsync(transactionHash);
-            if (cacheStatus == null)
-            {
-                _logger.LogError("Transaction {transactionHash} status was null, still null, but failed setting to {newStatus}, retrying.", transactionHash, newRecord.NewStatus);
-
             }
-            else if (cacheStatus.NewStatus == TransactionStatus.Unknown)
+
+            var latest = JsonSerializer.Deserialize<TransactionStatusRecord>(latestValue!);
+
+            if (current == null && latest!.NewStatus == TransactionStatus.Unknown)
             {
-                _logger.LogWarning("Transaction {transactionHash} status was unknown while setting to {newStatus}, retrying.", transactionHash, newRecord.NewStatus);
-                await SafeSetRecord(transactionHash, newRecord, cacheRecord);
+                _logger.LogWarning("Concurrent modification detected. Existing state was unknown. Update aborted for {transactionHash}", transactionHash);
             }
             else
             {
-                _logger.LogError("Transaction {transactionHash} status was set by another process while setting to {newStatus}, change aborted.", transactionHash, newRecord.NewStatus);
+                _logger.LogError("Concurrent modification detected. Existing state was {status}. Update aborted for {transactionHash}", latest!.NewStatus, transactionHash);
             }
         }
-        else
-        {
-            if (await TryUpdateExistingRecordAsync(transactionHash, newRecord, cacheRecord))
-                return;
-
-            _logger.LogError("Transaction {transactionHash} status was changed by another process while setting to {newStatus}, old state {cacheState}, change aborted.", transactionHash, newRecord.NewStatus, cacheRecord.NewStatus);
-        }
-    }
-
-    private async Task<bool> TrySetNewRecordAsync(TransactionHash transactionHash, TransactionStatusRecord newRecord)
-    {
-        var redisDatabase = _connectionMultiplexer.GetDatabase();
-
-        return await redisDatabase.StringSetAsync(
-            transactionHash,
-            JsonSerializer.Serialize(newRecord),
-            when: When.NotExists,
-            expiry: CacheTime);
-    }
-
-    private async Task<bool> TryUpdateExistingRecordAsync(TransactionHash transactionHash, TransactionStatusRecord newRecord, TransactionStatusRecord cacheRecord)
-    {
-        var redisDatabase = _connectionMultiplexer.GetDatabase();
-
-        var transaction = redisDatabase.CreateTransaction();
-        transaction.AddCondition(Condition.StringEqual(transactionHash, JsonSerializer.Serialize(cacheRecord)));
-        _ = transaction.StringSetAsync(
-            transactionHash,
-            JsonSerializer.Serialize(newRecord),
-            expiry: CacheTime);
-        return await transaction.ExecuteAsync();
-    }
-
-    private async Task<TransactionStatusRecord?> GetRecordAsync(TransactionHash transactionHash)
-    {
-        var redisDatabase = _connectionMultiplexer.GetDatabase();
-
-        var redisValue = await redisDatabase.StringGetAsync(transactionHash);
-
-        if (redisValue.HasValue)
-        {
-            await redisDatabase.KeyExpireAsync(transactionHash, CacheTime);
-            return JsonSerializer.Deserialize<TransactionStatusRecord>(redisValue!);
-        }
-        else
-            return null;
     }
 }
