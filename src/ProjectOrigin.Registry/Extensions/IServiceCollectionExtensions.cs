@@ -125,11 +125,19 @@ public static class IServiceCollectionExtensions
             case CacheTypes.Redis:
                 services.AddSingleton<IConnectionMultiplexer>(_ =>
                 {
-                    var options = new ConfigurationOptions
+                    var redisConfig = cacheOptions.Redis!;
+                    var options = ConfigurationOptions.Parse(redisConfig.ConnectionString);
+                    options.Password = redisConfig.Password;
+
+                    if (!string.IsNullOrWhiteSpace(redisConfig.ServiceName))
                     {
-                        Password = cacheOptions.Redis!.Password,
-                        EndPoints = { cacheOptions.Redis.ConnectionString }
-                    };
+                        options.ServiceName = redisConfig.ServiceName;
+                        options.TieBreaker = "";
+                        options.CommandMap = CommandMap.Default; // Important: Default, not Sentinel map
+                    }
+
+                    options.AbortOnConnectFail = false;
+
                     return ConnectionMultiplexer.Connect(options);
                 });
 
@@ -150,7 +158,9 @@ public static class IServiceCollectionExtensions
                             ConnectionMultiplexerFactory = () => Task.FromResult(redis)
                         });
                     });
+
                 break;
+
 
             default:
                 throw new NotSupportedException($"Cache type ”{cacheOptions.Type}” not supported");
