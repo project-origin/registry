@@ -7,6 +7,7 @@ public record RedisOptions() : IValidatableObject
 {
     public string? Password { get; init; }
     public string ConnectionString { get; init; } = string.Empty;
+    public List<string> Endpoints { get; init; } = [];
     public string? ServiceName { get; init; }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

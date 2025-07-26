@@ -72,7 +72,7 @@ public class RedisTransactionStatusService : ITransactionStatusService
             transaction.AddCondition(Condition.StringEqual(key, serializedCurrent));
         }
 
-        _ = transaction.StringSetAsync(key, serializedNew);
+        _ = transaction.StringSetAsync(key, serializedNew, flags: CommandFlags.DemandMaster);
         bool isCommitted = await transaction.ExecuteAsync();
 
         if (isCommitted)

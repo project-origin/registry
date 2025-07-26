@@ -9,62 +9,55 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using ProjectOrigin.Registry.Extensions;
+using ProjectOrigin.Registry.IntegrationTests.Fixtures;
 using ProjectOrigin.Registry.Repository.Models;
 using ProjectOrigin.Registry.TransactionStatusCache;
-using ProjectOrigin.TestCommon.Fixtures;
 using StackExchange.Redis;
 using Xunit;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace ProjectOrigin.Registry.Tests.TransactionStatusCache;
 
-public class RedisTransactionStatusServiceTests : AbstractTransactionStatusServiceTests, IClassFixture<RedisFixture>
+public class RedisTransactionStatusServiceTests : AbstractTransactionStatusServiceTests, IClassFixture<ReplicatedRedisFixture>
 {
     private readonly Mock<ILogger<RedisTransactionStatusService>> _mockLogger;
     private readonly RedisTransactionStatusService _service;
     private readonly IFusionCache _fusionCache;
 
-    public RedisTransactionStatusServiceTests(RedisFixture redisFixture)
+
+    public RedisTransactionStatusServiceTests(ReplicatedRedisFixture redisFixture)
     {
-        // Set up service collection with minimal configuration
         var services = new ServiceCollection();
+
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["Cache:Type"] = "Redis",
-                ["Cache:Redis:ConnectionString"] = redisFixture.HostConnectionString,
-                ["Cache:Redis:ServiceName"] = "TestService"
+                ["Cache:Redis:ConnectionString"] = redisFixture.MasterConnectionString,
+                ["Cache:Redis:Endpoints:0"] = redisFixture.MasterConnectionString,
+                ["Cache:Redis:Endpoints:1"] = redisFixture.ReplicaConnectionString,
             })
             .Build();
 
-        // Use the same configuration logic as the real application
+
         services.ConfigureTransactionStatusCache(configuration);
-
-        // Build the service provider
         var serviceProvider = services.BuildServiceProvider();
-
-        // Get the configured FusionCache instance
         _fusionCache = serviceProvider.GetRequiredService<IFusionCache>();
-        _mockLogger = new Mock<ILogger<RedisTransactionStatusService>>();
 
-        // Get the Redis connection from the service provider
+        _mockLogger = new Mock<ILogger<RedisTransactionStatusService>>();
         var connection = serviceProvider.GetRequiredService<IConnectionMultiplexer>();
 
-        _service = new RedisTransactionStatusService(
-            _mockLogger.Object,
-            _fusionCache,
-            _repository,
-            connection);
-    }
 
+        _service = new RedisTransactionStatusService(_mockLogger.Object, _fusionCache, _repository, connection);
+    }
 
     protected override ITransactionStatusService Service => _service;
     protected override IInvocationList LoggedMessages => _mockLogger.Invocations;
 
     [Theory]
     [InlineData(null, null, LogLevel.Error)]
-    [InlineData(null, TransactionStatus.Unknown, LogLevel.Warning)]
     [InlineData(null, TransactionStatus.Pending, LogLevel.Error)]
+    [InlineData(null, TransactionStatus.Unknown, LogLevel.Warning)]
     [InlineData(TransactionStatus.Unknown, TransactionStatus.Unknown, LogLevel.Error)]
     public async Task SetTransactionStatus_LogsCorrectMessage_RaceCondition(TransactionStatus? firstReturn, TransactionStatus? secondReturn, LogLevel logLevel)
     {
