@@ -10,10 +10,36 @@ namespace ProjectOrigin.Registry.TransactionStatusCache;
 
 public class RedisTransactionStatusService : ITransactionStatusService
 {
+    private const int MaxRetries = 5;
     private static readonly TimeSpan CacheTime = TimeSpan.FromMinutes(60);
 
+    private static readonly LuaScript AtomicUpdateScript = LuaScript.Prepare(
+        @"local current = redis.call('GET', KEYS[1])
+          local newStatus = tonumber(ARGV[1])
+
+          if current == false then
+              redis.call('SET', KEYS[1], ARGV[2], 'EX', ARGV[3])
+              return {1, 'CREATED'}
+          end
+
+          local currentRecord
+          pcall(function()
+              currentRecord = cjson.decode(current)
+          end)
+          if not currentRecord then
+              return {0, 'INVALID_CURRENT_STATE'}
+          end
+
+          if newStatus < currentRecord.NewStatus then
+              return {0, 'STATUS_DOWNGRADE'}
+          end
+
+          redis.call('SET', KEYS[1], ARGV[2], 'EX', ARGV[3])
+          return {1, 'UPDATED'}"
+    );
+
     private readonly ILogger<RedisTransactionStatusService> _logger;
-    private readonly IConnectionMultiplexer _connectionMultiplexer;
+    private readonly IDatabase _db;
     private readonly ITransactionRepository _transactionRepository;
 
     public RedisTransactionStatusService(
@@ -22,110 +48,106 @@ public class RedisTransactionStatusService : ITransactionStatusService
         ITransactionRepository transactionRepository)
     {
         _logger = logger;
-        _connectionMultiplexer = connectionMultiplexer;
+        _db = connectionMultiplexer.GetDatabase();
         _transactionRepository = transactionRepository;
     }
 
     public async Task<TransactionStatusRecord> GetTransactionStatus(TransactionHash transactionHash)
     {
-        var cacheStatus = await GetRecordAsync(transactionHash);
-        if (cacheStatus is not null)
-        {
-            return cacheStatus;
-        }
-        else
-        {
-            var dbStatus = await _transactionRepository.GetTransactionStatus(transactionHash);
-            var statusRecord = new TransactionStatusRecord(dbStatus);
-            await SafeSetRecord(transactionHash, statusRecord, null);
+        var record = await GetRecordWithConsistencyAsync(transactionHash);
+        if (record != null) return record;
 
-            return statusRecord;
-        }
+        var dbStatus = await _transactionRepository.GetTransactionStatus(transactionHash);
+        var newRecord = new TransactionStatusRecord(dbStatus);
+
+        var result = await TrySetRecordAtomic(transactionHash, newRecord);
+        if (result.Success) return newRecord;
+
+        return (await GetRecordWithConsistencyAsync(transactionHash)) ?? newRecord;
     }
 
     public async Task SetTransactionStatus(TransactionHash transactionHash, TransactionStatusRecord newRecord)
     {
-        _logger.LogTrace("Setting transaction status for {transactionHash} to {newStatus}", transactionHash, newRecord.NewStatus);
+        _logger.LogTrace("Updating status for {hash} to {status}",
+            transactionHash, newRecord.NewStatus);
 
-        var cacheStatus = await GetRecordAsync(transactionHash);
-
-        if (newRecord.NewStatus < cacheStatus?.NewStatus)
+        int attempt = 0;
+        while (attempt < MaxRetries)
         {
-            _logger.LogWarning("Transaction {transactionHash} status in cache is {oldStatus} and is higher than {newStatus}, change aborted.", transactionHash, cacheStatus.NewStatus, newRecord.NewStatus);
-            return;
-        }
+            var result = await TrySetRecordAtomic(transactionHash, newRecord);
 
-        await SafeSetRecord(transactionHash, newRecord, cacheStatus);
-    }
+            if (result.Success) return;
 
-    private async Task SafeSetRecord(TransactionHash transactionHash, TransactionStatusRecord newRecord, TransactionStatusRecord? cacheRecord)
-    {
-        if (cacheRecord is null)
-        {
-            if (await TrySetNewRecordAsync(transactionHash, newRecord))
+            if (result.Error == "STATUS_DOWNGRADE")
+            {
+                _logger.LogWarning("Status downgrade rejected for {hash}", transactionHash);
                 return;
+            }
 
-            var cacheStatus = await GetRecordAsync(transactionHash);
-            if (cacheStatus == null)
-            {
-                _logger.LogError("Transaction {transactionHash} status was null, still null, but failed setting to {newStatus}, retrying.", transactionHash, newRecord.NewStatus);
-
-            }
-            else if (cacheStatus.NewStatus == TransactionStatus.Unknown)
-            {
-                _logger.LogWarning("Transaction {transactionHash} status was unknown while setting to {newStatus}, retrying.", transactionHash, newRecord.NewStatus);
-                await SafeSetRecord(transactionHash, newRecord, cacheRecord);
-            }
-            else
-            {
-                _logger.LogError("Transaction {transactionHash} status was set by another process while setting to {newStatus}, change aborted.", transactionHash, newRecord.NewStatus);
-            }
+            attempt++;
+            await Task.Delay(CalculateBackoff(attempt));
         }
-        else
-        {
-            if (await TryUpdateExistingRecordAsync(transactionHash, newRecord, cacheRecord))
-                return;
 
-            _logger.LogError("Transaction {transactionHash} status was changed by another process while setting to {newStatus}, old state {cacheState}, change aborted.", transactionHash, newRecord.NewStatus, cacheRecord.NewStatus);
-        }
+        _logger.LogError("Failed to update status for {hash} after {attempts} attempts",
+            transactionHash, MaxRetries);
     }
 
-    private async Task<bool> TrySetNewRecordAsync(TransactionHash transactionHash, TransactionStatusRecord newRecord)
+    private async Task<TransactionStatusRecord?> GetRecordWithConsistencyAsync(TransactionHash transactionHash)
     {
-        var redisDatabase = _connectionMultiplexer.GetDatabase();
-
-        return await redisDatabase.StringSetAsync(
+        var redisValue = await _db.StringGetAsync(
             transactionHash,
-            JsonSerializer.Serialize(newRecord),
-            when: When.NotExists,
-            expiry: CacheTime);
+            flags: CommandFlags.DemandMaster
+        );
+
+        if (!redisValue.HasValue) return null;
+
+        await _db.KeyExpireAsync(transactionHash, CacheTime, flags: CommandFlags.DemandMaster);
+        return JsonSerializer.Deserialize<TransactionStatusRecord>(redisValue!);
     }
 
-    private async Task<bool> TryUpdateExistingRecordAsync(TransactionHash transactionHash, TransactionStatusRecord newRecord, TransactionStatusRecord cacheRecord)
+    private async Task<(bool Success, string Error)> TrySetRecordAtomic(
+        TransactionHash transactionHash,
+        TransactionStatusRecord newRecord)
     {
-        var redisDatabase = _connectionMultiplexer.GetDatabase();
+        var serializedNew = JsonSerializer.Serialize(newRecord);
+        var expirySeconds = (int)CacheTime.TotalSeconds;
 
-        var transaction = redisDatabase.CreateTransaction();
-        transaction.AddCondition(Condition.StringEqual(transactionHash, JsonSerializer.Serialize(cacheRecord)));
-        _ = transaction.StringSetAsync(
-            transactionHash,
-            JsonSerializer.Serialize(newRecord),
-            expiry: CacheTime);
-        return await transaction.ExecuteAsync();
-    }
-
-    private async Task<TransactionStatusRecord?> GetRecordAsync(TransactionHash transactionHash)
-    {
-        var redisDatabase = _connectionMultiplexer.GetDatabase();
-
-        var redisValue = await redisDatabase.StringGetAsync(transactionHash);
-
-        if (redisValue.HasValue)
+        var parameters = new
         {
-            await redisDatabase.KeyExpireAsync(transactionHash, CacheTime);
-            return JsonSerializer.Deserialize<TransactionStatusRecord>(redisValue!);
+            keys = new RedisKey[] { transactionHash },
+            argv = new RedisValue[]
+            {
+                (int)newRecord.NewStatus,
+                serializedNew,
+                expirySeconds
+            }
+        };
+
+        try
+        {
+            RedisResult rawResult = await AtomicUpdateScript.EvaluateAsync(
+                db: _db,
+                ps: parameters,
+                flags: CommandFlags.DemandMaster);
+
+            object boxed = rawResult;
+
+            if (boxed is RedisResult[] { Length: >= 2 } resultArray)
+            {
+                bool success = (int)resultArray[0] == 1;
+                string message = resultArray[1].ToString();
+                return (success, success ? string.Empty : message);
+            }
+
+            return (false, "INVALID_RESPONSE");
         }
-        else
-            return null;
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Atomic update failed for {hash}", transactionHash);
+            return (false, "EXECUTION_ERROR");
+        }
     }
+
+    private TimeSpan CalculateBackoff(int attempt) =>
+        TimeSpan.FromMilliseconds(50 * Math.Pow(2, attempt));
 }
