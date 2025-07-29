@@ -1,5 +1,5 @@
 using System;
-using System.Text.Json;
+using System.Text;
 using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
@@ -17,61 +17,84 @@ public class RedisTransactionStatusServiceTests : AbstractTransactionStatusServi
 {
     private readonly Mock<ILogger<RedisTransactionStatusService>> _mockLogger;
     private readonly RedisTransactionStatusService _service;
+    private readonly IConnectionMultiplexer _connection;
 
     public RedisTransactionStatusServiceTests(RedisFixture redisFixture)
     {
-        var connection = ConnectionMultiplexer.Connect(redisFixture.HostConnectionString);
+        _connection = ConnectionMultiplexer.Connect(redisFixture.HostConnectionString);
         _mockLogger = new Mock<ILogger<RedisTransactionStatusService>>();
 
-        _service = new RedisTransactionStatusService(_mockLogger.Object, connection, _repository);
+        _service = new RedisTransactionStatusService(_mockLogger.Object, _connection, _repository);
     }
 
     protected override ITransactionStatusService Service => _service;
     protected override IInvocationList LoggedMessages => _mockLogger.Invocations;
 
     [Theory]
-    [InlineData(null, null, LogLevel.Error)]
-    [InlineData(null, TransactionStatus.Unknown, LogLevel.Warning)]
-    [InlineData(null, TransactionStatus.Pending, LogLevel.Error)]
-    [InlineData(TransactionStatus.Unknown, TransactionStatus.Unknown, LogLevel.Error)]
-    public async Task SetTransactionStatus_LogsCorrectMessage_RaceCondition(TransactionStatus? firstReturn, TransactionStatus? secondReturn, LogLevel logLevel)
+    [InlineData(null, LogLevel.Trace)]
+    [InlineData(TransactionStatus.Committed, LogLevel.Warning)]
+    [InlineData(TransactionStatus.Finalized, LogLevel.Warning)]
+    [InlineData(TransactionStatus.Pending, LogLevel.Error)]
+    public async Task SetTransactionStatus_LogsCorrectLevel(
+        TransactionStatus? initialStatus,
+        LogLevel expectedLevel)
     {
-        // Arrange
+        var txHash = _fixture.Create<TransactionHash>();
+        var db = _connection.GetDatabase();
+        await SeedKeyAsync(db, txHash, initialStatus);
+
+        if (expectedLevel == LogLevel.Error && initialStatus is null)
+        {
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(5);
+                await SeedKeyAsync(db, txHash, TransactionStatus.Finalized);
+            });
+        }
+
         var newRecord = new TransactionStatusRecord(TransactionStatus.Pending);
 
-        var startState = firstReturn.HasValue ? JsonSerializer.Serialize(new TransactionStatusRecord(firstReturn.Value)) : string.Empty;
-        var secondState = secondReturn.HasValue ? JsonSerializer.Serialize(new TransactionStatusRecord(secondReturn.Value)) : string.Empty;
+        await _service.SetTransactionStatus(txHash, newRecord);
 
-        var transactionHash = _fixture.Create<TransactionHash>();
-        var mockMultiplexer = new Mock<IConnectionMultiplexer>();
-        var mockDatabase = new Mock<IDatabase>();
-        var transaction = new Mock<ITransaction>();
-        mockMultiplexer.Setup(m => m.GetDatabase(It.IsAny<int>(), It.IsAny<object>())).Returns(mockDatabase.Object);
+        LoggedMessages.Should().Contain(invocation =>
+            invocation.Method.Name == nameof(ILogger.Log) &&
+            invocation.Arguments[0] is LogLevel &&
+            (LogLevel)invocation.Arguments[0] == expectedLevel);
+    }
 
-        mockDatabase
-            .SetupSequence(db => db.CreateTransaction(It.IsAny<object>()))
-            .Returns(transaction.Object);
-        transaction
-            .Setup(t => t.ExecuteAsync(It.IsAny<CommandFlags>()))
-            .ReturnsAsync(false);
-        mockDatabase
-            .SetupSequence(db => db.StringSetAsync(It.IsAny<RedisKey>(), It.IsAny<RedisValue>(), It.IsAny<TimeSpan?>(), It.IsAny<When>()))
-            .ReturnsAsync(false)
-            .ReturnsAsync(true);
+    private static readonly TimeSpan CacheTime = TimeSpan.FromMinutes(60);
 
-        var service = new RedisTransactionStatusService(_mockLogger.Object, mockMultiplexer.Object, _repository);
+    private static byte[] Encode(TransactionStatusRecord rec)
+    {
+        var msg = string.IsNullOrEmpty(rec.Message)
+            ? Array.Empty<byte>()
+            : Encoding.UTF8.GetBytes(rec.Message);
 
-        mockDatabase
-            .SetupSequence(db => db.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
-            .ReturnsAsync(new RedisValue(startState))
-            .ReturnsAsync(new RedisValue(secondState));
+        var buf = new byte[1 + msg.Length];
+        buf[0] = (byte)rec.NewStatus;
+        if (msg.Length > 0)
+            Buffer.BlockCopy(msg, 0, buf, 1, msg.Length);
+        return buf;
+    }
 
-        // Act
-        await service.SetTransactionStatus(transactionHash, newRecord);
-
-        // Assert
-        LoggedMessages
-            .Should()
-            .Contain(x => x.Method.Name == nameof(ILogger.Log) && x.Arguments[0].Equals(logLevel));
+    private static async Task SeedKeyAsync(
+        IDatabase db,
+        TransactionHash key,
+        TransactionStatus? status)
+    {
+        if (status is null)
+        {
+            await db.KeyDeleteAsync((RedisKey)key);
+        }
+        else
+        {
+            var rec = new TransactionStatusRecord(status.Value);
+            await db.StringSetAsync(
+                (RedisKey)key,
+                (RedisValue)Encode(rec),
+                expiry: CacheTime,
+                when: When.Always);
+        }
     }
 }
+
