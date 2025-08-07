@@ -59,7 +59,7 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
             return null;
 
         var block = await connection.QuerySingleOrDefaultAsync<BlockRecord>(
-            "SELECT * FROM blocks WHERE from_transaction <= @id AND @id <= to_transaction",
+            "SELECT * FROM blocks WHERE int8range(from_transaction, to_transaction, '[]') @> @id",
             new { id });
 
         if (block is null)
@@ -116,7 +116,7 @@ public sealed class PostgresqlRepository : ITransactionRepository, IDisposable
             return TransactionStatus.Unknown;
 
         var hasBeenPublished = await connection.QuerySingleOrDefaultAsync<bool?>(
-            "SELECT publication IS NOT NULL FROM blocks WHERE from_transaction <= @id AND @id <= to_transaction",
+            "SELECT publication IS NOT NULL FROM blocks WHERE int8range(from_transaction, to_transaction, '[]') @> @id",
             new { id });
 
         if (hasBeenPublished.HasValue && hasBeenPublished.Value)
