@@ -1,6 +1,6 @@
 ARG PROJECT=ProjectOrigin.Registry
 
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:9.0.301 AS build
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:9.0.304 AS build
 ARG PROJECT
 
 WORKDIR /builddir

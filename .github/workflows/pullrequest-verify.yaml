@@ -7,19 +7,19 @@ on:
 
 jobs:
   verify-devcontainer:
-    uses: project-origin/.github/.github/workflows/reusable-verify-devcontainer.yaml@5cd6abbccdae9ec7fa5eb13f5deeb746d3611061
+    uses: project-origin/.github/.github/workflows/reusable-verify-devcontainer.yaml@fc1e5df9d97e6fcc5f2ac7bd999b4070e9d57250
 
   verify-code:
-    uses: project-origin/.github/.github/workflows/reusable-verify-code.yaml@5cd6abbccdae9ec7fa5eb13f5deeb746d3611061
+    uses: project-origin/.github/.github/workflows/reusable-verify-code.yaml@fc1e5df9d97e6fcc5f2ac7bd999b4070e9d57250
 
   verify-renovate-config:
-    uses: project-origin/.github/.github/workflows/reusable-verify-renovate.yaml@5cd6abbccdae9ec7fa5eb13f5deeb746d3611061
+    uses: project-origin/.github/.github/workflows/reusable-verify-renovate.yaml@fc1e5df9d97e6fcc5f2ac7bd999b4070e9d57250
 
   verify-chart:
-    uses: project-origin/.github/.github/workflows/reusable-verify-chart.yaml@5cd6abbccdae9ec7fa5eb13f5deeb746d3611061
+    uses: project-origin/.github/.github/workflows/reusable-verify-chart.yaml@fc1e5df9d97e6fcc5f2ac7bd999b4070e9d57250
 
   verify-container-build:
-    uses: project-origin/.github/.github/workflows/reusable-build-push-container-ghcr.yaml@5cd6abbccdae9ec7fa5eb13f5deeb746d3611061
+    uses: project-origin/.github/.github/workflows/reusable-build-push-container-ghcr.yaml@fc1e5df9d97e6fcc5f2ac7bd999b4070e9d57250
     with:
       imagename: ghcr.io/project-origin/registry-server
       version: test
@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-24.04
     environment: testnet
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
 
       - name: Setup .NET Core SDK from global.json
         uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
