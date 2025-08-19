@@ -101,7 +101,15 @@ public class RedisTransactionStatusService : ITransactionStatusService
             newRecord,
             flags: CommandFlags.DemandMaster,
             expiry: CacheTime);
-        return await transaction.ExecuteAsync();
+        var success = await transaction.ExecuteAsync();
+
+        if (!success)
+        {
+            var found = await GetRecordAsync(transactionHash, CommandFlags.PreferMaster);
+            _logger.LogError("Failed to update transaction {transactionHash} status from {cacheRecord} to {newRecord}. Current cache state: {currentState}.", transactionHash, cacheRecord, newRecord, found?.SerializedRecord);
+        }
+
+        return success;
     }
 
     private async Task<CacheRecord?> GetRecordAsync(TransactionHash transactionHash, CommandFlags flags)
