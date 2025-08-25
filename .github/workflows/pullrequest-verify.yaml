@@ -19,7 +19,7 @@ jobs:
     uses: project-origin/.github/.github/workflows/reusable-verify-chart.yaml@8b73fb4eb0fd5b44058e41f2de0edff0d8ce2a41
 
   generate-diagram:
-    uses: project-origin/.github/.github/workflows/reusable-create-diagram.yaml@84d16abd4731ec029678228672f049f4e290c57b
+    uses: project-origin/.github/.github/workflows/reusable-create-diagram.yaml@97b85935916efd424f992c2e9a63dfd20aa4a3f4
     with:
       chart_folder: "./chart"
 
