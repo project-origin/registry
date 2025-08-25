@@ -18,6 +18,11 @@ jobs:
   verify-chart:
     uses: project-origin/.github/.github/workflows/reusable-verify-chart.yaml@8b73fb4eb0fd5b44058e41f2de0edff0d8ce2a41
 
+  generate-diagram:
+    uses: project-origin/.github/.github/workflows/reusable-create-diagram.yaml@f7e90c49051d8fa04aaedd9b0f956524ba14c583
+    with:
+      chart_folder: "./chart"
+
   verify-container-build:
     uses: project-origin/.github/.github/workflows/reusable-build-push-container-ghcr.yaml@8b73fb4eb0fd5b44058e41f2de0edff0d8ce2a41
     with:
