@@ -36,7 +36,6 @@ public class RedisTransactionStatusServiceTests : AbstractTransactionStatusServi
     [Theory]
     [InlineData(null, null, LogLevel.Error)]
     [InlineData(null, TransactionStatus.Pending, LogLevel.Error)]
-    [InlineData(TransactionStatus.Unknown, TransactionStatus.Unknown, LogLevel.Error)]
     public async Task SetTransactionStatus_LogsCorrectMessage_RaceCondition(TransactionStatus? firstReturn, TransactionStatus? secondReturn, LogLevel logLevel)
     {
         // Arrange

@@ -11,6 +11,13 @@ namespace ProjectOrigin.Registry.TransactionStatusCache;
 public class RedisTransactionStatusService : ITransactionStatusService
 {
     private static readonly TimeSpan CacheTime = TimeSpan.FromMinutes(60);
+    private const string SafeSetLua = @"
+if redis.call('GET', KEYS[1]) == ARGV[1] then
+  redis.call('SET', KEYS[1], ARGV[2], 'PX', ARGV[3])
+  return 1
+else
+  return 0
+end";
 
     private readonly ILogger<RedisTransactionStatusService> _logger;
     private readonly IConnectionMultiplexer _connectionMultiplexer;
@@ -94,22 +101,15 @@ public class RedisTransactionStatusService : ITransactionStatusService
     {
         var redisDatabase = _connectionMultiplexer.GetDatabase();
 
-        var transaction = redisDatabase.CreateTransaction();
-        transaction.AddCondition(Condition.StringEqual(transactionHash, cacheRecord));
-        _ = transaction.StringSetAsync(
-            transactionHash,
-            newRecord,
-            flags: CommandFlags.DemandMaster,
-            expiry: CacheTime);
-        var success = await transaction.ExecuteAsync();
+        var result = await redisDatabase.ScriptEvaluateAsync(
+            SafeSetLua,
+            [transactionHash.ToString()],
+            [cacheRecord, newRecord, (long)CacheTime.TotalMilliseconds],
+            flags: CommandFlags.DemandMaster);
 
-        if (!success)
-        {
-            var found = await GetRecordAsync(transactionHash, CommandFlags.PreferMaster);
-            _logger.LogError("Failed to update transaction {transactionHash} status from {cacheRecord} to {newRecord}. Current cache state: {currentState}.", transactionHash, cacheRecord, newRecord, found?.SerializedRecord);
-        }
+        if (result.IsNull) return false;
 
-        return success;
+        return (long)result == 1;
     }
 
     private async Task<CacheRecord?> GetRecordAsync(TransactionHash transactionHash, CommandFlags flags)
@@ -120,7 +120,7 @@ public class RedisTransactionStatusService : ITransactionStatusService
 
         if (redisValue.HasValue)
         {
-            await redisDatabase.KeyExpireAsync(transactionHash, CacheTime);
+            await redisDatabase.KeyExpireAsync(transactionHash, CacheTime, flags);
             var deserialized = JsonSerializer.Deserialize<TransactionStatusRecord>(redisValue!);
             if (deserialized is not null)
             {
