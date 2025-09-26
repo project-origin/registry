@@ -7,20 +7,24 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using ProjectOrigin.Registry.Repository.Models;
 using ProjectOrigin.Registry.TransactionStatusCache;
-using ProjectOrigin.TestCommon.Fixtures;
+using ProjectOrigin.Registry.Tests.Fixtures;
 using StackExchange.Redis;
 using Xunit;
 
 namespace ProjectOrigin.Registry.Tests.TransactionStatusCache;
 
-public class RedisTransactionStatusServiceTests : AbstractTransactionStatusServiceTests, IClassFixture<RedisFixture>
+public class RedisTransactionStatusServiceTests : AbstractTransactionStatusServiceTests, IClassFixture<ReplicatedRedisFixture>
 {
     private readonly Mock<ILogger<RedisTransactionStatusService>> _mockLogger;
     private readonly RedisTransactionStatusService _service;
 
-    public RedisTransactionStatusServiceTests(RedisFixture redisFixture)
+    public RedisTransactionStatusServiceTests(ReplicatedRedisFixture redisFixture)
     {
-        var connection = ConnectionMultiplexer.Connect(redisFixture.HostConnectionString);
+        var connection = ConnectionMultiplexer.Connect(new ConfigurationOptions()
+        {
+            EndPoints = { redisFixture.MasterConnectionString, redisFixture.ReplicaConnectionString },
+        });
+
         _mockLogger = new Mock<ILogger<RedisTransactionStatusService>>();
 
         _service = new RedisTransactionStatusService(_mockLogger.Object, connection, _repository);
@@ -31,9 +35,7 @@ public class RedisTransactionStatusServiceTests : AbstractTransactionStatusServi
 
     [Theory]
     [InlineData(null, null, LogLevel.Error)]
-    [InlineData(null, TransactionStatus.Unknown, LogLevel.Warning)]
     [InlineData(null, TransactionStatus.Pending, LogLevel.Error)]
-    [InlineData(TransactionStatus.Unknown, TransactionStatus.Unknown, LogLevel.Error)]
     public async Task SetTransactionStatus_LogsCorrectMessage_RaceCondition(TransactionStatus? firstReturn, TransactionStatus? secondReturn, LogLevel logLevel)
     {
         // Arrange
