@@ -10,16 +10,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Grpc.Tools" Version="2.72.0">
+    <PackageReference Include="Grpc.Tools" Version="2.83.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="ProjectOrigin.TestCommon" Version="2.0.2" />
-    <PackageReference Include="FluentAssertions" Version="7.2.0" />
+    <PackageReference Include="FluentAssertions" Version="7.2.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="AutoFixture" Version="4.18.1" />
     <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4">
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
